@@ -43,7 +43,7 @@ jobs:
     name: Build & Test PetroGlyph.Games.EawFoc.Client
     strategy:
       matrix:
-        os: windows-latest
+        os: [windows-latest]
         configuration: [Debug, Release]
         dotnet-framework: [5.0.x]
       fail-fast: false
