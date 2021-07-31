@@ -32,3 +32,8 @@ jobs:
       run: dotnet build src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.csproj
       env:
         Configuration: ${{ matrix.configuration }}
+        
+    - name: Test
+      run: dotnet build src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.Test/PetroGlyph.Games.EawFoc.Test.csproj
+      env:
+        Configuration: ${{ matrix.configuration }}    
