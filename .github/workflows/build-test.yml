@@ -1,0 +1,34 @@
+name: PetroglyphGameInfrastructure Build & Test
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build-test-core:
+    name: Build & Test PetroGlyph.Games.EawFoc
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        configuration: [Debug, Release]
+        dotnet-framework: [5.0.x]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ matrix.dotnet-framework }}
+        
+    - name: Build
+      run: dotnet build src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.csproj
+      env:
+        Configuration: ${{ matrix.configuration }}
