@@ -1,7 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <Authors>Anakin Sklavenwalker</Authors>
+    <Company>Republic at War Modding Team</Company>
+    <Product>PetroglyphTools</Product>
+    <Description>Core implementation for the Petroglyph Game infrastructire, providing classes and services to detect and initialize PG Star Wars games (EaW, FoC) and their mods.</Description>
+    <Copyright>2021 - Anakin Sklavenwalker</Copyright>
+    <PackageTags>petroglyph, alamo, glyphx, foc, eaw</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>../../../AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
