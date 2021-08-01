@@ -29,15 +29,15 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ matrix.dotnet-framework }}
+        dotnet-version: '5.0.x'
         
     - name: Build
-      run: dotnet build src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.csproj
+      run: dotnet build src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.csproj -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }}
       env:
         Configuration: ${{ matrix.configuration }}
         
     - name: Test
-      run: dotnet test src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.Test/PetroGlyph.Games.EawFoc.Test.csproj
+      run: dotnet test src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.Test/PetroGlyph.Games.EawFoc.Test.csproj -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }} --no-build --no-restore
       env:
         Configuration: ${{ matrix.configuration }}   
 
