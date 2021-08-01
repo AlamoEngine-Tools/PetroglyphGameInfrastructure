@@ -37,7 +37,7 @@ jobs:
         Configuration: ${{ matrix.configuration }}
         
     - name: Test
-      run: dotnet test src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.Test/PetroGlyph.Games.EawFoc.Test.csproj -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }} --no-build --no-restore
+      run: dotnet test src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.Test/PetroGlyph.Games.EawFoc.Test.csproj -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }} 
       env:
         Configuration: ${{ matrix.configuration }}   
 
