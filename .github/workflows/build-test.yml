@@ -16,7 +16,7 @@ jobs:
         dotnet-framework: [5.0.x, net48]
         exclude:
           - os: ubuntu-latest
-            framework: net48
+            dotnet-framework: net48
       fail-fast: false
     runs-on: ${{ matrix.os }}
     continue-on-error: true
