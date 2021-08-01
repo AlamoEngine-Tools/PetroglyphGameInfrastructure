@@ -2,7 +2,6 @@
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using PetroGlyph.Games.EawFoc.Games;
 using Validation;
@@ -19,24 +18,30 @@ namespace PetroGlyph.Games.EawFoc.Services.Detection
 
         private readonly IDirectoryInfo _directory;
 
-        private static DirectoryGameDetector? _currentDirectoryDetector;
-
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
+        /// <param name="directory">The directory to search for an installation.</param>
+        /// <param name="serviceProvider">The service provider.</param>
         public DirectoryGameDetector(IDirectoryInfo directory, IServiceProvider serviceProvider) : base(serviceProvider, false)
         {
             Requires.NotNull(directory, nameof(directory));
             _directory = directory;
         }
 
+        /// <summary>
+        /// Gets an instance which checks the current process' location for an installation.
+        /// </summary>
+        /// <param name="serviceProvider">the service provider which shall be passed to the instance.</param>
+        /// <returns>The detector instance.</returns>
         public static DirectoryGameDetector CurrentDirectoryGameDetector(IServiceProvider serviceProvider)
         {
-            return LazyInitializer.EnsureInitialized(ref _currentDirectoryDetector, () =>
-            {
-                var fs = new FileSystem();
-                var currentDir = fs.DirectoryInfo.FromDirectoryName(fs.Directory.GetCurrentDirectory());
-                return new DirectoryGameDetector(currentDir, serviceProvider);
-            })!;
+            var fs = new FileSystem();
+            var currentDir = fs.DirectoryInfo.FromDirectoryName(fs.Directory.GetCurrentDirectory());
+            return new DirectoryGameDetector(currentDir, serviceProvider);
         }
 
+        /// <inheritdoc/>
         protected internal override GameLocationData FindGameLocation(GameDetectorOptions options)
         {
             Logger?.LogDebug($"Searching for game {options.Type} at directory: {_directory}");

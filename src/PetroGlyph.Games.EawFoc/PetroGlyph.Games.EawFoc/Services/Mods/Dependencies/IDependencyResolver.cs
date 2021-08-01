@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using EawModinfo.Spec;
 using PetroGlyph.Games.EawFoc.Mods;
 
 namespace PetroGlyph.Games.EawFoc.Services.Dependencies

@@ -175,10 +175,19 @@ namespace PetroGlyph.Games.EawFoc.Services.Detection
         /// </summary>
         protected internal struct GameLocationData
         {
+            /// <summary>
+            /// Nullable location entry.
+            /// </summary>
             public IDirectoryInfo? Location { get; init; }
 
+            /// <summary>
+            /// Indicates whether an initialization is required.
+            /// </summary>
             public bool InitializationRequired { get; init; }
 
+            /// <summary>
+            /// Indicates whether this instance represents an installed game.
+            /// </summary>
             public bool IsInstalled => Location != null || InitializationRequired;
 
             internal void ThrowIfInvalid()
