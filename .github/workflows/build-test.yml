@@ -13,7 +13,10 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
         configuration: [Debug, Release]
-        dotnet-framework: [5.0.x]
+        dotnet-framework: [5.0.x, net48]
+        exclude:
+          - os: ubuntu-latest
+            framework: net48
       fail-fast: false
     runs-on: ${{ matrix.os }}
     continue-on-error: true
