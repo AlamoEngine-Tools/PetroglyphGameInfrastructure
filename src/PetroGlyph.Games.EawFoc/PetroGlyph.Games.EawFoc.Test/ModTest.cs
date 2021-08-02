@@ -50,7 +50,7 @@ namespace PetroGlyph.Games.EawFoc.Test
             var mod = new Mod(game.Object, modDir, false, "Name", sp.Object);
             Assert.Equal("Name", mod.Name);
             Assert.Equal(ModType.Default, mod.Type);
-            Assert.Equal("C:\\Game\\Mods\\A", mod.Identifier);
+            Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/Mods/A" : "C:\\Game\\Mods\\A", mod.Identifier);
             Assert.NotNull(mod.FileService);
             Assert.NotNull(mod.FileSystem);
             Assert.Null(mod.ModinfoFile);

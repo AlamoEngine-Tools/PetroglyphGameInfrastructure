@@ -46,13 +46,29 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             var game = SetupGame(fs, sp.Object);
 
             fs.AddDirectory("Game/Mods/Target");
-            var targetInfo = new ModinfoData("Name")
+
+            IModinfo targetInfo;
+            if (TestUtils.IsUnixLikePlatform)
             {
-                Dependencies = new DependencyList(new List<IModReference>()
+                targetInfo = new ModinfoData("Name")
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
-                }, DependencyResolveLayout.ResolveRecursive)
-            };
+                    Dependencies = new DependencyList(new List<IModReference>()
+                    {
+                        new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x"))
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
+            else
+            {
+                targetInfo = new ModinfoData("Name")
+                {
+                    Dependencies = new DependencyList(new List<IModReference>()
+                    {
+                        new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
+
             var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
 
             fs.AddDirectory("Game/Mods/dep");
@@ -85,13 +101,29 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             var game = SetupGame(fs, sp.Object);
 
             fs.AddDirectory("Game/Mods/Target");
-            var targetInfo = new ModinfoData("Name")
+
+            IModinfo targetInfo;
+            if (TestUtils.IsUnixLikePlatform)
             {
-                Dependencies = new DependencyList(new List<IModReference>
+                targetInfo = new ModinfoData("Name")
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
-                }, DependencyResolveLayout.ResolveRecursive)
-            };
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x"))
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
+            else
+            {
+                targetInfo = new ModinfoData("Name")
+                {
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
+
             var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
 
             fs.AddDirectory("Game/Mods/dep");
@@ -122,13 +154,27 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             var game = SetupGame(fs, sp.Object);
 
             fs.AddDirectory("Game/Mods/Target");
-            var targetInfo = new ModinfoData("Name")
+            IModinfo targetInfo;
+            if (TestUtils.IsUnixLikePlatform)
             {
-                Dependencies = new DependencyList(new List<IModReference>
+                targetInfo = new ModinfoData("Name")
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
-                }, DependencyResolveLayout.ResolveRecursive)
-            };
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x"))
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
+            else
+            {
+                targetInfo = new ModinfoData("Name")
+                {
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
             var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
 
             fs.AddDirectory("Game/Mods/dep");
@@ -159,23 +205,51 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             var game = SetupGame(fs, sp.Object);
 
             fs.AddDirectory("Game/Mods/Target");
-            var targetInfo = new ModinfoData("Name")
+            IModinfo targetInfo;
+            if (TestUtils.IsUnixLikePlatform)
             {
-                Dependencies = new DependencyList(new List<IModReference>
+                targetInfo = new ModinfoData("Name")
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
-                }, DependencyResolveLayout.ResolveRecursive)
-            };
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x"))
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
+            else
+            {
+                targetInfo = new ModinfoData("Name")
+                {
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
             var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
 
             fs.AddDirectory("Game/Mods/dep");
-            var depInfo = new ModinfoData("Dep")
+            IModinfo depInfo;
+            if (TestUtils.IsUnixLikePlatform)
             {
-                Dependencies = new DependencyList(new List<IModReference>
+                depInfo = new ModinfoData("Dep")
                 {
-                    new ModReference("C:\\Game\\Mods\\subdep", ModType.Default)
-                }, DependencyResolveLayout.ResolveRecursive)
-            };
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("/Game/Mods/subdep", ModType.Default)
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
+            else
+            {
+                depInfo = new ModinfoData("Dep")
+                {
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("C:\\Game\\Mods\\subdep", ModType.Default)
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
             var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, sp.Object);
 
             fs.AddDirectory("Game/Mods/subdep");
@@ -213,25 +287,54 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             var game = SetupGame(fs, sp.Object);
 
             fs.AddDirectory("Game/Mods/Target");
-            var targetInfo = new ModinfoData("Name")
+            IModinfo targetInfo;
+            if (TestUtils.IsUnixLikePlatform)
             {
-                Dependencies = new DependencyList(new List<IModReference>
+                targetInfo = new ModinfoData("Name")
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x")),
-                    new ModReference("C:\\Game\\Mods\\dep2", ModType.Default)
-                }, DependencyResolveLayout.ResolveLastItem)
-            };
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x")),
+                        new ModReference("/Game/Mods/dep2", ModType.Default)
+                    }, DependencyResolveLayout.ResolveLastItem)
+                };
+            }
+            else
+            {
+                targetInfo = new ModinfoData("Name")
+                {
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x")),
+                        new ModReference("C:\\Game\\Mods\\dep2", ModType.Default)
+                    }, DependencyResolveLayout.ResolveLastItem)
+                };
+            }
             var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
             targetMod.SetLayout(DependencyResolveLayout.ResolveLastItem);
 
             fs.AddDirectory("Game/Mods/dep");
-            var depInfo = new ModinfoData("Dep")
+            IModinfo depInfo;
+            if (TestUtils.IsUnixLikePlatform)
             {
-                Dependencies = new DependencyList(new List<IModReference>
+                depInfo = new ModinfoData("Dep")
                 {
-                    new ModReference("C:\\Game\\Mods\\subdep", ModType.Default)
-                }, DependencyResolveLayout.ResolveRecursive)
-            };
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("/Game/Mods/subdep", ModType.Default)
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
+            else
+            {
+                depInfo = new ModinfoData("Dep")
+                {
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("C:\\Game\\Mods\\subdep", ModType.Default)
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
             var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, sp.Object);
 
             fs.AddDirectory("Game/Mods/dep2");
@@ -271,25 +374,54 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             var game = SetupGame(fs, sp.Object);
 
             fs.AddDirectory("Game/Mods/Target");
-            var targetInfo = new ModinfoData("Name")
+            IModinfo targetInfo;
+            if (TestUtils.IsUnixLikePlatform)
             {
-                Dependencies = new DependencyList(new List<IModReference>
+                targetInfo = new ModinfoData("Name")
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x")),
-                    new ModReference("C:\\Game\\Mods\\dep2", ModType.Default)
-                }, DependencyResolveLayout.FullResolved)
-            };
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x")),
+                        new ModReference("/Game/Mods/dep2", ModType.Default)
+                    }, DependencyResolveLayout.FullResolved)
+                };
+            }
+            else
+            {
+                targetInfo = new ModinfoData("Name")
+                {
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x")),
+                        new ModReference("C:\\Game\\Mods\\dep2", ModType.Default)
+                    }, DependencyResolveLayout.FullResolved)
+                };
+            }
             var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
             targetMod.SetLayout(DependencyResolveLayout.FullResolved);
 
             fs.AddDirectory("Game/Mods/dep");
-            var depInfo = new ModinfoData("Dep")
+            IModinfo depInfo;
+            if (TestUtils.IsUnixLikePlatform)
             {
-                Dependencies = new DependencyList(new List<IModReference>
+                depInfo = new ModinfoData("Dep")
                 {
-                    new ModReference("C:\\Game\\Mods\\subdep", ModType.Default)
-                }, DependencyResolveLayout.ResolveRecursive)
-            };
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("/Game/Mods/subdep", ModType.Default)
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
+            else
+            {
+                depInfo = new ModinfoData("Dep")
+                {
+                    Dependencies = new DependencyList(new List<IModReference>
+                    {
+                        new ModReference("C:\\Game\\Mods\\subdep", ModType.Default)
+                    }, DependencyResolveLayout.ResolveRecursive)
+                };
+            }
             var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, sp.Object);
 
             fs.AddDirectory("Game/Mods/dep2");

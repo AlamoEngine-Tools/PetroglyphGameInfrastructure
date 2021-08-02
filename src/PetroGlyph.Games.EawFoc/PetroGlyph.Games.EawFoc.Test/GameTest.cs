@@ -204,7 +204,7 @@ namespace PetroGlyph.Games.EawFoc.Test
             var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
             fs.AddDirectory("Game");
             var dataLocation = game.ModsLocation;
-            Assert.Equal("C:\\Game\\Mods", dataLocation.FullName);
+            Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/Mods" : "C:\\Game\\Mods", dataLocation.FullName);
         }
     }
 }

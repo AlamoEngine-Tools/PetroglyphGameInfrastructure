@@ -18,7 +18,10 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices
             fs.AddDirectory("SteamLib/Apps/common/32470/Game");
             fs.AddDirectory("workshop/content/32470");
             var wsDir = SteamGameHelpers.GetWorkshopsLocation(mock.Object);
-            Assert.Equal("C:\\SteamLib\\Apps\\workshop\\content\\32470", wsDir.FullName);
+            Assert.Equal(
+                TestUtils.IsUnixLikePlatform
+                    ? "/SteamLib/Apps/workshop/content/32470"
+                    : "C:\\SteamLib\\Apps\\workshop\\content\\32470", wsDir.FullName);
         }
 
         [Fact]

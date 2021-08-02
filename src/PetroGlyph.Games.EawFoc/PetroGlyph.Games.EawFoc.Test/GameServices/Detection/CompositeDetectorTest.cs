@@ -61,8 +61,7 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection
                     new GameDetectionResult(new GameIdentity(GameType.EaW, GamePlatform.Disk),
                         fs.DirectoryInfo.FromDirectoryName("Game")));
             var result = detector.Detect(options);
-
-            Assert.Equal("C:\\Game", result.GameLocation?.FullName);
+            Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game" : "C:\\Game", result.GameLocation?.FullName);
         }
 
         [Fact]
@@ -80,8 +79,7 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection
                     new GameDetectionResult(new GameIdentity(GameType.EaW, GamePlatform.Disk),
                         fs.DirectoryInfo.FromDirectoryName("Game")));
             var result = detector.Detect(options);
-
-            Assert.Equal("C:\\Game", result.GameLocation?.FullName);
+            Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game" : "C:\\Game", result.GameLocation?.FullName);
         }
     }
 }

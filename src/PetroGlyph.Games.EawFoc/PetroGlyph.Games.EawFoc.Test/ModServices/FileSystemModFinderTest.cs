@@ -70,7 +70,7 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             game.Setup(g => g.ModsLocation).Returns(fs.DirectoryInfo.FromDirectoryName("Game/Mods"));
             var mods = new FileSystemModFinder().FindMods(game.Object);
             var mod = Assert.Single(mods);
-            Assert.Equal("C:\\Game\\Mods\\ModA", mod.Identifier);
+            Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/Mods/ModA" : "C:\\Game\\Mods\\ModA", mod.Identifier);
             Assert.Equal(ModType.Default, mod.Type);
         }
 
@@ -101,7 +101,8 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             game.Setup(g => g.ModsLocation).Returns(fs.DirectoryInfo.FromDirectoryName("Lib/Game/Eaw/Mods"));
             var mods = new FileSystemModFinder().FindMods(game.Object);
             var mod = Assert.Single(mods);
-            Assert.Equal("C:\\Lib\\Game\\Eaw\\Mods\\ModA", mod.Identifier);
+            Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Lib/Game/Eaw/Mods/ModA" : "C:\\Lib\\Game\\Eaw\\Mods\\ModA",
+                mod.Identifier);
             Assert.Equal(ModType.Default, mod.Type);
         }
 

@@ -52,7 +52,7 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices
             game.Setup(g => g.FileService).Returns(fileService.Object);
             var finder = new FallbackGameIconFinder();
             var icon = finder.FindIcon(game.Object);
-            Assert.Equal("C:\\Game\\foc.ico", icon);
+            Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/foc.ico" : "C:\\Game\\foc.ico", icon);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices
             game.Setup(g => g.FileService).Returns(fileService.Object);
             var finder = new FallbackGameIconFinder();
             var icon = finder.FindIcon(game.Object);
-            Assert.Equal("C:\\Game\\eaw.ico", icon);
+            Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/eaw.ico" : "C:\\Game\\eaw.ico", icon);
         }
     }
 }
