@@ -21,7 +21,7 @@ namespace PetroGlyph.Games.EawFoc.Test
         [Fact]
         public void TestLanguage_Throws()
         {
-            var obj = new PlayableObjectMock(() => null);
+            var obj = new PlayableObjectMock(() => null!);
             Assert.Throws<PetroglyphException>(() => obj.InstalledLanguages);
         }
 
