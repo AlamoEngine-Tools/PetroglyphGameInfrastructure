@@ -14,7 +14,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
     /// </summary>
     public abstract class WindowsGameRegistry : IGameRegistry
     {
-        private WindowsReadonlyRegistry? _registry;
+        private WindowsRegistryWrapper? _registry;
 
         private const string VersionKey = "1.0";
         private const string CDKeyProperty = "CD Key";
@@ -159,8 +159,8 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
                 throw new NotSupportedException("This instance is only supported on windows systems");
 
             Requires.NotNullOrEmpty(basePath, nameof(basePath));
-            var rootKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-            _registry = new WindowsReadonlyRegistry(rootKey, basePath);
+            var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+            _registry = new WindowsRegistryWrapper(baseKey, basePath);
             _fileSystem = fileSystem ?? new FileSystem();
         }
 
