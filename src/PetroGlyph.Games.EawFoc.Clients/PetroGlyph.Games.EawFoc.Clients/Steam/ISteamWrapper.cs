@@ -14,7 +14,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
 
         bool IsGameInstalled(uint gameId, out IDirectoryInfo location);
 
-        void StartSteamProcess();
+        void StartSteam();
 
         Task WaitSteamRunningAndLoggedInAsync(CancellationToken cancellation = default);
 

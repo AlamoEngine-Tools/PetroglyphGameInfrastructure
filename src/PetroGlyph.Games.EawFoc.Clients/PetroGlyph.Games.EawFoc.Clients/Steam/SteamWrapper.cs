@@ -9,12 +9,13 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
         public bool Installed { get; }
         public bool IsRunning { get; }
         public bool? WantOfflineMode { get; }
+
         public bool IsGameInstalled(uint gameId, out IDirectoryInfo location)
         {
             throw new System.NotImplementedException();
         }
 
-        public void StartSteamProcess()
+        public void StartSteam()
         {
             throw new System.NotImplementedException();
         }
