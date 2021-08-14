@@ -1,5 +1,5 @@
 ﻿using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using PetroGlyph.Games.EawFoc.Clients.Process;
+using PetroGlyph.Games.EawFoc.Clients.Processes;
 
 namespace PetroGlyph.Games.EawFoc.Clients
 {

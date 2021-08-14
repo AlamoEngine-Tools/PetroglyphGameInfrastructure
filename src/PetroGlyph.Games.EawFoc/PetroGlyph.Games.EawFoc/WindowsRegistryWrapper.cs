@@ -163,6 +163,22 @@ namespace PetroGlyph.Games.EawFoc
         }
 
         /// <inheritdoc/>
+        public string[]? GetSubKeyNames(string subPath)
+        {
+            using var key = GetKey(subPath);
+            if (key is null)
+                return null;
+            try
+            {
+                return key.GetSubKeyNames();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <inheritdoc/>
         public void Dispose()
         {
             RootKey.Dispose();

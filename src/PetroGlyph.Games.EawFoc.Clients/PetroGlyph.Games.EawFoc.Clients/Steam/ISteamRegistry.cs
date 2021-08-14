@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using Microsoft.Win32;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam
 {
     public interface ISteamRegistry : IDisposable
     {
-        int? ActiveUserId { get; internal set; }
+        RegistryKey? ActiveProcessKey { get; }
+
+        int? ActiveUserId { get; set; }
 
         int? ProcessId { get; }
 
@@ -14,6 +17,6 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
 
         IDirectoryInfo? InstallationDirectory { get; }
 
-        ISet<string>? InstalledApps { get; }
+        ISet<uint>? InstalledApps { get; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 #if NET
@@ -17,10 +18,20 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
         private const string SteamActiveUserKey = "ActiveUser";
 
         private const string SteamProcessNode = "ActiveProcess";
+        private const string SteamAppsNode = "Apps";
 
         private WindowsRegistryWrapper? _registry;
         private bool _disposed;
         private readonly IFileSystem _fileSystem;
+
+        public RegistryKey? ActiveProcessKey
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return _registry.GetKey(SteamProcessNode);
+            }
+        }
 
         int? ISteamRegistry.ActiveUserId
         {
@@ -68,7 +79,20 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             }
         }
 
-        public ISet<string>? InstalledApps { get; }
+        public ISet<uint>? InstalledApps
+        {
+            get
+            {
+                ThrowIfDisposed();
+                var keyNames = _registry.GetSubKeyNames(SteamAppsNode);
+                if (keyNames is null)
+                    return null;
+                var ids = keyNames
+                    .Select(n => !uint.TryParse(n, out var id) ? (uint?)0 : id)
+                    .OfType<uint>();
+                return new HashSet<uint>(ids);
+            }
+        }
 
 
         public SteamRegistry(IFileSystem? fileSystem = null)
@@ -76,7 +100,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 throw new PlatformNotSupportedException("This instance is only available on Windows systems.");
             _registry = new WindowsRegistryWrapper(
-                RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default), "Software/Valve/Steam");
+                RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default), "Software\\Valve\\Steam");
             _fileSystem = fileSystem ?? new FileSystem();
         }
 

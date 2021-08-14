@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using PetroGlyph.Games.EawFoc.Clients.NativeMethods;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Threading
@@ -26,7 +27,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Threading
             // and if .NET Core ever adds CoWait support on Windows, we'll still behave properly.
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return NativeMethods.WaitForMultipleObjects((uint)waitHandles.Length, waitHandles, waitAll,
+                return Kernel32.WaitForMultipleObjects((uint)waitHandles.Length, waitHandles, waitAll,
                     (uint)millisecondsTimeout);
             }
 

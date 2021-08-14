@@ -131,5 +131,12 @@ namespace PetroGlyph.Games.EawFoc
         /// <param name="subPath">The sub-path.</param>
         /// <returns><see langword="true"/> if a value was deleted successfully; <see langword="false"/> otherwise.</returns>
         bool DeleteValue(string name, string subPath);
+
+        /// <summary>
+        /// Retrieves an array of strings that contains all the subkey names or <see langword="null"/> if the operation failed.
+        /// </summary>
+        /// <param name="subPath">The sub-path.</param>
+        /// <returns>An array of strings that contains the names of the subkeys for the given <paramref name="subPath"/>.</returns>
+        string[]? GetSubKeyNames(string subPath);
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Process
+namespace PetroGlyph.Games.EawFoc.Clients.Processes
 {
     public interface IGameProcess
     {

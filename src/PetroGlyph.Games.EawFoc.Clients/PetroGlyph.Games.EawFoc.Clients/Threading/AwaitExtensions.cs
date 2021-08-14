@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using Microsoft.Win32.SafeHandles;
+using PetroGlyph.Games.EawFoc.Clients.NativeMethods;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Threading
@@ -88,7 +90,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Threading
                 using var evt = new ManualResetEventSlim();
                 Action registerAction = delegate
                 {
-                    int win32Error = NativeMethods.RegNotifyChangeKeyValue(
+                    int win32Error = Advapi32.RegNotifyChangeKeyValue(
                         registryKeyHandle,
                         watchSubtree,
                         change,
@@ -102,7 +104,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Threading
 
                 if (IsWindows8OrLater)
                 {
-                    change |= NativeMethods.RegNotifyThreadAgnostic;
+                    change |= Advapi32.RegNotifyThreadAgnostic;
                     registerAction();
                 }
                 else

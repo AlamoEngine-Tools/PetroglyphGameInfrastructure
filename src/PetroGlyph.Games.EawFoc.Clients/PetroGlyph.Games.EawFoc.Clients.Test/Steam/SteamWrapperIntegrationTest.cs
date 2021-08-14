@@ -1,0 +1,39 @@
+﻿using System;
+using System.Threading.Tasks;
+using Moq;
+using PetroGlyph.Games.EawFoc.Clients.Steam;
+using Xunit;
+
+namespace PetroGlyph.Games.EawFoc.Clients.Test.Steam
+{
+    public class SteamWrapperIntegrationTest
+    {
+        //[Fact]
+        public void TestGameInstalled()
+        {
+            var sp = new Mock<IServiceProvider>();
+            var steam = new SteamWrapper(new SteamRegistry(), sp.Object);
+
+            var notInstalled = steam.IsGameInstalled(0, out _);
+            var installed = steam.IsGameInstalled(32472, out _);
+        }
+
+        //[Fact]
+        public void Running()
+        {
+            var sp = new Mock<IServiceProvider>();
+            var steam = new SteamWrapper(new SteamRegistry(), sp.Object);
+
+            var running = steam.IsRunning;
+        }
+
+        //[Fact]
+        public async Task WaitRunning()
+        {
+            var sp = new Mock<IServiceProvider>();
+            var steam = new SteamWrapper(new SteamRegistry(), sp.Object);
+
+            await steam.WaitSteamRunningAndLoggedInAsync(false);
+        }
+    }
+}

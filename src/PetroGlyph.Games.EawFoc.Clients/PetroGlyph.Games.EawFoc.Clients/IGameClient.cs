@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using PetroGlyph.Games.EawFoc.Clients.Process;
+using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Games;
 
 namespace PetroGlyph.Games.EawFoc.Clients

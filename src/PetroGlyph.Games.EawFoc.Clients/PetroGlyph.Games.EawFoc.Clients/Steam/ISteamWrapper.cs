@@ -12,12 +12,10 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
 
         bool? WantOfflineMode { get; }
 
-        bool IsGameInstalled(uint gameId, out IDirectoryInfo location);
+        bool IsGameInstalled(uint gameId, out IDirectoryInfo? location);
 
         void StartSteam();
 
-        Task WaitSteamRunningAndLoggedInAsync(CancellationToken cancellation = default);
-
-        Task WaitSteamUserLoggedInAsync(CancellationToken token = default);
+        Task WaitSteamRunningAndLoggedInAsync(bool startIfNotRunning, CancellationToken cancellation = default);
     }
 }
