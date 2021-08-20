@@ -1,6 +1,9 @@
 ﻿using System.IO.Abstractions;
 using System.Threading;
 using System.Threading.Tasks;
+#if NET
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam
 {
@@ -12,7 +15,12 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
 
         bool? WantOfflineMode { get; }
 
+#if NET
+        bool IsGameInstalled(uint gameId, [MaybeNullWhen(false)] out IDirectoryInfo location);
+#else
         bool IsGameInstalled(uint gameId, out IDirectoryInfo? location);
+#endif
+
 
         void StartSteam();
 

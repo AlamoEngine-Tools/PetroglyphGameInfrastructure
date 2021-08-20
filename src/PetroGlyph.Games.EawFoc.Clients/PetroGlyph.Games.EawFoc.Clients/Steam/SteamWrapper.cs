@@ -11,12 +11,16 @@ using PetroGlyph.Games.EawFoc.Clients.NativeMethods;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Clients.Threading;
 using Validation;
+#if NET
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam
 {
     internal class SteamWrapper : ISteamWrapper
     {
         private readonly ISteamRegistry _registry;
+        private readonly IServiceProvider _serviceProvider;
         private readonly IProcessHelper _processHelper;
         private readonly IFileSystem _fileSystem;
 
@@ -40,21 +44,28 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
                 if (steamDirectory is null || !steamDirectory.Exists)
                     return null;
 
-                var configFile = _fileSystem.Path.Combine(steamDirectory.FullName, "config\\loginusers.vdf");
+                var configFile = _fileSystem.Path.Combine(steamDirectory.FullName, "config/loginusers.vdf");
                 if (!_fileSystem.File.Exists(configFile))
                     return null;
 
-                var config = VdfConvert.Deserialize(_fileSystem.File.ReadAllText(configFile)).ToJson();
-                var usersWantingOffline = config.SelectTokens("$..[?(@.WantsOfflineMode=='1')]").ToList();
-                if (!usersWantingOffline.Any())
-                    return false;
+                try
+                {
+                    var config = VdfConvert.Deserialize(_fileSystem.File.ReadAllText(configFile)).ToJson();
+                    var usersWantingOffline = config.SelectTokens("$..[?(@.WantsOfflineMode=='1')]").ToList();
+                    if (!usersWantingOffline.Any())
+                        return false;
 
-                var anyMostRecent = config.SelectTokens("$..[?(@.mostrecent)]");
-                if (!anyMostRecent.Any())
-                    return true;
+                    var anyMostRecent = config.SelectTokens("$..[?(@.mostrecent)]");
+                    if (!anyMostRecent.Any())
+                        return true;
 
-                var mostRecent = usersWantingOffline.FirstOrDefault(x => x.SelectToken("$..[?(@.mostrecent=='1')]") != null);
-                return mostRecent is not null;
+                    var mostRecent = usersWantingOffline.FirstOrDefault(x => x.SelectToken("$..[?(@.mostrecent=='1')]") != null);
+                    return mostRecent is not null;
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
 
@@ -72,19 +83,30 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             Requires.NotNull(registry, nameof(registry));
             Requires.NotNull(serviceProvider, nameof(serviceProvider));
             _registry = registry;
+            _serviceProvider = serviceProvider;
             _processHelper = serviceProvider.GetService<IProcessHelper>() ?? new ProcessHelper();
             _fileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
         }
 
+#if NET
+        public bool IsGameInstalled(uint gameId, [MaybeNullWhen(false)] out IDirectoryInfo location)
+#else
         public bool IsGameInstalled(uint gameId, out IDirectoryInfo? location)
+#endif
         {
             ThrowIfSteamNotInstalled();
             location = null;
             var apps = _registry.InstalledApps;
             if (apps is null)
                 return false;
-            // TODO: Search the game
-            return apps.Contains(gameId);
+
+            var steamInstallDir = _registry.InstallationDirectory;
+            if (!apps.Contains(gameId) || steamInstallDir is null)
+                return false;
+
+            var locationFinder = _serviceProvider.GetService<ISteamGameLocationFinder>() ?? new SteamGameLocationFinder(_serviceProvider);
+            location = locationFinder.FindGame(steamInstallDir, gameId);
+            return location is not null;
         }
 
         public void StartSteam()
