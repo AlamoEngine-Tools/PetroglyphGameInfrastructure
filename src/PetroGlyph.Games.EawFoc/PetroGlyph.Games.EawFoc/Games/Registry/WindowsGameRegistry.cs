@@ -32,6 +32,9 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
         private bool _disposed;
 
         /// <inheritdoc/>
+        public abstract GameType Type { get; }
+
+        /// <inheritdoc/>
         public bool Exits
         {
             get

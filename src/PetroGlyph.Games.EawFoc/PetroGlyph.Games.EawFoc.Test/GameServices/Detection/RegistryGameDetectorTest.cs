@@ -15,8 +15,11 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection
         public void TestInvalidArgs_Throws()
         {
             var registry = new Mock<IGameRegistry>();
-            Assert.Throws<ArgumentNullException>(() => new RegistryGameDetector(null, false, null));
-            Assert.Throws<ArgumentNullException>(() => new RegistryGameDetector(registry.Object, false, null));
+            Assert.Throws<ArgumentNullException>(() => new RegistryGameDetector(null, null, false, null));
+            var sp = new Mock<IServiceProvider>();
+            Assert.Throws<ArgumentNullException>(() => new RegistryGameDetector(registry.Object, null, false, sp.Object));
+            Assert.Throws<ArgumentNullException>(() => new RegistryGameDetector(null, registry.Object, false, sp.Object));
+            Assert.Throws<ArgumentNullException>(() => new RegistryGameDetector(registry.Object, registry.Object, false, null));
         }
 
         [Fact]
@@ -26,7 +29,7 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection
             var registry = new Mock<IGameRegistry>();
             var sp = new Mock<IServiceProvider>();
             sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new RegistryGameDetector(registry.Object, false, sp.Object);
+            var detector = new RegistryGameDetector(registry.Object, registry.Object, false, sp.Object);
             var options = new GameDetectorOptions(GameType.EaW);
             var result = detector.FindGameLocation(options);
             Assert.Null(result.Location);
@@ -40,7 +43,7 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection
             registry.Setup(r => r.Exits).Returns(true);
             var sp = new Mock<IServiceProvider>();
             sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new RegistryGameDetector(registry.Object, false, sp.Object);
+            var detector = new RegistryGameDetector(registry.Object, registry.Object, false, sp.Object);
             var options = new GameDetectorOptions(GameType.EaW);
             var result = detector.FindGameLocation(options);
             Assert.True(result.InitializationRequired);
@@ -56,7 +59,7 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection
             registry.Setup(r => r.ExePath).Returns(fs.FileInfo.FromFileName("Game/sweaw.exe"));
             var sp = new Mock<IServiceProvider>();
             sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new RegistryGameDetector(registry.Object, false, sp.Object);
+            var detector = new RegistryGameDetector(registry.Object, registry.Object, false, sp.Object);
             var options = new GameDetectorOptions(GameType.EaW);
             var result = detector.FindGameLocation(options);
             Assert.NotNull(result.Location);

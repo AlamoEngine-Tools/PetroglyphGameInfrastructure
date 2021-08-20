@@ -10,6 +10,9 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
         private const string FocRegistryPath =
             @"SOFTWARE\LucasArts\Star Wars Empire at War Forces of Corruption";
 
+        /// <inheritdoc/>
+        public override GameType Type => GameType.Foc;
+
         /// <summary>
         /// Creates a new instance
         /// </summary>

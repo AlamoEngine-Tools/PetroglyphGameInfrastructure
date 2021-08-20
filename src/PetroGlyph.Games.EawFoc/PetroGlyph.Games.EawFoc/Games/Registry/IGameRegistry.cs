@@ -9,6 +9,11 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
     public interface IGameRegistry : IDisposable
     {
         /// <summary>
+        /// The <see cref="GameType"/> this registry is dedicated to.
+        /// </summary>
+        GameType Type { get; }
+
+        /// <summary>
         /// Key indication the game exists.
         /// </summary>
         bool Exits { get; }

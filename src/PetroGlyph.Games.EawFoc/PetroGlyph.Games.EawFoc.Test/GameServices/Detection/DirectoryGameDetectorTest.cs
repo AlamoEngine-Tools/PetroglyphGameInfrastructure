@@ -16,8 +16,10 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection
         public void TestInvalidArgs_Throws()
         {
             var fs = new MockFileSystem();
+            var sp = new Mock<IServiceProvider>();
             Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null, null));
             Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Game"), null));
+            Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null, sp.Object));
         }
 
         [Fact]

@@ -10,6 +10,9 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
         private const string EawRegistryPath =
             @"SOFTWARE\LucasArts\Star Wars Empire at War";
 
+        /// <inheritdoc/>
+        public override GameType Type => GameType.EaW;
+
         /// <summary>
         /// Creates a new instance
         /// </summary>
