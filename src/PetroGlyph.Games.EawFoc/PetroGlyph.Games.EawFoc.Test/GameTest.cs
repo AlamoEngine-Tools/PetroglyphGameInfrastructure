@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO.Abstractions.TestingHelpers;
+using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
+using PetroGlyph.Games.EawFoc.Services.Detection;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test
@@ -128,6 +130,8 @@ namespace PetroGlyph.Games.EawFoc.Test
         {
             var fs = new MockFileSystem();
             var sp = new Mock<IServiceProvider>();
+            var builder = new Mock<IModIdentifierBuilder>();
+            sp.Setup(p => p.GetService(typeof(IModIdentifierBuilder))).Returns(builder.Object);
             var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
             var loc = fs.DirectoryInfo.FromDirectoryName("Game");
             var name = "Name";
@@ -150,6 +154,10 @@ namespace PetroGlyph.Games.EawFoc.Test
         {
             var fs = new MockFileSystem();
             var sp = new Mock<IServiceProvider>();
+            var builder = new Mock<IModIdentifierBuilder>();
+            builder.Setup(b => b.Normalize(It.IsAny<IModReference>()))
+                .Returns(new ModReference("bla", ModType.Virtual));
+            sp.Setup(p => p.GetService(typeof(IModIdentifierBuilder))).Returns(builder.Object);
             var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
             var loc = fs.DirectoryInfo.FromDirectoryName("Game");
             var name = "Name";

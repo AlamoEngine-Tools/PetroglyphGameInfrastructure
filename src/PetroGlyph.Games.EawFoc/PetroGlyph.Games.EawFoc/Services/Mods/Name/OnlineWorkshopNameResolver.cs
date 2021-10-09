@@ -13,9 +13,12 @@ namespace PetroGlyph.Games.EawFoc.Services.Name
     /// </summary>
     public class OnlineWorkshopNameResolver : ModNameResolverBase
     {
+        private readonly ISteamGameHelpers _steamHelper;
+
         /// <inheritdoc/>
         public OnlineWorkshopNameResolver(IServiceProvider serviceProvider) : base(serviceProvider)
         {
+            _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
         }
 
         /// <inheritdoc/>
@@ -23,7 +26,7 @@ namespace PetroGlyph.Games.EawFoc.Services.Name
         {
             if (modReference.Type != ModType.Workshops)
                 throw new NotSupportedException("Can only resolve for Steam Workshop mods!");
-            if (!SteamGameHelpers.ToSteamWorkshopsId(modReference.Identifier, out var modId))
+            if (!_steamHelper.ToSteamWorkshopsId(modReference.Identifier, out var modId))
                 throw new InvalidOperationException($"Cannot get SteamID from workshops object {modReference.Identifier}");
 
             var downloader = ServiceProvider.GetService<ISteamWorkshopWebpageDownloader>() ??

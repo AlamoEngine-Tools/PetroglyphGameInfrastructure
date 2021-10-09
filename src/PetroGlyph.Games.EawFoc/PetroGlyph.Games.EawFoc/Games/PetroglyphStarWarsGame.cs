@@ -11,7 +11,7 @@ using PetroGlyph.Games.EawFoc.Services.Detection;
 using PetroGlyph.Games.EawFoc.Services.FileService;
 using PetroGlyph.Games.EawFoc.Services.Icon;
 using PetroGlyph.Games.EawFoc.Services.Language;
-using PetroGlyph.Games.EawFoc.Utilities;
+using Sklavenwalker.CommonUtilities.FileSystem;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Games
@@ -27,6 +27,11 @@ namespace PetroGlyph.Games.EawFoc.Games
         private readonly string _normalizedPath;
         private IPhysicalFileService? _fileService;
         private IDirectoryInfo? _modLocation;
+
+        /// <summary>
+        /// Service for handling file system paths.
+        /// </summary>
+        protected readonly IPathHelperService PathHelperService;
 
         /// <summary>
         /// Shared Service provider instance.
@@ -106,7 +111,9 @@ namespace PetroGlyph.Games.EawFoc.Games
             Platform = gameIdentity.Platform;
             Directory = gameDirectory;
             ServiceProvider = serviceProvider;
-            _normalizedPath = Directory.FileSystem.Path.NormalizePath(Directory.FullName);
+            PathHelperService = serviceProvider.GetService<IPathHelperService>() ??
+                                new PathHelperService(gameDirectory.FileSystem);
+            _normalizedPath = PathHelperService.NormalizePath(Directory.FullName, PathNormalizeOptions.Full);
         }
 
         /// <inheritdoc/>
@@ -149,8 +156,9 @@ namespace PetroGlyph.Games.EawFoc.Games
         /// <inheritdoc/>
         public IMod FindMod(IModReference modReference)
         {
-            // TODO: Normalize reference with location resolver
-            var foundMod = Mods.FirstOrDefault(modReference.Equals);
+            var identifierBuilder = ServiceProvider.GetRequiredService<IModIdentifierBuilder>();
+            var normalized = identifierBuilder.Normalize(modReference);
+            var foundMod = Mods.FirstOrDefault(normalized.Equals);
             if (foundMod is null)
                 throw new ModNotFoundException(modReference, this);
             return foundMod;
@@ -195,7 +203,7 @@ namespace PetroGlyph.Games.EawFoc.Games
             if (Platform != other.Platform)
                 return false;
             var normalizedDirectory =
-                other.Directory.FileSystem.Path.NormalizePath(other.Directory.FullName);
+                PathHelperService.NormalizePath(other.Directory.FullName, PathNormalizeOptions.Full);
             return _normalizedPath.Equals(normalizedDirectory, StringComparison.Ordinal);
         }
 

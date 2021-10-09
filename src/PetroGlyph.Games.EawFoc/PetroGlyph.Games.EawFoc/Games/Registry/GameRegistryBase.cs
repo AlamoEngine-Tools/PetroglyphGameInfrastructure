@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
-using System.Runtime.InteropServices;
-using Microsoft.Win32;
+using Microsoft.Extensions.DependencyInjection;
+using Sklavenwalker.CommonUtilities.Registry;
 using Validation;
 #if NET
 using System.Diagnostics.CodeAnalysis;
@@ -12,9 +12,9 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
     /// <summary>
     /// Windows only registry wrapper for an Petroglyph Star Wars game.
     /// </summary>
-    public abstract class WindowsGameRegistry : IGameRegistry
+    public sealed class GameRegistry : IGameRegistry
     {
-        private WindowsRegistryWrapper? _registry;
+        private IRegistryKey? _registryKey;
 
         private const string VersionKey = "1.0";
         private const string CDKeyProperty = "CD Key";
@@ -32,7 +32,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
         private bool _disposed;
 
         /// <inheritdoc/>
-        public abstract GameType Type { get; }
+        public GameType Type { get; }
 
         /// <inheritdoc/>
         public bool Exits
@@ -40,7 +40,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                return _registry!.GetKey(string.Empty) is not null;
+                return _registryKey.GetKey(string.Empty) is not null;
             }
         }
 
@@ -56,7 +56,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
                 // Currently the there only exists a 1.x release of the game
                 // and likely never to happen that we see a change here.
                 // Thus we leave this part hardcoded and pray PG does not alter the deal.
-                return _registry!.HasPath(VersionKey) ? VersionInstance : null;
+                return _registryKey.HasPath(VersionKey) ? VersionInstance : null;
             }
         }
 
@@ -66,7 +66,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registry!.GetValueOrDefault(CDKeyProperty, VersionKey, out string? value, null))
+                if (!_registryKey.GetValueOrDefault(CDKeyProperty, VersionKey, out string? value, null))
                     return null;
                 return value;
             }
@@ -78,7 +78,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registry!.GetValueOrDefault(EawGoldProperty, VersionKey, out int? value, null))
+                if (!_registryKey.GetValueOrDefault(EawGoldProperty, VersionKey, out int? value, null))
                     return null;
                 return value;
             }
@@ -90,7 +90,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registry!.GetValueOrDefault(ExePathProperty, VersionKey, out string? value, null))
+                if (!_registryKey.GetValueOrDefault(ExePathProperty, VersionKey, out string? value, null))
                     return null;
                 if (string.IsNullOrEmpty(value))
                     return null;
@@ -104,7 +104,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registry!.GetValueOrDefault(InstalledProperty, VersionKey, out bool? value, null))
+                if (!_registryKey.GetValueOrDefault(InstalledProperty, VersionKey, out bool? value, null))
                     return null;
                 return value;
             }
@@ -116,7 +116,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registry!.GetValueOrDefault(InstallPathProperty, VersionKey, out string? value, null))
+                if (!_registryKey.GetValueOrDefault(InstallPathProperty, VersionKey, out string? value, null))
                     return null;
                 if (string.IsNullOrEmpty(value))
                     return null;
@@ -130,7 +130,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registry!.GetValueOrDefault(LauncherProperty, VersionKey, out string? value, null))
+                if (!_registryKey.GetValueOrDefault(LauncherProperty, VersionKey, out string? value, null))
                     return null;
                 if (string.IsNullOrEmpty(value))
                     return null;
@@ -144,7 +144,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registry!.GetValueOrDefault(RevisionProperty, VersionKey, out int? value, null))
+                if (!_registryKey.GetValueOrDefault(RevisionProperty, VersionKey, out int? value, null))
                     return null;
                 return value;
             }
@@ -153,22 +153,18 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
         /// <summary>
         /// Creates a new instance
         /// </summary>
-        /// <param name="basePath">Registry base path</param>
-        /// <param name="fileSystem">Optional custom filesystem implementation.
-        /// Uses the native file system implementation when <see langword="null"/> is passed.</param>
-        protected WindowsGameRegistry(string basePath, IFileSystem? fileSystem = null)
+        /// <param name="gameType">The <see cref="GameType"/> this registry is associated to.</param>
+        /// <param name="registryKey">The root key of the game's registry.</param>
+        /// <param name="serviceProvider">Service provider for this instance.</param>
+        public GameRegistry(GameType gameType, IRegistryKey registryKey, IServiceProvider serviceProvider)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                throw new NotSupportedException("This instance is only supported on windows systems");
-
-            Requires.NotNullOrEmpty(basePath, nameof(basePath));
-            var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-            _registry = new WindowsRegistryWrapper(baseKey, basePath);
-            _fileSystem = fileSystem ?? new FileSystem();
+            Requires.NotNull(registryKey, nameof(registryKey));
+            _registryKey = registryKey;
+            _fileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
         }
 
         /// <inheritdoc/>
-        ~WindowsGameRegistry()
+        ~GameRegistry()
         {
             Dispose(false);
         }
@@ -192,25 +188,25 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
         /// Disposed all managed resources acquired by this instance.
         /// </summary>
         /// <param name="disposing"><see langword="false"/> if called from the destructor; <see langword="true"/> otherwise.</param>
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _registry?.Dispose();
-                _registry = null;
+                _registryKey?.Dispose();
+                _registryKey = null;
                 _disposed = true;
             }
         }
         
 
 #if NET
-        [MemberNotNull(nameof(_registry))]
+        [MemberNotNull(nameof(_registryKey))]
 #endif
         private void ThrowIfDisposed()
         {
             if (_disposed)
                 throw new ObjectDisposedException(ToString());
-            if (_registry is null)
+            if (_registryKey is null)
                 throw new Exception("registry must not be null in non-disposed state");
         }
     }

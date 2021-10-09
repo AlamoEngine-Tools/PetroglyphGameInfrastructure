@@ -7,6 +7,7 @@ using EawModinfo.File;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using EawModinfo.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Detection;
@@ -18,12 +19,6 @@ namespace PetroGlyph.Games.EawFoc.Services
     /// <inheritdoc/>
     public class ModFactory : IModFactory
     {
-        /// <summary>
-        /// Default service instance to get the location of a a <see cref="IModReference"/> 
-        /// </summary>
-        public static readonly IModReferenceLocationResolver DefaultLocationResolver =
-            new ModReferenceLocationResolver();
-
         private static readonly Func<IDirectoryInfo, IModinfoFileFinder> DefaultModinfoFileFinderFactory =
             ModinfoFileFinderFactory;
 
@@ -43,68 +38,31 @@ namespace PetroGlyph.Games.EawFoc.Services
         /// </summary>
         /// <param name="serviceProvider">Service provider which gets passed to an <see cref="IMod"/> instance.</param>
         public ModFactory(IServiceProvider serviceProvider)
-            : this(DefaultLocationResolver, DefaultModinfoFileFinderFactory,
-                CompositeModNameResolver.CreateDefaultModNameResolver(serviceProvider), CultureInfo.InvariantCulture, serviceProvider)
+            : this(DefaultModinfoFileFinderFactory, CultureInfo.InvariantCulture, serviceProvider)
         {
         }
 
         /// <summary>
         /// Creates a new mod factory.
         /// </summary>
-        /// <param name="referenceLocationResolver">Instance to resolve a <see cref="IModReference"/>'s location.</param>
-        /// <param name="serviceProvider">Service provider which gets passed to an <see cref="IMod"/> instance.</param>
-        public ModFactory(IModReferenceLocationResolver referenceLocationResolver, IServiceProvider serviceProvider)
-            : this(referenceLocationResolver, DefaultModinfoFileFinderFactory,
-                CompositeModNameResolver.CreateDefaultModNameResolver(serviceProvider), CultureInfo.InvariantCulture, serviceProvider)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new mod factory.
-        /// </summary>
-        /// <param name="referenceLocationResolver">Instance to resolve a <see cref="IModReference"/>'s location.</param>
-        /// <param name="nameResolver">The mod's name resolver instance.</param>
-        /// <param name="serviceProvider">Service provider which gets passed to an <see cref="IMod"/> instance.</param>
-        public ModFactory(
-            IModReferenceLocationResolver referenceLocationResolver,
-            IModNameResolver nameResolver,
-            IServiceProvider serviceProvider)
-            : this(referenceLocationResolver, DefaultModinfoFileFinderFactory, nameResolver,
-                CultureInfo.InvariantCulture, serviceProvider)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new mod factory.
-        /// </summary>
-        /// <param name="referenceLocationResolver">Instance to resolve a <see cref="IModReference"/>'s location.</param>
-        /// <param name="nameResolver">The mod's name resolver instance.</param>
         /// <param name="culture">The culture which shall get used to resolve a mod's name.</param>
         /// <param name="serviceProvider">Service provider which gets passed to an <see cref="IMod"/> instance.</param>
-        public ModFactory(
-            IModReferenceLocationResolver referenceLocationResolver,
-            IModNameResolver nameResolver,
-            CultureInfo culture,
-            IServiceProvider serviceProvider)
-            : this(referenceLocationResolver, DefaultModinfoFileFinderFactory, nameResolver, culture, serviceProvider)
+        public ModFactory(CultureInfo culture, IServiceProvider serviceProvider)
+            : this(DefaultModinfoFileFinderFactory, culture, serviceProvider)
         {
         }
 
         internal ModFactory(
-            IModReferenceLocationResolver referenceLocationResolver,
             Func<IDirectoryInfo, IModinfoFileFinder> defaultModinfoFileFinderFactory,
-            IModNameResolver nameResolver,
             CultureInfo culture,
             IServiceProvider serviceProvider)
         {
-            Requires.NotNull(referenceLocationResolver, nameof(referenceLocationResolver));
             Requires.NotNull(defaultModinfoFileFinderFactory, nameof(defaultModinfoFileFinderFactory));
-            Requires.NotNull(nameResolver, nameof(nameResolver));
             Requires.NotNull(culture, nameof(culture));
             Requires.NotNull(serviceProvider, nameof(serviceProvider));
-            _referenceLocationResolver = referenceLocationResolver;
+            _referenceLocationResolver = serviceProvider.GetRequiredService<IModReferenceLocationResolver>();
             _defaultModinfoFileFinderFactory = defaultModinfoFileFinderFactory;
-            _nameResolver = nameResolver;
+            _nameResolver = serviceProvider.GetRequiredService<IModNameResolver>();
             _culture = culture;
             _serviceProvider = serviceProvider;
         }

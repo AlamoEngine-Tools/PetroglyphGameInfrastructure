@@ -2,10 +2,10 @@
 using System.IO.Abstractions;
 using System.Linq;
 using EawModinfo.Spec;
+using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Steam;
-using PetroGlyph.Games.EawFoc.Utilities;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Detection
@@ -13,6 +13,17 @@ namespace PetroGlyph.Games.EawFoc.Services.Detection
     /// <inheritdoc cref="IModReferenceLocationResolver"/>
     public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
     {
+        private readonly ISteamGameHelpers _steamHelper;
+
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider.</param>
+        public ModReferenceLocationResolver(IServiceProvider serviceProvider)
+        {
+            _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
+        }
+
         /// <inheritdoc/>
         public IDirectoryInfo ResolveLocation(IModReference mod, IGame game)
         {
@@ -29,13 +40,13 @@ namespace PetroGlyph.Games.EawFoc.Services.Detection
             };
         }
 
-        private static IDirectoryInfo ResolveWorkshopsMod(IModReference mod, IGame game)
+        private IDirectoryInfo ResolveWorkshopsMod(IModReference mod, IGame game)
         {
-            var workshopPath = SteamGameHelpers.GetWorkshopsLocation(game);
+            var workshopPath = _steamHelper.GetWorkshopsLocation(game);
             if (!workshopPath.Exists)
                 throw new SteamException("Could not find workshops location");
 
-            if (!SteamGameHelpers.ToSteamWorkshopsId(mod.Identifier, out var steamId))
+            if (!_steamHelper.ToSteamWorkshopsId(mod.Identifier, out var steamId))
                 throw new SteamException("Mod identifier cannot be interpreted as an Steam-ID");
 
             var modLocation = workshopPath.EnumerateDirectories(steamId.ToString()).FirstOrDefault();
@@ -47,18 +58,16 @@ namespace PetroGlyph.Games.EawFoc.Services.Detection
 
         private static IDirectoryInfo ResolveNormalMod(IModReference mod, IGame game)
         {
-            if (!game.Directory.FileSystem.IsValidDirectoryPath(mod.Identifier))
-                throw new ModException("Mod identifier cannot be interpreted as an absolute or relative path");
+            var fs = game.Directory.FileSystem;
+            var pathUtilities = new Sklavenwalker.CommonUtilities.FileSystem.PathHelperService(fs);
+            var modIdentifier = mod.Identifier;
 
-            if (!PathUtilities.IsAbsolute(game.Directory.FullName))
+            if (!pathUtilities.IsAbsolute(game.Directory.FullName))
                 throw new GameException("Game path must be absolute");
 
-
-            var fs = game.Directory.FileSystem;
-            var modIdentifier = mod.Identifier;
-            if (PathUtilities.IsAbsolute(modIdentifier))
+            if (pathUtilities.IsAbsolute(modIdentifier))
             {
-                if (!PathUtilities.IsChildOf(game.Directory.FullName, modIdentifier))
+                if (!pathUtilities.IsChildOf(game.Directory.FullName, modIdentifier))
                     throw new PetroglyphException("Mod and game must share the same path.");
                 return fs.DirectoryInfo.FromDirectoryName(modIdentifier);
             }

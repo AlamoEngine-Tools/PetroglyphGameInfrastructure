@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using EawModinfo.Spec;
+using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
+using PetroGlyph.Games.EawFoc.Services.Detection;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Mods
@@ -119,8 +121,8 @@ namespace PetroGlyph.Games.EawFoc.Mods
 
         private string CalculateIdentifier()
         {
-            var id = Dependencies.Aggregate(Name, (current, dependency) => current + dependency.GetHashCode());
-            return id.GetHashCode().ToString();
+            var builder = ServiceProvider.GetService<IModIdentifierBuilder>() ?? new ModIdentifierBuilder(ServiceProvider);
+            return builder.Build(this);
         }
     }
 }

@@ -5,7 +5,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
-using Moq;
+using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
@@ -16,17 +16,27 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
 {
     public class ModDependencyResolverIntegrationTest
     {
+        private readonly IGame _game;
+        private readonly MockFileSystem _fileSystem;
+        private readonly IServiceProvider _serviceProvider;
+
+        public ModDependencyResolverIntegrationTest()
+        {
+            _fileSystem = new MockFileSystem();
+            var sc = new ServiceCollection();
+            sc.AddSingleton<IFileSystem>(_fileSystem);
+            PetroglyphGameInfrastructureLibrary.InilializeLibraryWithDefaultServices(sc);
+            _serviceProvider = sc.BuildServiceProvider();
+            _game = SetupGame(_fileSystem, _serviceProvider);
+        }
+
         [Fact]
         public void TestNoDependencies()
         {
-            var fs = new MockFileSystem();
-            var sp = new Mock<IServiceProvider>();
-            var game = SetupGame(fs, sp.Object);
+            _fileSystem.AddDirectory("Game/Mods/Target");
+            var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, "Name", _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/Target");
-            var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, "Name", sp.Object);
-
-            var resolver = new ModDependencyResolver(sp.Object);
+            var resolver = new ModDependencyResolver(_serviceProvider);
 
             Assert.Equal(DependencyResolveStatus.None, targetMod.DependencyResolveStatus);
 
@@ -41,11 +51,7 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestResolveDependency()
         {
-            var fs = new MockFileSystem();
-            var sp = new Mock<IServiceProvider>();
-            var game = SetupGame(fs, sp.Object);
-
-            fs.AddDirectory("Game/Mods/Target");
+            _fileSystem.AddDirectory("Game/Mods/Target");
 
             IModinfo targetInfo;
             if (TestUtils.IsUnixLikePlatform)
@@ -69,16 +75,16 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                 };
             }
 
-            var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
+            var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/dep");
-            var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", sp.Object);
+            _fileSystem.AddDirectory("Game/Mods/dep");
+            var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", _serviceProvider);
 
 
-            game.AddMod(targetMod);
-            game.AddMod(depMod);
+            _game.AddMod(targetMod);
+            _game.AddMod(depMod);
 
-            var resolver = new ModDependencyResolver(sp.Object);
+            var resolver = new ModDependencyResolver(_serviceProvider);
 
             Assert.Equal(DependencyResolveStatus.None, targetMod.DependencyResolveStatus);
 
@@ -96,11 +102,7 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestResolveDependencyIgnoreCycle()
         {
-            var fs = new MockFileSystem();
-            var sp = new Mock<IServiceProvider>();
-            var game = SetupGame(fs, sp.Object);
-
-            fs.AddDirectory("Game/Mods/Target");
+            _fileSystem.AddDirectory("Game/Mods/Target");
 
             IModinfo targetInfo;
             if (TestUtils.IsUnixLikePlatform)
@@ -124,18 +126,18 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                 };
             }
 
-            var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
+            var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/dep");
-            var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", sp.Object);
+            _fileSystem.AddDirectory("Game/Mods/dep");
+            var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", _serviceProvider);
             depMod.SetStatus(DependencyResolveStatus.Resolved);
             depMod.DependencyAction(l => l.Add(new ModDependencyEntry(targetMod)));
 
 
-            game.AddMod(targetMod);
-            game.AddMod(depMod);
+            _game.AddMod(targetMod);
+            _game.AddMod(depMod);
 
-            var resolver = new ModDependencyResolver(sp.Object);
+            var resolver = new ModDependencyResolver(_serviceProvider);
 
             Assert.Equal(DependencyResolveStatus.None, targetMod.DependencyResolveStatus);
 
@@ -149,11 +151,7 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestResolveDependencyCycle_Throws()
         {
-            var fs = new MockFileSystem();
-            var sp = new Mock<IServiceProvider>();
-            var game = SetupGame(fs, sp.Object);
-
-            fs.AddDirectory("Game/Mods/Target");
+            _fileSystem.AddDirectory("Game/Mods/Target");
             IModinfo targetInfo;
             if (TestUtils.IsUnixLikePlatform)
             {
@@ -175,18 +173,18 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                     }, DependencyResolveLayout.ResolveRecursive)
                 };
             }
-            var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
+            var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/dep");
-            var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", sp.Object);
+            _fileSystem.AddDirectory("Game/Mods/dep");
+            var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", _serviceProvider);
             depMod.SetStatus(DependencyResolveStatus.Resolved);
             depMod.DependencyAction(l => l.Add(new ModDependencyEntry(targetMod)));
 
 
-            game.AddMod(targetMod);
-            game.AddMod(depMod);
+            _game.AddMod(targetMod);
+            _game.AddMod(depMod);
 
-            var resolver = new ModDependencyResolver(sp.Object);
+            var resolver = new ModDependencyResolver(_serviceProvider);
 
             Assert.Equal(DependencyResolveStatus.None, targetMod.DependencyResolveStatus);
 
@@ -200,11 +198,7 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestResolveDependencyChain()
         {
-            var fs = new MockFileSystem();
-            var sp = new Mock<IServiceProvider>();
-            var game = SetupGame(fs, sp.Object);
-
-            fs.AddDirectory("Game/Mods/Target");
+            _fileSystem.AddDirectory("Game/Mods/Target");
             IModinfo targetInfo;
             if (TestUtils.IsUnixLikePlatform)
             {
@@ -226,9 +220,9 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                     }, DependencyResolveLayout.ResolveRecursive)
                 };
             }
-            var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
+            var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/dep");
+            _fileSystem.AddDirectory("Game/Mods/dep");
             IModinfo depInfo;
             if (TestUtils.IsUnixLikePlatform)
             {
@@ -250,17 +244,17 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                     }, DependencyResolveLayout.ResolveRecursive)
                 };
             }
-            var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, sp.Object);
+            var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/subdep");
-            var subDepMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/subdep"), false, "SubDep", sp.Object);
+            _fileSystem.AddDirectory("Game/Mods/subdep");
+            var subDepMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/subdep"), false, "SubDep", _serviceProvider);
 
 
-            game.AddMod(targetMod);
-            game.AddMod(depMod);
-            game.AddMod(subDepMod);
+            _game.AddMod(targetMod);
+            _game.AddMod(depMod);
+            _game.AddMod(subDepMod);
 
-            var resolver = new ModDependencyResolver(sp.Object);
+            var resolver = new ModDependencyResolver(_serviceProvider);
 
             Assert.Equal(DependencyResolveStatus.None, targetMod.DependencyResolveStatus);
 
@@ -282,11 +276,7 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestResolveDependencyChainLayoutLastItem()
         {
-            var fs = new MockFileSystem();
-            var sp = new Mock<IServiceProvider>();
-            var game = SetupGame(fs, sp.Object);
-
-            fs.AddDirectory("Game/Mods/Target");
+            _fileSystem.AddDirectory("Game/Mods/Target");
             IModinfo targetInfo;
             if (TestUtils.IsUnixLikePlatform)
             {
@@ -310,10 +300,10 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                     }, DependencyResolveLayout.ResolveLastItem)
                 };
             }
-            var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
+            var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
             targetMod.SetLayout(DependencyResolveLayout.ResolveLastItem);
 
-            fs.AddDirectory("Game/Mods/dep");
+            _fileSystem.AddDirectory("Game/Mods/dep");
             IModinfo depInfo;
             if (TestUtils.IsUnixLikePlatform)
             {
@@ -335,21 +325,21 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                     }, DependencyResolveLayout.ResolveRecursive)
                 };
             }
-            var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, sp.Object);
+            var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/dep2");
-            var dep2Mod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep2"), false, "Dep2", sp.Object);
+            _fileSystem.AddDirectory("Game/Mods/dep2");
+            var dep2Mod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep2"), false, "Dep2", _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/subdep");
-            var subDepMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/subdep"), false, "SubDep", sp.Object);
+            _fileSystem.AddDirectory("Game/Mods/subdep");
+            var subDepMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/subdep"), false, "SubDep", _serviceProvider);
 
 
-            game.AddMod(targetMod);
-            game.AddMod(depMod);
-            game.AddMod(dep2Mod);
-            game.AddMod(subDepMod);
+            _game.AddMod(targetMod);
+            _game.AddMod(depMod);
+            _game.AddMod(dep2Mod);
+            _game.AddMod(subDepMod);
 
-            var resolver = new ModDependencyResolver(sp.Object);
+            var resolver = new ModDependencyResolver(_serviceProvider);
 
             Assert.Equal(DependencyResolveStatus.None, targetMod.DependencyResolveStatus);
 
@@ -369,11 +359,7 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestResolveDependencyChainLayoutFullResolved()
         {
-            var fs = new MockFileSystem();
-            var sp = new Mock<IServiceProvider>();
-            var game = SetupGame(fs, sp.Object);
-
-            fs.AddDirectory("Game/Mods/Target");
+            _fileSystem.AddDirectory("Game/Mods/Target");
             IModinfo targetInfo;
             if (TestUtils.IsUnixLikePlatform)
             {
@@ -397,10 +383,10 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                     }, DependencyResolveLayout.FullResolved)
                 };
             }
-            var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, sp.Object);
+            var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
             targetMod.SetLayout(DependencyResolveLayout.FullResolved);
 
-            fs.AddDirectory("Game/Mods/dep");
+            _fileSystem.AddDirectory("Game/Mods/dep");
             IModinfo depInfo;
             if (TestUtils.IsUnixLikePlatform)
             {
@@ -422,21 +408,21 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                     }, DependencyResolveLayout.ResolveRecursive)
                 };
             }
-            var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, sp.Object);
+            var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/dep2");
-            var dep2Mod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep2"), false, "Dep2", sp.Object);
+            _fileSystem.AddDirectory("Game/Mods/dep2");
+            var dep2Mod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep2"), false, "Dep2", _serviceProvider);
 
-            fs.AddDirectory("Game/Mods/subdep");
-            var subDepMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/subdep"), false, "SubDep", sp.Object);
+            _fileSystem.AddDirectory("Game/Mods/subdep");
+            var subDepMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/subdep"), false, "SubDep", _serviceProvider);
 
 
-            game.AddMod(targetMod);
-            game.AddMod(depMod);
-            game.AddMod(dep2Mod);
-            game.AddMod(subDepMod);
+            _game.AddMod(targetMod);
+            _game.AddMod(depMod);
+            _game.AddMod(dep2Mod);
+            _game.AddMod(subDepMod);
 
-            var resolver = new ModDependencyResolver(sp.Object);
+            var resolver = new ModDependencyResolver(_serviceProvider);
 
             Assert.Equal(DependencyResolveStatus.None, targetMod.DependencyResolveStatus);
 

@@ -3,8 +3,9 @@ using System.IO.Abstractions;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
+using PetroGlyph.Games.EawFoc.Services.Detection;
 using PetroGlyph.Games.EawFoc.Services.FileService;
-using PetroGlyph.Games.EawFoc.Utilities;
+using Sklavenwalker.CommonUtilities.FileSystem;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Mods
@@ -15,8 +16,14 @@ namespace PetroGlyph.Games.EawFoc.Mods
     public class Mod : ModBase, IPhysicalMod
     {
         private IPhysicalFileService? _fileService;
+        private string? _identifier;
 
         internal string InternalPath { get; }
+
+        /// <summary>
+        /// Service for handling file system paths.
+        /// </summary>
+        protected readonly IPathHelperService PathHelperService;
 
         /// <inheritdoc/>
         public IDirectoryInfo Directory { get; }
@@ -31,7 +38,8 @@ namespace PetroGlyph.Games.EawFoc.Mods
             {
                 if (_fileService is not null)
                     return _fileService;
-                var fs = ServiceProvider.GetService<IPhysicalFileServiceTest>() ?? (IPhysicalFileService?)new DefaultFileService(this);
+                var fs = ServiceProvider.GetService<IPhysicalFileServiceTest>() ??
+                         (IPhysicalFileService?)new DefaultFileService(this);
                 _fileService = fs!;
                 return _fileService;
             }
@@ -49,13 +57,13 @@ namespace PetroGlyph.Games.EawFoc.Mods
         {
             get
             {
-                return Type switch
+                if (string.IsNullOrEmpty(_identifier))
                 {
-                    ModType.Default => InternalPath,
-                    ModType.Workshops => Directory.Name,
-                    ModType.Virtual => throw new ModException($"Instance of {GetType()} must not be virtual."),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                    var identifierBuilder = ServiceProvider.GetService<IModIdentifierBuilder>()
+                                            ?? new ModIdentifierBuilder(ServiceProvider);
+                    _identifier = identifierBuilder.Build(this);
+                }
+                return _identifier;
             }
         }
 
@@ -74,6 +82,8 @@ namespace PetroGlyph.Games.EawFoc.Mods
             Requires.NotNull(serviceProvider, nameof(serviceProvider));
             ModinfoFile = modinfoFile;
             Directory = modDirectory;
+            PathHelperService = serviceProvider.GetService<IPathHelperService>() ??
+                                new PathHelperService(modDirectory.FileSystem);
             InternalPath = CreateInternalPath(modDirectory);
         }
 
@@ -92,6 +102,8 @@ namespace PetroGlyph.Games.EawFoc.Mods
             Requires.NotNullOrEmpty(name, nameof(name));
             Requires.NotNull(serviceProvider, nameof(serviceProvider));
             Directory = modDirectory;
+            PathHelperService = serviceProvider.GetService<IPathHelperService>() ??
+                                new PathHelperService(modDirectory.FileSystem);
             InternalPath = CreateInternalPath(modDirectory);
         }
 
@@ -111,12 +123,14 @@ namespace PetroGlyph.Games.EawFoc.Mods
             if (!modDirectory.Exists)
                 throw new ModException($"The mod's directory '{modDirectory.FullName}' does not exists.");
             Directory = modDirectory;
+            PathHelperService = serviceProvider.GetService<IPathHelperService>() ??
+                                new PathHelperService(modDirectory.FileSystem);
             InternalPath = CreateInternalPath(modDirectory);
         }
 
-        internal static string CreateInternalPath(IDirectoryInfo directory)
+        internal string CreateInternalPath(IDirectoryInfo directory)
         {
-            return directory.FileSystem.Path.NormalizePath(directory.FullName);
+            return PathHelperService.NormalizePath(directory.FullName, PathNormalizeOptions.Full);
         }
     }
 }

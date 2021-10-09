@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services;
@@ -16,58 +18,62 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
 {
     public class ModFactoryTest
     {
+        private readonly ModFactory _service;
+        private readonly Mock<IModNameResolver> _nameResolver;
+        private readonly Mock<IModinfoFileFinder> _modInfoFinder;
+        private readonly Mock<IModReferenceLocationResolver> _locationResolver;
+        private readonly MockFileSystem _fileSystem;
+
+        public ModFactoryTest()
+        {
+            var sc = new ServiceCollection();
+            _nameResolver = new Mock<IModNameResolver>();
+            _modInfoFinder = new Mock<IModinfoFileFinder>();
+            _locationResolver = new Mock<IModReferenceLocationResolver>();
+            _fileSystem = new MockFileSystem();
+
+            sc.AddTransient(_ => _nameResolver.Object);
+            sc.AddTransient(_ => _locationResolver.Object);
+            sc.AddTransient<IFileSystem>(_ => _fileSystem);
+
+            _service = new ModFactory(_ => _modInfoFinder.Object, CultureInfo.InvariantCulture, sc.BuildServiceProvider());
+        }
+
+
         [Fact]
         public void NullCtor_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => new ModFactory(null));
             Assert.Throws<ArgumentNullException>(() => new ModFactory(null, null, null));
-            Assert.Throws<ArgumentNullException>(() => new ModFactory(null, null, null, null));
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            Assert.Throws<ArgumentNullException>(() => new ModFactory(locResolver.Object, null));
         }
 
         [Fact]
         public void TestModInfoSpecCreation_NoModinfoFiles()
         {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Mods/Name");
+            _fileSystem.AddDirectory("Mods/Name");
             var game = new Mock<IGame>();
-            var sp = new Mock<IServiceProvider>();
-            var modLoc = fs.DirectoryInfo.FromDirectoryName("Mods/Name");
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            locResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+            var modLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Mods/Name");
+            _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
                 .Returns(modLoc);
 
-            var nameResolver = new Mock<IModNameResolver>();
-            nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+            _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
 
-            var modinfoFinder = new Mock<IModinfoFileFinder>();
-            modinfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
+            _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
                 .Returns(new ModinfoFinderCollection(modLoc));
-
-            var factory = new ModFactory(locResolver.Object, _ => modinfoFinder.Object, nameResolver.Object,
-                CultureInfo.InvariantCulture, sp.Object);
 
             var modRef = new ModReference("Mods/Name", ModType.Default);
 
-            var mods = factory.FromReference(game.Object, modRef);
+            var mods = _service.FromReference(game.Object, modRef);
             Assert.Single(mods);
         }
 
         [Fact]
         public void TestModInfoSpecCreation_MainModinfoFiles()
         {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Mods/Name");
+            _fileSystem.AddDirectory("Mods/Name");
             var game = new Mock<IGame>();
-            var sp = new Mock<IServiceProvider>();
-            var modLoc = fs.DirectoryInfo.FromDirectoryName("Mods/Name");
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            locResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+            var modLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Mods/Name");
+            _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
                 .Returns(modLoc);
-
-            var nameResolver = new Mock<IModNameResolver>();
-
             var modinfo = new Mock<IModinfo>();
             modinfo.Setup(m => m.Name).Returns("MyName");
             modinfo.Setup(m => m.Dependencies)
@@ -76,32 +82,23 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             var mainFile = new Mock<IModinfoFile>();
             mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
             mainFile.Setup(m => m.GetModinfo()).Returns(modinfo.Object);
-            var modinfoFinder = new Mock<IModinfoFileFinder>();
-            modinfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
+            _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
                 .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
-
-            var factory = new ModFactory(locResolver.Object, _ => modinfoFinder.Object, nameResolver.Object,
-                CultureInfo.InvariantCulture, sp.Object);
 
             var modRef = new ModReference("Mods/Name", ModType.Default);
 
-            var mods = factory.FromReference(game.Object, modRef);
+            var mods = _service.FromReference(game.Object, modRef);
             Assert.Single(mods);
         }
 
         [Fact]
         public void TestModInfoSpecCreation_VariantsOnly()
         {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Mods/Name");
+            _fileSystem.AddDirectory("Mods/Name");
             var game = new Mock<IGame>();
-            var sp = new Mock<IServiceProvider>();
-            var modLoc = fs.DirectoryInfo.FromDirectoryName("Mods/Name");
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            locResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+            var modLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Mods/Name");
+            _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
                 .Returns(modLoc);
-
-            var nameResolver = new Mock<IModNameResolver>();
 
             var variantA = new Mock<IModinfo>();
             variantA.Setup(m => m.Name).Returns("MyNameA");
@@ -121,45 +118,33 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             variantFileB.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
             variantFileB.Setup(m => m.GetModinfo()).Returns(variantB.Object);
 
-            var modinfoFinder = new Mock<IModinfoFileFinder>();
-            modinfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
+            _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
                 .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object }));
 
-
-            var factory = new ModFactory(locResolver.Object, _ => modinfoFinder.Object, nameResolver.Object,
-                CultureInfo.InvariantCulture, sp.Object);
-
+            
             var modRef = new ModReference("Mods/Name", ModType.Default);
 
-            var mods = factory.FromReference(game.Object, modRef);
+            var mods = _service.FromReference(game.Object, modRef);
             Assert.Equal(2, mods.Count());
         }
 
         [Fact]
         public void TestModCreation_NoModinfoFiles()
         {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Mods/Name");
+            _fileSystem.AddDirectory("Mods/Name");
             var game = new Mock<IGame>();
-            var sp = new Mock<IServiceProvider>();
-            var modLoc = fs.DirectoryInfo.FromDirectoryName("Mods/Name");
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            locResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+            var modLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Mods/Name");
+            _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
                 .Returns(modLoc);
 
-            var nameResolver = new Mock<IModNameResolver>();
-            nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+            _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
 
-            var modinfoFinder = new Mock<IModinfoFileFinder>();
-            modinfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
+            _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
                 .Returns(new ModinfoFinderCollection(modLoc));
-
-            var factory = new ModFactory(locResolver.Object, _ => modinfoFinder.Object, nameResolver.Object,
-                CultureInfo.InvariantCulture, sp.Object);
 
             var modRef = new ModReference("Mods/Name", ModType.Default);
 
-            var mod = factory.FromReference(game.Object, modRef, null);
+            var mod = _service.FromReference(game.Object, modRef, null);
             Assert.NotNull(mod);
             Assert.Equal("Name", mod.Name);
         }
@@ -167,14 +152,13 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestModCreation_WithModinfo()
         {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Mods/Name");
+            _fileSystem.AddDirectory("Mods/Name");
             var game = new Mock<IGame>();
-            var sp = new Mock<IServiceProvider>();
-            var modLoc = fs.DirectoryInfo.FromDirectoryName("Mods/Name");
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            locResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+            var modLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Mods/Name");
+            
+            _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
                 .Returns(modLoc);
+            _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
 
             var modinfo = new Mock<IModinfo>();
             modinfo.Setup(m => m.Name).Returns("MyName");
@@ -182,19 +166,12 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                 .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
             modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
 
-            var nameResolver = new Mock<IModNameResolver>();
-            nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
-
-            var modinfoFinder = new Mock<IModinfoFileFinder>();
-            modinfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
+            _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
                 .Returns(new ModinfoFinderCollection(modLoc));
-
-            var factory = new ModFactory(locResolver.Object, _ => modinfoFinder.Object, nameResolver.Object,
-                CultureInfo.InvariantCulture, sp.Object);
 
             var modRef = new ModReference("Mods/Name", ModType.Default);
 
-            var mod = factory.FromReference(game.Object, modRef, modinfo.Object);
+            var mod = _service.FromReference(game.Object, modRef, modinfo.Object);
             Assert.NotNull(mod);
             Assert.Equal("MyName", mod.Name);
         }
@@ -202,13 +179,10 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestModCreation_SearchMainModinfo()
         {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Mods/Name");
+            _fileSystem.AddDirectory("Mods/Name");
             var game = new Mock<IGame>();
-            var sp = new Mock<IServiceProvider>();
-            var modLoc = fs.DirectoryInfo.FromDirectoryName("Mods/Name");
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            locResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+            var modLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Mods/Name");
+            _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
                 .Returns(modLoc);
 
             var modinfo = new Mock<IModinfo>();
@@ -217,22 +191,18 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                 .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
             modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
 
-            var nameResolver = new Mock<IModNameResolver>();
-            nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+            _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
 
             var mainFile = new Mock<IModinfoFile>();
             mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
             mainFile.Setup(m => m.GetModinfo()).Returns(modinfo.Object);
-            var modinfoFinder = new Mock<IModinfoFileFinder>();
-            modinfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
+            _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
                 .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
 
-            var factory = new ModFactory(locResolver.Object, _ => modinfoFinder.Object, nameResolver.Object,
-                CultureInfo.InvariantCulture, sp.Object);
-
+            
             var modRef = new ModReference("Mods/Name", ModType.Default);
 
-            var mod = factory.FromReference(game.Object, modRef, true);
+            var mod = _service.FromReference(game.Object, modRef, true);
             Assert.NotNull(mod);
             Assert.Equal("MyName", mod.Name);
         }
@@ -240,13 +210,10 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestModCreation_NoSearchMainModinfo()
         {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Mods/Name");
+            _fileSystem.AddDirectory("Mods/Name");
             var game = new Mock<IGame>();
-            var sp = new Mock<IServiceProvider>();
-            var modLoc = fs.DirectoryInfo.FromDirectoryName("Mods/Name");
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            locResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+            var modLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Mods/Name");
+            _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
                 .Returns(modLoc);
 
             var modinfo = new Mock<IModinfo>();
@@ -255,23 +222,18 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                 .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
             modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
 
-            var nameResolver = new Mock<IModNameResolver>();
-            nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+            _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
 
             var mainFile = new Mock<IModinfoFile>();
             mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
             mainFile.Setup(m => m.GetModinfo()).Returns(modinfo.Object);
-            var modinfoFinder = new Mock<IModinfoFileFinder>();
-            modinfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
+            _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
                 .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
 
-
-            var factory = new ModFactory(locResolver.Object, _ => modinfoFinder.Object, nameResolver.Object,
-                CultureInfo.InvariantCulture, sp.Object);
-
+            
             var modRef = new ModReference("Mods/Name", ModType.Default);
 
-            var mod = factory.FromReference(game.Object, modRef, false);
+            var mod = _service.FromReference(game.Object, modRef, false);
             Assert.NotNull(mod);
             Assert.Equal("Name", mod.Name);
         }
@@ -279,13 +241,10 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
         [Fact]
         public void TestVariantModCreation_NoVariants()
         {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Mods/Name");
+            _fileSystem.AddDirectory("Mods/Name");
             var game = new Mock<IGame>();
-            var sp = new Mock<IServiceProvider>();
-            var modLoc = fs.DirectoryInfo.FromDirectoryName("Mods/Name");
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            locResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+            var modLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Mods/Name");
+            _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
                 .Returns(modLoc);
 
             var modinfo = new Mock<IModinfo>();
@@ -294,36 +253,25 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
                 .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
             modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
 
-            var nameResolver = new Mock<IModNameResolver>();
-            nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+            _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
 
-            var modinfoFinder = new Mock<IModinfoFileFinder>();
-            modinfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
+            _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
                 .Returns(new ModinfoFinderCollection(modLoc));
-
-
-            var factory = new ModFactory(locResolver.Object, _ => modinfoFinder.Object, nameResolver.Object,
-                CultureInfo.InvariantCulture, sp.Object);
-
+            
             var modRef = new ModReference("Mods/Name", ModType.Default);
 
-            var mods = factory.VariantsFromReference(game.Object, modRef);
+            var mods = _service.VariantsFromReference(game.Object, modRef);
             Assert.Empty(mods);
         }
 
         [Fact]
         public void TestVariantModCreation_TwoVariants()
         {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Mods/Name");
+            _fileSystem.AddDirectory("Mods/Name");
             var game = new Mock<IGame>();
-            var sp = new Mock<IServiceProvider>();
-            var modLoc = fs.DirectoryInfo.FromDirectoryName("Mods/Name");
-            var locResolver = new Mock<IModReferenceLocationResolver>();
-            locResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+            var modLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Mods/Name");
+            _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
                 .Returns(modLoc);
-
-            var nameResolver = new Mock<IModNameResolver>();
 
             var variantA = new Mock<IModinfo>();
             variantA.Setup(m => m.Name).Returns("MyNameA");
@@ -343,17 +291,13 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             variantFileB.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
             variantFileB.Setup(m => m.GetModinfo()).Returns(variantB.Object);
 
-            var modinfoFinder = new Mock<IModinfoFileFinder>();
-            modinfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
+            _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
                 .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object }));
 
-
-            var factory = new ModFactory(locResolver.Object, _ => modinfoFinder.Object, nameResolver.Object,
-                CultureInfo.InvariantCulture, sp.Object);
-
+            
             var modRef = new ModReference("Mods/Name", ModType.Default);
 
-            var mods = factory.VariantsFromReference(game.Object, modRef);
+            var mods = _service.VariantsFromReference(game.Object, modRef);
             Assert.Equal(2, mods.Count());
         }
     }
