@@ -20,18 +20,20 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <Reference Include="System.Web"/>
+    <Reference Include="System.Web" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="eaw.modinfo" Version="3.1.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.37" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="QuikGraph" Version="2.3.0" />
     <PackageReference Include="SemanticVersioning" Version="2.0.0" />
-    <PackageReference Include="System.IO.Abstractions" Version="13.2.43" />
+    <PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.0" />
+    <PackageReference Include="Sklavenwalker.CommonUtilities.Registry" Version="1.0.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
   </ItemGroup>
 
 </Project>
