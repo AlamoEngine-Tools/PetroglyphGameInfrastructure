@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\PetroGlyph.Games.EawFoc\PetroGlyph.Games.EawFoc.csproj" />
+    <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
   </ItemGroup>
 
 </Project>

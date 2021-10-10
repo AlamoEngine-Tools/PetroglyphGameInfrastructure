@@ -85,12 +85,14 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test.Steam
         public void TestGameInstalled()
         {
             var reg = SetupInstalledRegistry(out var fs);
-            var finder = new Mock<ISteamGameLocationFinder>();
+            var mFile = fs.FileInfo.FromFileName("manifest.acf");
+            var finder = new Mock<ISteamGameFinder>();
             finder.SetupSequence(f => f.FindGame(It.IsAny<IDirectoryInfo>(), It.IsAny<uint>()))
-                .Returns((IDirectoryInfo?)null)
-                .Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+                .Returns((SteamAppManifest?)null)
+                .Returns(new SteamAppManifest(mFile, 1234, "name", fs.DirectoryInfo.FromDirectoryName("Game"),
+                    SteamAppState.StateFullyInstalled, new HashSet<uint>()));
             var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(ISteamGameLocationFinder))).Returns(finder.Object);
+            sp.Setup(p => p.GetService(typeof(ISteamGameFinder))).Returns(finder.Object);
             reg.Setup(r => r.InstalledApps).Returns(new HashSet<uint> { 1, 2, 3 });
             reg.Setup(r => r.InstallationDirectory).Returns(fs.DirectoryInfo.FromDirectoryName("Steam"));
 
