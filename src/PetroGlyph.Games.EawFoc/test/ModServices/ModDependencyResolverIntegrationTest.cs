@@ -25,7 +25,7 @@ namespace PetroGlyph.Games.EawFoc.Test.ModServices
             _fileSystem = new MockFileSystem();
             var sc = new ServiceCollection();
             sc.AddSingleton<IFileSystem>(_fileSystem);
-            PetroglyphGameInfrastructureLibrary.InilializeLibraryWithDefaultServices(sc);
+            PetroglyphGameInfrastructureLibrary.InitializeLibraryWithDefaultServices(sc);
             _serviceProvider = sc.BuildServiceProvider();
             _game = SetupGame(_fileSystem, _serviceProvider);
         }

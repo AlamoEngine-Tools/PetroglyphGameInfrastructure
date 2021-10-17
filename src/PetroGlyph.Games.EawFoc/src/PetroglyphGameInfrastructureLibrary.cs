@@ -13,7 +13,7 @@ namespace PetroGlyph.Games.EawFoc
         /// so that the library can be used in client applications. 
         /// </summary>
         /// <param name="serviceCollection">The service collection to be filled.</param>
-        public static void InilializeLibraryWithDefaultServices(IServiceCollection serviceCollection)
+        public static void InitializeLibraryWithDefaultServices(IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
         }

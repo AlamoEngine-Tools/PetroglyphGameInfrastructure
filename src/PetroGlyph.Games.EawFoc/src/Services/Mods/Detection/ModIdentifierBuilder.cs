@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Text;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,8 +64,16 @@ namespace PetroGlyph.Games.EawFoc.Services.Detection
 
         private static string BuildVirtualModId(IMod mod)
         {
-            var id = mod.Dependencies.Aggregate(mod.Name, (current, dependency) => current + dependency.GetHashCode());
-            return id.GetHashCode().ToString();
+            var sb = new StringBuilder();
+            sb.Append(mod.Name);
+            if (mod.Dependencies.Any())
+                sb.Append("-");
+            foreach (var dependency in mod.Dependencies)
+            {
+                sb.Append(dependency.GetHashCode());
+                sb.Append("-");
+            }
+            return sb.ToString().TrimEnd('-');
         }
 
         public ModReference Normalize(IModReference modReference)

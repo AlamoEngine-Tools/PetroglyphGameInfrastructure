@@ -10,7 +10,7 @@ namespace PetroGlyph.Games.EawFoc.Mods
     /// </summary>
     /// <remarks>Equality is implemented as specified in
     /// <see href="https://github.com/AlamoEngine-Tools/eaw.modinfo#the-version-range-property"/>.
-    /// Meaning the <see cref="VersionRange"/> get totally ignored.</remarks>
+    /// Meaning the <see cref="VersionRange"/> gets totally ignored.</remarks>
     public sealed class ModDependencyEntry : IEquatable<ModDependencyEntry>
     {
         /// <summary>
