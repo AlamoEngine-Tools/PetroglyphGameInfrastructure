@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;
 
 namespace PetroGlyph.Games.EawFoc
@@ -15,6 +16,7 @@ namespace PetroGlyph.Games.EawFoc
         /// <param name="serviceCollection">The service collection to be filled.</param>
         public static void InitializeLibraryWithDefaultServices(IServiceCollection serviceCollection)
         {
+            serviceCollection.AddTransient<IGameRegistryFactory>(_ => new GameRegistryFactory());
             serviceCollection.AddTransient<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
         }
     }
