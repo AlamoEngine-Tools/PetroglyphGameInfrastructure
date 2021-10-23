@@ -1,11 +1,10 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients.Arguments
-{
-    public abstract class DebugGameArgument<T> : GameArgument<T> where T : notnull
-    {
-        public sealed override bool DebugArgument => true;
+﻿namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
-        protected DebugGameArgument(T value) : base(value)
-        {
-        }
+public abstract class DebugGameArgument<T> : GameArgument<T> where T : notnull
+{
+    public sealed override bool DebugArgument => true;
+
+    protected DebugGameArgument(T value) : base(value)
+    {
     }
 }

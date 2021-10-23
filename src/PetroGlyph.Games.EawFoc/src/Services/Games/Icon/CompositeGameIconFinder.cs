@@ -2,40 +2,39 @@
 using PetroGlyph.Games.EawFoc.Games;
 using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Services.Icon
+namespace PetroGlyph.Games.EawFoc.Services.Icon;
+
+/// <summary>
+/// Instance which takes other <see cref="IGameIconFinder"/>s and returns the first found icon.
+/// </summary>
+public class CompositeGameIconFinder : IGameIconFinder
 {
+    private readonly IList<IGameIconFinder> _orderedFinders;
+
     /// <summary>
-    /// Instance which takes other <see cref="IGameIconFinder"/>s and returns the first found icon.
+    /// Creates a new instance
     /// </summary>
-    public class CompositeGameIconFinder : IGameIconFinder
+    /// <param name="orderedFinders">Ordered list of <see cref="IGameIconFinder"/>s.</param>
+    public CompositeGameIconFinder(IList<IGameIconFinder> orderedFinders)
     {
-        private readonly IList<IGameIconFinder> _orderedFinders;
+        Requires.NotNullOrEmpty(orderedFinders, nameof(orderedFinders));
+        _orderedFinders = orderedFinders;
+    }
 
-        /// <summary>
-        /// Creates a new instance
-        /// </summary>
-        /// <param name="orderedFinders">Ordered list of <see cref="IGameIconFinder"/>s.</param>
-        public CompositeGameIconFinder(IList<IGameIconFinder> orderedFinders)
+    /// <summary>
+    /// Searches the internal icon finder instances and returns the first match.
+    /// </summary>
+    /// <param name="game">The game instance.</param>
+    /// <returns>The first found icon path or <see langword="null"/></returns>
+    public string? FindIcon(IGame game)
+    {
+        Requires.NotNull(game, nameof(game));
+        foreach (var finder in _orderedFinders)
         {
-            Requires.NotNullOrEmpty(orderedFinders, nameof(orderedFinders));
-            _orderedFinders = orderedFinders;
+            var iconFile = finder.FindIcon(game);
+            if (iconFile is not null)
+                return iconFile;
         }
-
-        /// <summary>
-        /// Searches the internal icon finder instances and returns the first match.
-        /// </summary>
-        /// <param name="game">The game instance.</param>
-        /// <returns>The first found icon path or <see langword="null"/></returns>
-        public string? FindIcon(IGame game)
-        {
-            Requires.NotNull(game, nameof(game));
-            foreach (var finder in _orderedFinders)
-            {
-                var iconFile = finder.FindIcon(game);
-                if (iconFile is not null)
-                    return iconFile;
-            }
-            return null;
-        }
+        return null;
     }
 }

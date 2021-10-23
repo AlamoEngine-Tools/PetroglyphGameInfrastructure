@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace PetroGlyph.Games.EawFoc.Clients
+namespace PetroGlyph.Games.EawFoc.Clients;
+
+public class ClientException : Exception
 {
-    public class ClientException : Exception
-    {
-    }
 }

@@ -1,11 +1,10 @@
 ﻿using System.Diagnostics;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes
-{
-    internal interface IProcessHelper
-    {
-        Process? GetProcessByPid(int pid);
+namespace PetroGlyph.Games.EawFoc.Clients.Processes;
 
-        Process? FindProcess(string name);
-    }
+internal interface IProcessHelper
+{
+    Process? GetProcessByPid(int pid);
+
+    Process? FindProcess(string name);
 }

@@ -1,17 +1,16 @@
-﻿namespace PetroGlyph.Games.EawFoc.Games
+﻿namespace PetroGlyph.Games.EawFoc.Games;
+
+/// <summary>
+/// The type of the game can be either "Empire at War" of "Forces of Corruption"
+/// </summary>
+public enum GameType
 {
     /// <summary>
-    /// The type of the game can be either "Empire at War" of "Forces of Corruption"
+    /// Empire at War
     /// </summary>
-    public enum GameType
-    {
-        /// <summary>
-        /// Empire at War
-        /// </summary>
-        EaW,
-        /// <summary>
-        /// Forces of Corruption
-        /// </summary>
-        Foc
-    }
+    EaW,
+    /// <summary>
+    /// Forces of Corruption
+    /// </summary>
+    Foc
 }

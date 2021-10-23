@@ -1,8 +1,7 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients
+﻿namespace PetroGlyph.Games.EawFoc.Clients;
+
+public enum GameBuildType
 {
-    public enum GameBuildType
-    {
-        Release,
-        Debug
-    }
+    Release,
+    Debug
 }

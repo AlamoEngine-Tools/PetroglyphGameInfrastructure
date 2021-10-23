@@ -4,22 +4,21 @@ using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients
+namespace PetroGlyph.Games.EawFoc.Clients;
+
+public interface IGameClient
 {
-    public interface IGameClient
-    {
-        event EventHandler<GameStartedEventArgs> GameStarted;
+    event EventHandler<GameStartedEventArgs> GameStarted;
 
-        event EventHandler<GameStartingEventArgs> GameStarting;
+    event EventHandler<GameStartingEventArgs> GameStarting;
 
-        event EventHandler<GameClosedEventArgs> GameClosed;
+    event EventHandler<GameClosedEventArgs> GameClosed;
 
-        ICollection<IPlayableObject> RunningInstances { get; }
+    ICollection<IPlayableObject> RunningInstances { get; }
 
-        ISet<GamePlatform> SupportedPlatforms { get; }
+    ISet<GamePlatform> SupportedPlatforms { get; }
 
-        IGameProcess Play(IPlayableObject instance);
+    IGameProcess Play(IPlayableObject instance);
 
-        IGameProcess Play(IPlayableObject instance, IGameArgumentCollection arguments);
-    }
+    IGameProcess Play(IPlayableObject instance, IGameArgumentCollection arguments);
 }

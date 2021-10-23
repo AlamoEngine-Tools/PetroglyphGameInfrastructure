@@ -1,22 +1,21 @@
 ﻿using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Services.Dependencies
+namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
+
+/// <summary>
+/// Options used by an <see cref="IDependencyResolver"/>.
+/// </summary>
+public record DependencyResolverOptions
 {
     /// <summary>
-    /// Options used by an <see cref="IDependencyResolver"/>.
+    /// When set to <see langword="true"/> the complete mod dependency chain gets resolved
+    /// by honoring the individual <see cref="DependencyResolveLayout"/> property.
     /// </summary>
-    public record DependencyResolverOptions
-    {
-        /// <summary>
-        /// When set to <see langword="true"/> the complete mod dependency chain gets resolved
-        /// by honoring the individual <see cref="DependencyResolveLayout"/> property.
-        /// </summary>
-        public bool ResolveCompleteChain { get; init; }
+    public bool ResolveCompleteChain { get; init; }
 
-        /// <summary>
-        /// When dependencies are resolved, a cycle check will be performed.
-        /// When set to <see langword="true"/> this may cause an <see cref="IDependencyResolver"/> to throw an exception.
-        /// </summary>
-        public bool CheckForCycle { get; init; }
-    }
+    /// <summary>
+    /// When dependencies are resolved, a cycle check will be performed.
+    /// When set to <see langword="true"/> this may cause an <see cref="IDependencyResolver"/> to throw an exception.
+    /// </summary>
+    public bool CheckForCycle { get; init; }
 }

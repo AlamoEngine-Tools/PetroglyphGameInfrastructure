@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 
-namespace PetroGlyph.Games.EawFoc.Services.Steam
+namespace PetroGlyph.Games.EawFoc.Services.Steam;
+
+internal interface ISteamWorkshopWebpageDownloader
 {
-    internal interface ISteamWorkshopWebpageDownloader
-    {
-        Task<HtmlDocument?> GetSteamWorkshopsPageHtmlAsync(ulong workshopId, CultureInfo? culture);
-    }
+    Task<HtmlDocument?> GetSteamWorkshopsPageHtmlAsync(ulong workshopId, CultureInfo? culture);
 }

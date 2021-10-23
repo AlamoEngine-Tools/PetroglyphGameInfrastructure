@@ -2,12 +2,11 @@
 using EawModinfo.Spec;
 using PetroGlyph.Games.EawFoc.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection
-{
-    internal interface IModIdentifierBuilder
-    {
-        string Build(IMod mod);
+namespace PetroGlyph.Games.EawFoc.Services.Detection;
 
-        ModReference Normalize(IModReference modReference);
-    }
+internal interface IModIdentifierBuilder
+{
+    string Build(IMod mod);
+
+    ModReference Normalize(IModReference modReference);
 }

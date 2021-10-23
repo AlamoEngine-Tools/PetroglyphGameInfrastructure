@@ -2,22 +2,21 @@
 using System.Collections.Generic;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes
+namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+
+public interface IGameProcess
 {
-    public interface IGameProcess
-    {
-        event EventHandler Closed;
+    event EventHandler Closed;
 
-        GameBuildType BuildType { get; }
+    GameBuildType BuildType { get; }
 
-        IPlayableObject PlayedInstance { get; }
+    IPlayableObject PlayedInstance { get; }
 
-        IReadOnlyCollection<IGameArgument> Arguments { get; }
+    IReadOnlyCollection<IGameArgument> Arguments { get; }
 
-        bool Running { get; }
+    bool Running { get; }
 
-        bool WasClosed { get; }
+    bool WasClosed { get; }
 
-        void Exit();
-    }
+    void Exit();
 }

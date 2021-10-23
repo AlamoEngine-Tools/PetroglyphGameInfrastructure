@@ -2,59 +2,58 @@
 using System.IO.Abstractions;
 using PetroGlyph.Games.EawFoc.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection.Platform
+namespace PetroGlyph.Games.EawFoc.Services.Detection.Platform;
+
+internal class SteamIdentifier : SpecificPlatformIdentifier
 {
-    internal class SteamIdentifier : SpecificPlatformIdentifier
+
+    private static readonly string[] KnownSteamFiles = {
+        "32470_install.vdf",
+        "32472_install.vdf",
+        "runm2.dat",
+        "runme.dat",
+        "runme.exe",
+        "runme2.exe"
+    };
+
+    public SteamIdentifier(IServiceProvider serviceProvider) : base(serviceProvider)
     {
+    }
 
-        private static readonly string[] KnownSteamFiles = {
-            "32470_install.vdf",
-            "32472_install.vdf",
-            "runm2.dat",
-            "runme.dat",
-            "runme.exe",
-            "runme2.exe"
-        };
+    public override bool IsPlatformFoc(ref IDirectoryInfo location)
+    {
+        if (!GameDetector.GameExeExists(location, GameType.Foc))
+            return false;
 
-        public SteamIdentifier(IServiceProvider serviceProvider) : base(serviceProvider)
-        {
-        }
+        if (!ContainsSteamExe(location))
+            return false;
 
-        public override bool IsPlatformFoc(ref IDirectoryInfo location)
-        {
-            if (!GameDetector.GameExeExists(location, GameType.Foc))
-                return false;
+        return location.Name.Equals("corruption", StringComparison.InvariantCultureIgnoreCase) &&
+               ParentContainsSteamFiles(location);
+    }
 
-            if (!ContainsSteamExe(location))
-                return false;
+    public override bool IsPlatformEaw(ref IDirectoryInfo location)
+    {
+        if (!GameDetector.GameExeExists(location, GameType.EaW))
+            return false;
 
-            return location.Name.Equals("corruption", StringComparison.InvariantCultureIgnoreCase) &&
-                   ParentContainsSteamFiles(location);
-        }
+        if (!ContainsSteamExe(location))
+            return false;
 
-        public override bool IsPlatformEaw(ref IDirectoryInfo location)
-        {
-            if (!GameDetector.GameExeExists(location, GameType.EaW))
-                return false;
+        return location.Name.Equals("GameData", StringComparison.InvariantCultureIgnoreCase) &&
+               ParentContainsSteamFiles(location);
+    }
 
-            if (!ContainsSteamExe(location))
-                return false;
+    private static bool ParentContainsSteamFiles(IDirectoryInfo gameLocation)
+    {
+        var parentDir = gameLocation.Parent;
+        return parentDir is not null && DirectoryContainsFiles(parentDir, KnownSteamFiles);
+    }
 
-            return location.Name.Equals("GameData", StringComparison.InvariantCultureIgnoreCase) &&
-                   ParentContainsSteamFiles(location);
-        }
-
-        private static bool ParentContainsSteamFiles(IDirectoryInfo gameLocation)
-        {
-            var parentDir = gameLocation.Parent;
-            return parentDir is not null && DirectoryContainsFiles(parentDir, KnownSteamFiles);
-        }
-
-        private static bool ContainsSteamExe(IFileSystemInfo directory)
-        {
-            const string exeFile = "StarWarsG.exe";
-            var exePath = directory.FileSystem.Path.Combine(directory.FullName, exeFile);
-            return directory.FileSystem.File.Exists(exePath);
-        }
+    private static bool ContainsSteamExe(IFileSystemInfo directory)
+    {
+        const string exeFile = "StarWarsG.exe";
+        var exePath = directory.FileSystem.Path.Combine(directory.FullName, exeFile);
+        return directory.FileSystem.File.Exists(exePath);
     }
 }

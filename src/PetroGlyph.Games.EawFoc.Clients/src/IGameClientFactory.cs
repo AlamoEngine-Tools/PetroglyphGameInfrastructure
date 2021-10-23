@@ -1,10 +1,9 @@
 ﻿using System;
 using PetroGlyph.Games.EawFoc.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients
+namespace PetroGlyph.Games.EawFoc.Clients;
+
+public interface IGameClientFactory
 {
-    public interface IGameClientFactory
-    {
-        IGameClient CreateClient(GamePlatform gamePlatform, IServiceProvider serviceProvider);
-    }
+    IGameClient CreateClient(GamePlatform gamePlatform, IServiceProvider serviceProvider);
 }

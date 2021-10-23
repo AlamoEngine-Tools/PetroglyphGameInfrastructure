@@ -1,25 +1,24 @@
 ﻿using System;
 
-namespace PetroGlyph.Games.EawFoc.Games
+namespace PetroGlyph.Games.EawFoc.Games;
+
+/// <summary>
+/// <see cref="PetroglyphException"/> for anything related to an <see cref="IGame"/>
+/// </summary>
+public class GameException : PetroglyphException
 {
-    /// <summary>
-    /// <see cref="PetroglyphException"/> for anything related to an <see cref="IGame"/>
-    /// </summary>
-    public class GameException : PetroglyphException
+    /// <inheritdoc/>
+    public GameException()
     {
-        /// <inheritdoc/>
-        public GameException()
-        {
-        }
+    }
 
-        /// <inheritdoc/>
-        public GameException(string message) : base(message)
-        {
-        }
+    /// <inheritdoc/>
+    public GameException(string message) : base(message)
+    {
+    }
 
-        /// <inheritdoc/>
-        public GameException(string message, Exception exception) : base(message, exception)
-        {
-        }
+    /// <inheritdoc/>
+    public GameException(string message, Exception exception) : base(message, exception)
+    {
     }
 }

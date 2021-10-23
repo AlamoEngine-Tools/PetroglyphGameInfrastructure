@@ -5,34 +5,33 @@ using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
 
-namespace PetroGlyph.Games.EawFoc.Services.Steam
+namespace PetroGlyph.Games.EawFoc.Services.Steam;
+
+internal class SteamWorkshopWebpageDownloader : ISteamWorkshopWebpageDownloader
 {
-    internal class SteamWorkshopWebpageDownloader : ISteamWorkshopWebpageDownloader
+    private const string SteamWorkshopsBaseUrl = "https://steamcommunity.com/sharedfiles/filedetails/?";
+
+    public async Task<HtmlDocument?> GetSteamWorkshopsPageHtmlAsync(ulong workshopId, CultureInfo? culture)
     {
-        private const string SteamWorkshopsBaseUrl = "https://steamcommunity.com/sharedfiles/filedetails/?";
+        NameValueCollection queryString = HttpUtility.ParseQueryString(string.Empty);
+        queryString.Add("id", workshopId.ToString());
 
-        public async Task<HtmlDocument?> GetSteamWorkshopsPageHtmlAsync(ulong workshopId, CultureInfo? culture)
+        if (culture != null && !Equals(culture, CultureInfo.InvariantCulture))
+            queryString.Add("l", culture.EnglishName.ToLower());
+
+        try
         {
-            NameValueCollection queryString = HttpUtility.ParseQueryString(string.Empty);
-            queryString.Add("id", workshopId.ToString());
+            var address = $"{SteamWorkshopsBaseUrl}{queryString}";
+            var client = new WebClient();
+            var reply = await client.DownloadStringTaskAsync(address);
 
-            if (culture != null && !Equals(culture, CultureInfo.InvariantCulture))
-                queryString.Add("l", culture.EnglishName.ToLower());
-
-            try
-            {
-                var address = $"{SteamWorkshopsBaseUrl}{queryString}";
-                var client = new WebClient();
-                var reply = await client.DownloadStringTaskAsync(address);
-
-                var htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(reply);
-                return htmlDocument;
-            }
-            catch
-            {
-                return null;
-            }
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(reply);
+            return htmlDocument;
+        }
+        catch
+        {
+            return null;
         }
     }
 }
