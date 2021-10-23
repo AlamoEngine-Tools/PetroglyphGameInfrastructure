@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net5.0;net48</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
@@ -19,10 +19,6 @@
     <AssemblyOriginatorKeyFile>../../../AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <Reference Include="System.Web" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="eaw.modinfo" Version="3.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.37" />
@@ -32,7 +28,7 @@
     <PackageReference Include="QuikGraph" Version="2.3.0" />
     <PackageReference Include="SemanticVersioning" Version="2.0.0" />
     <PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.0" />
-    <PackageReference Include="Sklavenwalker.CommonUtilities.Registry" Version="1.0.0" />
+    <PackageReference Include="Sklavenwalker.CommonUtilities.Registry" Version="1.0.1" />
     <PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
   </ItemGroup>
 

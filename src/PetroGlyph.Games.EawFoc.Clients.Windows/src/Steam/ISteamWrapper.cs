@@ -15,9 +15,9 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
         bool? WantOfflineMode { get; }
 
 #if NET
-        bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest location);
+        bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest manifest);
 #else
-        bool IsGameInstalled(uint gameId, out SteamAppManifest? location);
+        bool IsGameInstalled(uint gameId, out SteamAppManifest? manifest);
 #endif
 
 

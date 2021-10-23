@@ -10,7 +10,7 @@ using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Windows.Test.Steam
+namespace PetroGlyph.Games.EawFoc.Clients.Windows.Test
 {
     public class SteamPetroglyphStarWarsGameDetectorTest
     {

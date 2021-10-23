@@ -79,6 +79,4 @@ namespace PetroGlyph.Games.EawFoc.Services.FileService
 #endif
         }
     }
-
-    // For testing DI only.
 }

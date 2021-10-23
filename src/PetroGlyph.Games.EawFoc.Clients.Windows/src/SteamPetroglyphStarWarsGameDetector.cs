@@ -1,11 +1,12 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PetroGlyph.Games.EawFoc.Clients.Steam;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam;
+namespace PetroGlyph.Games.EawFoc.Clients;
 
 public class SteamPetroglyphStarWarsGameDetector : GameDetector
 {
