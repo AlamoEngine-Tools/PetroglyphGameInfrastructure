@@ -89,23 +89,22 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
         }
 
 #if NET
-        public bool IsGameInstalled(uint gameId, [MaybeNullWhen(false)] out SteamAppManifest location)
+        public bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest? game)
 #else
-        public bool IsGameInstalled(uint gameId, out SteamAppManifest? location)
+        public bool IsGameInstalled(uint gameId, out SteamAppManifest? game)
 #endif
         {
             ThrowIfSteamNotInstalled();
-            location = null;
+            game = null;
             var apps = _registry.InstalledApps;
             if (apps is null)
                 return false;
 
-            var steamInstallDir = _registry.InstallationDirectory;
-            if (!apps.Contains(gameId) || steamInstallDir is null)
+            if (!apps.Contains(gameId))
                 return false;
 
             var gameFinder = _serviceProvider.GetService<ISteamGameFinder>() ?? new SteamGameFinder(_serviceProvider);
-            var game = gameFinder.FindGame(steamInstallDir, gameId);
+            game = gameFinder.FindGame(gameId);
             return game is not null;
         }
 
@@ -125,10 +124,10 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             process.Start();
         }
 
-        public async Task WaitSteamRunningAndLoggedInAsync(bool startIfNotRunning, CancellationToken cancellation = default)
+        public async Task WaitSteamRunningAndLoggedInAsync(bool startIfNotRunning,
+            CancellationToken cancellation = default)
         {
             ThrowIfSteamNotInstalled();
-
             var running = IsRunning;
             if (!running)
             {
@@ -138,7 +137,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
                     StartSteam();
                 await WaitSteamRunningAsync(cancellation);
             }
-            
+
             if (IsUserLoggedIn)
                 return;
 
@@ -153,7 +152,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             }
             else
             {
-               await WaitSteamUserLoggedInAsync(cancellation);
+                await WaitSteamUserLoggedInAsync(cancellation);
             }
         }
 

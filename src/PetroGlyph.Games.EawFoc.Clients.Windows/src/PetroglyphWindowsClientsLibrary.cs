@@ -17,8 +17,12 @@ public class PetroglyphWindowsClientsLibrary
     {
         // Singleton Services
         serviceCollection.AddSingleton<ISteamRegistry>(sp => new SteamRegistry(sp));
+        serviceCollection.AddSingleton<ISteamWrapper>(sp => new SteamWrapper(sp));
        
         // Transient Services
         serviceCollection.AddTransient<ISteamGameFinder>(sp => new SteamGameFinder(sp));
+        serviceCollection.AddTransient<ISteamAppManifestReader>(sp => new SteamVdfReader(sp));
+        serviceCollection.AddTransient<ILibraryConfigReader>(sp => new SteamVdfReader(sp));
+        serviceCollection.AddTransient<ISteamLibraryFinder>(sp => new SteamLibraryFinder(sp));
     }
 }

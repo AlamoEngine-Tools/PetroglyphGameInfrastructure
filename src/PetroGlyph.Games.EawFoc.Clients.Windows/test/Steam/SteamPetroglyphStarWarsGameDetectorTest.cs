@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Clients.Steam;
 using PetroGlyph.Games.EawFoc.Games;
@@ -13,273 +14,214 @@ namespace PetroGlyph.Games.EawFoc.Clients.Windows.Test.Steam
 {
     public class SteamPetroglyphStarWarsGameDetectorTest
     {
+        private readonly SteamPetroglyphStarWarsGameDetector _service;
+        private readonly MockFileSystem _fileSystem;
+        private readonly Mock<ISteamWrapper> _steamWrapper;
+        private readonly Mock<IGameRegistryFactory> _gameRegistryFactory;
+        private readonly Mock<IGameRegistry> _gameRegistry;
+        private readonly Mock<ISteamLibrary> _gameLib;
+
+        public SteamPetroglyphStarWarsGameDetectorTest()
+        {
+            var sc = new ServiceCollection();
+            _fileSystem = new MockFileSystem();
+            _steamWrapper = new Mock<ISteamWrapper>();
+            _gameRegistryFactory = new Mock<IGameRegistryFactory>();
+            _gameRegistry = new Mock<IGameRegistry>();
+            sc.AddTransient<IFileSystem>(_ => _fileSystem);
+            sc.AddTransient(_ => _steamWrapper.Object);
+            sc.AddTransient(_ => _gameRegistryFactory.Object);
+            _service = new SteamPetroglyphStarWarsGameDetector(sc.BuildServiceProvider());
+            _gameLib = new Mock<ISteamLibrary>();
+        }
+
         [Fact]
         public void TestInvalidCtor_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameDetector(null, null, null, null));
-            var sp = new Mock<IServiceProvider>();
-            Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameDetector(null, null, null, sp.Object));
-            var steam = new Mock<ISteamWrapper>();
-            Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameDetector(steam.Object, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameDetector(null));
         }
 
         [Fact]
         public void TestNoGame1()
         {
-#if NET
-            return;
-#endif
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out It.Ref<SteamAppManifest?>.IsAny)).Returns(false);
-            var fs = new MockFileSystem();
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, null, sp.Object);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out It.Ref<SteamAppManifest?>.IsAny))
+                .Returns(false);
             var options = new GameDetectorOptions(GameType.Foc);
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.Null(result.GameLocation);
         }
 
         [Fact]
         public void TestNoGame2()
         {
-#if NET
-            return;
-#endif
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateInvalid, new HashSet<uint>{ 32472 });
+            var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName("Game");
+            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateInvalid,
+                new HashSet<uint> { 32472 });
 
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, null, sp.Object);
+            _steamWrapper.Setup(s => s.Installed).Returns(true);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
+
             var options = new GameDetectorOptions(GameType.Foc);
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.Null(result.GameLocation);
         }
 
         [Fact]
         public void TestNoGame3()
         {
-#if NET
-            return;
-#endif
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            fs.AddFile("Game/swfoc.exe", MockFileData.NullObject);
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateInvalid, new HashSet<uint>{ 32472 });
+            var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName("Game");
+            _fileSystem.AddFile("Game/swfoc.exe", MockFileData.NullObject);
+            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateInvalid,
+                new HashSet<uint> { 32472 });
 
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, null, sp.Object);
+            _steamWrapper.Setup(s => s.Installed).Returns(true);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
             var options = new GameDetectorOptions(GameType.Foc);
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.Null(result.GameLocation);
         }
 
         [Fact]
         public void TestNoGame4()
         {
-#if NET
-            return;
-#endif
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            fs.AddFile("Game/swfoc.exe", MockFileData.NullObject);
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateInvalid, new HashSet<uint>());
+            var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName("Game");
+            _fileSystem.AddFile("Game/swfoc.exe", MockFileData.NullObject);
+            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateInvalid,
+                new HashSet<uint>());
 
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, null, sp.Object);
+            _steamWrapper.Setup(s => s.Installed).Returns(true);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
             var options = new GameDetectorOptions(GameType.Foc);
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.Null(result.GameLocation);
         }
 
         [Fact]
         public void TestNoGame5()
         {
-#if NET
-            return;
-#endif
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            fs.AddFile("Game/swfoc.exe", MockFileData.NullObject);
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled, new HashSet<uint> { 32472 });
+            var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName("Game");
+            _fileSystem.AddFile("Game/swfoc.exe", MockFileData.NullObject);
+            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
+                new HashSet<uint> { 32472 });
 
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, null, sp.Object);
+            _steamWrapper.Setup(s => s.Installed).Returns(true);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
             var options = new GameDetectorOptions(GameType.Foc);
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.Null(result.GameLocation);
         }
 
         [Fact]
         public void TestGameExists1()
         {
-#if NET
-            return;
-#endif
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            fs.AddFile("Game/corruption/swfoc.exe", MockFileData.NullObject);
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled, new HashSet<uint> { 32472 });
+            var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName("Game");
+            _fileSystem.AddFile("Game/corruption/swfoc.exe", MockFileData.NullObject);
+            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
+                new HashSet<uint> { 32472 });
 
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, null, sp.Object);
+            _steamWrapper.Setup(s => s.Installed).Returns(true);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
+
+            _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc, It.IsAny<IServiceProvider>()))
+                .Returns(_gameRegistry.Object);
+            _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
+            _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
+
             var options = new GameDetectorOptions(GameType.Foc);
-            var result = detector.Detect(options);
-            Assert.NotNull(result.GameLocation);
-        }
-
-        [Fact]
-        public void TestGameExists2()
-        {
-#if NET
-            return;
-#endif
-            var reg = new Mock<IGameRegistry>();
-            reg.Setup(r => r.Type).Returns(GameType.Foc);
-            reg.Setup(r => r.Version).Returns(new Version(1, 0));
-
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            fs.AddFile("Game/corruption/swfoc.exe", MockFileData.NullObject);
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled, new HashSet<uint> { 32472 });
-
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, reg.Object, sp.Object);
-            var options = new GameDetectorOptions(GameType.Foc);
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.NotNull(result.GameLocation);
         }
 
         [Fact]
         public void TestGameExists3()
         {
-#if NET
-            return;
-#endif
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            fs.AddFile("Game/corruption/swfoc.exe", MockFileData.NullObject);
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled | SteamAppState.StateAppRunning, new HashSet<uint> { 32472 });
+            var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName("Game");
+            _fileSystem.AddFile("Game/corruption/swfoc.exe", MockFileData.NullObject);
+            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation,
+                SteamAppState.StateFullyInstalled | SteamAppState.StateAppRunning, new HashSet<uint> { 32472 });
 
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, null, sp.Object);
+            _steamWrapper.Setup(s => s.Installed).Returns(true);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
+
+            _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc, It.IsAny<IServiceProvider>()))
+                .Returns(_gameRegistry.Object);
+            _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
+            _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
+
             var options = new GameDetectorOptions(GameType.Foc);
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.NotNull(result.GameLocation);
         }
 
         [Fact]
         public void TestGameExists4()
         {
-#if NET
-            return;
-#endif
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            fs.AddFile("Game/GameData/sweaw.exe", MockFileData.NullObject);
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled, new HashSet<uint> { 32472 });
+            var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName("Game");
+            _fileSystem.AddFile("Game/GameData/sweaw.exe", MockFileData.NullObject);
+            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
+                new HashSet<uint> { 32472 });
 
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, null, sp.Object);
+            _steamWrapper.Setup(s => s.Installed).Returns(true);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
+
+            _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.EaW, It.IsAny<IServiceProvider>()))
+                .Returns(_gameRegistry.Object);
+            _gameRegistry.Setup(r => r.Type).Returns(GameType.EaW);
+            _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
+
             var options = new GameDetectorOptions(GameType.EaW);
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.NotNull(result.GameLocation);
         }
 
         [Fact]
         public void TestInvalidRegistry()
         {
-#if NET
-            return;
-#endif
-            var reg = new Mock<IGameRegistry>();
-            reg.Setup(r => r.Type).Returns(GameType.EaW);
-            reg.Setup(r => r.Version).Returns(new Version(1, 0));
-
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            fs.AddFile("Game/swfoc.exe", MockFileData.NullObject);
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled, new HashSet<uint> { 32472 });
+            var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName("Game");
+            _fileSystem.AddFile("Game/swfoc.exe", MockFileData.NullObject);
+            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
+                new HashSet<uint> { 32472 });
 
 
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, reg.Object, sp.Object);
+            _steamWrapper.Setup(s => s.Installed).Returns(true);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
+
+            _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc, It.IsAny<IServiceProvider>()))
+                .Returns(_gameRegistry.Object);
+            _gameRegistry.Setup(r => r.Type).Returns(GameType.EaW);
+            _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
+
             var options = new GameDetectorOptions(GameType.Foc);
-
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.IsType<InvalidOperationException>(result.Error);
         }
 
         [Fact]
         public void TestGameRequiresInit()
         {
-#if NET
-            return;
-#endif
-            var reg = new Mock<IGameRegistry>();
-            reg.Setup(r => r.Type).Returns(GameType.Foc);
-            reg.Setup(r => r.Version).Returns((Version)null);
+            var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName("Game");
+            _fileSystem.AddFile("Game/swfoc.exe", MockFileData.NullObject);
+            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
+                new HashSet<uint> { 32472 });
 
-            var fs = new MockFileSystem();
-            var installLocation = fs.DirectoryInfo.FromDirectoryName("Game");
-            fs.AddFile("Game/swfoc.exe", MockFileData.NullObject);
-            var mFile = fs.FileInfo.FromFileName("manifest.acf");
-            var app = new SteamAppManifest(mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled, new HashSet<uint> { 32472 });
+            _steamWrapper.Setup(s => s.Installed).Returns(true);
+            _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
 
-            var steam = new Mock<ISteamWrapper>();
-            steam.Setup(s => s.Installed).Returns(true);
-            steam.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-            var detector = new SteamPetroglyphStarWarsGameDetector(steam.Object, null, reg.Object, sp.Object);
+            _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc, It.IsAny<IServiceProvider>()))
+                .Returns(_gameRegistry.Object);
+            _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
+
             var options = new GameDetectorOptions(GameType.Foc);
-            var result = detector.Detect(options);
+            var result = _service.Detect(options);
             Assert.True(result.InitializationRequired);
         }
     }

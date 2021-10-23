@@ -1,52 +1,102 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using Sklavenwalker.CommonUtilities.FileSystem;
+using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
-public class SteamLibrary
+internal class SteamLibrary : ISteamLibrary
 {
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ConcurrentDictionary<KnownLibraryLocations, IDirectoryInfo> _locations = new();
+
+    private readonly Dictionary<KnownLibraryLocations, string> _locationsNames = new()
+    {
+        { KnownLibraryLocations.SteamApps, "steamapps" },
+        { KnownLibraryLocations.Common, "common" },
+        { KnownLibraryLocations.Workshops, "workshop" }
+    };
+
+    private readonly IPathHelperService _pathHelper;
     private readonly string _normalizedLocation;
 
     public IDirectoryInfo LibraryLocation { get; }
 
-    public ISet<SteamAppManifest> Apps { get; }
+    public IDirectoryInfo SteamAppsLocation => GetKnownLibraryLocation(KnownLibraryLocations.SteamApps);
 
-    public SteamLibrary(IDirectoryInfo libraryLocation, ISet<SteamAppManifest> apps)
+    public IDirectoryInfo CommonLocation => GetKnownLibraryLocation(KnownLibraryLocations.Common);
+
+    public IDirectoryInfo WorkshopsLocation => GetKnownLibraryLocation(KnownLibraryLocations.Workshops);
+    
+    public SteamLibrary(IDirectoryInfo libraryLocation, IServiceProvider serviceProvider)
     {
+        Requires.NotNull(libraryLocation, nameof(libraryLocation));
+        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        _serviceProvider = serviceProvider;
+        _pathHelper = serviceProvider.GetService<IPathHelperService>() ??
+                      new PathHelperService(libraryLocation.FileSystem);
+        _normalizedLocation = _pathHelper.NormalizePath(libraryLocation.FullName, PathNormalizeOptions.Full);
         LibraryLocation = libraryLocation;
-        Apps = apps;
-        var pathHelper = new PathHelperService(libraryLocation.FileSystem);
-        _normalizedLocation = pathHelper.NormalizePath(libraryLocation.FullName, PathNormalizeOptions.Full);
     }
 
-    public bool Equals(SteamLibrary? other)
+    public IEnumerable<SteamAppManifest> GetApps()
     {
-        if (other is null)
-            return false;
-        if (ReferenceEquals(this, other))
-            return true;
-        return _normalizedLocation.Equals(other._normalizedLocation) && Apps.Equals(other.Apps);
+        if (!SteamAppsLocation.Exists)
+            return Array.Empty<SteamAppManifest>();
+        var apps = new HashSet<SteamAppManifest>();
+        var manifestReader = _serviceProvider.GetRequiredService<ISteamAppManifestReader>();
+        foreach (var manifestFile in SteamAppsLocation.EnumerateFiles("*.acf", SearchOption.TopDirectoryOnly))
+            apps.Add(manifestReader.ReadManifest(manifestFile, this));
+        return apps;
     }
 
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(this, obj))
             return true;
-        return obj is SteamLibrary other && Equals(other);
+        return obj is ISteamLibrary other && Equals(other);
     }
 
     public override int GetHashCode()
     {
-        unchecked
-        {
-            return (_normalizedLocation.GetHashCode() * 397) ^ Apps.GetHashCode();
-        }
+        return _normalizedLocation.GetHashCode();
     }
 
+    public bool Equals(ISteamLibrary? other)
+    {
+        if (other is null)
+            return false;
+        if (ReferenceEquals(this, other))
+            return true;
+        return _normalizedLocation.Equals(_pathHelper.NormalizePath(other.LibraryLocation.FullName,
+            PathNormalizeOptions.Full));
+    }
 
     public override string ToString()
     {
         return $"SteamLibrary:'{LibraryLocation.FullName}'";
+    }
+
+    private IDirectoryInfo GetKnownLibraryLocation(KnownLibraryLocations location)
+    {
+        return _locations.GetOrAdd(location, l =>
+        {
+            var fs = LibraryLocation.FileSystem;
+            var locationFolderName = _locationsNames[l];
+            var basePath = LibraryLocation.FullName;
+            var locationPath = fs.Path.Combine(basePath, locationFolderName);
+            return fs.DirectoryInfo.FromDirectoryName(locationPath);
+        });
+    }
+
+    private enum KnownLibraryLocations
+    {
+        SteamApps,
+        Common,
+        Workshops
     }
 }

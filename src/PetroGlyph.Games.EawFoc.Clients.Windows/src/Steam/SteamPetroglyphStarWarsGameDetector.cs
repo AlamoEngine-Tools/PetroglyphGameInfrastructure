@@ -1,9 +1,9 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
@@ -13,30 +13,16 @@ public class SteamPetroglyphStarWarsGameDetector : GameDetector
     private const uint FocDepotId = 32472;
 
     private readonly ISteamWrapper _steamWrapper;
-    private readonly IGameRegistry? _eawGameRegistry;
-    private readonly IGameRegistry? _focGameRegistry;
+    private readonly IGameRegistryFactory _registryFactory;
 
-    public SteamPetroglyphStarWarsGameDetector(
-        ISteamWrapper steamWrapper, 
-        IGameRegistry? eawGameRegistry, 
-        IGameRegistry? focGameRegistry, 
-        IServiceProvider serviceProvider) : base(serviceProvider, true)
+    public SteamPetroglyphStarWarsGameDetector(IServiceProvider serviceProvider) : base(serviceProvider, true)
     {
-        Requires.NotNull(steamWrapper, nameof(steamWrapper));
-        _steamWrapper = steamWrapper;
-        _eawGameRegistry = eawGameRegistry;
-        _focGameRegistry = focGameRegistry;
+        _registryFactory = ServiceProvider.GetRequiredService<IGameRegistryFactory>();
+        _steamWrapper = ServiceProvider.GetRequiredService<ISteamWrapper>();
     }
 
     protected override GameLocationData FindGameLocation(GameDetectorOptions options)
-    {
-        var registry = options.Type switch
-        {
-            GameType.EaW => _eawGameRegistry,
-            GameType.Foc => _focGameRegistry,
-            _ => throw new ArgumentOutOfRangeException(nameof(options))
-        };
-
+    { 
         if (!_steamWrapper.Installed)
             return default;
 
@@ -61,13 +47,7 @@ public class SteamPetroglyphStarWarsGameDetector : GameDetector
 
         var installLocation = FileSystem.DirectoryInfo.FromDirectoryName(fullGamePath);
 
-        if (registry is null)
-        {
-            return !GameExeExists(installLocation, options.Type)
-                ? default
-                : new GameLocationData { Location = installLocation };
-        }
-
+        using var registry = _registryFactory.CreateRegistry(options.Type, ServiceProvider);
         if (registry.Type != options.Type)
             throw new InvalidOperationException("Incompatible registry");
 
