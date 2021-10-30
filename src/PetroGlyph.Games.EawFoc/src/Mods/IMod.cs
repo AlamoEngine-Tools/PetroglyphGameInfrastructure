@@ -34,11 +34,6 @@ public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContai
     new string Name { get; }
 
     /// <summary>
-    /// The <see cref="IGame"/> this mod is associated with.
-    /// </summary>
-    IGame Game { get; }
-
-    /// <summary>
     /// If a modinfo.json file is available its data gets stored here; otherwise this returns <see langword="null"/>
     /// </summary>
     IModinfo? ModInfo { get; }

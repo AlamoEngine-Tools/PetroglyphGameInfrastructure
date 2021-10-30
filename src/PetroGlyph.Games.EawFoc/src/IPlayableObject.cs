@@ -25,4 +25,10 @@ public interface IPlayableObject
     /// Absolute or relative path to an icon of this instance.
     /// </summary>
     string? IconFile { get; }
+
+    /// <summary>
+    /// The game associated to this instance.
+    /// If this instance is an <see cref="IGame"/> this returns itself.
+    /// </summary>
+    IGame Game { get; }
 }

@@ -53,7 +53,7 @@ public abstract class ModBase : PlayableObject, IMod
     public abstract string Identifier { get; }
 
     /// <inheritdoc/>
-    public IGame Game { get; }
+    public override IGame Game { get; }
 
     /// <inheritdoc/>
     public ModType Type { get; }

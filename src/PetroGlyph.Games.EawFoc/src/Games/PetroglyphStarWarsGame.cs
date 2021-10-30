@@ -47,6 +47,9 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     public override string Name { get; }
 
     /// <inheritdoc/>
+    public override IGame Game => this;
+
+    /// <inheritdoc/>
     public GameType Type { get; }
 
     /// <inheritdoc/>

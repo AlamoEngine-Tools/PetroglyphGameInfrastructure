@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using EawModinfo.Spec;
+using PetroGlyph.Games.EawFoc.Games;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test
@@ -50,6 +51,7 @@ namespace PetroGlyph.Games.EawFoc.Test
             private int _iconCounter;
 
             public override string Name => Name;
+            public override IGame Game { get; }
 
             public PlayableObjectMock(Func<ISet<ILanguageInfo>> langSetFunc)
             {

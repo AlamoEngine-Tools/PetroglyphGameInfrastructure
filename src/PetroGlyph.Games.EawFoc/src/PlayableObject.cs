@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using EawModinfo.Spec;
+using PetroGlyph.Games.EawFoc.Games;
 
 namespace PetroGlyph.Games.EawFoc;
 
@@ -18,6 +19,9 @@ public abstract class PlayableObject : IPlayableObject
 
     /// <inheritdoc/>
     public abstract string Name { get; }
+
+    /// <inheritdoc/>
+    public abstract IGame Game { get; }
 
     /// <inheritdoc/>
     public ISet<ILanguageInfo> InstalledLanguages
