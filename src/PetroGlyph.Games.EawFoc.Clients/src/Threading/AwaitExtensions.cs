@@ -6,7 +6,8 @@ using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Threading;
 
-// From https://github.com/microsoft/vs-threading
+// From https://github.com/microsoft/vs-threading and https://github.com/dotnet/runtime
+
 internal static class AwaitExtensions
 {
     /// <summary>
@@ -23,24 +24,28 @@ internal static class AwaitExtensions
         CancellationToken cancellationToken = default)
     {
         Requires.NotNull(process, nameof(process));
-
-        var tcs = new TaskCompletionSource<int>();
-
-        void ExitHandler(object o, EventArgs eventArgs)
-        {
-            tcs.TrySetResult(process.ExitCode);
-        }
+        
+        if (!process.HasExited)
+            cancellationToken.ThrowIfCancellationRequested();
 
         try
         {
             process.EnableRaisingEvents = true;
-            process.Exited += ExitHandler;
+        }
+        catch (InvalidOperationException)
+        {
             if (process.HasExited)
-            {
-                // Allow for the race condition that the process has already exited.
-                tcs.TrySetResult(process.ExitCode);
-            }
+                return process.ExitCode;
+            throw;
+        }
 
+        var tcs = new TaskCompletionSource<int>();
+        void Handler(object o, EventArgs eventArgs) => tcs.TrySetResult(process.ExitCode);
+        try
+        {
+            process.Exited += Handler;
+            if (process.HasExited)
+                return process.ExitCode;
             using (cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken)))
             {
                 return await tcs.Task.ConfigureAwait(false);
@@ -48,7 +53,7 @@ internal static class AwaitExtensions
         }
         finally
         {
-            process.Exited -= ExitHandler;
+            process.Exited -= Handler;
         }
     }
 }

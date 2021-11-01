@@ -8,13 +8,15 @@ namespace PetroGlyph.Games.EawFoc.Clients;
 
 public interface IGameClient
 {
-    event EventHandler<GameStartedEventArgs> GameStarted;
+    event EventHandler<IGameProcess> GameStarted;
 
     event EventHandler<GameStartingEventArgs> GameStarting;
 
-    event EventHandler<GameClosedEventArgs> GameClosed;
+    event EventHandler<IGameProcess> GameClosed;
 
-    ICollection<IPlayableObject> RunningInstances { get; }
+    IGameArgumentCollection DefaultArguments { get; }
+
+    IReadOnlyCollection<IPlayableObject> RunningInstances { get; }
 
     ISet<GamePlatform> SupportedPlatforms { get; }
 

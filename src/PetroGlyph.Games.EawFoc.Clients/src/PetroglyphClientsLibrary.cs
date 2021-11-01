@@ -15,8 +15,12 @@ namespace PetroGlyph.Games.EawFoc.Clients
         /// <param name="serviceCollection">The service collection to be filled.</param>
         public static void InitializeLibraryWithDefaultServices(IServiceCollection serviceCollection)
         {
-            // Singletons
             serviceCollection.AddTransient<IProcessHelper>(_ => new ProcessHelper());
+
+
+            serviceCollection.AddTransient<IGameExecutableFileService>(sp => new GameExecutableFileService(sp));
+            serviceCollection.AddTransient<IGameExecutableNameBuilder>(sp => new DefaultGameExecutableNameBuilder(sp));
+            serviceCollection.AddTransient<IGameExecutableNameBuilder>(sp => new DefaultGameExecutableNameBuilder(sp));
         }
     }
 }

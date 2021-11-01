@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0-windows; net48</TargetFrameworks>
+    <TargetFrameworks>net6.0; net48</TargetFrameworks>
     <LangVersion>10.0</LangVersion>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
-    <ProjectReference Include="..\src\PetroGlyph.Games.EawFoc.Clients.Windows.csproj" />
+    <ProjectReference Include="..\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
   </ItemGroup>
 
 </Project>
