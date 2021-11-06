@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
+﻿using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Processes;
@@ -10,9 +9,9 @@ public class GameProcessInfo
 
     public IPlayableObject PlayedInstance { get; }
 
-    public IReadOnlyCollection<IGameArgument> Arguments { get; }
+    public IGameArgumentCollection Arguments { get; }
 
-    public GameProcessInfo(IPlayableObject playedInstance, GameBuildType buildType, IReadOnlyCollection<IGameArgument> arguments)
+    public GameProcessInfo(IPlayableObject playedInstance, GameBuildType buildType, IGameArgumentCollection arguments)
     {
         Requires.NotNull(playedInstance, nameof(playedInstance));
         Requires.NotNull(arguments, nameof(arguments));

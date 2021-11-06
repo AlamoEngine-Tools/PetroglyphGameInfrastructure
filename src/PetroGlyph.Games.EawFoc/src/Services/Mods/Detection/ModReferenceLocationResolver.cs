@@ -65,12 +65,15 @@ public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
         if (!pathUtilities.IsAbsolute(game.Directory.FullName))
             throw new GameException("Game path must be absolute");
 
+        // Note about mod paths:
+        // The path can be absolute or relative. 
+        //  a) If absolute the mod may be located anywhere, even on different volumes.
+        //  b) If relative the path must be relative to the game's root directory.
+        // For starting mods the path also must not contain any spaces, but that's not assured here,
+        // because may have custom features to still support these mods. 
+
         if (pathUtilities.IsAbsolute(modIdentifier))
-        {
-            if (!pathUtilities.IsChildOf(game.Directory.FullName, modIdentifier))
-                throw new PetroglyphException("Mod and game must share the same path.");
             return fs.DirectoryInfo.FromDirectoryName(modIdentifier);
-        }
 
         var modLocationPath = fs.Path.Combine(game.Directory.FullName, modIdentifier);
         var modLocation = fs.DirectoryInfo.FromDirectoryName(modLocationPath);

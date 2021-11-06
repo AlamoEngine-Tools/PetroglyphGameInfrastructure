@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;
+using PetroGlyph.Games.EawFoc.Services.Steam;
 
 namespace PetroGlyph.Games.EawFoc;
 
@@ -18,5 +19,6 @@ public static class PetroglyphGameInfrastructureLibrary
     {
         serviceCollection.AddTransient<IGameRegistryFactory>(_ => new GameRegistryFactory());
         serviceCollection.AddTransient<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
+        serviceCollection.AddTransient<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
     }
 }

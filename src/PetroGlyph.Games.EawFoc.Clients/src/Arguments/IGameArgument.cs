@@ -1,17 +1,21 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+﻿using System;
 
-public interface IGameArgument<T> : IGameArgument
+namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+
+public interface IGameArgument<out T> : IGameArgument where T : notnull
 {
     new T Value { get; }
 }
 
-public interface IGameArgument
+public interface IGameArgument : IEquatable<IGameArgument>
 {
+    ArgumentKind Kind { get; }
+
     bool DebugArgument { get; }
 
     string Name { get; }
 
     object Value { get; }
 
-    string ToCommandLine();
+    string ValueToCommandLine();
 }
