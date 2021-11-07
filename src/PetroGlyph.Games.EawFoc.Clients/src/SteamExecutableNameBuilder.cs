@@ -7,7 +7,7 @@ namespace PetroGlyph.Games.EawFoc.Clients;
 internal class SteamExecutableNameBuilder : GameExecutableNameBuilderBase
 {
     private const string FileNameBase = "StarWars";
-    private const string ReleaseSuffix = "I";
+    private const string ReleaseSuffix = "G";
     private const string DebugSuffix = "I";
 
     public override IReadOnlyCollection<GamePlatform> SupportedPlatforms => new List<GamePlatform> { GamePlatform.SteamGold };

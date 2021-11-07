@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
+using PetroGlyph.Games.EawFoc.Mods;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
 
@@ -20,9 +21,16 @@ public abstract class DebugableClientBase : ClientBase, IDebugableGameClient
 
     public IGameProcess Debug(IPlayableObject instance)
     {
-        return Debug(instance, DefaultArguments, false);
+        var arguments = DefaultArguments;
+        if (instance is IMod mod)
+        {
+            var argFactory = ServiceProvider.GetService<IModArgumentListFactory>() ?? new ModArgumentListFactory(ServiceProvider);
+            var modArgs = argFactory.BuildArgumentList(mod);
+            arguments = ArgumentCollection.Merge(DefaultArguments, modArgs);
+        }
+        return Debug(instance, arguments, false);
     }
-
+    
     public IGameProcess Debug(IPlayableObject instance, IGameArgumentCollection arguments, bool fallbackToPlay)
     {
         var buildType = GameBuildType.Debug;
