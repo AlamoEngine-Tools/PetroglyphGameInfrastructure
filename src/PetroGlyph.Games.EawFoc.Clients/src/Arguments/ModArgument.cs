@@ -3,7 +3,7 @@
 public sealed class ModArgument : NamedArgument<string>
 {
     public ModArgument(string value, bool workshops) : 
-        base(workshops ? "STEAMMOD" : "MODPATH", value, false)
+        base(workshops ? ArgumentNameCatalog.SteamModArg : ArgumentNameCatalog.ModPathArg, value, false)
     {
     }
 

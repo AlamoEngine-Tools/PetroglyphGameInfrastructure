@@ -27,7 +27,7 @@ public class SteamGameClient : DebugableClientBase
         {
             Requires.NotNull(serviceProvider, nameof(serviceProvider));
             _steamWrapper = serviceProvider.GetRequiredService<ISteamWrapper>();
-            _internalLauncher = serviceProvider.GetService<IGameProcessLauncher>() ?? new DefaultGameProcessLauncher();
+            _internalLauncher = serviceProvider.GetService<IGameProcessLauncher>() ?? new DefaultGameProcessLauncher(serviceProvider);
         }
 
         public IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo)

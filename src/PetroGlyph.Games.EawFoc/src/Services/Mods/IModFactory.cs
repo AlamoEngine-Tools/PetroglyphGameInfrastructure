@@ -22,8 +22,11 @@ public interface IModFactory
     /// <param name="game">The parent <see cref="IGame"/> instance of the mod.</param>
     /// <param name="modReference">The mod reference of the new mod.</param>
     /// <returns>One mod or multiple variant mods. </returns>
-    /// <exception cref="IModReference">when <see cref="ModException"/> could not be located as an existing location</exception>
-    /// <exception cref="DirectoryNotFoundException">when no instance could be created due to missing information (such as the mod's name)</exception>
+    /// <exception cref="DirectoryNotFoundException"><paramref name="modReference"/> could not be located as an existing location</exception>
+    /// <exception cref="ModException">
+    /// <paramref name="modReference"/> or identified modinfo files had illegal information, such as empty names.
+    /// Or a duplicate mod was already in the result. 
+    /// </exception>
     IEnumerable<IPhysicalMod> FromReference(IGame game, IModReference modReference);
 
     /// <summary>
@@ -33,10 +36,13 @@ public interface IModFactory
     /// <remarks>The created mods dot NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
     /// <param name="game">The parent <see cref="IGame"/> instance of the mod.</param>
     /// <param name="modReference">The mod reference of the new mod.</param>
-    /// <param name="modinfo">Optional <see cref="DirectoryNotFoundException"/> from which the mod will get initialized.</param>
+    /// <param name="modinfo">Optional <see cref="IModinfo"/> from which the mod will get initialized.</param>
     /// <returns>the Mod instance</returns>
-    /// <exception cref="IModReference.Identifier">when <see cref="IModReference"/> could not be located as an existing location</exception>
-    /// <exception cref="ModinfoData">when no instance could be created due to missing information (such as the mod's name)</exception>
+    /// <exception cref="DirectoryNotFoundException">when <paramref name="modReference"/> could not be located as an existing location</exception>
+    /// <exception cref="ModException">
+    /// <paramref name="modReference"/> or identified modinfo files had illegal information, such as empty names.
+    /// Or a duplicate mod was already in the result. 
+    /// </exception>
     IPhysicalMod FromReference(IGame game, IModReference modReference, IModinfo? modinfo);
 
     /// <summary>
@@ -49,9 +55,8 @@ public interface IModFactory
     /// <param name="searchModinfoFile">When <see langword="true"/> a modinfo.json file, if present, will be used to initialize;
     /// otherwise a modinfo.json will be ignored</param>
     /// <returns>the Mod instance</returns>
-    /// <exception cref="DirectoryNotFoundException">when <see cref="IModReference.Identifier"/> could not be located as an existing location</exception>
+    /// <exception cref="DirectoryNotFoundException"><paramref name="modReference"/> could not be located as an existing location</exception>
     /// <exception cref="ModException">when no instance could be created due to missing information (such as the mod's name)</exception>
-    /// <exception cref="ModException">if <paramref name="searchModinfoFile"/> is true and the directory contains any variant files.</exception>
     IPhysicalMod FromReference(IGame game, IModReference modReference, bool searchModinfoFile);
 
     /// <summary>
@@ -62,9 +67,11 @@ public interface IModFactory
     /// <param name="game">The parent <see cref="IGame"/> instance of the mods.</param>
     /// <param name="modReference">Mod reference of the new mods.</param>
     /// <returns>All mod variants which are found.</returns>
-    /// <exception cref="DirectoryNotFoundException">when <see cref="IModReference.Identifier"/> could not be located as an existing location</exception>
-    /// <exception cref="ModException">when no instance could be created due to missing information (such as the mod's name)</exception>
-    /// <exception cref="ModException">when the same instance was created multiple times.</exception>
+    /// <exception cref="DirectoryNotFoundException"><paramref name="modReference"/> could not be located as an existing location</exception>
+    /// <exception cref="ModException">
+    /// <paramref name="modReference"/> or identified modinfo files had illegal information, such as empty names.
+    /// Or a duplicate mod was already in the result. 
+    /// </exception>
     IEnumerable<IPhysicalMod> VariantsFromReference(IGame game, IModReference modReference);
 
 

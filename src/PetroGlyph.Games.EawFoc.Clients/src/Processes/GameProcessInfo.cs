@@ -9,9 +9,9 @@ public class GameProcessInfo
 
     public IPlayableObject PlayedInstance { get; }
 
-    public IGameArgumentCollection Arguments { get; }
+    public IArgumentCollection Arguments { get; }
 
-    public GameProcessInfo(IPlayableObject playedInstance, GameBuildType buildType, IGameArgumentCollection arguments)
+    public GameProcessInfo(IPlayableObject playedInstance, GameBuildType buildType, IArgumentCollection arguments)
     {
         Requires.NotNull(playedInstance, nameof(playedInstance));
         Requires.NotNull(arguments, nameof(arguments));

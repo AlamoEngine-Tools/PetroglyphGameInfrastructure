@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
@@ -11,7 +10,7 @@ public sealed class ModArgumentList : GameArgument<IReadOnlyList<IGameArgument<s
 
     public override ArgumentKind Kind => ArgumentKind.ModList;
 
-    public override string Name => "MODLIST";
+    public override string Name => ArgumentNameCatalog.ModListArg;
 
     public ModArgumentList(IReadOnlyList<NamedArgument<string>> mods) : base(mods)
     {

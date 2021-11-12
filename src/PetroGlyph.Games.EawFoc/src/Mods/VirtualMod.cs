@@ -35,7 +35,7 @@ public sealed class VirtualMod : ModBase, IVirtualMod
         : base(game, ModType.Virtual, modInfoData, serviceProvider)
     {
         if (modInfoData.Dependencies is null || !modInfoData.Dependencies.Any())
-            throw new ModException("Virtual mods must be initialized with pre-defined dependencies");
+            throw new PetroglyphException("Virtual mods must be initialized with pre-defined dependencies");
 
         // Since we are in a ctor we cannot use the common services.
         // We have to use a lightweight implementation for resolving and checking dependencies.
@@ -67,7 +67,7 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     {
         Requires.NotNull(dependencies, nameof(dependencies));
         if (!dependencies.Any())
-            throw new ModException("Virtual mods must be initialized with pre-defined dependencies");
+            throw new PetroglyphException("Virtual mods must be initialized with pre-defined dependencies");
 
         // Since we are in a ctor we cannot use the common services.
         // We have to use a lightweight implementation for resolving and checking dependencies.
@@ -77,7 +77,7 @@ public sealed class VirtualMod : ModBase, IVirtualMod
         foreach (var dependency in dependencies)
         {
             if (!dependency.Mod.Game.Equals(game))
-                throw new ModException($"Game of mod {dependency} does not match this mod's game.");
+                throw new PetroglyphException($"Game of mod {dependency} does not match this mod's game.");
             DependenciesInternal.Add(dependency);
         }
         DependencyResolveLayout = layout;

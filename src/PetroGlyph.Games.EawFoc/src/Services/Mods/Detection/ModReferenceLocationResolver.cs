@@ -34,7 +34,7 @@ public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
         {
             ModType.Virtual => throw new NotSupportedException(
                 "Resolving physical location for a virtual mod is not allowed."),
-            ModType.Workshops when game.Platform != GamePlatform.SteamGold => throw new ModException(
+            ModType.Workshops when game.Platform != GamePlatform.SteamGold => throw new ModException(mod,
                 "Trying to find a workshop mods for a non-Steam game instance"),
             _ => mod.Type == ModType.Workshops ? ResolveWorkshopsMod(mod, game) : ResolveNormalMod(mod, game)
         };

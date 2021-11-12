@@ -9,5 +9,5 @@ public interface IDebugableGameClient : IGameClient
 
     IGameProcess Debug(IPlayableObject instance);
 
-    IGameProcess Debug(IPlayableObject instance, IGameArgumentCollection arguments, bool fallbackToPlay);
+    IGameProcess Debug(IPlayableObject instance, IArgumentCollection arguments, bool fallbackToPlay);
 }

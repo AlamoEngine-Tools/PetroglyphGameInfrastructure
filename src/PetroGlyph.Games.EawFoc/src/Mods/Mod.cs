@@ -120,8 +120,6 @@ public class Mod : ModBase, IPhysicalMod
     {
         Requires.NotNull(modDirectory, nameof(modDirectory));
         Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        if (!modDirectory.Exists)
-            throw new ModException($"The mod's directory '{modDirectory.FullName}' does not exists.");
         Directory = modDirectory;
         PathHelperService = serviceProvider.GetService<IPathHelperService>() ??
                             new PathHelperService(modDirectory.FileSystem);

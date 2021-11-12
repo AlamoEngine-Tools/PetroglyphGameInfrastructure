@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Steam;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
@@ -25,6 +26,7 @@ public class PetroglyphWindowsClientsLibrary
         serviceCollection.AddTransient<ISteamAppManifestReader>(sp => new SteamVdfReader(sp));
         serviceCollection.AddTransient<ILibraryConfigReader>(sp => new SteamVdfReader(sp));
         serviceCollection.AddTransient<ISteamLibraryFinder>(sp => new SteamLibraryFinder(sp));
-        
+        serviceCollection.AddTransient<IArgumentValidator>(_ => new ArgumentValidator());
+        serviceCollection.AddTransient<IArgumentCommandLineBuilder>(sp => new ArgumentCommandLineBuilder(sp));
     }
 }

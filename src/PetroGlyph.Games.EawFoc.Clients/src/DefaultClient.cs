@@ -12,6 +12,6 @@ public sealed class DefaultClient : ClientBase
     
     protected override IGameProcessLauncher GetGameLauncherService()
     { 
-        return ServiceProvider.GetService<IGameProcessLauncher>() ?? new DefaultGameProcessLauncher();
+        return ServiceProvider.GetService<IGameProcessLauncher>() ?? new DefaultGameProcessLauncher(ServiceProvider);
     }
 }

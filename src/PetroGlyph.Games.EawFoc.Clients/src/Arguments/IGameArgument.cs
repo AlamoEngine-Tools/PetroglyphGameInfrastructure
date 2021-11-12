@@ -18,4 +18,6 @@ public interface IGameArgument : IEquatable<IGameArgument>
     object Value { get; }
 
     string ValueToCommandLine();
+
+    bool IsValid(out ArgumentValidityStatus reason);
 }

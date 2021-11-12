@@ -20,7 +20,7 @@ namespace PetroGlyph.Games.EawFoc.Clients
 
             serviceCollection.AddTransient<IGameExecutableFileService>(sp => new GameExecutableFileService(sp));
             serviceCollection.AddTransient<IGameExecutableNameBuilder>(sp => new DefaultGameExecutableNameBuilder(sp));
-            serviceCollection.AddTransient<IGameExecutableNameBuilder>(sp => new DefaultGameExecutableNameBuilder(sp));
+            serviceCollection.AddTransient<IGameExecutableNameBuilder>(sp => new SteamExecutableNameBuilder(sp));
         }
     }
 }

@@ -26,12 +26,12 @@ public abstract class DebugableClientBase : ClientBase, IDebugableGameClient
         {
             var argFactory = ServiceProvider.GetService<IModArgumentListFactory>() ?? new ModArgumentListFactory(ServiceProvider);
             var modArgs = argFactory.BuildArgumentList(mod);
-            arguments = ArgumentCollection.Merge(DefaultArguments, modArgs);
+            arguments = new ArgumentCollectionBuilder(DefaultArguments).Add(modArgs).Build();
         }
         return Debug(instance, arguments, false);
     }
     
-    public IGameProcess Debug(IPlayableObject instance, IGameArgumentCollection arguments, bool fallbackToPlay)
+    public IGameProcess Debug(IPlayableObject instance, IArgumentCollection arguments, bool fallbackToPlay)
     {
         var buildType = GameBuildType.Debug;
         if (!IsDebugAvailable(instance))

@@ -18,6 +18,7 @@ internal sealed class GameProcess : IGameProcess
     {
         add
         {
+            // Execute event right away if the process was already closed.
             if (_closed)
                 value?.Invoke(this, EventArgs.Empty);
             else

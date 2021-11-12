@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
-public struct EmptyArgumentsCollection : IGameArgumentCollection
+public struct EmptyArgumentsCollection : IArgumentCollection
 {
     public IEnumerator<IGameArgument> GetEnumerator()
     {
@@ -17,25 +17,16 @@ public struct EmptyArgumentsCollection : IGameArgumentCollection
 
     public int Count => 0;
 
-    public string ToCommandlineString() => string.Empty;
-
-    private struct Enumerator : IEnumerator<IGameArgument>
+    public struct Enumerator : IEnumerator<IGameArgument>
     {
-        public IGameArgument Current => default!;
+        public bool MoveNext() => false;
+
+        public void Reset() { }
+
+        public IGameArgument Current => null!;
 
         object IEnumerator.Current => Current;
 
-        public bool MoveNext()
-        {
-            return false;
-        }
-
-        public void Reset()
-        {
-        }
-        
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
 }

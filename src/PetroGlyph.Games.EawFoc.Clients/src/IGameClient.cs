@@ -14,7 +14,7 @@ public interface IGameClient
 
     event EventHandler<IGameProcess> GameClosed;
 
-    IGameArgumentCollection DefaultArguments { get; }
+    IArgumentCollection DefaultArguments { get; }
 
     IReadOnlyCollection<IPlayableObject> RunningInstances { get; }
 
@@ -22,5 +22,5 @@ public interface IGameClient
 
     IGameProcess Play(IPlayableObject instance);
 
-    IGameProcess Play(IPlayableObject instance, IGameArgumentCollection arguments);
+    IGameProcess Play(IPlayableObject instance, IArgumentCollection arguments);
 }

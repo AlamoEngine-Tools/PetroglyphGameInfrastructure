@@ -113,7 +113,7 @@ public class ModFactory : IModFactory
         {
             if (!mods.Add(mod))
                 throw new ModException(
-                    $"Unable to create mod {mod.Name} " +
+                    mod, $"Unable to create mod {mod.Name} " +
                     $"from '{modReferenceLocation.FullName}' because it already was created within this operation.");
         }
 
@@ -149,12 +149,12 @@ public class ModFactory : IModFactory
         foreach (var variant in variantModInfoFiles)
         {
             if (variant.FileKind == ModinfoFileKind.MainFile)
-                throw new ModException("Cannot create a variant mod from a main modinfo file.");
+                throw new ModException(modReference, "Cannot create a variant mod from a main modinfo file.");
 
             var mod = CreateModFromDirectory(game, modReference, modReferenceLocation, variant);
             if (!variants.Add(mod) || !names.Add(mod.Name))
                 throw new ModException(
-                    $"Unable to create variant mod of name {mod.Name}, because it already exists");
+                    mod, $"Unable to create variant mod of name {mod.Name}, because it already exists");
         }
 
         return variants;
@@ -190,7 +190,7 @@ public class ModFactory : IModFactory
         if (string.IsNullOrEmpty(name))
             name = _nameResolver.ResolveName(modReference);
         if (string.IsNullOrEmpty(name))
-            throw new ModException("Unable to create a mod with an empty name.");
+            throw new ModException(modReference, "Unable to create a mod with an empty name.");
         return name!;
     }
 }

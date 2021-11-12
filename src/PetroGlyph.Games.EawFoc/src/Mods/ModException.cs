@@ -8,18 +8,39 @@ namespace PetroGlyph.Games.EawFoc.Mods;
 /// </summary>
 public class ModException : PetroglyphException
 {
-    /// <inheritdoc/>
-    public ModException()
+    /// <summary>
+    /// The <see cref="IModReference"/> which caused the exception.
+    /// </summary>
+    public IModReference Mod { get; }
+
+    /// <summary>
+    /// Creates a new exception caused by <paramref name="mod"/>.
+    /// </summary>
+    /// <param name="mod">The mod which caused the exception.</param>
+    public ModException(IModReference mod)
     {
+        Mod = mod;
     }
 
-    /// <inheritdoc/>
-    public ModException(string message) : base(message)
+    /// <summary>
+    /// Creates a new exception caused by <paramref name="mod"/>.
+    /// </summary>
+    /// <param name="mod">The mod which caused the exception.</param>
+    /// <param name="message">The error message that explains the reason for the exception.</param>
+    public ModException(IModReference mod, string message) : base(message)
     {
+        Mod = mod;
     }
 
-    /// <inheritdoc/>
-    public ModException(string message, Exception exception) : base(message, exception)
+    /// <summary>
+    /// Creates a new exception caused by <paramref name="mod"/>.
+    /// </summary>
+    /// <param name="mod">The mod which caused the exception.</param>
+    /// <param name="message">The error message that explains the reason for the exception.</param>
+    /// <param name="exception">The exception that is the cause of the current exception,
+    /// or a <see langword="null"/> reference if no inner exception is specified.</param>
+    public ModException(IModReference mod, string message, Exception exception) : base(message, exception)
     {
+        Mod = mod;
     }
 }

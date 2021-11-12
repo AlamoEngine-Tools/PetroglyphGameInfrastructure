@@ -41,7 +41,7 @@ public class ModDependencyResolver : IDependencyResolver
             ResolveDependencies(dependencyGraph, mod);
 
         if (options.CheckForCycle && dependencyGraph.HasCycle())
-            throw new ModDependencyCycleException($"The mod {mod} has a dependency cycle");
+            throw new ModDependencyCycleException(mod, $"The mod {mod} has a dependency cycle");
 
         // We cannot use the graph here because DependenciesOf always returns the direct neighbors, 
         // meaning e.g. a FullResolved layout might not get returned in a whole by this.

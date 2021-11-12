@@ -21,5 +21,26 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
 
     public abstract string ValueToCommandLine();
 
+    protected virtual bool IsDataValid()
+    {
+        return true;
+    }
+
+    public bool IsValid(out ArgumentValidityStatus reason)
+    {
+        return IsValid(new ArgumentValidator(), out reason);
+    }
+
+    internal bool IsValid(IArgumentValidator validator, out ArgumentValidityStatus reason)
+    {
+        reason = validator.CheckArgument(this, out _, out _);
+        if (reason != ArgumentValidityStatus.Valid)
+            return false;
+        if (IsDataValid())
+            return true;
+        reason = ArgumentValidityStatus.InvalidData;
+        return false;
+    }
+
     public abstract bool Equals(IGameArgument other);
 }

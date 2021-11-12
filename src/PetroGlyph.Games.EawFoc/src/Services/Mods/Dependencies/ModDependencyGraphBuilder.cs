@@ -110,7 +110,7 @@ public class ModDependencyGraphBuilder : IModDependencyGraphBuilder
     private static (IList<IMod>, DependencyResolveLayout) ResolvingDependenciesFactory(IMod source)
     {
         if (source.DependencyResolveStatus != DependencyResolveStatus.Resolved)
-            throw new ModException($"Mod {source} is not yet resolved.");
+            throw new ModException(source, $"Mod {source} is not yet resolved.");
         return (source.Dependencies.Select(d => d.Mod).ToList(), source.DependencyResolveLayout);
     }
 

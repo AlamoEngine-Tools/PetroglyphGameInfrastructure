@@ -64,7 +64,7 @@ public class ModArgumentListFactory : IModArgumentListFactory
             // we try to relativize to path if it's not absolute.
             var relativeOrAbsoluteModPath = GetAbsoluteOrRelativeModPath(mod);
             if (relativeOrAbsoluteModPath.Any(char.IsWhiteSpace))
-                throw new InvalidOperationException(
+                throw new ModException(mod,
                     $"MODPATH value '{relativeOrAbsoluteModPath}' must not contain white space characters");
             argumentValue = relativeOrAbsoluteModPath;
         }

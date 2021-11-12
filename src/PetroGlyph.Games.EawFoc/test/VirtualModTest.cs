@@ -27,11 +27,11 @@ namespace PetroGlyph.Games.EawFoc.Test
             Assert.Throws<ArgumentNullException>(() => new VirtualMod("name", game.Object, new List<ModDependencyEntry>(), DependencyResolveLayout.FullResolved, null));
             var sp = new Mock<IServiceProvider>();
             Assert.Throws<ModinfoException>(() => new VirtualMod(game.Object, new Mock<IModinfo>().Object, sp.Object));
-            Assert.Throws<ModException>(() => new VirtualMod("name", game.Object, new List<ModDependencyEntry>(), DependencyResolveLayout.FullResolved, sp.Object));
+            Assert.Throws<PetroglyphException>(() => new VirtualMod("name", game.Object, new List<ModDependencyEntry>(), DependencyResolveLayout.FullResolved, sp.Object));
             var modinfo = new Mock<IModinfo>();
             modinfo.Setup(i => i.Name).Returns("Name");
             modinfo.Setup(i => i.Dependencies).Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-            Assert.Throws<ModException>(() => new VirtualMod(game.Object, modinfo.Object, sp.Object));
+            Assert.Throws<PetroglyphException>(() => new VirtualMod(game.Object, modinfo.Object, sp.Object));
         }
 
         [Fact]

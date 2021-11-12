@@ -148,7 +148,7 @@ public abstract class ModBase : PlayableObject, IMod
         Requires.NotNull(resolver, nameof(resolver));
         Requires.NotNull(options, nameof(options));
         if (DependencyResolveStatus == DependencyResolveStatus.Resolving)
-            throw new ModDependencyCycleException("Already resolving the current instance's dependencies. Is there a Cycle?");
+            throw new ModDependencyCycleException(this, "Already resolving the current instance's dependencies. Is there a Cycle?");
 
         try
         {
@@ -171,7 +171,7 @@ public abstract class ModBase : PlayableObject, IMod
     public virtual bool AddMod(IMod mod)
     {
         if (Game != mod.Game)
-            throw new ModException("Game instances of the two mods must be equal");
+            throw new ModException(mod, "Game instances of the two mods must be equal");
         var result = ModsInternal.Add(mod);
         if (result)
             OnModsCollectionModified(new ModCollectionChangedEventArgs(mod, ModCollectionChangedAction.Add));

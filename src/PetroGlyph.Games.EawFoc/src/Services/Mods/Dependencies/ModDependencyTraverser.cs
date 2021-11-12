@@ -29,7 +29,7 @@ public class ModDependencyTraverser : IModDependencyTraverser
                            new ModDependencyGraphBuilder();
         var dependencyGraph = graphBuilder.Build(targetMod);
         if (dependencyGraph.HasCycle())
-            throw new ModDependencyCycleException($"Cycle detected while traversing {targetMod}.");
+            throw new ModDependencyCycleException(targetMod, $"Cycle detected while traversing {targetMod}.");
 
         var result = TraverseCore(dependencyGraph, new ModDependencyEntry(targetMod), new List<ModDependencyEntry>(), new Queue<ModDependencyEntry>());
         RemoveDuplicates(result);

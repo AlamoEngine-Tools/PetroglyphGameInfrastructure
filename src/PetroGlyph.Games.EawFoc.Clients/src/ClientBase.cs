@@ -21,7 +21,7 @@ public abstract class ClientBase : IGameClient
 
     protected readonly IServiceProvider ServiceProvider;
 
-    public virtual IGameArgumentCollection DefaultArguments => new EmptyArgumentsCollection();
+    public virtual IArgumentCollection DefaultArguments => new EmptyArgumentsCollection();
 
     public IReadOnlyCollection<IPlayableObject> RunningInstances =>
         _runningInstances.Select(i => i.ProcessInfo.PlayedInstance).ToList();
@@ -55,17 +55,17 @@ public abstract class ClientBase : IGameClient
         {
             var argFactory = ServiceProvider.GetService<IModArgumentListFactory>() ?? new ModArgumentListFactory(ServiceProvider);
             var modArgs = argFactory.BuildArgumentList(mod);
-            arguments = ArgumentCollection.Merge(DefaultArguments, modArgs);
+            arguments = new ArgumentCollectionBuilder(DefaultArguments).Add(modArgs).Build();
         }
         return Play(instance, arguments);
     }
 
-    public IGameProcess Play(IPlayableObject instance, IGameArgumentCollection arguments)
+    public IGameProcess Play(IPlayableObject instance, IArgumentCollection arguments)
     {
         return StartGame(instance, arguments, GameBuildType.Release);
     }
 
-    protected IGameProcess StartGame(IPlayableObject instance, IGameArgumentCollection arguments, GameBuildType type)
+    protected IGameProcess StartGame(IPlayableObject instance, IArgumentCollection arguments, GameBuildType type)
     {
         Requires.NotNull(instance, nameof(instance));
         Requires.NotNull(arguments, nameof(arguments));
@@ -92,8 +92,10 @@ public abstract class ClientBase : IGameClient
     private void OnGameStartedInternal(IGameProcess gameProcess)
     {
         OnGameStarted(gameProcess);
+        // Quit immediately if process was already terminated.
         if (gameProcess.State == GameProcessState.Closed)
             return;
+        GameStarted?.Invoke(this, gameProcess);
         lock (_syncObj)
         {
             gameProcess.Closed += OnGameProcessClosed;
@@ -149,6 +151,8 @@ public abstract class ClientBase : IGameClient
     /// Gets called before right after the game process was started.
     /// </summary>
     /// <remarks>
+    /// This method races with the <paramref name="gameProcess"/> lifetime.
+    /// It is possible that the process terminates before this method is finished.
     /// Important: Do not raise the <see cref="GameStarted"/> event. This will be done by the base class.
     /// </remarks>
     protected virtual void OnGameStarted(IGameProcess gameProcess)

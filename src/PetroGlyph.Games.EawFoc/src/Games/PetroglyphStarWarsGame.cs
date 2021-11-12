@@ -139,7 +139,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     {
         // To avoid programming errors due to copies of the same game instance, we only check for reference equality.
         if (!ReferenceEquals(this, mod.Game))
-            throw new ModException("Mod does not match to this game instance.");
+            throw new ModException(mod, "Mod does not match to this game instance.");
 
         var result = ModsInternal.Add(mod);
         if (result)
