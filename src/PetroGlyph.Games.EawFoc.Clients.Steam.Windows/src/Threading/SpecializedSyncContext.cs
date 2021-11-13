@@ -2,7 +2,7 @@
 using System.Threading;
 using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Threading;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
 
 // From https://github.com/microsoft/vs-threading
 internal readonly struct SpecializedSyncContext : IDisposable

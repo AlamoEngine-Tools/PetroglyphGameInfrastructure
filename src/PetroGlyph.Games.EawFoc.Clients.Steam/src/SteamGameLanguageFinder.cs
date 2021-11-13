@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Language;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
 /// <summary>
 /// Searches installed game languages, based on the Steam Game Manifest.

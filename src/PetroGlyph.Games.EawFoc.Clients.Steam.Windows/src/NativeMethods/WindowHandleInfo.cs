@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace PetroGlyph.Games.EawFoc.Clients.NativeMethods;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
 
 internal class WindowHandleInfo
 {

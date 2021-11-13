@@ -2,17 +2,14 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Windows.Test
+namespace PetroGlyph.Games.EawFoc.Clients.Steam.Test
 {
     public class SteamPetroglyphStarWarsGameDetectorTest
     {

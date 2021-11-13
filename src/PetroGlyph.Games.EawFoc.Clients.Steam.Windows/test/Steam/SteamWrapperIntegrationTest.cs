@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Windows.Test.Steam
+namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
 {
     public class SteamWrapperIntegrationTest
     {
@@ -15,7 +14,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Windows.Test.Steam
         {
             var sc = new ServiceCollection();
             PetroglyphClientsLibrary.InitializeLibraryWithDefaultServices(sc); 
-            PetroglyphWindowsClientsLibrary.InitializeLibraryWithDefaultServices(sc);
+            PetroglyphWindowsSteamClientsLibrary.InitializeLibraryWithDefaultServices(sc);
 
             _sp = sc.BuildServiceProvider();
             _service = _sp.GetRequiredService<ISteamWrapper>() as SteamWrapper;

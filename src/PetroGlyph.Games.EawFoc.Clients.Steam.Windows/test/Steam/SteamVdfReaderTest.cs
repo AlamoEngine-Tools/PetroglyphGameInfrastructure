@@ -3,11 +3,10 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using Sklavenwalker.CommonUtilities.FileSystem;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Windows.Test.Steam;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam;
 
 public class SteamVdfReaderTest
 {

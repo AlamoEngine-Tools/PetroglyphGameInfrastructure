@@ -180,12 +180,12 @@ public abstract class GameDetector : IGameDetector
         /// <summary>
         /// Nullable location entry.
         /// </summary>
-        public IDirectoryInfo? Location { get; init; }
+        public IDirectoryInfo? Location;
 
         /// <summary>
         /// Indicates whether an initialization is required.
         /// </summary>
-        public bool InitializationRequired { get; init; }
+        public bool InitializationRequired;
 
         /// <summary>
         /// Indicates whether this instance represents an installed game.

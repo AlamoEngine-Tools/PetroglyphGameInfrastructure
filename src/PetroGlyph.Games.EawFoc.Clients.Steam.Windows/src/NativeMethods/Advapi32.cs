@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
-using PetroGlyph.Games.EawFoc.Clients.Threading;
+using PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
 
-namespace PetroGlyph.Games.EawFoc.Clients.NativeMethods;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
 
 internal static class Advapi32
 {

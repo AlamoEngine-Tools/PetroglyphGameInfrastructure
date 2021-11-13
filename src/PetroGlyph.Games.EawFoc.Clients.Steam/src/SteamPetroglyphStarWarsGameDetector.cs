@@ -1,12 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
 /// <summary>
 /// Searches an installation of a Petroglyph Star Wars game on the Steam client.
@@ -35,7 +34,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
 
     /// <inheritdoc/>
     protected override GameLocationData FindGameLocation(GameDetectorOptions options)
-    { 
+    {
         if (!_steamWrapper.Installed)
             return default;
 

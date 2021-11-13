@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using PetroGlyph.Games.EawFoc.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
 internal class SteamExecutableNameBuilder : GameExecutableNameBuilderBase
 {

@@ -5,10 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using Microsoft.Win32.SafeHandles;
-using PetroGlyph.Games.EawFoc.Clients.NativeMethods;
+using PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
 using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Threading;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
 
 // From https://github.com/microsoft/vs-threading
 internal static class AwaitExtensions

@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace PetroGlyph.Games.EawFoc.Clients.NativeMethods;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
 
 internal static class User32
 {

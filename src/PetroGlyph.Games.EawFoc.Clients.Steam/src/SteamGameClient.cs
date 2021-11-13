@@ -2,10 +2,9 @@
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
 /// <summary>
 /// <see cref="IDebugableGameClient"/> dedicated to the steam version of the games.

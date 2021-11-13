@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
 /// <summary>
 /// Provides initialization routines for this library.
 /// </summary>
-public class PetroglyphWindowsClientsLibrary
+public class PetroglyphWindowsSteamClientsLibrary
 {
     /// <summary>
     /// Adds services provided by this library to the given <paramref name="serviceCollection"/>

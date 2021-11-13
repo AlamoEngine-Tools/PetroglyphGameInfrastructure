@@ -17,7 +17,7 @@
 	  <SignAssembly>true</SignAssembly>
 	  <DelaySign>false</DelaySign>
 	  <AssemblyOriginatorKeyFile>../../../AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
-	  <RootNamespace>PetroGlyph.Games.EawFoc.Clients</RootNamespace>
+	  <RootNamespace>PetroGlyph.Games.EawFoc.Clients.Steam</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc.Clients.Steam\src\PetroGlyph.Games.EawFoc.Clients.Steam.csproj" />
     <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
     <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
   </ItemGroup>
