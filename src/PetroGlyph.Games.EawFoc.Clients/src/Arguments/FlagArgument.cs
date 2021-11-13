@@ -2,13 +2,13 @@
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
-public sealed class FlagArgument : GameArgument<bool>
+public abstract class FlagArgument : GameArgument<bool>
 {
     public override ArgumentKind Kind { get; }
 
     public override string Name { get; }
 
-    public FlagArgument(string name, bool value, bool dashed = false, bool debug = false) : base(value, debug)
+    protected FlagArgument(string name, bool value, bool dashed = false, bool debug = false) : base(value, debug)
     {
         Name = name;
         Kind = dashed ? ArgumentKind.DashedFlag : ArgumentKind.Flag;

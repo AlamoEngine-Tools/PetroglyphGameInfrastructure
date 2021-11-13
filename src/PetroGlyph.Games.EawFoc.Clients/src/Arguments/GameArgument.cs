@@ -1,4 +1,5 @@
-﻿using Validation;
+﻿using System;
+using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
@@ -33,13 +34,21 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
 
     internal bool IsValid(IArgumentValidator validator, out ArgumentValidityStatus reason)
     {
-        reason = validator.CheckArgument(this, out _, out _);
-        if (reason != ArgumentValidityStatus.Valid)
+        try
+        {
+            reason = validator.CheckArgument(this, out _, out _);
+            if (reason != ArgumentValidityStatus.Valid)
+                return false;
+            if (IsDataValid())
+                return true;
+            reason = ArgumentValidityStatus.InvalidData;
             return false;
-        if (IsDataValid())
-            return true;
-        reason = ArgumentValidityStatus.InvalidData;
-        return false;
+        }
+        catch (Exception)
+        {
+            reason = ArgumentValidityStatus.InvalidData;
+            return false;
+        }
     }
 
     public abstract bool Equals(IGameArgument other);

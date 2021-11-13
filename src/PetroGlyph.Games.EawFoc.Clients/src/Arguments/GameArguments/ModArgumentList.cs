@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 
 public sealed class ModArgumentList : GameArgument<IReadOnlyList<IGameArgument<string>>>
 {

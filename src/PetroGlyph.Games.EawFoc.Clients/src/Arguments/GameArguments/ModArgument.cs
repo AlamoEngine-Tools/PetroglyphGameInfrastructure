@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+﻿namespace PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 
 public sealed class ModArgument : NamedArgument<string>
 {

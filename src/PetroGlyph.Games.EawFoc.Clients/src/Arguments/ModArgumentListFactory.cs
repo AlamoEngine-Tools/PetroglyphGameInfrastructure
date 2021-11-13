@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
+using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Steam;
-using Sklavenwalker.CommonUtilities.FileSystem;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
@@ -62,7 +62,7 @@ public class ModArgumentListFactory : IModArgumentListFactory
             // The path MUST NOT contain any spacing. Even escaping it with " or ' does not help.
             // It will not be launched by the game. To allow the game part of the full path is allowed to have spaces,
             // we try to relativize to path if it's not absolute.
-            var relativeOrAbsoluteModPath = GetAbsoluteOrRelativeModPath(mod);
+            var relativeOrAbsoluteModPath = new ArgumentValueSerializer().ShortenPath(mod.Directory, mod.Game.Directory);
             if (relativeOrAbsoluteModPath.Any(char.IsWhiteSpace))
                 throw new ModException(mod,
                     $"MODPATH value '{relativeOrAbsoluteModPath}' must not contain white space characters");
@@ -72,23 +72,9 @@ public class ModArgumentListFactory : IModArgumentListFactory
         {
             var steamHelper = _serviceProvider.GetRequiredService<ISteamGameHelpers>();
             if (!steamHelper.ToSteamWorkshopsId(argumentValue, out _))
-                throw new InvalidOperationException("Identifier is not a valid SteamID");
+                throw new SteamException("Identifier is not a valid SteamID");
         }
 
         return new ModArgument(argumentValue, isWorkshop);
-    }
-
-
-    private string GetAbsoluteOrRelativeModPath(IPhysicalMod mod)
-    {
-        var pathHelper = _serviceProvider.GetService<IPathHelperService>() ?? new PathHelperService(mod.FileSystem);
-        
-        var gamePath = pathHelper.EnsureTrailingSeparator(
-            pathHelper.NormalizePath(mod.Game.Directory.FullName, PathNormalizeOptions.Full));
-        var modPath = pathHelper.EnsureTrailingSeparator(
-            pathHelper.NormalizePath(mod.Directory.FullName, PathNormalizeOptions.Full));
-
-        // It's important not to resolve, as that would give us an absolute path again.
-        return pathHelper.NormalizePath(pathHelper.GetRelativePath(gamePath, modPath), PathNormalizeOptions.FullNoResolve);
     }
 }

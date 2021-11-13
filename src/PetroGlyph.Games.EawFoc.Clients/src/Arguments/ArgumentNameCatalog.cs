@@ -11,6 +11,7 @@ public static class ArgumentNameCatalog
     public const string ModListArg = "MODLIST";
     public const string WindowedArg = "WINDOWED";
     public const string MCEArg = "MCE";
+    public const string LowRamArg = "LOWRAM";
     public const string SafeModeArg = "SAFEMODE";
     public const string IgnoreAssertsArg = "IGNOREASSERTS";
     public const string NoArtProcessArg = "NOARTPROCESS";
@@ -57,8 +58,8 @@ public static class ArgumentNameCatalog
     public const string ProfileArg = "PROFILE";
     public const string BCast4Arg = "BCAST4";
     public const string BCast3Arg = "BCAST3";
-    public const string BCast1Arg = "BCAST2";
-    public const string AILogSytyleArg = "AILOGSTYLE";
+    public const string BCast2Arg = "BCAST2";
+    public const string AILogStyleArg = "AILOGSTYLE";
     public const string AILogFileArg = "AILOGFILE";
     public const string SyncLogFilterArg = "SYNCLOGFILTER";
     public const string RandomLogFileArg = "RANDOMLOGFILE";
@@ -74,68 +75,68 @@ public static class ArgumentNameCatalog
 
     public static IReadOnlyCollection<string> SupportedFlagArgumentNames => new HashSet<string>
     {
-        "WINDOWED",
-        "MCE",
-        "LOWRAM",
-        "SAFEMODE",
-        "IGNOREASSERTS",
-        "NOARTPROCESS",
-        "RECORDING",
-        "MULTI",
-        "PERSISTASSERTS",
-        "NOTIMEOUT",
-        "SUPRESSLOG",
-        "PREVALIDATE_AUDIO_MEGS",
-        "LEFTLEFT",
-        "DEEPSYNC",
-        "NOFOW",
-        "NOINTRO",
-        "SAVELOADDEBUG",
-        "REFCOUNTTRACKING",
-        "NOHARDWAREMOUSE",
-        "PROCESS_ENGLISH_ASSETS_AND_EXIT",
-        "PROCESS_ASSETS_AND_EXIT",
-        "ATTRACT",
-        "DEBUG_UNITS",
-        "NOMENU",
-        "FULLSCREEN"
+        WindowedArg,
+        MCEArg,
+        LowRamArg,
+        SafeModeArg,
+        IgnoreAssertsArg,
+        NoArtProcessArg,
+        RecordingArg,
+        MultiArg,
+        PersistAssertsArg,
+        NoTimeoutArg,
+        SuppressLogArg,
+        PreValidateAudioMessagesArg,
+        LeftLeftArg,
+        DeepSyncArg,
+        NoFowArg,
+        NoIntroArg,
+        SaveLoadDebugArg,
+        RefCountTrackingArg,
+        NoHardwareMouseArg,
+        ProcessEnglishAssetsAndExitArg,
+        ProcessAssetsAndExitArg,
+        AttractArg,
+        DebugUnitsArg,
+        NoMenuArg,
+        FullScreenArg
 
     };
 
     public static IReadOnlyCollection<string> SupportedKeyValueArgumentNames => new HashSet<string>
     {
-        "LOCALPORT",
-        "MONITOR",
-        "SCREENWIDTH",
-        "SCREENHEIGHT",
-        "FPSCAP",
-        "FALLBACKPATH",
-        "MODPATH",
-        "STEAMMOD",
-        "LANGUAGE",
-        "ORIGINAL_ASSET_PATH",
-        "RANDOMSEED",
-        "EXPCDKEY",
-        "CDKEY",
-        "MPPLAYBACKFILE",
-        "MPRECORDFILE",
-        "MAP",
-        "RECORDING",
-        "SAVEFOLDER",
-        "QUICKLOADRECORDING",
-        "QUICKLOAD",
-        "CONFIG",
-        "PROFILE",
-        "BCAST4",
-        "BCAST3",
-        "BCAST2",
-        "AILOGSTYLE",
-        "AILOGFILE",
-        "SYNCLOGFILTER",
-        "RANDOMLOGFILE",
-        "LOGFILE",
-        "CONSOLECOMMANDFILE",
-        "CONNECTPORT",
-        "CONNECTIP"
+        LocalPortArg,
+        MonitorArg,
+        ScreenWidthArg,
+        ScreenHeightArg,
+        FPSCapArg,
+        FallbackPathArg,
+        ModPathArg,
+        SteamModArg,
+        LanguageArg,
+        OriginalAssetPathArg,
+        RandomSeedArg,
+        ExpCDKeyArg,
+        CDKeyArg,
+        MPPlaybackFileArg,
+        MPRecordFileArg,
+        MapArg,
+        RecordingArg,
+        SaveFolderArg,
+        QuickLoadRecordingArg,
+        QuickLoadArg,
+        ConfigArg,
+        ProfileArg,
+        BCast2Arg,
+        BCast3Arg,
+        BCast4Arg,
+        AILogStyleArg,
+        AILogFileArg,
+        SyncLogFilterArg,
+        RandomLogFileArg,
+        LogFileArg,
+        ConsoleCommandFileArg,
+        ConnectPortArg,
+        ConnectIPArg
     };
 }
