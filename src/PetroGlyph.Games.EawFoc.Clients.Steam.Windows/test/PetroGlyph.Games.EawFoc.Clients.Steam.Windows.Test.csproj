@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
-    <ProjectReference Include="..\src\PetroGlyph.Games.EawFoc.Clients.Windows.csproj" />
+    <ProjectReference Include="..\src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows.csproj" />
   </ItemGroup>
 
 </Project>

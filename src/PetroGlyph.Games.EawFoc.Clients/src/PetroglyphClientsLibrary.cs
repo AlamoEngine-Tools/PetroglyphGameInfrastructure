@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 
 namespace PetroGlyph.Games.EawFoc.Clients
@@ -21,6 +22,9 @@ namespace PetroGlyph.Games.EawFoc.Clients
             serviceCollection.AddTransient<IGameExecutableFileService>(sp => new GameExecutableFileService(sp));
             serviceCollection.AddTransient<IGameExecutableNameBuilder>(sp => new DefaultGameExecutableNameBuilder(sp));
             serviceCollection.AddTransient<IGameExecutableNameBuilder>(sp => new SteamExecutableNameBuilder(sp));
+
+            serviceCollection.AddTransient<IArgumentValidator>(_ => new ArgumentValidator());
+            serviceCollection.AddTransient<IArgumentCommandLineBuilder>(sp => new ArgumentCommandLineBuilder(sp));
         }
     }
 }
