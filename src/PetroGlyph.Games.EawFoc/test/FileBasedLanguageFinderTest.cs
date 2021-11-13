@@ -11,12 +11,12 @@ using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test
 {
-    public class SharedLanguageFinderTest
+    public class FileBasedLanguageFinderTest
     {
         [Fact]
         public void TestMerge()
         {
-            var finder = new SharedLanguageFinder();
+            var finder = new FileBasedLanguageFinder();
             Assert.Empty(finder.Merge());
 
             var enumA = new List<ILanguageInfo>
@@ -49,7 +49,7 @@ namespace PetroGlyph.Games.EawFoc.Test
             var game = new Mock<IGame>();
             game.Setup(g => g.FileService).Returns(fileService.Object);
 
-            var finder = new SharedLanguageFinder();
+            var finder = new FileBasedLanguageFinder();
             var actual = finder.GetTextLocalizations(game.Object);
 
             Assert.Empty(actual);
@@ -74,7 +74,7 @@ namespace PetroGlyph.Games.EawFoc.Test
             game.Setup(g => g.FileService).Returns(fileService.Object);
             game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
 
-            var finder = new SharedLanguageFinder();
+            var finder = new FileBasedLanguageFinder();
             var actual = finder.GetTextLocalizations(game.Object);
 
             Assert.Equal(new HashSet<ILanguageInfo>
@@ -106,7 +106,7 @@ namespace PetroGlyph.Games.EawFoc.Test
             game.Setup(g => g.FileSystem).Returns(fs);
             game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
 
-            var finder = new SharedLanguageFinder();
+            var finder = new FileBasedLanguageFinder();
             var actual = finder.GetSfxMegLocalizations(game.Object);
 
             Assert.Equal(new HashSet<ILanguageInfo>
@@ -138,7 +138,7 @@ namespace PetroGlyph.Games.EawFoc.Test
             game.Setup(g => g.FileSystem).Returns(fs);
             game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
 
-            var finder = new SharedLanguageFinder();
+            var finder = new FileBasedLanguageFinder();
             var actual = finder.GetSpeechLocalizationsFromMegs(game.Object);
 
             Assert.Equal(new HashSet<ILanguageInfo>
@@ -165,7 +165,7 @@ namespace PetroGlyph.Games.EawFoc.Test
             game.Setup(g => g.FileSystem).Returns(fs);
             game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
 
-            var finder = new SharedLanguageFinder();
+            var finder = new FileBasedLanguageFinder();
             var actual = finder.GetSpeechLocalizationsFromFolder(game.Object);
 
             Assert.Equal(new HashSet<ILanguageInfo>
@@ -189,7 +189,7 @@ namespace PetroGlyph.Games.EawFoc.Test
             game.Setup(g => g.FileSystem).Returns(fs);
             game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
 
-            var finder = new SharedLanguageFinder();
+            var finder = new FileBasedLanguageFinder();
             var actual = finder.GetSpeechLocalizationsFromFolder(game.Object);
 
             Assert.Empty(actual);

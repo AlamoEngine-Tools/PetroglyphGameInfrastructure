@@ -9,6 +9,9 @@ using PetroGlyph.Games.EawFoc.Services.Language;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
 
+/// <summary>
+/// Searches installed game languages, based on the Steam Game Manifest.
+/// </summary>
 public sealed class SteamGameLanguageFinder : IGameLanguageFinder
 {
     private readonly ISteamWrapper _steamWrapper;
@@ -21,11 +24,22 @@ public sealed class SteamGameLanguageFinder : IGameLanguageFinder
         { 32476 , "es"},
     };
 
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
     public SteamGameLanguageFinder(IServiceProvider serviceProvider)
     {
         _steamWrapper = serviceProvider.GetRequiredService<ISteamWrapper>();
     }
 
+    /// <summary>
+    /// Searches for installed languages.
+    /// The Steam languages for this games are supported with <see cref="LanguageSupportLevel.FullLocalized"/>
+    /// </summary>
+    /// <param name="game">The game instance to search languages for.</param>
+    /// <returns>Set of installed languages.</returns>
+    /// <exception cref="InvalidOperationException">If the game is not a Steam game. Or if the game is not installed.</exception>
     public ISet<ILanguageInfo> FindInstalledLanguages(IGame game)
     {
         if (game.Platform != GamePlatform.SteamGold)

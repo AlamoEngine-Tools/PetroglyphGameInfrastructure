@@ -164,7 +164,11 @@ public class VObject : VToken, IList<VToken>, IDictionary<string, VToken>
         _children.RemoveAt(index);
     }
 
+#if NET
     public bool TryGetValue(string key, [MaybeNullWhen(false)] out VToken value)
+#else
+    public bool TryGetValue(string key, out VToken value)
+#endif
     {
         value = Properties().FirstOrDefault(x => x.Key == key)?.Value;
         return (value != null);

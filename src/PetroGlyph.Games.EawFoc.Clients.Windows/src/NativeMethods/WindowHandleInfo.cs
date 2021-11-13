@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace PetroGlyph.Games.EawFoc.Clients.NativeMethods;
 
-public class WindowHandleInfo
+internal class WindowHandleInfo
 {
     private readonly IntPtr _mainHandle;
 

@@ -8,7 +8,14 @@ using PetroGlyph.Games.EawFoc.Services.Detection;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
 
-public class SteamPetroglyphStarWarsGameDetector : GameDetector
+/// <summary>
+/// Searches an installation of a Petroglyph Star Wars game on the Steam client.
+/// <para>
+/// When an installation was found, but was not initialized,
+/// this instance will raise an <see cref="IGameDetector.InitializationRequested"/> event.
+/// </para>
+/// </summary>
+public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
 {
     private const uint EaWGameId = 32470;
     private const uint FocDepotId = 32472;
@@ -16,12 +23,17 @@ public class SteamPetroglyphStarWarsGameDetector : GameDetector
     private readonly ISteamWrapper _steamWrapper;
     private readonly IGameRegistryFactory _registryFactory;
 
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
     public SteamPetroglyphStarWarsGameDetector(IServiceProvider serviceProvider) : base(serviceProvider, true)
     {
         _registryFactory = ServiceProvider.GetRequiredService<IGameRegistryFactory>();
         _steamWrapper = ServiceProvider.GetRequiredService<ISteamWrapper>();
     }
 
+    /// <inheritdoc/>
     protected override GameLocationData FindGameLocation(GameDetectorOptions options)
     { 
         if (!_steamWrapper.Installed)

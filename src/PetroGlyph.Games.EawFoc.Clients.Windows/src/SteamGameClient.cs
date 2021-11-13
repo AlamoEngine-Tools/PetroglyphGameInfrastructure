@@ -7,12 +7,23 @@ using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
 
-public class SteamGameClient : DebugableClientBase
+/// <summary>
+/// <see cref="IDebugableGameClient"/> dedicated to the steam version of the games.
+/// </summary>
+public sealed class SteamGameClient : DebugableClientBase
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
     public SteamGameClient(IServiceProvider serviceProvider) : base(serviceProvider)
     {
     }
 
+    /// <summary>
+    /// Returns a custom <see cref="IGameProcessLauncher"/> which checks if Steam is running.
+    /// </summary>
+    /// <returns>The game launcher.</returns>
     protected override IGameProcessLauncher GetGameLauncherService()
     {
         return new SteamGameLauncher(ServiceProvider);

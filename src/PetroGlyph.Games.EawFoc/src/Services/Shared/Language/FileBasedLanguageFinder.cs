@@ -8,8 +8,10 @@ using EawModinfo.Spec;
 
 namespace PetroGlyph.Games.EawFoc.Services.Language;
 
-/// <inheritdoc cref="ILanguageFinder"/>
-public sealed class SharedLanguageFinder : ILanguageFinder
+/// <summary>
+/// Finds installed languages based on well-known file locations and names.
+/// </summary>
+public sealed class FileBasedLanguageFinder : ILanguageFinder
 {
     
     /// <inheritdoc/>

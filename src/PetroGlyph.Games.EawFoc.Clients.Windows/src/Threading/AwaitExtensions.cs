@@ -10,6 +10,7 @@ using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Threading;
 
+// From https://github.com/microsoft/vs-threading
 internal static class AwaitExtensions
 {
     private static readonly Version Windows8Version = new(6, 2, 9200);
@@ -20,9 +21,11 @@ internal static class AwaitExtensions
     /// Returns a Task that completes when the specified registry key changes.
     /// </summary>
     /// <param name="registryKey">The registry key to watch for changes.</param>
-    /// <param name="watchSubtree"><c>true</c> to watch the keys descendent keys as well; <c>false</c> to watch only this key without descendents.</param>
+    /// <param name="watchSubtree"><c>true</c> to watch the keys descendent keys as well;
+    /// <c>false</c> to watch only this key without descendents.</param>
     /// <param name="change">Indicates the kinds of changes to watch for.</param>
-    /// <param name="cancellationToken">A token that may be canceled to release the resources from watching for changes and complete the returned Task as canceled.</param>
+    /// <param name="cancellationToken">A token that may be canceled to release the resources from watching
+    /// for changes and complete the returned Task as canceled.</param>
     /// <returns>
     /// A task that completes when the registry key changes, the handle is closed, or upon cancellation.
     /// </returns>
@@ -43,24 +46,20 @@ internal static class AwaitExtensions
         try
         {
             using var evt = new ManualResetEventSlim();
-            Action registerAction = delegate
+
+            void RegisterAction()
             {
-                int win32Error = Advapi32.RegNotifyChangeKeyValue(
-                    registryKeyHandle,
-                    watchSubtree,
-                    change,
-                    evt.WaitHandle.SafeWaitHandle,
-                    true);
+                var win32Error = Advapi32.RegNotifyChangeKeyValue(registryKeyHandle, watchSubtree, change, evt.WaitHandle.SafeWaitHandle, true);
                 if (win32Error != 0)
                 {
                     throw new Win32Exception(win32Error);
                 }
-            };
+            }
 
             if (IsWindows8OrLater)
             {
                 change |= Advapi32.RegNotifyThreadAgnostic;
-                registerAction();
+                RegisterAction();
             }
             else
             {
@@ -71,7 +70,7 @@ internal static class AwaitExtensions
                 // This async method we're calling uses .ConfigureAwait(false) internally so this won't
                 // deadlock if we're called on a thread with a single-thread SynchronizationContext.
                 dedicatedThreadReleaser = DownlevelRegistryWatcherSupport
-                    .ExecuteOnDedicatedThreadAsync(registerAction).GetAwaiter().GetResult();
+                    .ExecuteOnDedicatedThreadAsync(RegisterAction).GetAwaiter().GetResult();
             }
 
             await evt.WaitHandle.ToTask(cancellationToken: cancellationToken).ConfigureAwait(false);

@@ -5,7 +5,7 @@ using Sklavenwalker.CommonUtilities.Registry;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
-public interface ISteamRegistry : IDisposable
+internal interface ISteamRegistry : IDisposable
 {
     IRegistryKey? ActiveProcessKey { get; }
 

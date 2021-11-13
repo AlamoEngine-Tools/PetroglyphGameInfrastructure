@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam
 {
-    public sealed class SteamRegistry : ISteamRegistry
+    internal sealed class SteamRegistry : ISteamRegistry
     {
         private const string SteamExeKey = "SteamExe";
         private const string SteamPathKey = "SteamPath";

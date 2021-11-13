@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>net6.0-windows;net48</TargetFrameworks>
-	  <GenerateDocumentationFile>false</GenerateDocumentationFile>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	  <LangVersion>10.0</LangVersion>
 	  <Nullable>enable</Nullable>
 	  <Authors>Anakin Sklavenwalker</Authors>

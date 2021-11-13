@@ -49,7 +49,7 @@ internal static class TplExtensions
                 },
                 Tuple.Create(tcs, cancellationToken));
 
-        RegisteredWaitHandle callbackHandle = ThreadPool.RegisterWaitForSingleObject(
+        var callbackHandle = ThreadPool.RegisterWaitForSingleObject(
             handle,
             (state, timedOut) => ((TaskCompletionSource<bool>)state!).TrySetResult(!timedOut),
             tcs,

@@ -103,7 +103,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             if (!apps.Contains(gameId))
                 return false;
 
-            var gameFinder = _serviceProvider.GetService<ISteamGameFinder>() ?? new SteamGameFinder(_serviceProvider);
+            var gameFinder = _serviceProvider.GetRequiredService<ISteamGameFinder>();
             game = gameFinder.FindGame(gameId);
             return game is not null;
         }

@@ -7,7 +7,9 @@ using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Language;
 
-/// <inheritdoc cref="IGameLanguageFinder"/>
+/// <summary>
+/// Search for installed game languages by analyzing installed game files, such as .meg archives.
+/// </summary>
 public class GameLanguageFinder : IGameLanguageFinder
 {
     private readonly ILanguageFinder _helper;
@@ -19,7 +21,7 @@ public class GameLanguageFinder : IGameLanguageFinder
     public GameLanguageFinder(IServiceProvider serviceProvider)
     {
         Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _helper = serviceProvider.GetService<ILanguageFinder>() ?? new SharedLanguageFinder();
+        _helper = serviceProvider.GetService<ILanguageFinder>() ?? new FileBasedLanguageFinder();
     }
 
     /// <inheritdoc/>
