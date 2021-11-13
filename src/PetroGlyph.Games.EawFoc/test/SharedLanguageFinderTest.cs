@@ -41,18 +41,7 @@ namespace PetroGlyph.Games.EawFoc.Test
                 new LanguageInfo("fr", LanguageSupportLevel.Text | LanguageSupportLevel.Speech),
             }, finder.Merge(enumA, enumB));
         }
-
-        [Fact]
-        public void TestCreateInfo()
-        {
-            Assert.Equal(new LanguageInfo("de", LanguageSupportLevel.FullLocalized),
-                SharedLanguageFinder.LanguageNameToLanguageInfo("german", LanguageSupportLevel.FullLocalized));
-            Assert.Equal(new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
-                SharedLanguageFinder.LanguageNameToLanguageInfo("english", LanguageSupportLevel.FullLocalized));
-            Assert.Equal(new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
-                SharedLanguageFinder.LanguageNameToLanguageInfo("ENGLISH", LanguageSupportLevel.FullLocalized));
-        }
-
+        
         [Fact]
         public void TestFindText_None()
         {

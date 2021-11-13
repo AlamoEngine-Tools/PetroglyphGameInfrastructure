@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Threading;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 
@@ -12,22 +11,7 @@ namespace PetroGlyph.Games.EawFoc.Services.Language;
 /// <inheritdoc cref="ILanguageFinder"/>
 public sealed class SharedLanguageFinder : ILanguageFinder
 {
-
-    private static readonly IDictionary<string, CultureInfo>? NeutralCultures;
-
-    private static readonly IDictionary<string, CultureInfo> AllCultures = LazyInitializer.EnsureInitialized(ref NeutralCultures!,
-        () =>
-        {
-            var dictionary = new Dictionary<string, CultureInfo>();
-            foreach (var culture in CultureInfo.GetCultures(CultureTypes.NeutralCultures))
-            {
-                var englishName = culture.EnglishName.ToLowerInvariant();
-                if (!dictionary.ContainsKey(englishName))
-                    dictionary.Add(englishName, culture);
-            }
-            return dictionary;
-        });
-
+    
     /// <inheritdoc/>
     public ISet<ILanguageInfo> GetTextLocalizations(IPhysicalPlayableObject playableObject)
     {
@@ -93,27 +77,13 @@ public sealed class SharedLanguageFinder : ILanguageFinder
         {
             try
             {
-                result.Add(LanguageNameToLanguageInfo(folder.Name, LanguageSupportLevel.Speech));
+                result.Add(LanguageInfoUtilities.FromEnglishName(folder.Name, LanguageSupportLevel.Speech));
             }
             catch (CultureNotFoundException)
             {
             }
         }
         return result;
-    }
-
-    /// <summary>
-    /// Converts a given language name and <see cref="LanguageSupportLevel"/> to an <see cref="ILanguageInfo"/>
-    /// </summary>
-    /// <param name="languageName">The english name of the language.</param>
-    /// <param name="supportLevel">The desired support level.</param>
-    /// <returns>A new instance of a <see cref="ILanguageInfo"/></returns>
-    public static ILanguageInfo LanguageNameToLanguageInfo(string languageName, LanguageSupportLevel supportLevel)
-    {
-        languageName = languageName.ToLowerInvariant();
-        if (!AllCultures.TryGetValue(languageName, out var culture))
-            throw new CultureNotFoundException($"Unable to get culture for language {languageName}");
-        return new LanguageInfo(culture.TwoLetterISOLanguageName, supportLevel);
     }
 
     /// <inheritdoc/>
@@ -147,7 +117,7 @@ public sealed class SharedLanguageFinder : ILanguageFinder
         {
             try
             {
-                result.Add(LanguageNameToLanguageInfo(languageName!, supportLevel));
+                result.Add(LanguageInfoUtilities.FromEnglishName(languageName!, supportLevel));
             }
             catch (CultureNotFoundException)
             {
