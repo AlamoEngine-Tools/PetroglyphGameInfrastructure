@@ -2,14 +2,15 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using PetroGlyph.Games.EawFoc.Clients.Threading;
 using Validation;
+#if !NET
+using PetroGlyph.Games.EawFoc.Clients.Threading;
+#endif
 
 namespace PetroGlyph.Games.EawFoc.Clients.Processes;
 
 internal sealed class GameProcess : IGameProcess
 {
-
     private volatile bool _closed;
 
     private EventHandler? _closingHandler;

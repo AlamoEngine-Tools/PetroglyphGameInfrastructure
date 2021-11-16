@@ -10,7 +10,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 /// If this factory already created an instance for a matching <see cref="GamePlatform"/> it will reuse the instance. 
 /// </para>
 /// </summary>
-public class WindowsGameClientFactory : IGameClientFactory
+public class DefaultGameClientFactory : IGameClientFactory
 {
     private readonly IServiceProvider _serviceProvider;
 
@@ -21,7 +21,7 @@ public class WindowsGameClientFactory : IGameClientFactory
     /// Creates a new instance.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
-    public WindowsGameClientFactory(IServiceProvider serviceProvider)
+    public DefaultGameClientFactory(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }

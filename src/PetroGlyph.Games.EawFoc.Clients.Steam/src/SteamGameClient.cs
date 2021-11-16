@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
+using PetroGlyph.Games.EawFoc.Games;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
@@ -11,6 +13,11 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 /// </summary>
 public sealed class SteamGameClient : DebugableClientBase
 {
+    /// <summary>
+    /// This instance only supports <see cref="GamePlatform.SteamGold"/>
+    /// </summary>
+    public override ISet<GamePlatform> SupportedPlatforms => new HashSet<GamePlatform> { GamePlatform.SteamGold };
+
     /// <summary>
     /// Creates a new instance.
     /// </summary>

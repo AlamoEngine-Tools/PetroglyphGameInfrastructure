@@ -19,7 +19,7 @@ public class ModArgumentListFactory : IModArgumentListFactory
         _serviceProvider = serviceProvider;
     }
 
-    public IGameArgument<IReadOnlyList<IGameArgument<string>>> BuildArgumentList(IList<IMod> traversedModChain)
+    public ModArgumentList BuildArgumentList(IList<IMod> traversedModChain)
     {
         var dependencyArgs = new List<ModArgument>();
         foreach (var dependency in traversedModChain)
@@ -33,7 +33,7 @@ public class ModArgumentListFactory : IModArgumentListFactory
         return !dependencyArgs.Any() ? ModArgumentList.Empty : new ModArgumentList(dependencyArgs);
     }
 
-    public IGameArgument<IReadOnlyList<IGameArgument<string>>> BuildArgumentList(IMod modInstance)
+    public ModArgumentList BuildArgumentList(IMod modInstance)
     {
         if (modInstance.DependencyResolveStatus == DependencyResolveStatus.Resolved)
         {

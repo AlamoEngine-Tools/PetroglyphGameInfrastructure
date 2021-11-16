@@ -1,21 +1,37 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using PetroGlyph.Games.EawFoc.Games;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
 
+/// <summary>
+/// Cancelable event handler when a game was requested to start.
+/// </summary>
 public class GameStartingEventArgs : CancelEventArgs
 {
-    public IGame Game { get; }
+    /// <summary>
+    /// The instance requested to start.
+    /// </summary>
+    public IPlayableObject PlayableObject { get; }
 
-    public IReadOnlyCollection<IGameArgument> GameArguments { get; }
+    /// <summary>
+    /// The requested game arguments 
+    /// </summary>
+    public IArgumentCollection GameArguments { get; }
 
+    /// <summary>
+    /// The requested <see cref="GameBuildType"/> of the game.
+    /// </summary>
     public GameBuildType BuildType { get; }
 
-    public GameStartingEventArgs(IGame game, IReadOnlyCollection<IGameArgument> arguments, GameBuildType buildType)
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="game">The instance requested to start.</param>
+    /// <param name="arguments">The requested game arguments </param>
+    /// <param name="buildType">The requested <see cref="GameBuildType"/> of the game.</param>
+    public GameStartingEventArgs(IPlayableObject game, IArgumentCollection arguments, GameBuildType buildType)
     {
-        Game = game;
+        PlayableObject = game;
         GameArguments = arguments;
         BuildType = buildType;
     }

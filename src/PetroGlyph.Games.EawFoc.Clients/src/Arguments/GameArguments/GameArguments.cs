@@ -11,6 +11,9 @@ namespace PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 /// </summary>
 public sealed class WindowedArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public WindowedArgument() : base(ArgumentNameCatalog.WindowedArg, true)
     {
     }
@@ -29,7 +32,7 @@ internal sealed class SafeMode : FlagArgument
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-public sealed class LowRamArgument : FlagArgument
+internal sealed class LowRamArgument : FlagArgument
 {
     public LowRamArgument() : base(ArgumentNameCatalog.LowRamArg, true)
     {
@@ -55,6 +58,9 @@ internal sealed class MCEArgument : FlagArgument
 /// </summary>
 public sealed class IgnoreAssertsArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public IgnoreAssertsArgument() : base(ArgumentNameCatalog.IgnoreAssertsArg, true)
     {
     }
@@ -65,6 +71,9 @@ public sealed class IgnoreAssertsArgument : FlagArgument
 /// </summary>
 public sealed class NoArtProcessArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public NoArtProcessArgument() : base(ArgumentNameCatalog.NoArtProcessArg, true)
     {
     }
@@ -85,6 +94,9 @@ internal sealed class RecordingArgument : FlagArgument
 /// </summary>
 public sealed class MultiArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public MultiArgument() : base(ArgumentNameCatalog.MultiArg, true)
     {
     }
@@ -95,6 +107,9 @@ public sealed class MultiArgument : FlagArgument
 /// </summary>
 public sealed class PersistAssertsArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public PersistAssertsArgument() : base(ArgumentNameCatalog.PersistAssertsArg, true)
     {
     }
@@ -115,6 +130,9 @@ internal sealed class NoTimeoutArgument : FlagArgument
 /// </summary>
 public sealed class SuppressLogArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public SuppressLogArgument() : base(ArgumentNameCatalog.SuppressLogArg, true)
     {
     }
@@ -145,6 +163,9 @@ internal sealed class LeftLeftArgument : FlagArgument
 /// </summary>
 public sealed class DeppSyncArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public DeppSyncArgument() : base(ArgumentNameCatalog.DeepSyncArg, true)
     {
     }
@@ -155,6 +176,9 @@ public sealed class DeppSyncArgument : FlagArgument
 /// </summary>
 public sealed class NoFowArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public NoFowArgument() : base(ArgumentNameCatalog.NoFowArg, true)
     {
     }
@@ -165,6 +189,9 @@ public sealed class NoFowArgument : FlagArgument
 /// </summary>
 public sealed class NoIntroArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public NoIntroArgument() : base(ArgumentNameCatalog.NoIntroArg, true)
     {
     }
@@ -195,6 +222,9 @@ internal sealed class RefCountTrackingArgument : FlagArgument
 /// </summary>
 public sealed class NoHardwareMouseArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public NoHardwareMouseArgument() : base(ArgumentNameCatalog.NoHardwareMouseArg, true)
     {
     }
@@ -245,6 +275,9 @@ internal sealed class DebugUnitsArgument : FlagArgument
 /// </summary>
 public sealed class NoMenuArgument : FlagArgument
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
     public NoMenuArgument() : base(ArgumentNameCatalog.NoMenuArg, true)
     {
     }
@@ -269,9 +302,14 @@ internal sealed class FullScreenArgument : FlagArgument
 /// </summary>
 public sealed class LanguageArgument : NamedArgument<ILanguageInfo>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="language">The language of the game.</param>
     public LanguageArgument(ILanguageInfo language) : base(ArgumentNameCatalog.LanguageArg, language, false)
     {
     }
+
 
     public override string ValueToCommandLine()
     {
@@ -284,6 +322,10 @@ public sealed class LanguageArgument : NamedArgument<ILanguageInfo>
 /// </summary>
 public sealed class LocalPortArgument : NamedArgument<uint>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The local port to use.</param>
     public LocalPortArgument(uint value) : base(ArgumentNameCatalog.LocalPortArg, value, false)
     {
     }
@@ -299,10 +341,15 @@ public sealed class LocalPortArgument : NamedArgument<uint>
 /// </summary>
 public sealed class MonitorArgument : NamedArgument<uint>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The system monitor index to use.</param>
     public MonitorArgument(uint value) : base(ArgumentNameCatalog.MonitorArg, value, false)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -314,10 +361,15 @@ public sealed class MonitorArgument : NamedArgument<uint>
 /// </summary>
 public sealed class ScreenWidthArgument : NamedArgument<uint>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The window width in pixels.</param>
     public ScreenWidthArgument(uint value) : base(ArgumentNameCatalog.ScreenWidthArg, value, false)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -329,10 +381,15 @@ public sealed class ScreenWidthArgument : NamedArgument<uint>
 /// </summary>
 public sealed class ScreenHeightArgument : NamedArgument<uint>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The window height in pixels.</param>
     public ScreenHeightArgument(uint value) : base(ArgumentNameCatalog.ScreenHeightArg, value, false)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -344,10 +401,15 @@ public sealed class ScreenHeightArgument : NamedArgument<uint>
 /// </summary>
 public sealed class FPSCapArgument : NamedArgument<uint>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The max. FPS of the game.</param>
     public FPSCapArgument(uint value) : base(ArgumentNameCatalog.FPSCapArg, value, false)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -382,10 +444,15 @@ internal sealed class OriginalAssetPathArgument : NamedArgument<IDirectoryInfo>
 /// </summary>
 public sealed class RandomSeedArgument : NamedArgument<uint>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The seed value.</param>
     public RandomSeedArgument(uint value) : base(ArgumentNameCatalog.RandomSeedArg, value, true)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -446,10 +513,15 @@ internal sealed class MpPlaybackFileArgument : NamedArgument<IFileInfo>
 /// </summary>
 public sealed class MapArgument : NamedArgument<string>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The name of the map</param>
     public MapArgument(string value) : base(ArgumentNameCatalog.MapArg, value, true)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return Value;
@@ -468,12 +540,18 @@ public sealed class SaveFolderArgument : NamedArgument<IDirectoryInfo>
 {
     private readonly IDirectoryInfo _defaultRootSaveLocation;
 
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The directory of save files.</param>
+    /// <param name="defaultRootSaveLocation">The default root location.</param>
     public SaveFolderArgument(IDirectoryInfo value, IDirectoryInfo defaultRootSaveLocation) :
         base(ArgumentNameCatalog.MPPlaybackFileArg, value, true)
     {
         _defaultRootSaveLocation = defaultRootSaveLocation;
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().ShortenPath(Value, _defaultRootSaveLocation);
@@ -535,10 +613,15 @@ internal sealed class ConfigArgument : NamedArgument<string>
 /// </summary>
 public sealed class ProfileArgument : NamedArgument<uint>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The profile number.</param>
     public ProfileArgument(uint value) : base(ArgumentNameCatalog.ProfileArg, value, true)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -551,10 +634,15 @@ public sealed class ProfileArgument : NamedArgument<uint>
 /// <remarks>The value usually matches with <see cref="LocalPortArgument"/> from the other instance.</remarks>
 public sealed class BCast2Argument : NamedArgument<uint>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The port number</param>
     public BCast2Argument(uint value) : base(ArgumentNameCatalog.BCast2Arg, value, true)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -596,6 +684,9 @@ internal sealed class BCast4Argument : NamedArgument<uint>
 /// </summary>
 public sealed class AILogStyleArgument : NamedArgument<AILogStyleArgument.AILogStyle>
 {
+    /// <summary>
+    /// Level of detail of LUA logging.
+    /// </summary>
     [SerializeEnumName]
     public enum AILogStyle
     {
@@ -613,10 +704,15 @@ public sealed class AILogStyleArgument : NamedArgument<AILogStyleArgument.AILogS
         Heavy
     }
 
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The logging style to use.</param>
     public AILogStyleArgument(AILogStyle value) : base(ArgumentNameCatalog.AILogStyleArg, value, true)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value).ToUpperInvariant();
@@ -633,11 +729,17 @@ public sealed class AILogFileArgument : NamedArgument<IFileInfo>
 {
     private readonly IDirectoryInfo _gameDir;
 
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The log file.</param>
+    /// <param name="gameDir">The game's directory.</param>
     public AILogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : base(ArgumentNameCatalog.AILogFileArg, value, true)
     {
         _gameDir = gameDir;
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().ShortenPath(Value, _gameDir);
@@ -654,11 +756,17 @@ public sealed class RandomLogFileArgument : NamedArgument<IFileInfo>
 {
     private readonly IDirectoryInfo _gameDir;
 
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The log file.</param>
+    /// <param name="gameDir">The game's directory.</param>
     public RandomLogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : base(ArgumentNameCatalog.RandomLogFileArg, value, true)
     {
         _gameDir = gameDir;
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().ShortenPath(Value, _gameDir);
@@ -675,11 +783,17 @@ public sealed class LogFileArgument : NamedArgument<IFileInfo>
 {
     private readonly IDirectoryInfo _gameDir;
 
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The log file.</param>
+    /// <param name="gameDir">The game's directory.</param>
     public LogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : base(ArgumentNameCatalog.LogFileArg, value, true)
     {
         _gameDir = gameDir;
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().ShortenPath(Value, _gameDir);
@@ -693,7 +807,8 @@ internal sealed class ConsoleCommandFileArgument : NamedArgument<IFileInfo>
 {
     private readonly IDirectoryInfo _gameDir;
 
-    public ConsoleCommandFileArgument(IFileInfo value, IDirectoryInfo gameDir) : base(ArgumentNameCatalog.ConsoleCommandFileArg, value, true)
+    public ConsoleCommandFileArgument(IFileInfo value, IDirectoryInfo gameDir) : 
+        base(ArgumentNameCatalog.ConsoleCommandFileArg, value, true)
     {
         _gameDir = gameDir;
     }
@@ -710,10 +825,15 @@ internal sealed class ConsoleCommandFileArgument : NamedArgument<IFileInfo>
 /// <remarks>This obviously is an enum but it's not documented, so we leave it as a plain ushort value.</remarks>
 public sealed class SyncLogFilterArgument : NamedArgument<ushort>
 {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="value">The log filter value.</param>
     public SyncLogFilterArgument(ushort value) : base(ArgumentNameCatalog.SyncLogFilterArg, value, true)
     {
     }
 
+    /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);

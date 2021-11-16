@@ -1,11 +1,17 @@
-﻿using System.Collections.Generic;
-using PetroGlyph.Games.EawFoc.Games;
+﻿using PetroGlyph.Games.EawFoc.Games;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
 
-internal interface IGameExecutableNameBuilder
+/// <summary>
+/// Service that gets the correct executable file name for a Petroglyph Star Wars game.
+/// </summary>
+public interface IGameExecutableNameBuilder
 {
-    IReadOnlyCollection<GamePlatform> SupportedPlatforms { get; }
-
+    /// <summary>
+    /// Converts <paramref name="game"/> and <paramref name="buildType"/> into the correct executable file name.
+    /// </summary>
+    /// <param name="game">The game to get the executable name from.</param>
+    /// <param name="buildType">The game's build type.</param>
+    /// <returns>The executable file name.</returns>
     string GetExecutableFileName(IGame game, GameBuildType buildType);
 }

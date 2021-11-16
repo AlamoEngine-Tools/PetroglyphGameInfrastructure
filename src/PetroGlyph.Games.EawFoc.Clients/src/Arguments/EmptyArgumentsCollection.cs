@@ -3,8 +3,12 @@ using System.Collections.Generic;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
+/// <summary>
+/// An always empty argument collection.
+/// </summary>
 public struct EmptyArgumentsCollection : IArgumentCollection
 {
+    /// <inheritdoc/>
     public IEnumerator<IGameArgument> GetEnumerator()
     {
         return new Enumerator();
@@ -15,9 +19,10 @@ public struct EmptyArgumentsCollection : IArgumentCollection
         return GetEnumerator();
     }
 
+    /// <inheritdoc/>
     public int Count => 0;
 
-    public struct Enumerator : IEnumerator<IGameArgument>
+    private struct Enumerator : IEnumerator<IGameArgument>
     {
         public bool MoveNext() => false;
 

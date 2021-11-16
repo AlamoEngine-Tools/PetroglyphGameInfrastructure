@@ -8,72 +8,76 @@ namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 /// </summary>
 public static class ArgumentNameCatalog
 {
-    public const string ModListArg = "MODLIST";
-    public const string WindowedArg = "WINDOWED";
-    public const string MCEArg = "MCE";
-    public const string LowRamArg = "LOWRAM";
-    public const string SafeModeArg = "SAFEMODE";
-    public const string IgnoreAssertsArg = "IGNOREASSERTS";
-    public const string NoArtProcessArg = "NOARTPROCESS";
-    public const string RecordingArg = "RECORDING";
-    public const string MultiArg = "MULTI";
-    public const string PersistAssertsArg = "PERSISTASSERTS";
-    public const string NoTimeoutArg = "NOTIMEOUT";
-    public const string SuppressLogArg = "SUPRESSLOG"; // Typo as in binary!
-    public const string PreValidateAudioMessagesArg = "PREVALIDATE_AUDIO_MEGS";
-    public const string LeftLeftArg = "LEFTLEFT";
-    public const string DeepSyncArg = "DEEPSYNC";
-    public const string NoFowArg = "NOFOW";
-    public const string NoIntroArg = "NOINTRO";
-    public const string SaveLoadDebugArg = "SAVELOADDEBUG";
-    public const string RefCountTrackingArg = "REFCOUNTTRACKING";
-    public const string NoHardwareMouseArg = "NOHARDWAREMOUSE";
-    public const string ProcessEnglishAssetsAndExitArg = "PROCESS_ENGLISH_ASSETS_AND_EXIT";
-    public const string ProcessAssetsAndExitArg = "PROCESS_ASSETS_AND_EXIT";
-    public const string AttractArg = "ATTRACT";
-    public const string DebugUnitsArg = "DEBUG_UNITS";
-    public const string NoMenuArg = "NOMENU";
-    public const string FullScreenArg = "FULLSCREEN";
+    internal const string ModListArg = "MODLIST";
+    internal const string WindowedArg = "WINDOWED";
+    internal const string MCEArg = "MCE";
+    internal const string LowRamArg = "LOWRAM";
+    internal const string SafeModeArg = "SAFEMODE";
+    internal const string IgnoreAssertsArg = "IGNOREASSERTS";
+    internal const string NoArtProcessArg = "NOARTPROCESS";
+    internal const string RecordingArg = "RECORDING";
+    internal const string MultiArg = "MULTI";
+    internal const string PersistAssertsArg = "PERSISTASSERTS";
+    internal const string NoTimeoutArg = "NOTIMEOUT";
+    internal const string SuppressLogArg = "SUPRESSLOG"; // Typo as in binary!
+    internal const string PreValidateAudioMessagesArg = "PREVALIDATE_AUDIO_MEGS";
+    internal const string LeftLeftArg = "LEFTLEFT";
+    internal const string DeepSyncArg = "DEEPSYNC";
+    internal const string NoFowArg = "NOFOW";
+    internal const string NoIntroArg = "NOINTRO";
+    internal const string SaveLoadDebugArg = "SAVELOADDEBUG";
+    internal const string RefCountTrackingArg = "REFCOUNTTRACKING";
+    internal const string NoHardwareMouseArg = "NOHARDWAREMOUSE";
+    internal const string ProcessEnglishAssetsAndExitArg = "PROCESS_ENGLISH_ASSETS_AND_EXIT";
+    internal const string ProcessAssetsAndExitArg = "PROCESS_ASSETS_AND_EXIT";
+    internal const string AttractArg = "ATTRACT";
+    internal const string DebugUnitsArg = "DEBUG_UNITS";
+    internal const string NoMenuArg = "NOMENU";
+    internal const string FullScreenArg = "FULLSCREEN";
 
-    public const string LocalPortArg = "LOCALPORT";
-    public const string MonitorArg = "MONITOR";
-    public const string ScreenWidthArg = "SCREENWIDTH";
-    public const string ScreenHeightArg = "SCREENHEIGHT";
-    public const string FPSCapArg = "FPSCAP";
-    public const string FallbackPathArg = "FALLBACKPATH";
-    public const string ModPathArg = "MODPATH";
-    public const string SteamModArg = "STEAMMOD";
-    public const string LanguageArg = "LANGUAGE";
-    public const string OriginalAssetPathArg = "ORIGINAL_ASSET_PATH";
-    public const string RandomSeedArg = "RANDOMSEED";
-    public const string ExpCDKeyArg = "EXPCDKEY";
-    public const string CDKeyArg = "CDKEY";
-    public const string MPPlaybackFileArg = "MPPLAYBACKFILE";
-    public const string MPRecordFileArg = "MPRECORDFILE";
-    public const string MapArg = "MAP";
-    public const string SaveFolderArg = "SAVEFOLDER";
-    public const string QuickLoadRecordingArg = "QUICKLOADRECORDING";
-    public const string QuickLoadArg = "QUICKLOAD";
-    public const string ConfigArg = "CONFIG";
-    public const string ProfileArg = "PROFILE";
-    public const string BCast4Arg = "BCAST4";
-    public const string BCast3Arg = "BCAST3";
-    public const string BCast2Arg = "BCAST2";
-    public const string AILogStyleArg = "AILOGSTYLE";
-    public const string AILogFileArg = "AILOGFILE";
-    public const string SyncLogFilterArg = "SYNCLOGFILTER";
-    public const string RandomLogFileArg = "RANDOMLOGFILE";
-    public const string LogFileArg = "LOGFILE";
-    public const string ConsoleCommandFileArg = "CONSOLECOMMANDFILE";
-    public const string ConnectPortArg = "CONNECTPORT";
-    public const string ConnectIPArg = "CONNECTIP";
+    internal const string LocalPortArg = "LOCALPORT";
+    internal const string MonitorArg = "MONITOR";
+    internal const string ScreenWidthArg = "SCREENWIDTH";
+    internal const string ScreenHeightArg = "SCREENHEIGHT";
+    internal const string FPSCapArg = "FPSCAP";
+    internal const string FallbackPathArg = "FALLBACKPATH";
+    internal const string ModPathArg = "MODPATH";
+    internal const string SteamModArg = "STEAMMOD";
+    internal const string LanguageArg = "LANGUAGE";
+    internal const string OriginalAssetPathArg = "ORIGINAL_ASSET_PATH";
+    internal const string RandomSeedArg = "RANDOMSEED";
+    internal const string ExpCDKeyArg = "EXPCDKEY";
+    internal const string CDKeyArg = "CDKEY";
+    internal const string MPPlaybackFileArg = "MPPLAYBACKFILE";
+    internal const string MPRecordFileArg = "MPRECORDFILE";
+    internal const string MapArg = "MAP";
+    internal const string SaveFolderArg = "SAVEFOLDER";
+    internal const string QuickLoadRecordingArg = "QUICKLOADRECORDING";
+    internal const string QuickLoadArg = "QUICKLOAD";
+    internal const string ConfigArg = "CONFIG";
+    internal const string ProfileArg = "PROFILE";
+    internal const string BCast4Arg = "BCAST4";
+    internal const string BCast3Arg = "BCAST3";
+    internal const string BCast2Arg = "BCAST2";
+    internal const string AILogStyleArg = "AILOGSTYLE";
+    internal const string AILogFileArg = "AILOGFILE";
+    internal const string SyncLogFilterArg = "SYNCLOGFILTER";
+    internal const string RandomLogFileArg = "RANDOMLOGFILE";
+    internal const string LogFileArg = "LOGFILE";
+    internal const string ConsoleCommandFileArg = "CONSOLECOMMANDFILE";
+    internal const string ConnectPortArg = "CONNECTPORT";
+    internal const string ConnectIPArg = "CONNECTIP";
 
+    /// <summary>
+    /// Collection of all supported argument names.
+    /// </summary>
+    /// <remarks>The names are in upper case.</remarks>
     public static IReadOnlyCollection<string> AllSupportedArgumentNames =
         SupportedFlagArgumentNames.Union(SupportedFlagArgumentNames).Union(SupportedKeyValueArgumentNames).ToList();
 
-    public static IReadOnlyCollection<string> SyntheticArgumentNames => new[] { ModListArg };
+    internal static IReadOnlyCollection<string> SyntheticArgumentNames => new[] { ModListArg };
 
-    public static IReadOnlyCollection<string> SupportedFlagArgumentNames => new HashSet<string>
+    internal static IReadOnlyCollection<string> SupportedFlagArgumentNames => new HashSet<string>
     {
         WindowedArg,
         MCEArg,
@@ -103,7 +107,7 @@ public static class ArgumentNameCatalog
 
     };
 
-    public static IReadOnlyCollection<string> SupportedKeyValueArgumentNames => new HashSet<string>
+    internal static IReadOnlyCollection<string> SupportedKeyValueArgumentNames => new HashSet<string>
     {
         LocalPortArg,
         MonitorArg,

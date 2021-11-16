@@ -19,7 +19,7 @@ namespace PetroGlyph.Games.EawFoc.Clients
             serviceCollection.AddTransient<IProcessHelper>(_ => new ProcessHelper());
 
             serviceCollection.AddTransient<IGameExecutableFileService>(sp => new GameExecutableFileService(sp));
-            serviceCollection.AddTransient<IGameExecutableNameBuilder>(sp => new DefaultGameExecutableNameBuilder(sp));
+            serviceCollection.AddTransient<IGameExecutableNameBuilder>(_ => new GameExecutableNameBuilder());
             
             serviceCollection.AddTransient<IArgumentValidator>(_ => new ArgumentValidator());
             serviceCollection.AddTransient<IArgumentCommandLineBuilder>(sp => new ArgumentCommandLineBuilder(sp));

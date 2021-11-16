@@ -10,61 +10,114 @@ using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
 
+/// <summary>
+/// Base implementation for an <see cref="IGameClient"/> which handles registration and raising of the game events. 
+/// </summary>
 public abstract class ClientBase : IGameClient
 {
+    /// <inheritdoc/>
     public event EventHandler<IGameProcess>? GameStarted;
+    /// <inheritdoc/>
     public event EventHandler<GameStartingEventArgs>? GameStarting;
+    /// <inheritdoc/>
     public event EventHandler<IGameProcess>? GameClosed;
 
     private readonly ICollection<IGameProcess> _runningInstances = new List<IGameProcess>();
     private readonly object _syncObj = new();
 
+    /// <summary>
+    /// Service provider for this instance.
+    /// </summary>
     protected readonly IServiceProvider ServiceProvider;
 
+    /// <summary>
+    /// By default this gives an empty <see cref="IArgumentCollection"/>.
+    /// </summary>
     public virtual IArgumentCollection DefaultArguments => new EmptyArgumentsCollection();
 
-    public IReadOnlyCollection<IPlayableObject> RunningInstances =>
-        _runningInstances.Select(i => i.ProcessInfo.PlayedInstance).ToList();
-
-    public ISet<GamePlatform> SupportedPlatforms =>
-        new HashSet<GamePlatform>
+    /// <inheritdoc/>
+    public IReadOnlyCollection<IGameProcess> RunningInstances
+    {
+        get
         {
-            GamePlatform.Disk,
-            GamePlatform.DiskGold,
-            GamePlatform.GoG,
-            GamePlatform.Origin,
-            GamePlatform.SteamGold
-        };
+            lock (_syncObj)
+                return _runningInstances.ToList();
+        }
+    }
 
+    /// <inheritdoc/>
+    public abstract ISet<GamePlatform> SupportedPlatforms { get; }
+
+    /// <summary>
+    /// Initializes a new client.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
     protected ClientBase(IServiceProvider serviceProvider)
     {
         Requires.NotNull(serviceProvider, nameof(serviceProvider));
         ServiceProvider = serviceProvider;
     }
 
-    /// <summary>
-    /// Starts the game bound to the given <paramref name="instance"/>.
-    /// If <paramref name="instance"/> represents an <see cref="IMod"/> the mod's dependencies get added to the launch arguments.
-    /// </summary>
-    /// <param name="instance">The game or mod to play.</param>
-    /// <returns>The game's process.</returns>
-    public virtual IGameProcess Play(IPlayableObject instance)
+    /// <inheritdoc/>
+    public IGameProcess Play(IPlayableObject instance)
     {
-        var arguments = DefaultArguments;
-        if (instance is IMod mod)
-        {
-            var argFactory = ServiceProvider.GetService<IModArgumentListFactory>() ?? new ModArgumentListFactory(ServiceProvider);
-            var modArgs = argFactory.BuildArgumentList(mod);
-            arguments = new ArgumentCollectionBuilder(DefaultArguments).Add(modArgs).Build();
-        }
-        return Play(instance, arguments);
+        return StartGame(instance, GameBuildType.Release);
     }
 
+    /// <inheritdoc/>
     public IGameProcess Play(IPlayableObject instance, IArgumentCollection arguments)
     {
         return StartGame(instance, arguments, GameBuildType.Release);
     }
 
+    /// <summary>
+    /// Plays the given <paramref name="instance"/> with <see cref="DefaultArguments"/>.
+    /// <para>
+    /// If <paramref name="instance"/> in an <see cref="IMod"/> the arguments passed
+    /// will be <see cref="DefaultArguments"/> merged with the dependency chain of the given mod.
+    /// </para>
+    /// </summary>
+    /// <param name="instance">The game or mod to start.</param>
+    /// <param name="buildType">The requested build type to start.</param>
+    /// <returns>The process of the started game.</returns>
+    /// <exception cref="GameStartException">
+    /// The game's platform is not supported by this client.
+    /// OR
+    /// Starting the game was cancelled by one <see cref="GameStarting"/> handler.
+    /// OR
+    /// The executable file of the game was not found.
+    /// OR
+    /// An internal error occurred.
+    /// </exception>
+    protected IGameProcess StartGame(IPlayableObject instance, GameBuildType buildType)
+    {
+        var arguments = DefaultArguments;
+        if (instance is IMod mod)
+        {
+            var modArgFactory = ServiceProvider.GetService<IModArgumentListFactory>() ?? new ModArgumentListFactory(ServiceProvider);
+            var modArgs = modArgFactory.BuildArgumentList(mod);
+            var builder = ServiceProvider.GetService<IArgumentCollectionBuilder>() ?? new KeyBasedArgumentCollectionBuilder();
+            arguments = builder.AddAll(DefaultArguments).Add(modArgs).Build();
+        }
+        return StartGame(instance, arguments, buildType);
+    }
+
+    /// <summary>
+    /// Starts a <paramref name="instance"/> with the given <paramref name="arguments"/> and the expected <paramref name="type"/>.
+    /// </summary>
+    /// <param name="instance">The instance to start.</param>
+    /// <param name="arguments">The requested arguments.</param>
+    /// <param name="type">The requested <see cref="GameBuildType"/>.</param>
+    /// <returns>The game process.</returns>
+    /// <exception cref="GameStartException">
+    /// The game's platform is not supported by this client.
+    /// OR
+    /// Starting the game was cancelled by one <see cref="GameStarting"/> handler.
+    /// OR
+    /// The executable file of the game was not found.
+    /// OR
+    /// An internal error occurred.
+    /// </exception>
     protected IGameProcess StartGame(IPlayableObject instance, IArgumentCollection arguments, GameBuildType type)
     {
         Requires.NotNull(instance, nameof(instance));
@@ -121,9 +174,9 @@ public abstract class ClientBase : IGameClient
         }
     }
 
-    private bool OnGameStartingInternal(IPlayableObject instance, IReadOnlyCollection<IGameArgument> arguments, GameBuildType type)
+    private bool OnGameStartingInternal(IPlayableObject instance,IArgumentCollection arguments, GameBuildType type)
     {
-        var gameStartingArgs = new GameStartingEventArgs(instance.Game, arguments, type);
+        var gameStartingArgs = new GameStartingEventArgs(instance, arguments, type);
         if (!OnGameStarting(instance, arguments, type))
             return false;
         GameStarting?.Invoke(this, gameStartingArgs);
@@ -159,5 +212,9 @@ public abstract class ClientBase : IGameClient
     {
     }
 
+    /// <summary>
+    /// Retrieves an <see cref="IGameProcessLauncher"/> for this instance to start the game process.
+    /// </summary>
+    /// <returns>The <see cref="IGameProcessLauncher"/> instance.</returns>
     protected abstract IGameProcessLauncher GetGameLauncherService();
 }

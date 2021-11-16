@@ -2,16 +2,23 @@
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
-using PetroGlyph.Games.EawFoc.Mods;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
 
+/// <summary>
+/// Base implementation for an <see cref="IDebugableGameClient"/>.
+/// </summary>
 public abstract class DebugableClientBase : ClientBase, IDebugableGameClient
 {
+    /// <summary>
+    /// Initializes a new instance with a given <paramref name="serviceProvider"/>.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
     protected DebugableClientBase(IServiceProvider serviceProvider) : base(serviceProvider)
     {
     }
 
+    /// <inheritdoc/>
     public bool IsDebugAvailable(IPlayableObject instance)
     {
         var debugExecutable = ServiceProvider.GetRequiredService<IGameExecutableFileService>()
@@ -19,18 +26,13 @@ public abstract class DebugableClientBase : ClientBase, IDebugableGameClient
         return debugExecutable is not null && debugExecutable.Exists;
     }
 
+    /// <inheritdoc/>
     public IGameProcess Debug(IPlayableObject instance)
     {
-        var arguments = DefaultArguments;
-        if (instance is IMod mod)
-        {
-            var argFactory = ServiceProvider.GetService<IModArgumentListFactory>() ?? new ModArgumentListFactory(ServiceProvider);
-            var modArgs = argFactory.BuildArgumentList(mod);
-            arguments = new ArgumentCollectionBuilder(DefaultArguments).Add(modArgs).Build();
-        }
-        return Debug(instance, arguments, false);
+        return StartGame(instance, GameBuildType.Debug);
     }
-    
+
+    /// <inheritdoc/>
     public IGameProcess Debug(IPlayableObject instance, IArgumentCollection arguments, bool fallbackToPlay)
     {
         var buildType = GameBuildType.Debug;

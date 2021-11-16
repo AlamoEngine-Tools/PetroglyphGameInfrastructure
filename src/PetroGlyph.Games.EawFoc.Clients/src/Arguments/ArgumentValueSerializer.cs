@@ -6,9 +6,15 @@ using Sklavenwalker.CommonUtilities.FileSystem;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
+/// <summary>
+/// Attribute to indicate that an enum shall be serialized by its name.
+/// </summary>
 [AttributeUsage(AttributeTargets.Enum)]
 public class SerializeEnumNameAttribute : Attribute { }
 
+/// <summary>
+/// Attribute to indicate that an enum shall be serialized by its underlying value.
+/// </summary>
 [AttributeUsage(AttributeTargets.Enum)]
 public class SerializeEnumValueAttribute : Attribute { }
 
