@@ -5,6 +5,7 @@ using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Language;
+using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
@@ -29,6 +30,7 @@ public sealed class SteamGameLanguageFinder : IGameLanguageFinder
     /// <param name="serviceProvider">The service provider.</param>
     public SteamGameLanguageFinder(IServiceProvider serviceProvider)
     {
+        Requires.NotNull(serviceProvider, nameof(serviceProvider));
         _steamWrapper = serviceProvider.GetRequiredService<ISteamWrapper>();
     }
 
@@ -46,7 +48,8 @@ public sealed class SteamGameLanguageFinder : IGameLanguageFinder
         if (!_steamWrapper.IsGameInstalled(32470u, out var manifest))
             throw new InvalidOperationException("Empire at War is not registered as a Steam Game");
 
-        var result = new HashSet<ILanguageInfo>();
+        // English is always included by default.
+        var result = new HashSet<ILanguageInfo> { new LanguageInfo("en", LanguageSupportLevel.FullLocalized) };
         foreach (var depot in manifest!.Depots)
         {
             if (_localizationDepots.TryGetValue(depot, out var languageCode))
