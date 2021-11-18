@@ -17,7 +17,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
             PetroglyphWindowsSteamClientsLibrary.InitializeLibraryWithDefaultServices(sc);
 
             _sp = sc.BuildServiceProvider();
-            _service = _sp.GetRequiredService<ISteamWrapper>() as SteamWrapper;
+            _service = _sp.GetRequiredService<ISteamWrapper>() as SteamWrapper ?? throw new InvalidOperationException();
         }
 
         //[Fact]

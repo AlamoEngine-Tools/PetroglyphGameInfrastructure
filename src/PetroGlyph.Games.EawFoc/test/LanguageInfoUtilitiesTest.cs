@@ -3,29 +3,28 @@ using EawModinfo.Spec;
 using PetroGlyph.Games.EawFoc.Services.Language;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test
+namespace PetroGlyph.Games.EawFoc.Test;
+
+public class LanguageInfoUtilitiesTest
 {
-    public class LanguageInfoUtilitiesTest
+    [Fact]
+    public void TestCreateInfo()
     {
-        [Fact]
-        public void TestCreateInfo()
-        {
-            Assert.Equal(new LanguageInfo("de", LanguageSupportLevel.FullLocalized),
-                LanguageInfoUtilities.FromEnglishName("german", LanguageSupportLevel.FullLocalized));
-            Assert.Equal(new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
-                LanguageInfoUtilities.FromEnglishName("english", LanguageSupportLevel.FullLocalized));
-            Assert.Equal(new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
-                LanguageInfoUtilities.FromEnglishName("ENGLISH", LanguageSupportLevel.FullLocalized));
-        }
+        Assert.Equal(new LanguageInfo("de", LanguageSupportLevel.FullLocalized),
+            LanguageInfoUtilities.FromEnglishName("german", LanguageSupportLevel.FullLocalized));
+        Assert.Equal(new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
+            LanguageInfoUtilities.FromEnglishName("english", LanguageSupportLevel.FullLocalized));
+        Assert.Equal(new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
+            LanguageInfoUtilities.FromEnglishName("ENGLISH", LanguageSupportLevel.FullLocalized));
+    }
 
-        [Fact]
-        public void TestGetEnglishName()
-        {
-            var de = new LanguageInfo("de", LanguageSupportLevel.FullLocalized);
-            var en = new LanguageInfo("en", LanguageSupportLevel.FullLocalized);
+    [Fact]
+    public void TestGetEnglishName()
+    {
+        var de = new LanguageInfo("de", LanguageSupportLevel.FullLocalized);
+        var en = new LanguageInfo("en", LanguageSupportLevel.FullLocalized);
 
-            Assert.Equal("German", LanguageInfoUtilities.GetEnglishName(de));
-            Assert.Equal("English", LanguageInfoUtilities.GetEnglishName(en));
-        }
+        Assert.Equal("German", LanguageInfoUtilities.GetEnglishName(de));
+        Assert.Equal("English", LanguageInfoUtilities.GetEnglishName(en));
     }
 }

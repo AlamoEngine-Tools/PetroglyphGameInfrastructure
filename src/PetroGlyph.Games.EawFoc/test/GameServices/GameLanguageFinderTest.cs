@@ -7,60 +7,59 @@ using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Language;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices
+namespace PetroGlyph.Games.EawFoc.Test.GameServices;
+
+public class GameLanguageFinderTest
 {
-    public class GameLanguageFinderTest
+    [Fact]
+    public void NullSp_Throws()
     {
-        [Fact]
-        public void NullSp_Throws()
-        {
-            Assert.Throws<ArgumentNullException>(() => new GameLanguageFinder(null));
-        }
+        Assert.Throws<ArgumentNullException>(() => new GameLanguageFinder(null));
+    }
 
-        [Fact]
-        public void TestEmptyResult()
-        {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Game");
+    [Fact]
+    public void TestEmptyResult()
+    {
+        var fs = new MockFileSystem();
+        fs.AddDirectory("Game");
 
-            var game = new Mock<IGame>();
-            game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        var game = new Mock<IGame>();
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
 
-            var languageHelper = new Mock<ILanguageFinder>();
-            languageHelper
-                .Setup(h => h.Merge(It.IsAny<IEnumerable<ILanguageInfo>[]>()))
-                .Returns(new HashSet<ILanguageInfo>());
+        var languageHelper = new Mock<ILanguageFinder>();
+        languageHelper
+            .Setup(h => h.Merge(It.IsAny<IEnumerable<ILanguageInfo>[]>()))
+            .Returns(new HashSet<ILanguageInfo>());
 
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(languageHelper.Object);
+        var sp = new Mock<IServiceProvider>();
+        sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(languageHelper.Object);
 
-            var finder = new GameLanguageFinder(sp.Object);
-            var langs = finder.FindInstalledLanguages(game.Object);
-            Assert.Empty(langs);
-        }
+        var finder = new GameLanguageFinder(sp.Object);
+        var langs = finder.FindInstalledLanguages(game.Object);
+        Assert.Empty(langs);
+    }
 
-        [Fact]
-        public void TestSomeResult()
-        {
-            var fs = new MockFileSystem();
-            fs.AddDirectory("Game");
+    [Fact]
+    public void TestSomeResult()
+    {
+        var fs = new MockFileSystem();
+        fs.AddDirectory("Game");
 
-            var game = new Mock<IGame>();
-            game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        var game = new Mock<IGame>();
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
 
-            var langInfo = new Mock<ILanguageInfo>();
+        var langInfo = new Mock<ILanguageInfo>();
 
-            var languageHelper = new Mock<ILanguageFinder>();
-            languageHelper
-                .Setup(h => h.Merge(It.IsAny<IEnumerable<ILanguageInfo>[]>()))
-                .Returns(new HashSet<ILanguageInfo> { langInfo.Object });
+        var languageHelper = new Mock<ILanguageFinder>();
+        languageHelper
+            .Setup(h => h.Merge(It.IsAny<IEnumerable<ILanguageInfo>[]>()))
+            .Returns(new HashSet<ILanguageInfo> { langInfo.Object });
 
-            var sp = new Mock<IServiceProvider>();
-            sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(languageHelper.Object);
+        var sp = new Mock<IServiceProvider>();
+        sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(languageHelper.Object);
 
-            var finder = new GameLanguageFinder(sp.Object);
-            var langs = finder.FindInstalledLanguages(game.Object);
-            Assert.Equal(1, langs.Count);
-        }
+        var finder = new GameLanguageFinder(sp.Object);
+        var langs = finder.FindInstalledLanguages(game.Object);
+        Assert.Equal(1, langs.Count);
     }
 }
