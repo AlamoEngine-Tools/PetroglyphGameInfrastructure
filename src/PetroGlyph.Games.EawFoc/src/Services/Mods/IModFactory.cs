@@ -18,7 +18,7 @@ public interface IModFactory
     /// The mod's filesystem location will be interpreted from <see cref="IModReference.Identifier"/>.
     /// If no modinfo file is present in that location, the directory itself will define the mod.
     /// </summary>
-    /// <remarks>The created mods dot NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
+    /// <remarks>The created mods do NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
     /// <param name="game">The parent <see cref="IGame"/> instance of the mod.</param>
     /// <param name="modReference">The mod reference of the new mod.</param>
     /// <returns>One mod or multiple variant mods. </returns>
@@ -33,7 +33,7 @@ public interface IModFactory
     /// Creates a new <see cref="IPhysicalMod"/> instance for a game from a file system path.
     /// The mod's filesystem location will be interpreted from <see cref="IModReference.Identifier"/>.
     /// </summary>
-    /// <remarks>The created mods dot NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
+    /// <remarks>The created mods do NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
     /// <param name="game">The parent <see cref="IGame"/> instance of the mod.</param>
     /// <param name="modReference">The mod reference of the new mod.</param>
     /// <param name="modinfo">Optional <see cref="IModinfo"/> from which the mod will get initialized.</param>
@@ -49,7 +49,7 @@ public interface IModFactory
     /// Creates a new <see cref="IPhysicalMod"/> instance for a game from a file system path.
     /// The mod's filesystem location will be interpreted from <see cref="IModReference.Identifier"/>.
     /// </summary>
-    /// <remarks>The created mods dot NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
+    /// <remarks>The created mods do NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
     /// <param name="game">The parent <see cref="IGame"/> instance of the mod.</param>
     /// <param name="modReference">The mod reference of the new mod.</param>
     /// <param name="searchModinfoFile">When <see langword="true"/> a modinfo.json file, if present, will be used to initialize;
@@ -63,7 +63,7 @@ public interface IModFactory
     /// Searches for variant modinfo files and returns new instances for each variant.
     /// The mod's filesystem location will be interpreted from <see cref="IModReference.Identifier"/>.
     /// </summary>
-    /// <remarks>The created mods dot NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
+    /// <remarks>The created mods do NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
     /// <param name="game">The parent <see cref="IGame"/> instance of the mods.</param>
     /// <param name="modReference">Mod reference of the new mods.</param>
     /// <returns>All mod variants which are found.</returns>
@@ -78,7 +78,7 @@ public interface IModFactory
     /// <summary>
     /// Creates a virtual mods from a given <see cref="IModinfo"/>.
     /// </summary>
-    /// <remarks>The created mods dot NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
+    /// <remarks>The created mods do NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
     /// <param name="game">The parent <see cref="IGame"/> instance of the mods.</param>
     /// <param name="virtualModInfo">Set of <see cref="IModinfo"/> where each element defines its own virtual mod.</param>
     /// <returns>One or many virtual mods</returns>
@@ -102,7 +102,7 @@ public interface IModFactory
     /// <summary>
     /// Creates virtual mods for a game.
     /// </summary>
-    /// <remarks>The created mods dot NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
+    /// <remarks>The created mods do NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
     /// <param name="game">The parent <see cref="IGame"/> instance of the mods.</param>
     /// <param name="name">The name of the virtual mod.</param>
     /// <param name="dependencies">dependencies of the mod.
