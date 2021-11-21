@@ -45,7 +45,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
                 .Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Library"));
             Assert.Equal(lib, other.Object);
 
-            var otherInst = new SteamLibrary(_fileSystem.DirectoryInfo.FromDirectoryName("./library"), _serviceProvider);
+            var otherInst = new SteamLibrary(_fileSystem.DirectoryInfo.FromDirectoryName("./Library"), _serviceProvider);
             Assert.Equal(lib, otherInst);
             Assert.Equal(lib.GetHashCode(), otherInst.GetHashCode());
         }
