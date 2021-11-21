@@ -87,7 +87,7 @@ public class DebugableClientBaseTest
         }
 
         public override ISet<GamePlatform> SupportedPlatforms => new HashSet<GamePlatform> { GamePlatform.Disk };
-        protected override IGameProcessLauncher GetGameLauncherService()
+        protected internal override IGameProcessLauncher GetGameLauncherService()
         {
             return ServiceProvider.GetRequiredService<IGameProcessLauncher>();
         }

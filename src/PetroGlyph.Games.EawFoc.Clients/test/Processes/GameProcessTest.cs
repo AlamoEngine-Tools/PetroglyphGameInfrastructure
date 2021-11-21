@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
@@ -15,7 +16,16 @@ public class GameProcessTest
     public async Task TestOnExit()
     {
         var game = new Mock<IGame>();
-        var p = Process.Start("cmd");
+
+        string processName;
+#if NET
+        if (!OperatingSystem.IsWindows())
+            processName = "bash";
+        else
+#endif
+        processName = "cmd";
+
+        var p = Process.Start(processName);
         var gp = new GameProcess(p, new GameProcessInfo(game.Object, GameBuildType.Debug, new EmptyArgumentsCollection()));
         var tcs = new TaskCompletionSource<bool>();
             
@@ -33,7 +43,14 @@ public class GameProcessTest
     public async Task TestAlreadyExited()
     {
         var game = new Mock<IGame>();
-        var p = Process.Start("cmd");
+        string processName;
+#if NET
+        if (!OperatingSystem.IsWindows())
+            processName = "bash";
+        else
+#endif
+            processName = "cmd";
+        var p = Process.Start(processName);
         p.Kill();
         var gp = new GameProcess(p, new GameProcessInfo(game.Object, GameBuildType.Debug, new EmptyArgumentsCollection()));
         var tcs = new TaskCompletionSource<bool>();

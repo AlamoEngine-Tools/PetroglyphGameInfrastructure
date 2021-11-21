@@ -95,7 +95,7 @@ public abstract class ClientBase : IGameClient
         if (instance is IMod mod)
         {
             var modArgFactory = ServiceProvider.GetService<IModArgumentListFactory>() ?? new ModArgumentListFactory(ServiceProvider);
-            var modArgs = modArgFactory.BuildArgumentList(mod);
+            var modArgs = modArgFactory.BuildArgumentList(mod, false);
             var builder = ServiceProvider.GetService<IArgumentCollectionBuilder>() ?? new KeyBasedArgumentCollectionBuilder();
             arguments = builder.AddAll(DefaultArguments).Add(modArgs).Build();
         }
@@ -195,7 +195,7 @@ public abstract class ClientBase : IGameClient
     /// <param name="arguments">The requested argument collection</param>
     /// <param name="type">The game build type.</param>
     /// <returns><see langword="true"/> if the game starting procedure shall continue; <see langword="false"/> otherwise.</returns>
-    protected virtual bool OnGameStarting(IPlayableObject instance, IReadOnlyCollection<IGameArgument> arguments, GameBuildType type)
+    protected internal virtual bool OnGameStarting(IPlayableObject instance, IArgumentCollection arguments, GameBuildType type)
     {
         return true;
     }
@@ -208,7 +208,7 @@ public abstract class ClientBase : IGameClient
     /// It is possible that the process terminates before this method is finished.
     /// Important: Do not raise the <see cref="GameStarted"/> event. This will be done by the base class.
     /// </remarks>
-    protected virtual void OnGameStarted(IGameProcess gameProcess)
+    protected internal virtual void OnGameStarted(IGameProcess gameProcess)
     {
     }
 
@@ -216,5 +216,5 @@ public abstract class ClientBase : IGameClient
     /// Retrieves an <see cref="IGameProcessLauncher"/> for this instance to start the game process.
     /// </summary>
     /// <returns>The <see cref="IGameProcessLauncher"/> instance.</returns>
-    protected abstract IGameProcessLauncher GetGameLauncherService();
+    protected internal abstract IGameProcessLauncher GetGameLauncherService();
 }

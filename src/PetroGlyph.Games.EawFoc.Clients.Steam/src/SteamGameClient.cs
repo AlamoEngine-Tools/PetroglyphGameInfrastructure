@@ -30,7 +30,7 @@ public sealed class SteamGameClient : DebugableClientBase
     /// Returns a custom <see cref="IGameProcessLauncher"/> which checks if Steam is running.
     /// </summary>
     /// <returns>The game launcher.</returns>
-    protected override IGameProcessLauncher GetGameLauncherService()
+    protected internal override IGameProcessLauncher GetGameLauncherService()
     {
         return new SteamGameLauncher(ServiceProvider);
     }

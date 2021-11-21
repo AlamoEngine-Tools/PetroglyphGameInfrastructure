@@ -31,7 +31,7 @@ public sealed class DefaultClient : ClientBase
     /// Gets an <see cref="IGameProcessLauncher"/> instance registered to the service provider or uses the default launcher instance.
     /// </summary>
     /// <returns>The <see cref="IGameProcessLauncher"/> instance.</returns>
-    protected override IGameProcessLauncher GetGameLauncherService()
+    protected internal override IGameProcessLauncher GetGameLauncherService()
     { 
         return ServiceProvider.GetService<IGameProcessLauncher>() ?? new DefaultGameProcessLauncher(ServiceProvider);
     }

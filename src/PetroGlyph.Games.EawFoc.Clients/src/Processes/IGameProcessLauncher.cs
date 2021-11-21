@@ -13,5 +13,6 @@ public interface IGameProcessLauncher
     /// <param name="executable">The executable to start.</param>
     /// <param name="processInfo">Process information including launch arguments.</param>
     /// <returns>The created game process.</returns>
+    /// <exception cref="GameStartException">The process could not be created.</exception>
     IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo);
 }
