@@ -159,6 +159,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
         public GameRegistry(GameType gameType, IRegistryKey registryKey, IServiceProvider serviceProvider)
         {
             Requires.NotNull(registryKey, nameof(registryKey));
+            Type = gameType;
             _registryKey = registryKey;
             _fileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
         }
