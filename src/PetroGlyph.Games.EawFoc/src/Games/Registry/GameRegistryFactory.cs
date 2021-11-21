@@ -28,7 +28,7 @@ public class GameRegistryFactory : IGameRegistryFactory
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
 
-        var gameKey = baseKey.CreateSubKey(gamePath);
+        var gameKey = baseKey.GetKey(gamePath);
         if (gameKey is null)
             throw new InvalidOperationException($"Unable to get registry key for game {type}");
         return new GameRegistry(type, gameKey, serviceProvider);

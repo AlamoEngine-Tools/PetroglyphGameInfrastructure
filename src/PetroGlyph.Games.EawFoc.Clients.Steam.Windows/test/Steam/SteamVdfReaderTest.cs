@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Sklavenwalker.CommonUtilities.FileSystem;
 using Xunit;
+#if NET
+using System;
+#endif
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam;
 
@@ -96,6 +99,8 @@ public class SteamVdfReaderTest
     [Fact]
     public void TestReadAppManifest()
     {
+
+
         var data = @"""AppState""
 {
 	""appid""		""1230""
@@ -123,7 +128,14 @@ public class SteamVdfReaderTest
         Assert.Equal(1230u, app.Id);
         Assert.Equal("GameName", app.Name);
         Assert.Equal(SteamAppState.StateFullyInstalled | SteamAppState.StateUpdatePaused, app.State);
+
+#if NET
+        if (!OperatingSystem.IsWindows())
+            Assert.Equal("/steamapps/common/GamePath", app.InstallDir.FullName);
+        else
+#endif
         Assert.Equal("C:\\steamapps\\common\\GamePath", app.InstallDir.FullName);
+
         Assert.Contains(1231u, app.Depots);
         Assert.Contains(1232u, app.Depots);
         Assert.Contains(1233u, app.Depots);

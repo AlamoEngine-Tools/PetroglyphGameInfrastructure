@@ -14,11 +14,11 @@ internal class SteamLibrary : ISteamLibrary
     private readonly IServiceProvider _serviceProvider;
     private readonly ConcurrentDictionary<KnownLibraryLocations, IDirectoryInfo> _locations = new();
 
-    private readonly Dictionary<KnownLibraryLocations, string> _locationsNames = new()
+    private readonly Dictionary<KnownLibraryLocations, string[]> _locationsNames = new()
     {
-        { KnownLibraryLocations.SteamApps, "steamapps" },
-        { KnownLibraryLocations.Common, "common" },
-        { KnownLibraryLocations.Workshops, "workshop" }
+        { KnownLibraryLocations.SteamApps, new[] { "steamapps" } },
+        { KnownLibraryLocations.Common, new[] { "steamapps", "common" } },
+        { KnownLibraryLocations.Workshops, new[] { "steamapps", "workshop" } }
     };
 
     private readonly IPathHelperService _pathHelper;
@@ -86,9 +86,14 @@ internal class SteamLibrary : ISteamLibrary
         return _locations.GetOrAdd(location, l =>
         {
             var fs = LibraryLocation.FileSystem;
-            var locationFolderName = _locationsNames[l];
+            var subPathParts = _locationsNames[l];
             var basePath = LibraryLocation.FullName;
-            var locationPath = fs.Path.Combine(basePath, locationFolderName);
+
+            var pathParts = new string[subPathParts.Length + 1];
+            pathParts[0] = basePath;
+            Array.Copy(subPathParts, 0, pathParts, 1, subPathParts.Length);
+
+            var locationPath = fs.Path.Combine(pathParts);
             return fs.DirectoryInfo.FromDirectoryName(locationPath);
         });
     }

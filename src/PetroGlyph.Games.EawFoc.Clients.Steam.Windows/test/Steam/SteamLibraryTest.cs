@@ -121,5 +121,16 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
             var result = Assert.Single(apps);
             Assert.Same(app, result);
         }
+
+        [Fact]
+        public void TestLocations()
+        {
+#if NET
+            if (!OperatingSystem.IsWindows())
+                return;
+#endif
+            var lib = new SteamLibrary(_fileSystem.DirectoryInfo.FromDirectoryName("Library"), _serviceProvider);
+            Assert.Equal("C:\\Library\\steamapps\\common", lib.CommonLocation.FullName);
+        }
     }
 }
