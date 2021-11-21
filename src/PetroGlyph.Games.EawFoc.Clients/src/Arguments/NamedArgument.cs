@@ -32,7 +32,7 @@ public abstract class NamedArgument<T> : GameArgument<T> where T : notnull
     }
 
     /// <inheritdoc/>
-    public override bool Equals(IGameArgument? other)
+    public sealed override bool Equals(IGameArgument? other)
     {
         if (other is null)
             return false;
@@ -42,13 +42,13 @@ public abstract class NamedArgument<T> : GameArgument<T> where T : notnull
     }
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj)
+    public sealed override bool Equals(object? obj)
     {
         return obj is IGameArgument other && Equals(other);
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode()
+    public sealed override int GetHashCode()
     {
         return HashCode.Combine(Kind, Name, Value);
     }

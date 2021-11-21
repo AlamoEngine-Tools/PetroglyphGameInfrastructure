@@ -7,19 +7,31 @@ using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Steam;
+using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
+/// <summary>
+///  Create a <see cref="ModArgumentList"/> from a given mod instance
+/// by using a registered service instance of <see cref="IModDependencyTraverser"/>
+/// </summary>
 public class ModArgumentListFactory : IModArgumentListFactory
 {
     private readonly IServiceProvider _serviceProvider;
+    private IArgumentValidator? _validator;
 
+    /// <summary>
+    /// Initializes a new builder instance.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
     public ModArgumentListFactory(IServiceProvider serviceProvider)
     {
+        Requires.NotNull(serviceProvider, nameof(serviceProvider));
         _serviceProvider = serviceProvider;
     }
 
-    public ModArgumentList BuildArgumentList(IList<IMod> traversedModChain)
+    /// <inheritdoc/>
+    public ModArgumentList BuildArgumentList(IList<IMod> traversedModChain, bool validateArgumentOnCreation)
     {
         var dependencyArgs = new List<ModArgument>();
         foreach (var dependency in traversedModChain)
@@ -27,54 +39,60 @@ public class ModArgumentListFactory : IModArgumentListFactory
             // Virtual and non physical mods are just "placeholders" we cannot add them to the argument list.
             if (dependency.Type == ModType.Virtual || dependency is not IPhysicalMod physicalMod)
                 continue;
-            dependencyArgs.Add(BuildSingleModArgument(physicalMod));
+            dependencyArgs.Add(BuildSingleModArgument(physicalMod, validateArgumentOnCreation));
         }
 
         return !dependencyArgs.Any() ? ModArgumentList.Empty : new ModArgumentList(dependencyArgs);
     }
 
-    public ModArgumentList BuildArgumentList(IMod modInstance)
+    /// <inheritdoc/>
+    public ModArgumentList BuildArgumentList(IMod modInstance, bool validateArgumentOnCreation)
     {
         if (modInstance.DependencyResolveStatus == DependencyResolveStatus.Resolved)
         {
             var traverser = _serviceProvider.GetRequiredService<IModDependencyTraverser>();
             var dependencies = traverser.Traverse(modInstance).Select(d => d.Mod).ToList();
-            return BuildArgumentList(dependencies);
+            return BuildArgumentList(dependencies, validateArgumentOnCreation);
         }
 
         // Virtual mods must have dependencies and are resolved at the time they are created.
-        // Also Mods with no dependencies must be physical. 
+        // Also Mnoods with no dependencies must be physical. 
         // This simply results in an empty list.
         if (modInstance.Type == ModType.Virtual || modInstance is not IPhysicalMod physicalMod)
             return ModArgumentList.Empty;
 
-        var arg = BuildSingleModArgument(physicalMod);
+        var arg = BuildSingleModArgument(physicalMod, validateArgumentOnCreation);
         return new ModArgumentList(new[] { arg });
     }
 
-    private ModArgument BuildSingleModArgument(IPhysicalMod mod)
+    private ModArgument BuildSingleModArgument(IPhysicalMod mod, bool validate)
     {
         var isWorkshop = mod.Type == ModType.Workshops;
         var argumentValue = mod.Identifier;
 
         if (!isWorkshop)
         {
-            // The path MUST NOT contain any spacing. Even escaping it with " or ' does not help.
-            // It will not be launched by the game. To allow the game part of the full path is allowed to have spaces,
-            // we try to relativize to path if it's not absolute.
+            // Shortening to the relative game's path allows the game to exit on a path which has space characters.
             var relativeOrAbsoluteModPath = new ArgumentValueSerializer().ShortenPath(mod.Directory, mod.Game.Directory);
-            if (relativeOrAbsoluteModPath.Any(char.IsWhiteSpace))
-                throw new ModException(mod,
-                    $"MODPATH value '{relativeOrAbsoluteModPath}' must not contain white space characters");
             argumentValue = relativeOrAbsoluteModPath;
         }
         else
         {
             var steamHelper = _serviceProvider.GetRequiredService<ISteamGameHelpers>();
+            // Throwing here is OK because this mod clearly violates its contract. 
             if (!steamHelper.ToSteamWorkshopsId(argumentValue, out _))
                 throw new SteamException("Identifier is not a valid SteamID");
         }
 
-        return new ModArgument(argumentValue, isWorkshop);
+        var argument = new ModArgument(argumentValue, isWorkshop);
+        if (validate)
+        {
+            _validator ??= _serviceProvider.GetRequiredService<IArgumentValidator>();
+            var validity = _validator.CheckArgument(argument, out _, out _);
+            if (validity != ArgumentValidityStatus.Valid)
+                throw new ModException(mod, $"Create mod argument for {mod} is not valid: {validity}");
+        }
+
+        return argument;
     }
 }

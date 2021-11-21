@@ -5,6 +5,8 @@
 /// </summary>
 public sealed class ModArgument : NamedArgument<string>
 {
+    private readonly bool _workshops;
+
     /// <summary>
     /// Creates a new argument 
     /// </summary>
@@ -13,11 +15,21 @@ public sealed class ModArgument : NamedArgument<string>
     public ModArgument(string value, bool workshops) : 
         base(workshops ? ArgumentNameCatalog.SteamModArg : ArgumentNameCatalog.ModPathArg, value, false)
     {
+        _workshops = workshops;
     }
 
     /// <inheritdoc/>
     public override string ValueToCommandLine()
     {
         return Value;
+    }
+
+    /// <summary>
+    /// Checks whether the given value is a valid SteamID.
+    /// </summary>
+    /// <remarks>Path checking is already completed if this method is invoked.</remarks>
+    protected override bool IsDataValid()
+    {
+        return !_workshops || uint.TryParse(Value, out _);
     }
 }
