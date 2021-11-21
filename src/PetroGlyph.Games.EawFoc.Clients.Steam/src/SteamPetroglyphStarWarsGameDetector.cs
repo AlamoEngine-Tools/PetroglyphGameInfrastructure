@@ -59,11 +59,18 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
 
         var installLocation = FileSystem.DirectoryInfo.FromDirectoryName(fullGamePath);
 
-        using var registry = _registryFactory.CreateRegistry(options.Type, ServiceProvider);
-        if (registry.Type != options.Type)
-            throw new InvalidOperationException("Incompatible registry");
-
-        if (registry.Version is null)
+        try
+        {
+            using var registry = _registryFactory.CreateRegistry(options.Type, ServiceProvider);
+            if (registry.Type != options.Type)
+                throw new InvalidOperationException("Incompatible registry");
+            if (registry.Version is null)
+            {
+                Logger?.LogDebug("Registry-Key found, but games are not initialized.");
+                return new GameLocationData { InitializationRequired = true };
+            }
+        }
+        catch (GameRegistryNotFoundException)
         {
             Logger?.LogDebug("Registry-Key found, but games are not initialized.");
             return new GameLocationData { InitializationRequired = true };
