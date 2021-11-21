@@ -26,7 +26,7 @@ public class DefaultGameProcessLauncherTest
     public void TestWrapsException_Throws()
     {
         var game = new Mock<IGame>();
-        var process = new GameProcessInfo(game.Object, GameBuildType.Release, new EmptyArgumentsCollection());
+        var process = new GameProcessInfo(game.Object, GameBuildType.Release, ArgumentCollection.Empty);
         Assert.Throws<GameStartException>(() => _service.StartGameProcess(null, process));
     }
 
@@ -37,8 +37,8 @@ public class DefaultGameProcessLauncherTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Game).Returns(game.Object);
         game.Setup(g => g.Directory).Returns(new MockDirectoryInfo(fs, "path"));
-        var process = new GameProcessInfo(game.Object, GameBuildType.Release, new EmptyArgumentsCollection());
+        var process = new GameProcessInfo(game.Object, GameBuildType.Release, ArgumentCollection.Empty);
         Assert.Throws<GameStartException>(() => _service.StartGameProcess(new MockFileInfo(fs, "test.exe"), process));
-        _builder.Verify(b => b.BuildCommandLine(new EmptyArgumentsCollection()), Times.Exactly(1));
+        _builder.Verify(b => b.BuildCommandLine(ArgumentCollection.Empty), Times.Exactly(1));
     }
 }

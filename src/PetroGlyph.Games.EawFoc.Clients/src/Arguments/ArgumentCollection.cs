@@ -7,6 +7,11 @@ namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 /// <inheritdoc/>
 public sealed class ArgumentCollection : IArgumentCollection
 {
+    /// <summary>
+    /// Singleton argument collection, which is always empty.
+    /// </summary>
+    public static IArgumentCollection Empty = new EmptyArgumentsCollection();
+
     private readonly IReadOnlyCollection<IGameArgument> _args;
 
     /// <inheritdoc/>
@@ -30,5 +35,38 @@ public sealed class ArgumentCollection : IArgumentCollection
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    /// <summary>
+    /// An always empty argument collection.
+    /// </summary>
+    private class EmptyArgumentsCollection : IArgumentCollection
+    {
+        /// <inheritdoc/>
+        public IEnumerator<IGameArgument> GetEnumerator()
+        {
+            return new Enumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        /// <inheritdoc/>
+        public int Count => 0;
+
+        private struct Enumerator : IEnumerator<IGameArgument>
+        {
+            public bool MoveNext() => false;
+
+            public void Reset() { }
+
+            public IGameArgument Current => null!;
+
+            object IEnumerator.Current => Current;
+
+            public void Dispose() { }
+        }
     }
 }

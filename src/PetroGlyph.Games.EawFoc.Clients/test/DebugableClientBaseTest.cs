@@ -58,23 +58,23 @@ public class DebugableClientBaseTest
             .Returns(fs.FileInfo.FromFileName("release.exe"));
 
         // Don't fallback - Throws.
-        Assert.Throws<GameStartException>(() => _service.Debug(game.Object, new EmptyArgumentsCollection(), false));
+        Assert.Throws<GameStartException>(() => _service.Debug(game.Object, ArgumentCollection.Empty, false));
 
         // Fallback to Release
         var releaseProcess = new Mock<IGameProcess>();
         releaseProcess.Setup(p => p.ProcessInfo)
-            .Returns(new GameProcessInfo(game.Object, GameBuildType.Release, new EmptyArgumentsCollection()));
+            .Returns(new GameProcessInfo(game.Object, GameBuildType.Release, ArgumentCollection.Empty));
         _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>())).Returns(releaseProcess.Object);
-        var realProcess = _service.Debug(game.Object, new EmptyArgumentsCollection(), true);
+        var realProcess = _service.Debug(game.Object, ArgumentCollection.Empty, true);
         Assert.Equal(GameBuildType.Release, realProcess.ProcessInfo.BuildType);
 
         // Use Debug
         fs.AddFile("debug.exe", MockFileData.NullObject);
         var debugProcess = new Mock<IGameProcess>();
         debugProcess.Setup(p => p.ProcessInfo)
-            .Returns(new GameProcessInfo(game.Object, GameBuildType.Debug, new EmptyArgumentsCollection()));
+            .Returns(new GameProcessInfo(game.Object, GameBuildType.Debug, ArgumentCollection.Empty));
         _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>())).Returns(debugProcess.Object);
-        realProcess = _service.Debug(game.Object, new EmptyArgumentsCollection(), true);
+        realProcess = _service.Debug(game.Object, ArgumentCollection.Empty, true);
         Assert.Equal(GameBuildType.Debug, realProcess.ProcessInfo.BuildType);
 
     }

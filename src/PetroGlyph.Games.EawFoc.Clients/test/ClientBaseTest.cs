@@ -46,7 +46,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
 
             _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(new EmptyArgumentsCollection());
+            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
             
             var e = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
             Assert.StartsWith("Unable to start", e.Message);
@@ -59,8 +59,8 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
             _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(new EmptyArgumentsCollection());
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), new EmptyArgumentsCollection(), GameBuildType.Release)).Returns(false);
+            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(false);
 
             var e = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
             Assert.Equal("Game starting was aborted.", e.Message);
@@ -73,8 +73,8 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
             _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(new EmptyArgumentsCollection());
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), new EmptyArgumentsCollection(), GameBuildType.Release)).Returns(true);
+            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
 
             var handlerCalled = false;
             _client.Object.GameStarting += (sender, args) =>
@@ -108,7 +108,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
             _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(new EmptyArgumentsCollection());
+            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
             var callbackTriggered = false;
             _client.Setup(c => c.OnGameStarting(It.IsAny<IPlayableObject>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release))
                 .Callback((IPlayableObject _, IArgumentCollection args, GameBuildType _) =>
@@ -130,8 +130,8 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
             _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(new EmptyArgumentsCollection());
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), new EmptyArgumentsCollection(), GameBuildType.Release)).Returns(true);
+            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
 
             var e1 = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
             Assert.StartsWith("Executable for", e1.Message);
@@ -152,8 +152,8 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
             _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(new EmptyArgumentsCollection());
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), new EmptyArgumentsCollection(), GameBuildType.Release)).Returns(true);
+            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
 
             var fs = new MockFileSystem();
             fs.AddFile("test.exe", MockFileData.NullObject);

@@ -33,7 +33,7 @@ public abstract class ClientBase : IGameClient
     /// <summary>
     /// By default this gives an empty <see cref="IArgumentCollection"/>.
     /// </summary>
-    public virtual IArgumentCollection DefaultArguments => new EmptyArgumentsCollection();
+    public virtual IArgumentCollection DefaultArguments => ArgumentCollection.Empty;
 
     /// <inheritdoc/>
     public IReadOnlyCollection<IGameProcess> RunningInstances

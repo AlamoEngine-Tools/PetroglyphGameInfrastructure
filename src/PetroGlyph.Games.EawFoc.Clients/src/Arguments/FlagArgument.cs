@@ -31,7 +31,7 @@ public abstract class FlagArgument : GameArgument<bool>
     }
 
     /// <inheritdoc/>
-    public override string ValueToCommandLine()
+    public sealed override string ValueToCommandLine()
     {
         return Value ? Name : string.Empty;
     }

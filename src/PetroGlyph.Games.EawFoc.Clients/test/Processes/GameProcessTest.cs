@@ -26,7 +26,7 @@ public class GameProcessTest
         processName = "cmd";
 
         var p = Process.Start(processName);
-        var gp = new GameProcess(p, new GameProcessInfo(game.Object, GameBuildType.Debug, new EmptyArgumentsCollection()));
+        var gp = new GameProcess(p, new GameProcessInfo(game.Object, GameBuildType.Debug, ArgumentCollection.Empty));
         var tcs = new TaskCompletionSource<bool>();
             
         gp.Closed += (_, _) => {
@@ -52,7 +52,7 @@ public class GameProcessTest
             processName = "cmd";
         var p = Process.Start(processName);
         p.Kill();
-        var gp = new GameProcess(p, new GameProcessInfo(game.Object, GameBuildType.Debug, new EmptyArgumentsCollection()));
+        var gp = new GameProcess(p, new GameProcessInfo(game.Object, GameBuildType.Debug, ArgumentCollection.Empty));
         var tcs = new TaskCompletionSource<bool>();
         gp.Closed += (_, _) =>
         {
