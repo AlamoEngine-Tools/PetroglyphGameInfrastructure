@@ -42,7 +42,8 @@ internal class ArgumentValueSerializer
             typeof (uint),
             typeof (ulong),
             typeof (float),
-            typeof(double)
+            typeof(double),
+            typeof(bool)
         };
         foreach (var type in typeArray) 
             SpecialTypes.Add(type.FullName, (type, null));

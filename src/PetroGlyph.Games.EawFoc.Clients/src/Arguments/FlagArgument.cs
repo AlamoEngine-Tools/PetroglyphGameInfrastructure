@@ -33,7 +33,7 @@ public abstract class FlagArgument : GameArgument<bool>
     /// <inheritdoc/>
     public sealed override string ValueToCommandLine()
     {
-        return Value ? Name : string.Empty;
+        return new ArgumentValueSerializer().Serialize(Value);
     }
 
     /// <inheritdoc/>

@@ -20,12 +20,12 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
     /// <summary>
     /// Converts this collection into a string which can be used as argument sequence for a Petroglyph Star Wars game.
     /// </summary>
+    /// <remarks>While this operation sanitizes bad input by throwing an exception, by design, we do not sanity check the values here.</remarks>
     /// <returns>Strings representation of arguments</returns>
     /// <exception cref="GameArgumentException"> This collection contained invalid arguments.
     /// </exception>
     public string BuildCommandLine(IArgumentCollection arguments)
     {
-        // While this operation sanitizes bad input by throwing an exception, by design, we do not sanity check the values here. 
         if (!arguments.Any())
             return string.Empty;
 
@@ -49,9 +49,9 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
         switch (argument.Kind)
         {
             case ArgumentKind.Flag:
-                return BuildFlagArgument(value, false);
+                return BuildFlagArgument(name, (bool)argument.Value, false);
             case ArgumentKind.DashedFlag:
-                return BuildFlagArgument(value, true);
+                return BuildFlagArgument(name, (bool)argument.Value, true);
             case ArgumentKind.KeyValue:
                 return BuildKeyValueArgument(name, value);
             case ArgumentKind.ModList:
@@ -64,14 +64,13 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
         }
     }
 
-    private static string BuildFlagArgument(string flag, bool dashed)
+    private static string BuildFlagArgument(string flag, bool value, bool dashed)
     {
-        if (string.IsNullOrEmpty(flag))
+        if (!value)
             return string.Empty;
-        var value = flag;
         if (dashed)
-            value = $"-{value}";
-        return value;
+            flag = $"-{flag}";
+        return flag;
     }
 
     private static string BuildKeyValueArgument(string key, string value)

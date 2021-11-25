@@ -30,10 +30,20 @@ public class FlagArgumentTest
         var a3 = new Flag("Name", true, true);
         var a4 = new Flag("Name", false, true);
 
-        Assert.Equal("Name", a1.ValueToCommandLine());
-        Assert.Equal(string.Empty, a2.ValueToCommandLine());
-        Assert.Equal("Name", a3.ValueToCommandLine());
-        Assert.Equal(string.Empty, a4.ValueToCommandLine());
+        Assert.Equal("True", a1.ValueToCommandLine());
+        Assert.Equal("False", a2.ValueToCommandLine());
+        Assert.Equal("True", a3.ValueToCommandLine());
+        Assert.Equal("False", a4.ValueToCommandLine());
+    }
+
+    [Fact]
+    public void TestIsDashed()
+    {
+        var flag = new Flag("Name", true);
+        Assert.Equal(ArgumentKind.Flag, flag.Kind);
+
+        var dashed = new Flag("Name", true, true);
+        Assert.Equal(ArgumentKind.DashedFlag, dashed.Kind);
     }
 
     private class Flag : FlagArgument

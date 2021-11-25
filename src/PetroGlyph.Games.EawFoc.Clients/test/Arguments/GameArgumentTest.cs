@@ -6,7 +6,6 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test.Arguments;
 
 public class GameArgumentTest
 {
-
     [Fact]
     public void TestArgValid()
     {

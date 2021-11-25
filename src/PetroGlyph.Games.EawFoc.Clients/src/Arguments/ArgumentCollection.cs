@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
@@ -21,9 +22,9 @@ public sealed class ArgumentCollection : IArgumentCollection
     /// Creates a new collection from a given list of <see cref="IGameArgument"/>s.
     /// </summary>
     /// <param name="arguments">The arguments to add to this instance.</param>
-    public ArgumentCollection(IList<IGameArgument> arguments)
+    public ArgumentCollection(IEnumerable<IGameArgument> arguments)
     {
-        _args = new ReadOnlyCollection<IGameArgument>(arguments);
+        _args = new ReadOnlyCollection<IGameArgument>(arguments.ToList());
     }
 
     /// <inheritdoc/>

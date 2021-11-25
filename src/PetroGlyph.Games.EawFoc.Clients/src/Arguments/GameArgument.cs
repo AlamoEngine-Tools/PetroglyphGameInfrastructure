@@ -41,7 +41,7 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
     /// <summary>
     /// This method shall only perform semantical checks on the <see cref="Value"/> property.
     /// <para>If this method returns <see langword="false"/>, <see cref="IsValid(out ArgumentValidityStatus)"/>
-    /// with return <langword cref="false"/> with reason <see cref="ArgumentValidityStatus.InvalidData"/>.</para>
+    /// with return <see langword="false"/> with reason <see cref="ArgumentValidityStatus.InvalidData"/>.</para>
     /// <para>
     /// This methods gets called in the sequence of <see cref="IsValid"/>. Returns <see langword="true"/> by default.
     /// </para>

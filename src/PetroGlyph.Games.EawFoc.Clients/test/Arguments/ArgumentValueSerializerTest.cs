@@ -25,6 +25,14 @@ public class ArgumentValueSerializerTest
     }
 
     [Fact]
+    public void TestBool()
+    {
+        var serializer = new ArgumentValueSerializer();
+        Assert.Equal("True", serializer.Serialize(true));
+        Assert.Equal("False", serializer.Serialize(false));
+    }
+
+    [Fact]
     public void TestSerializeSignedNotSupported()
     {
         var serializer = new ArgumentValueSerializer();

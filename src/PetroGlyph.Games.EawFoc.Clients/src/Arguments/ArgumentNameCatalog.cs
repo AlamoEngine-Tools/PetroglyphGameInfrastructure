@@ -73,7 +73,7 @@ public static class ArgumentNameCatalog
     /// </summary>
     /// <remarks>The names are in upper case.</remarks>
     public static IReadOnlyCollection<string> AllSupportedArgumentNames =
-        SupportedFlagArgumentNames.Union(SupportedFlagArgumentNames).Union(SupportedKeyValueArgumentNames).ToList();
+        SupportedFlagArgumentNames.Union(SupportedKeyValueArgumentNames).Union(SyntheticArgumentNames).ToList();
 
     internal static IReadOnlyCollection<string> SyntheticArgumentNames => new[] { ModListArg };
 
@@ -104,7 +104,6 @@ public static class ArgumentNameCatalog
         DebugUnitsArg,
         NoMenuArg,
         FullScreenArg
-
     };
 
     internal static IReadOnlyCollection<string> SupportedKeyValueArgumentNames => new HashSet<string>

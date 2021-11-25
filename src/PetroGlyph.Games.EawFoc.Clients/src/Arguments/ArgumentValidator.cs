@@ -4,8 +4,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
 internal sealed class ArgumentValidator : IArgumentValidator
 {
-    private static readonly char[] InvalidArgumentChars = { '\"', '<', '>', '|', '\0', ':', '*', '?'};
-
+    private static readonly char[] InvalidArgumentChars = { '\"', '<', '>', '|', ':', '*', '?'};
 
     public ArgumentValidityStatus CheckArgument(IGameArgument argument, out string name, out string value)
     {
@@ -14,10 +13,10 @@ internal sealed class ArgumentValidator : IArgumentValidator
         var kind = argument.Kind;
 
         // We do not support custom arguments
-        if (!ArgumentNameCatalog.AllSupportedArgumentNames.Contains(argument.Name))
+        if (!ArgumentNameCatalog.AllSupportedArgumentNames.Contains(name))
         {
             name = name.ToUpperInvariant();
-            if (!ArgumentNameCatalog.AllSupportedArgumentNames.Contains(argument.Name))
+            if (!ArgumentNameCatalog.AllSupportedArgumentNames.Contains(name))
                 return ArgumentValidityStatus.InvalidName;
         }
 
@@ -29,9 +28,6 @@ internal sealed class ArgumentValidator : IArgumentValidator
         // ModList kind is expected to return an empty string.
         if (!isNullOrEmpty && kind == ArgumentKind.ModList)
             return ArgumentValidityStatus.InvalidData;
-
-        if (isNullOrEmpty)
-            return ArgumentValidityStatus.Valid;
 
         var invalidChars = InvalidArgumentChars;
         foreach (var c in value)
