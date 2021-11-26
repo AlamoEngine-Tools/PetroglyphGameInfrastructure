@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<LangVersion>10.0</LangVersion>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Authors>Anakin Sklavenwalker</Authors>
+		<Company>Republic at War Modding Team</Company>
+		<Product>PetroglyphTools</Product>
+		<Description>Steam abstraction layer for Petroglyph Star Wars games.</Description>
+		<Copyright>2021 - Anakin Sklavenwalker</Copyright>
+		<PackageTags>petroglyph, alamo, glyphx, foc, eaw</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+
+		<SignAssembly>true</SignAssembly>
+		<DelaySign>false</DelaySign>
+		<AssemblyOriginatorKeyFile>../../../AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.1" />
+		<PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
+		<PackageReference Include="Validation" Version="2.5.42" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
+	  <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
+	</ItemGroup>
+
+</Project>

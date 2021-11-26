@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFrameworks>net6.0-windows;net48</TargetFrameworks>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <LangVersion>10.0</LangVersion>
+	  <Nullable>enable</Nullable>
+	  <Authors>Anakin Sklavenwalker</Authors>
+	  <Company>Republic at War Modding Team</Company>
+	  <Product>PetroglyphTools</Product>
+	  <Description>Provides tools for launching Petroglyph Star Wars games on various clients, such as Steam or Disk release.</Description>
+	  <Copyright>2021 - Anakin Sklavenwalker</Copyright>
+	  <PackageTags>petroglyph, alamo, glyphx, foc, eaw</PackageTags>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+
+	  <SignAssembly>true</SignAssembly>
+	  <DelaySign>false</DelaySign>
+	  <AssemblyOriginatorKeyFile>../../../AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
+	  <RootNamespace>PetroGlyph.Games.EawFoc.Clients.Steam</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.1" />
+    <PackageReference Include="Sklavenwalker.CommonUtilities.Registry.Windows" Version="1.0.2" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
+    <PackageReference Include="Validation" Version="2.5.42" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc.Clients.Steam\src\PetroGlyph.Games.EawFoc.Clients.Steam.csproj" />
+    <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
+    <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
+  </ItemGroup>
+
+</Project>
