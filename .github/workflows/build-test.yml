@@ -12,11 +12,6 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        configuration: [Debug, Release]
-        dotnet-framework: [net6.0, net48]
-        exclude:
-          - os: ubuntu-latest
-            dotnet-framework: net48
       fail-fast: false
     runs-on: ${{ matrix.os }}
     continue-on-error: true
@@ -36,7 +31,7 @@ jobs:
         dotnet-version: '6.0.x'
         
     - name: Build
-      run: dotnet build ${{ env.solution }} -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }}
+      run: dotnet build ${{ env.solution }} -c Release
         
     - name: Test
-      run: dotnet test ${{ env.solution}} -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }} 
+      run: dotnet test ${{ env.solution}} -c Release
