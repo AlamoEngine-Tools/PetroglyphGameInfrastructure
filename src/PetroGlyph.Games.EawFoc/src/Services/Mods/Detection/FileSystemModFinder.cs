@@ -1,0 +1,80 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO.Abstractions;
+using System.Linq;
+using EawModinfo.Model;
+using EawModinfo.Spec;
+using Microsoft.Extensions.DependencyInjection;
+using PetroGlyph.Games.EawFoc.Games;
+using PetroGlyph.Games.EawFoc.Services.Steam;
+using Sklavenwalker.CommonUtilities.FileSystem;
+using Validation;
+
+namespace PetroGlyph.Games.EawFoc.Services.Detection;
+
+/// <summary>
+/// Searches for <see cref="IModReference"/>s on the file system.
+/// </summary>
+public class FileSystemModFinder : IModReferenceFinder
+{
+    private readonly IPathHelperService _pathHelperService;
+    private readonly ISteamGameHelpers _steamHelper;
+
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider</param>
+    public FileSystemModFinder(IServiceProvider serviceProvider)
+    {
+        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        var fs = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
+        _pathHelperService = serviceProvider.GetService<IPathHelperService>() ?? new PathHelperService(fs);
+        _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
+    }
+
+    /// <summary>
+    /// Searches mods for the given <paramref name="game"/>.
+    /// </summary>
+    /// <param name="game">The game which hosts the mods.</param>
+    /// <returns>A set of <see cref="IModReference"/>s.
+    /// The <see cref="IModReference.Identifier"/> either holds the absolute path or Steam Workshops ID.</returns>
+    /// <exception cref="GameException">If the <paramref name="game"/> is not installed.</exception>
+    public ISet<IModReference> FindMods(IGame game)
+    {
+        Requires.NotNull(game, nameof(game));
+        if (!game.Exists())
+            throw new GameException("The game does not exist");
+
+        var mods = new HashSet<IModReference>();
+        foreach (var modReference in GetNormalMods(game).Union(GetWorkshopsMods(game)))
+            mods.Add(modReference);
+        return mods;
+    }
+
+    private IEnumerable<ModReference> GetNormalMods(IGame game)
+    {
+        return GetAllModsFromPath(game.ModsLocation, false);
+    }
+
+    private IEnumerable<ModReference> GetWorkshopsMods(IGame game)
+    {
+        return game.Platform != GamePlatform.SteamGold
+            ? Enumerable.Empty<ModReference>()
+            : GetAllModsFromPath(_steamHelper.GetWorkshopsLocation(game), true);
+    }
+
+    private IEnumerable<ModReference> GetAllModsFromPath(IDirectoryInfo lookupDirectory, bool isWorkshopsPath)
+    {
+        if (!lookupDirectory.Exists)
+            yield break;
+
+        var type = isWorkshopsPath ? ModType.Workshops : ModType.Default;
+        foreach (var modDirectory in lookupDirectory.EnumerateDirectories())
+        {
+            var id = isWorkshopsPath
+                ? modDirectory.Name
+                : _pathHelperService.NormalizePath(modDirectory.FullName, PathNormalizeOptions.Full);
+            yield return new ModReference(id, type);
+        }
+    }
+}

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<LangVersion>10.0</LangVersion>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+	  <PackageReference Include="Sklavenwalker.CommonUtilities.Registry.Windows" Version="1.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows\src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows.csproj" />
+	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc.Clients.Steam\src\PetroGlyph.Games.EawFoc.Clients.Steam.csproj" />
+	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
+	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
+	</ItemGroup>
+
+</Project>

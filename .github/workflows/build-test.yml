@@ -12,8 +12,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        configuration: [Debug, Release]
-        dotnet-framework: [net5.0, net48]
+        dotnet-framework: [net6.0, net48]
         exclude:
           - os: ubuntu-latest
             dotnet-framework: net48
@@ -22,8 +21,7 @@ jobs:
     continue-on-error: true
     
     env:
-        proj-path: './src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.csproj'
-        test-proj-path: './src/PetroGlyph.Games.EawFoc/PetroGlyph.Games.EawFoc.Test/PetroGlyph.Games.EawFoc.Test.csproj'
+        solution: 'PetroGlyphGameInfrastructure.sln'
     
     steps:
     - name: Checkout
@@ -34,38 +32,10 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '5.0.x'
+        dotnet-version: '6.0.x'
         
     - name: Build
-      run: dotnet build ${{ env.proj-path }} -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }}
+      run: dotnet build ${{ env.solution }} -c Release
         
     - name: Test
-      run: dotnet test ${{ env.test-proj-path }} -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }} 
-
-  build-test-client:
-    #needs: build-test-core
-    name: Build & Test PetroGlyph.Games.EawFoc.Client
-    strategy:
-      matrix:
-        os: [windows-latest]
-        configuration: [Debug, Release]
-        dotnet-framework: [net5.0, net48]
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
-    continue-on-error: true
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-        
-    - name: Build
-      run: dotnet build src/PetroGlyph.Games.EawFoc.Clients/PetroGlyph.Games.EawFoc.Clients/PetroGlyph.Games.EawFoc.Clients.csproj -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }} 
-        
-    - name: Test
-      run: dotnet test src/PetroGlyph.Games.EawFoc.Clients/PetroGlyph.Games.EawFoc.Clients.Test/PetroGlyph.Games.EawFoc.Clients.Test.csproj -c ${{ matrix.configuration }} -f ${{ matrix.dotnet-framework }}        
+      run: dotnet test ${{ env.solution}} -c Release -f ${{ matrix.dotnet-framework }} 
