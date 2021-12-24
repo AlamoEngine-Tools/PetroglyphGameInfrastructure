@@ -1,30 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <LangVersion>10.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <Authors>Anakin Sklavenwalker</Authors>
-    <Company>Republic at War Modding Team</Company>
-    <Product>PetroglyphTools</Product>
-    <Description>Provides tools for launching Petroglyph Star Wars games on various clients, such as Steam or Disk release.</Description>
-    <Copyright>2021 - Anakin Sklavenwalker</Copyright>
-    <PackageTags>petroglyph, alamo, glyphx, foc, eaw</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<PropertyGroup>
+		<Description>Provides tools for launching Petroglyph Star Wars games on various clients, such as Steam or Disk release.</Description>
+	</PropertyGroup>
 
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>../../../AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-  </ItemGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<InheritDocEnabled>true</InheritDocEnabled>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
+	</ItemGroup>
 
 </Project>

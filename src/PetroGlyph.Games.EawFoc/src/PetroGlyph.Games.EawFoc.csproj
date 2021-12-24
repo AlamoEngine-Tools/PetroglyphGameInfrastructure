@@ -1,35 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <LangVersion>10.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <Authors>Anakin Sklavenwalker</Authors>
-    <Company>Republic at War Modding Team</Company>
-    <Product>PetroglyphTools</Product>
-    <Description>Core implementation for the Petroglyph Game infrastructire, providing classes and services to detect and initialize PG Star Wars games (EaW, FoC) and their mods.</Description>
-    <Copyright>2021 - Anakin Sklavenwalker</Copyright>
-    <PackageTags>petroglyph, alamo, glyphx, foc, eaw</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<PropertyGroup>
+		<Description>Core implementation for the Petroglyph Game infrastructire, providing classes and services to detect and initialize PG Star Wars games (EaW, FoC) and their mods.</Description>
+	</PropertyGroup>
 
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>../../../AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="eaw.modinfo" Version="3.2.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.39" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-  	<PackageReference Include="QuikGraph" Version="2.3.0" PrivateAssets="All" />
-    <PackageReference Include="SemanticVersioning" Version="2.0.0" />
-    <PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.2" />
-    <PackageReference Include="Sklavenwalker.CommonUtilities.Registry" Version="1.0.2" />
-    <PackageReference Include="System.IO.Abstractions" Version="16.0.1" />
-  </ItemGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<InheritDocEnabled>true</InheritDocEnabled>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="eaw.modinfo" Version="3.2.0" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.39" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+		<PackageReference Include="QuikGraph" Version="2.3.0" PrivateAssets="All" />
+		<PackageReference Include="SemanticVersioning" Version="2.0.0" />
+		<PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.2" />
+		<PackageReference Include="Sklavenwalker.CommonUtilities.Registry" Version="1.0.2" />
+		<PackageReference Include="System.IO.Abstractions" Version="16.0.1" />
+	</ItemGroup>
 
 </Project>

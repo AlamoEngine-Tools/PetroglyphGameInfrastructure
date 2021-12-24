@@ -1,25 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+	
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0</TargetFrameworks>
-		<LangVersion>10.0</LangVersion>
-		<Nullable>enable</Nullable>
+		<Description>Steam abstraction layer for Petroglyph Star Wars games.</Description>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Authors>Anakin Sklavenwalker</Authors>
-		<Company>Republic at War Modding Team</Company>
-		<Product>PetroglyphTools</Product>
-		<Description>Steam abstraction layer for Petroglyph Star Wars games.</Description>
-		<Copyright>2021 - Anakin Sklavenwalker</Copyright>
-		<PackageTags>petroglyph, alamo, glyphx, foc, eaw</PackageTags>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	</PropertyGroup>
 
-		<SignAssembly>true</SignAssembly>
-		<DelaySign>false</DelaySign>
-		<AssemblyOriginatorKeyFile>../../../AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<InheritDocEnabled>true</InheritDocEnabled>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -34,8 +30,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
-	  <ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
+		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
+		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
 	</ItemGroup>
 
 </Project>
