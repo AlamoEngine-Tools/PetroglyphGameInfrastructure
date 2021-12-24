@@ -21,15 +21,15 @@
 
   <ItemGroup>
     <PackageReference Include="eaw.modinfo" Version="3.1.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.38" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.39" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
   	<PackageReference Include="QuikGraph" Version="2.3.0" PrivateAssets="All" />
     <PackageReference Include="SemanticVersioning" Version="2.0.0" />
-    <PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.1" />
+    <PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.2" />
     <PackageReference Include="Sklavenwalker.CommonUtilities.Registry" Version="1.0.2" />
-    <PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
+    <PackageReference Include="System.IO.Abstractions" Version="16.0.1" />
   </ItemGroup>
 
 </Project>

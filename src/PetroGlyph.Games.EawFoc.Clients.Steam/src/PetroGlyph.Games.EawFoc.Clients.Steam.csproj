@@ -28,8 +28,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-		<PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.1" />
-		<PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
+		<PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="1.0.2" />
+		<PackageReference Include="System.IO.Abstractions" Version="16.0.1" />
 		<PackageReference Include="Validation" Version="2.5.42" />
 	</ItemGroup>
 
