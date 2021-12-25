@@ -1,10 +1,12 @@
 name: Build & Test
 
 on:
+  workflow_call:
+  workflow_dispatch:
   push:
-    branches: [ main, develop ]
+    branches: [ develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ develop ]
 
 jobs:
   build-test:
@@ -13,18 +15,22 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
       fail-fast: false
-    runs-on: ${{ matrix.os }}
     
+    runs-on: ${{ matrix.os }}
+
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        
+
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '6.0.x'
-                
-    - name: Build & Test
-      run: dotnet test -c Release
+        dotnet-version: | 
+            3.1.x
+            5.0.x
+            6.0.x
+        
+    - name: Build & Test in Release Mode
+      run: dotnet test --configuration Release --logger "GitHubActions"
