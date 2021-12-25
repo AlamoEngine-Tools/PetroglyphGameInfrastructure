@@ -33,7 +33,7 @@ jobs:
 
   # Create a GitHub Release.
   release:
-    needs: pack-deploy
+    needs: [pack-deploy, tag]
     uses: AlamoEngine-Tools/PetroglyphGameInfrastructure/.github/workflows/release.yml@main
     with:
       tag: ${{needs.tag.outputs.new-tag}}
