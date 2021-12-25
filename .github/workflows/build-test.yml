@@ -1,4 +1,4 @@
-name: PetroglyphGameInfrastructure Build & Test
+name: Build & Test
 
 on:
   push:
@@ -7,21 +7,13 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  build-test-core:
-    name: Build & Test PetroGlyph.Games.EawFoc
+  build-test:
+    name: Build & Test
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        dotnet-framework: [net6.0, net48]
-        exclude:
-          - os: ubuntu-latest
-            dotnet-framework: net48
       fail-fast: false
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
-    
-    env:
-        solution: 'PetroGlyphGameInfrastructure.sln'
     
     steps:
     - name: Checkout
@@ -33,9 +25,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x'
-        
-    - name: Build
-      run: dotnet build ${{ env.solution }} -c Release
-        
-    - name: Test
-      run: dotnet test ${{ env.solution}} -c Release -f ${{ matrix.dotnet-framework }} 
+                
+    - name: Build & Test
+      run: dotnet test ${{ env.solution}} -c Release
