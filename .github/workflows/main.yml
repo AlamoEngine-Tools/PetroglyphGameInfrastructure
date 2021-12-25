@@ -12,12 +12,12 @@ jobs:
 
 # Builds and tests the solution.
   build-test:
-    uses: AlamoEngine-Tools/PetroglyphGameInfrastructure/.github/workflows/test.yml@master
+    uses: AlamoEngine-Tools/PetroglyphGameInfrastructure/.github/workflows/test.yml@main
 
 # Creates a new tag based on git history messages between the [latest-tag - HEAD].
   tag:
     needs: build-test
-    uses: AlamoEngine-Tools/PetroglyphGameInfrastructure/.github/workflows/tag.yml@master
+    uses: AlamoEngine-Tools/PetroglyphGameInfrastructure/.github/workflows/tag.yml@main
     with:
       create: ${{ github.event_name == 'push' }}
 
@@ -25,7 +25,7 @@ jobs:
   pack-deploy:
     if: ${{ github.event_name == 'push' && needs.tag.outputs.part != '' }} # Only deploy if we have a new tag.
     needs: tag
-    uses: AlamoEngine-Tools/PetroglyphGameInfrastructure/.github/workflows/pack-deploy.yml@master
+    uses: AlamoEngine-Tools/PetroglyphGameInfrastructure/.github/workflows/pack-deploy.yml@main
     secrets:
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
     with:
@@ -34,6 +34,6 @@ jobs:
   # Create a GitHub Release.
   release:
     needs: pack-deploy
-    uses: AlamoEngine-Tools/PetroglyphGameInfrastructure/.github/workflows/release.yml@master
+    uses: AlamoEngine-Tools/PetroglyphGameInfrastructure/.github/workflows/release.yml@main
     with:
       tag: ${{needs.tag.outputs.new-tag}}
