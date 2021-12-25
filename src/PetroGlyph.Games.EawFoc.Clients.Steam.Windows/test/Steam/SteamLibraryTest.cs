@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
@@ -125,12 +126,12 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestLocations()
         {
-#if NET
-            if (!OperatingSystem.IsWindows())
-                return;
-#endif
             var lib = new SteamLibrary(_fileSystem.DirectoryInfo.FromDirectoryName("Library"), _serviceProvider);
-            Assert.Equal("C:\\Library\\steamapps\\common", lib.CommonLocation.FullName);
+
+            Assert.Equal(
+                RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                    ? "/Library/steamapps/common"
+                    : "C:\\Library\\steamapps\\common", lib.CommonLocation.FullName);
         }
     }
 }

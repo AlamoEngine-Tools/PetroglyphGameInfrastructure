@@ -40,7 +40,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                return _registryKey.GetKey(string.Empty) is not null;
+                return _registryKey!.GetKey(string.Empty) is not null;
             }
         }
 
@@ -56,7 +56,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
                 // Currently the there only exists a 1.x release of the game
                 // and likely never to happen that we see a change here.
                 // Thus we leave this part hardcoded and pray PG does not alter the deal.
-                return _registryKey.HasPath(VersionKey) ? VersionInstance : null;
+                return _registryKey!.HasPath(VersionKey) ? VersionInstance : null;
             }
         }
 
@@ -66,7 +66,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registryKey.GetValueOrDefault(CDKeyProperty, VersionKey, out string? value, null))
+                if (!_registryKey!.GetValueOrDefault(CDKeyProperty, VersionKey, out string? value, null))
                     return null;
                 return value;
             }
@@ -78,7 +78,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registryKey.GetValueOrDefault(EawGoldProperty, VersionKey, out int? value, null))
+                if (!_registryKey!.GetValueOrDefault(EawGoldProperty, VersionKey, out int? value, null))
                     return null;
                 return value;
             }
@@ -90,7 +90,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registryKey.GetValueOrDefault(ExePathProperty, VersionKey, out string? value, null))
+                if (!_registryKey!.GetValueOrDefault(ExePathProperty, VersionKey, out string? value, null))
                     return null;
                 if (string.IsNullOrEmpty(value))
                     return null;
@@ -104,7 +104,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registryKey.GetValueOrDefault(InstalledProperty, VersionKey, out bool? value, null))
+                if (!_registryKey!.GetValueOrDefault(InstalledProperty, VersionKey, out bool? value, null))
                     return null;
                 return value;
             }
@@ -116,7 +116,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registryKey.GetValueOrDefault(InstallPathProperty, VersionKey, out string? value, null))
+                if (!_registryKey!.GetValueOrDefault(InstallPathProperty, VersionKey, out string? value, null))
                     return null;
                 if (string.IsNullOrEmpty(value))
                     return null;
@@ -130,7 +130,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registryKey.GetValueOrDefault(LauncherProperty, VersionKey, out string? value, null))
+                if (!_registryKey!.GetValueOrDefault(LauncherProperty, VersionKey, out string? value, null))
                     return null;
                 if (string.IsNullOrEmpty(value))
                     return null;
@@ -144,7 +144,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
             get
             {
                 ThrowIfDisposed();
-                if (!_registryKey.GetValueOrDefault(RevisionProperty, VersionKey, out int? value, null))
+                if (!_registryKey!.GetValueOrDefault(RevisionProperty, VersionKey, out int? value, null))
                     return null;
                 return value;
             }

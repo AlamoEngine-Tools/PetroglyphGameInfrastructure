@@ -6,7 +6,7 @@ namespace PetroGlyph.Games.EawFoc.Test.GameServices;
 
 public class SteamWorkshopWebpageDownloaderTest
 {
-    [Fact(Skip = "Skip because this requires an internet connection.")]
+    [Fact]
     public async void Test()
     {
         var downloader = new SteamWorkshopWebpageDownloader();

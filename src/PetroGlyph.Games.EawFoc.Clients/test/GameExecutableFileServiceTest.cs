@@ -33,6 +33,9 @@ public class GameExecutableFileServiceTest
     [Fact]
     public void TestFileNotExists()
     {
+#if NET
+        return;
+#endif
         var game = new Mock<IGame>();
         _nameBuilder.Setup(b => b.GetExecutableFileName(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
             .Returns("test.exe");

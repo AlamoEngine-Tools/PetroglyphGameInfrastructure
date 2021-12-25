@@ -310,7 +310,10 @@ public sealed class LanguageArgument : NamedArgument<ILanguageInfo>
     {
     }
 
-
+    /// <summary>
+    /// Gets the english name of the language in upper-case.
+    /// </summary>
+    /// <returns></returns>
     public override string ValueToCommandLine()
     {
         return LanguageInfoUtilities.GetEnglishName(Value).ToUpperInvariant();
@@ -330,6 +333,10 @@ public sealed class LocalPortArgument : NamedArgument<uint>
     {
     }
 
+    /// <summary>
+    /// Gets the local port using for the game instance.
+    /// </summary>
+    /// <returns></returns>
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
