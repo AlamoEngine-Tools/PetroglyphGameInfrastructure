@@ -1,5 +1,4 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
-using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
@@ -34,8 +33,9 @@ public class GameExecutableFileServiceTest
     [Fact]
     public void TestFileNotExists()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            return;
+#if NET
+        return
+#endif
         var game = new Mock<IGame>();
         _nameBuilder.Setup(b => b.GetExecutableFileName(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
             .Returns("test.exe");
@@ -50,8 +50,9 @@ public class GameExecutableFileServiceTest
     [Fact]
     public void TestExists()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            return;
+#if NET
+        return
+#endif
         var game = new Mock<IGame>();
         _nameBuilder.Setup(b => b.GetExecutableFileName(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
             .Returns("test.exe");
