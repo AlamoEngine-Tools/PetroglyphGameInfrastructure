@@ -43,7 +43,7 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
     /// <para>If this method returns <see langword="false"/>, <see cref="IsValid(out ArgumentValidityStatus)"/>
     /// with return <see langword="false"/> with reason <see cref="ArgumentValidityStatus.InvalidData"/>.</para>
     /// <para>
-    /// This methods gets called in the sequence of <see cref="IsValid"/>. Returns <see langword="true"/> by default.
+    /// This methods gets called in the sequence of <see cref="IGameArgument.IsValid"/>. Returns <see langword="true"/> by default.
     /// </para>
     /// </summary>
     /// <returns><see langword="true"/> if the data is valid; <see langword="false"/> otherwise.</returns>

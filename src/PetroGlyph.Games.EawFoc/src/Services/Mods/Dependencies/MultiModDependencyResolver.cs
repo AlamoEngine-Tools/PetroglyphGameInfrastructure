@@ -55,7 +55,7 @@ public class MultiModDependencyResolver
                 continue;
             try
             {
-                mod.DependenciesChanged += OnDependenciesResolved;
+                mod.DependenciesChanged += OnDependenciesResolved!;
                 mod.ResolveDependencies(_resolver, options);
             }
             catch (Exception e)
@@ -66,7 +66,7 @@ public class MultiModDependencyResolver
             }
             finally
             {
-                mod.DependenciesChanged += OnDependenciesResolved;
+                mod.DependenciesChanged -= OnDependenciesResolved!;
             }
         }
         return result;

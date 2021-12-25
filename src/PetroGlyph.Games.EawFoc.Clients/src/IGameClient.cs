@@ -64,7 +64,7 @@ public interface IGameClient
     IGameProcess Play(IPlayableObject instance);
 
     /// <summary>
-    /// Plays the given <paramref name="instance"/> with given <param name="arguments"></param>.
+    /// Plays the given <paramref name="instance"/> with given <paramref name="arguments"/>.
     /// <para>
     /// If <paramref name="instance"/> in an <see cref="IMod"/> the arguments passed,
     /// are required to have all required mod related arguments set..

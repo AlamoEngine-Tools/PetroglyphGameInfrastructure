@@ -1,22 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0; net48</TargetFrameworks>
-		<LangVersion>10.0</LangVersion>
-		<IsPackable>false</IsPackable>
+		<TargetFrameworks>net6.0</TargetFrameworks>
+		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net48</TargetFrameworks>
 		<Nullable>enable</Nullable>
-
 		<IsPackable>false</IsPackable>
-		<SignAssembly>true</SignAssembly>
-		<DelaySign>false</DelaySign>
-		<AssemblyOriginatorKeyFile>../../../AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
+		<IsTestable>true</IsTestable>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="GitHubActionsTestLogger" Version="1.2.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
 		<PackageReference Include="Moq" Version="4.16.1" />
-		<PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="13.2.47" />
+		<PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="16.0.1" />
 		<PackageReference Include="xunit" Version="2.4.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

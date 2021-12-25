@@ -41,7 +41,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
         if (!_steamWrapper.IsGameInstalled(EaWGameId, out var game))
             return default;
 
-        if (!game.State.HasFlag(SteamAppState.StateFullyInstalled))
+        if (!game!.State.HasFlag(SteamAppState.StateFullyInstalled))
             return default;
 
         if (options.Type == GameType.Foc && !game.Depots.Contains(FocDepotId))

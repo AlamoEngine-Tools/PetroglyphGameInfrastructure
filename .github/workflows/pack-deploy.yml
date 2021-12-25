@@ -1,0 +1,48 @@
+name: Pack & Deploy
+
+on:
+  workflow_call:
+    secrets:
+      NUGET_API_KEY:
+        required: true
+    inputs:
+      package-version:
+        required: true
+        type: string
+
+
+env:
+  NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
+  PACKAGE_OUTPUT_DIR: ${{ github.workspace}}/nupkgs
+
+jobs:
+  deploy:
+    name: Pack & Deploy Release
+    runs-on: ubuntu-latest
+
+    steps: 
+      - uses: madhead/semver-utils@latest
+        id: assembly-version
+        with:
+          version: ${{inputs.package-version}}  
+
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: | 
+            3.1.x
+            5.0.x
+            6.0.x
+
+      - name: Pack
+        run: dotnet pack --configuration Release -p:Version=${{env.assembly-version}}.0.0 -p:PackageVersion=${{inputs.package-version}} /p:InformationalVersion=${{inputs.package-version}} --output ${{ env.PACKAGE_OUTPUT_DIR }}
+        env: 
+          assembly-version: ${{steps.assembly-version.outputs.major}}
+          
+      - name: Publish to Nuget
+        run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIR }}/*.nupkg  --source ${{ env.NUGET_SOURCE_URL }} --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate

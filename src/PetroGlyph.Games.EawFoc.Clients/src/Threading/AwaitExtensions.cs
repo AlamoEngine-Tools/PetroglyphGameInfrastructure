@@ -43,7 +43,7 @@ internal static class AwaitExtensions
         void Handler(object o, EventArgs eventArgs) => tcs.TrySetResult(process.ExitCode);
         try
         {
-            process.Exited += Handler;
+            process.Exited += Handler!;
             if (process.HasExited)
                 return process.ExitCode;
             using (cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken)))
@@ -53,7 +53,7 @@ internal static class AwaitExtensions
         }
         finally
         {
-            process.Exited -= Handler;
+            process.Exited -= Handler!;
         }
     }
 }

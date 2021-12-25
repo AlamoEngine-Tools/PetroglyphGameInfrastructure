@@ -46,7 +46,7 @@ internal class ArgumentValueSerializer
             typeof(bool)
         };
         foreach (var type in typeArray) 
-            SpecialTypes.Add(type.FullName, (type, null));
+            SpecialTypes.Add(type.FullName!, (type, null));
     }
 
     public string Serialize(object value)
@@ -62,7 +62,7 @@ internal class ArgumentValueSerializer
                 return ((Enum)value).ToString("d");
             throw new InvalidOperationException();
         }
-        var converter = GetConverter(type.FullName);
+        var converter = GetConverter(type.FullName!);
         if (converter is null)
             throw new InvalidOperationException();
         return converter.ConvertToInvariantString(value) ?? string.Empty;

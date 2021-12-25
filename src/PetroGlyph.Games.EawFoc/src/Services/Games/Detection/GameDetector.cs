@@ -81,7 +81,7 @@ public abstract class GameDetector : IGameDetector
     public GameDetectionResult Detect(GameDetectorOptions options)
     {
         options = options.Normalize();
-        GameDetectionResult result = GameDetectionResult.NotInstalled(options.Type);
+        var result = GameDetectionResult.NotInstalled(options.Type);
         try
         {
             var locationData = FindGameLocation(options);

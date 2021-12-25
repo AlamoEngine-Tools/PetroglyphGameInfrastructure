@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Sklavenwalker.CommonUtilities.FileSystem;
@@ -129,12 +130,10 @@ public class SteamVdfReaderTest
         Assert.Equal("GameName", app.Name);
         Assert.Equal(SteamAppState.StateFullyInstalled | SteamAppState.StateUpdatePaused, app.State);
 
-#if NET
-        if (!OperatingSystem.IsWindows())
-            Assert.Equal("/steamapps/common/GamePath", app.InstallDir.FullName);
-        else
-#endif
-        Assert.Equal("C:\\steamapps\\common\\GamePath", app.InstallDir.FullName);
+        Assert.Equal(
+            RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                ? "/steamapps/common/GamePath"
+                : "C:\\steamapps\\common\\GamePath", app.InstallDir.FullName);
 
         Assert.Contains(1231u, app.Depots);
         Assert.Contains(1232u, app.Depots);

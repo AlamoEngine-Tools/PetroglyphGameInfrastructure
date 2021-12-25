@@ -63,7 +63,7 @@ public class Mod : ModBase, IPhysicalMod
                                         ?? new ModIdentifierBuilder(ServiceProvider);
                 _identifier = identifierBuilder.Build(this);
             }
-            return _identifier;
+            return _identifier!;
         }
     }
 
