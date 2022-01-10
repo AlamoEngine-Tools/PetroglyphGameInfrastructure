@@ -28,7 +28,7 @@
 		<PackageReference Include="SemanticVersioning" Version="2.0.0" />
 		<PackageReference Include="Sklavenwalker.CommonUtilities.FileSystem" Version="2.0.0" />
 		<PackageReference Include="Sklavenwalker.CommonUtilities.Registry" Version="2.1.0" />
-		<PackageReference Include="System.IO.Abstractions" Version="16.0.1" />
+		<PackageReference Include="System.IO.Abstractions" Version="16.0.8" />
 	</ItemGroup>
 
 </Project>
