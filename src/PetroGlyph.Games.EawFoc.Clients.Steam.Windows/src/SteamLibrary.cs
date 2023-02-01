@@ -94,7 +94,7 @@ internal class SteamLibrary : ISteamLibrary
             Array.Copy(subPathParts, 0, pathParts, 1, subPathParts.Length);
 
             var locationPath = fs.Path.Combine(pathParts);
-            return fs.DirectoryInfo.FromDirectoryName(locationPath);
+            return fs.DirectoryInfo.New(locationPath);
         });
     }
 

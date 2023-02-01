@@ -27,7 +27,8 @@ internal class SteamVdfReader : ISteamAppManifestReader, ILibraryConfigReader
     {
         Requires.NotNull(manifestFile, nameof(manifestFile));
         Requires.NotNull(library, nameof(library));
-        if (!_pathHelper.IsChildOf(library.LibraryLocation.FullName, manifestFile.Directory.FullName))
+        var directory = manifestFile.Directory;
+        if (directory is null || !_pathHelper.IsChildOf(library.LibraryLocation.FullName, directory.FullName))
             throw new SteamException("The game's manifest is not part of the given library");
         var manifestData = ReadFileAsJson(manifestFile);
         if (manifestData.Name != "AppState")
@@ -77,8 +78,8 @@ internal class SteamVdfReader : ISteamAppManifestReader, ILibraryConfigReader
             depots is null)
             throw new SteamException($"Invalid App Manifest at file {manifestFile.FullName}");
 
-        var installLocation = _fileSystem.DirectoryInfo.FromDirectoryName(
-            _fileSystem.Path.Combine(library.CommonLocation.FullName, installDir));
+        var installLocation = _fileSystem.DirectoryInfo.New(
+            _fileSystem.Path.Combine(library.CommonLocation.FullName, installDir!));
 
         return new SteamAppManifest(library, manifestFile, id.Value, name!, installLocation, state.Value,
             depots.ToHashSet());
@@ -110,7 +111,7 @@ internal class SteamVdfReader : ISteamAppManifestReader, ILibraryConfigReader
                 paths.Add((string)childValue.Value!);
             }
         }
-        return paths.Select(p => _fileSystem.DirectoryInfo.FromDirectoryName(p));
+        return paths.Select(p => _fileSystem.DirectoryInfo.New(p));
     }
 
     private static JProperty ReadFileAsJson(IFileInfo file)
