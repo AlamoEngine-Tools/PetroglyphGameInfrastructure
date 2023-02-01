@@ -30,7 +30,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             get
             {
                 ThrowIfDisposed();
-                return _registryKey.GetKey(SteamProcessNode);
+                return _registryKey!.GetKey(SteamProcessNode);
             }
         }
 
@@ -39,13 +39,13 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             get
             {
                 ThrowIfDisposed();
-                return !_registryKey.GetValue(SteamActiveUserKey, SteamProcessNode, out int? userId) ? null : userId;
+                return !_registryKey!.GetValue(SteamActiveUserKey, SteamProcessNode, out int? userId) ? null : userId;
             }
             set
             {
                 ThrowIfDisposed();
                 value ??= 0;
-                _registryKey.WriteValue(SteamActiveUserKey, SteamProcessNode, value);
+                _registryKey!.WriteValue(SteamActiveUserKey, SteamProcessNode, value);
             }
         }
 
@@ -54,7 +54,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             get
             {
                 ThrowIfDisposed();
-                return !_registryKey.GetValue(SteamProcessIdKey, SteamProcessNode, out int? pid) ? null : pid;
+                return !_registryKey!.GetValue(SteamProcessIdKey, SteamProcessNode, out int? pid) ? null : pid;
             }
         }
 
@@ -63,9 +63,9 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             get
             {
                 ThrowIfDisposed();
-                return !_registryKey.GetValue(SteamExeKey, out string? filePath)
+                return !_registryKey!.GetValue(SteamExeKey, out string? filePath)
                     ? null
-                    : _fileSystem.FileInfo.New(filePath);
+                    : _fileSystem.FileInfo.New(filePath!);
             }
         }
 
@@ -74,9 +74,9 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             get
             {
                 ThrowIfDisposed();
-                return !_registryKey.GetValue(SteamPathKey, out string? path)
+                return !_registryKey!.GetValue(SteamPathKey, out string? path)
                     ? null
-                    : _fileSystem.DirectoryInfo.FromDirectoryName(path);
+                    : _fileSystem.DirectoryInfo.New(path!);
             }
         }
 
@@ -85,7 +85,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
             get
             {
                 ThrowIfDisposed();
-                var keyNames = _registryKey.GetSubKeyNames(SteamAppsNode);
+                var keyNames = _registryKey!.GetSubKeyNames(SteamAppsNode);
                 if (keyNames is null)
                     return null;
                 var ids = keyNames
