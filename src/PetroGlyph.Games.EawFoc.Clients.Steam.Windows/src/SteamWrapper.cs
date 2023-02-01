@@ -4,14 +4,13 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AnakinRaW.CommonUtilities.Registry.Windows;
 using Gameloop.Vdf;
 using Gameloop.Vdf.JsonConverter;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
 using PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
-using PetroGlyph.Games.EawFoc.Clients.Threading;
-using Sklavenwalker.CommonUtilities.Registry.Windows;
 using Validation;
 #if NET
 using System.Diagnostics.CodeAnalysis;

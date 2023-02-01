@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
+using AnakinRaW.CommonUtilities.Registry;
+using AnakinRaW.CommonUtilities.Registry.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using Sklavenwalker.CommonUtilities.Registry;
-using Sklavenwalker.CommonUtilities.Registry.Windows;
-using RegistryHive = Sklavenwalker.CommonUtilities.Registry.RegistryHive;
-using RegistryView = Sklavenwalker.CommonUtilities.Registry.RegistryView;
 #if NET
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -67,7 +65,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
                 ThrowIfDisposed();
                 return !_registryKey.GetValue(SteamExeKey, out string? filePath)
                     ? null
-                    : _fileSystem.FileInfo.FromFileName(filePath);
+                    : _fileSystem.FileInfo.New(filePath);
             }
         }
 

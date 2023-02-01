@@ -61,13 +61,13 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         {
             _steamRegistry.SetupSequence(r => r.ExeFile)
                 .Returns((IFileInfo?)null)
-                .Returns(_fileSystem.FileInfo.FromFileName("steam.exe"))
-                .Returns(_fileSystem.FileInfo.FromFileName("steam.exe"));
+                .Returns(() => _fileSystem.FileInfo.New("steam.exe"))
+                .Returns(() => _fileSystem.FileInfo.New("steam.exe"));
 
             Assert.False(_service.Installed);
             Assert.False(_service.Installed);
 
-            _fileSystem.AddFile("steam.exe", MockFileData.NullObject);
+            _fileSystem.AddFile("steam.exe", new MockFileData(string.Empty));
 
             Assert.True(_service.Installed);
         }
@@ -89,17 +89,17 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         public void TestGameInstalled()
         {
             SetupInstalledRegistry();
-            var mFile = _fileSystem.FileInfo.FromFileName("manifest.acf");
+            var mFile = _fileSystem.FileInfo.New("manifest.acf");
 
             var expectedApp = new SteamAppManifest(new Mock<ISteamLibrary>().Object, mFile, 1234, "name",
-                _fileSystem.DirectoryInfo.FromDirectoryName("Game"), SteamAppState.StateFullyInstalled,
+                _fileSystem.DirectoryInfo.New("Game"), SteamAppState.StateFullyInstalled,
                 new HashSet<uint>());
 
             _gameFinder.SetupSequence(f => f.FindGame(It.IsAny<uint>()))
                 .Returns((SteamAppManifest?)null)
                 .Returns(expectedApp);
             _steamRegistry.Setup(r => r.InstalledApps).Returns(new HashSet<uint> { 1, 2, 3 });
-            _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Steam"));
+            _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("Steam"));
 
             Assert.False(_service.IsGameInstalled(0, out _));
             Assert.False(_service.IsGameInstalled(1, out _));
@@ -111,11 +111,11 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         {
             SetupInstalledRegistry();
            
-            _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("."));
+            _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
 
             Assert.Null(_service.WantOfflineMode);
 
-            _fileSystem.AddFile("config/loginusers.vdf", MockFileData.NullObject);
+            _fileSystem.AddFile("config/loginusers.vdf", new MockFileData(string.Empty));
             Assert.Null(_service.WantOfflineMode);
 
             _fileSystem.AddFile("config/loginusers.vdf", WantsNotOffline());
@@ -127,8 +127,8 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         
         private void SetupInstalledRegistry()
         {
-            _fileSystem.AddFile("steam.exe", MockFileData.NullObject);
-            _steamRegistry.Setup(r => r.ExeFile).Returns(_fileSystem.FileInfo.FromFileName("steam.exe"));
+            _fileSystem.AddFile("steam.exe", new MockFileData(string.Empty));
+            _steamRegistry.Setup(r => r.ExeFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
         }
 
         private static string WantsNotOffline()
