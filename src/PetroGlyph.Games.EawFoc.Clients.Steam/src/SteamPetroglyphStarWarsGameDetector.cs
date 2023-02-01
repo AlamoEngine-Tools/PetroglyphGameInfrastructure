@@ -57,7 +57,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
             _ => fullGamePath
         };
 
-        var installLocation = FileSystem.DirectoryInfo.FromDirectoryName(fullGamePath);
+        var installLocation = FileSystem.DirectoryInfo.New(fullGamePath);
 
         try
         {
