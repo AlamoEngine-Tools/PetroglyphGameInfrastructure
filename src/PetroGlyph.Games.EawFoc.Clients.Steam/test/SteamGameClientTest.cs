@@ -19,13 +19,13 @@ public class SteamGameClientTest
     public SteamGameClientTest()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("test.exe", MockFileData.NullObject);
+        fs.AddFile("test.exe", new MockFileData(string.Empty));
         var sc = new ServiceCollection();
         _steam = new Mock<ISteamWrapper>();
         sc.AddTransient(_ => _steam.Object);
         var fileService = new Mock<IGameExecutableFileService>();
         fileService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
-            .Returns(fs.FileInfo.FromFileName("test.exe"));
+            .Returns(fs.FileInfo.New("test.exe"));
         sc.AddTransient(_ => fileService.Object);
         
         _launcher = new Mock<IGameProcessLauncher>();

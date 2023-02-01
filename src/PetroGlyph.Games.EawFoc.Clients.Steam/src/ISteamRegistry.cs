@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using Sklavenwalker.CommonUtilities.Registry;
+using AnakinRaW.CommonUtilities.Registry;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
