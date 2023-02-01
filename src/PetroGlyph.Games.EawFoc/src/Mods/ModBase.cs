@@ -11,8 +11,9 @@ using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Icon;
 using PetroGlyph.Games.EawFoc.Services.Language;
+using Semver;
+using Semver.Ranges;
 using Validation;
-using Range = SemanticVersioning.Range;
 
 namespace PetroGlyph.Games.EawFoc.Mods;
 
@@ -30,7 +31,7 @@ public abstract class ModBase : PlayableObject, IMod
     /// <inheritdoc/>
     public event EventHandler<ModDependenciesChangedEventArgs>? DependenciesChanged;
 
-    private SemanticVersioning.Version? _modVersion;
+    private SemVersion? _modVersion;
     private IModinfo? _modInfo;
     private bool _modinfoSearched;
 
@@ -61,7 +62,7 @@ public abstract class ModBase : PlayableObject, IMod
     /// <summary>
     /// Always return <see langword="null"/>, because mod instances cannot have a version range.
     /// </summary>
-    public Range? VersionRange => null;
+    public SemVersionRange? VersionRange => null;
 
     /// <inheritdoc cref="IModIdentity" />
     public override string Name { get; }
@@ -85,7 +86,7 @@ public abstract class ModBase : PlayableObject, IMod
     }
 
     /// <inheritdoc/>
-    public SemanticVersioning.Version? Version => _modVersion ??= InitializeVersion();
+    public SemVersion? Version => _modVersion ??= InitializeVersion();
 
     IModDependencyList IModIdentity.Dependencies =>
         new DependencyList(Dependencies.OfType<IModReference>().ToList(), DependencyResolveLayout);
@@ -269,7 +270,7 @@ public abstract class ModBase : PlayableObject, IMod
     /// </summary>
     /// <remarks>The implementation returns the value from the <see cref="ModInfo"/>, or <see langword="null"/>.</remarks>
     /// <returns>The resolved version or <see langword="null"/>.</returns>
-    protected virtual SemanticVersioning.Version? InitializeVersion()
+    protected virtual SemVersion? InitializeVersion()
     {
         return ModInfo?.Version;
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using EawModinfo.Spec;
+using Semver.Ranges;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Mods;
@@ -21,7 +22,7 @@ public sealed class ModDependencyEntry : IEquatable<ModDependencyEntry>
     /// <summary>
     /// The original version range instance.
     /// </summary>
-    public SemanticVersioning.Range? VersionRange { get; }
+    public SemVersionRange? VersionRange { get; }
 
     /// <summary>
     /// Creates a new instance with <see langword="null"/> for <see cref="VersionRange"/>.
@@ -36,7 +37,7 @@ public sealed class ModDependencyEntry : IEquatable<ModDependencyEntry>
     /// </summary>
     /// <param name="mod">The dependency instance.</param>
     /// <param name="range">The original version range instance.</param>
-    public ModDependencyEntry(IMod mod, SemanticVersioning.Range? range)
+    public ModDependencyEntry(IMod mod, SemVersionRange? range)
     {
         Requires.NotNull(mod, nameof(mod));
         Mod = mod;

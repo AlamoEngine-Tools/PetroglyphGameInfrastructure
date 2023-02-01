@@ -37,7 +37,7 @@ public sealed class DirectoryGameDetector : GameDetector
     public static DirectoryGameDetector CurrentDirectoryGameDetector(IServiceProvider serviceProvider)
     {
         var fs = new FileSystem();
-        var currentDir = fs.DirectoryInfo.FromDirectoryName(fs.Directory.GetCurrentDirectory());
+        var currentDir = fs.DirectoryInfo.New(fs.Directory.GetCurrentDirectory());
         return new DirectoryGameDetector(currentDir, serviceProvider);
     }
 

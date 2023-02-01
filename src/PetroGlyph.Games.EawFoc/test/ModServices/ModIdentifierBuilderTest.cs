@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
+using AnakinRaW.CommonUtilities.FileSystem;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Detection;
-using Sklavenwalker.CommonUtilities.FileSystem;
+using Semver.Ranges;
 using Xunit;
-using Range = SemanticVersioning.Range;
 
 namespace PetroGlyph.Games.EawFoc.Test.ModServices;
 
@@ -69,8 +69,8 @@ public class ModIdentifierBuilderTest
     [Fact]
     public void TestNormalizeDefault()
     {
-        var mRef = new ModReference("path", ModType.Default, Range.Parse("1.*"));
-        var expected = new ModReference("c:\\path", ModType.Default, Range.Parse("1.*"));
+        var mRef = new ModReference("path", ModType.Default, SemVersionRange.Parse("1.*"));
+        var expected = new ModReference("c:\\path", ModType.Default, SemVersionRange.Parse("1.*"));
         _pathHelper.Setup(p => p.NormalizePath(It.IsAny<string>(), PathNormalizeOptions.Full)).Returns("c:\\path");
         var normalizedRef = _service.Normalize(mRef);
         Assert.Equal(expected, normalizedRef);
@@ -79,8 +79,8 @@ public class ModIdentifierBuilderTest
     [Fact]
     public void TestNormalizeWorkshops()
     {
-        var mRef = new ModReference("123456", ModType.Workshops, Range.Parse("1.*"));
-        var expected = new ModReference("123456", ModType.Workshops, Range.Parse("1.*"));
+        var mRef = new ModReference("123456", ModType.Workshops, SemVersionRange.Parse("1.*"));
+        var expected = new ModReference("123456", ModType.Workshops, SemVersionRange.Parse("1.*"));
         var normalizedRef = _service.Normalize(mRef);
         Assert.Equal(expected, normalizedRef);
     }
@@ -88,8 +88,8 @@ public class ModIdentifierBuilderTest
     [Fact]
     public void TestNormalizeVirtual()
     {
-        var mRef = new ModReference("123456", ModType.Virtual, Range.Parse("1.*"));
-        var expected = new ModReference("123456", ModType.Virtual, Range.Parse("1.*"));
+        var mRef = new ModReference("123456", ModType.Virtual, SemVersionRange.Parse("1.*"));
+        var expected = new ModReference("123456", ModType.Virtual, SemVersionRange.Parse("1.*"));
         var normalizedRef = _service.Normalize(mRef);
         Assert.Equal(expected, normalizedRef);
     }

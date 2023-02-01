@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
+using AnakinRaW.CommonUtilities.FileSystem;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Steam;
-using Sklavenwalker.CommonUtilities.FileSystem;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Detection;

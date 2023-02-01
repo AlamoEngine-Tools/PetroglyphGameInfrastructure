@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using Validation;
+
 namespace PetroGlyph.Games.EawFoc.Services.FileService;
 
 /// <inheritdoc cref="IPhysicalFileService"/>
@@ -42,7 +43,7 @@ public sealed class DefaultFileService : IPhysicalFileService
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             var dataPath = fs.Path.Combine(objectPath.FullName, "Data", subPath);
-            requestedDirectory = fs.DirectoryInfo.FromDirectoryName(dataPath);
+            requestedDirectory = fs.DirectoryInfo.New(dataPath);
         }
         else
         {

@@ -219,30 +219,30 @@ public class GamePlatformIdentifierTest
     private static IDirectoryInfo Disk_Eaw()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("GameData/sweaw.exe", MockFileData.NullObject);
+        fs.AddFile("GameData/sweaw.exe", new MockFileData(string.Empty));
         return fs.DirectoryInfo.FromDirectoryName("GameData");
     }
 
     private static IDirectoryInfo Disk_Foc()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("Game/swfoc.exe", MockFileData.NullObject);
+        fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
         return fs.DirectoryInfo.FromDirectoryName("Game");
     }
 
     private static IFileSystem SteamFs()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("Game/corruption/swfoc.exe", MockFileData.NullObject);
-        fs.AddFile("Game/corruption/StarWarsG.exe", MockFileData.NullObject);
-        fs.AddFile("Game/GameData/sweaw.exe", MockFileData.NullObject);
-        fs.AddFile("Game/GameData/StarWarsG.exe", MockFileData.NullObject);
-        fs.AddFile("Game/32470_install.vdf", MockFileData.NullObject);
-        fs.AddFile("Game/32472_install.vdf", MockFileData.NullObject);
-        fs.AddFile("Game/runme.dat", MockFileData.NullObject);
-        fs.AddFile("Game/runm2.dat", MockFileData.NullObject);
-        fs.AddFile("Game/runme.exe", MockFileData.NullObject);
-        fs.AddFile("Game/runme2.exe", MockFileData.NullObject);
+        fs.AddFile("Game/corruption/swfoc.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/corruption/StarWarsG.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/GameData/sweaw.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/GameData/StarWarsG.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/32470_install.vdf", new MockFileData(string.Empty));
+        fs.AddFile("Game/32472_install.vdf", new MockFileData(string.Empty));
+        fs.AddFile("Game/runme.dat", new MockFileData(string.Empty));
+        fs.AddFile("Game/runm2.dat", new MockFileData(string.Empty));
+        fs.AddFile("Game/runme.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/runme2.exe", new MockFileData(string.Empty));
         return fs;
     }
 
@@ -259,14 +259,14 @@ public class GamePlatformIdentifierTest
     private static IFileSystem GogFs()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("Game/EAWX/swfoc.exe", MockFileData.NullObject);
-        fs.AddFile("Game/corruption/StarWarsG.exe", MockFileData.NullObject);
-        fs.AddFile("Game/GameData/sweaw.exe", MockFileData.NullObject);
-        fs.AddFile("Game/GameData/goggame-1421404887.dll", MockFileData.NullObject);
-        fs.AddFile("Game/goggame.sdb", MockFileData.NullObject);
-        fs.AddFile("Game/goggame-1421404887.hashdb", MockFileData.NullObject);
-        fs.AddFile("Game/goggame-1421404887.info", MockFileData.NullObject);
-        fs.AddFile("Game/Language.exe", MockFileData.NullObject);
+        fs.AddFile("Game/EAWX/swfoc.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/corruption/StarWarsG.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/GameData/sweaw.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/GameData/goggame-1421404887.dll", new MockFileData(string.Empty));
+        fs.AddFile("Game/goggame.sdb", new MockFileData(string.Empty));
+        fs.AddFile("Game/goggame-1421404887.hashdb", new MockFileData(string.Empty));
+        fs.AddFile("Game/goggame-1421404887.info", new MockFileData(string.Empty));
+        fs.AddFile("Game/Language.exe", new MockFileData(string.Empty));
         return fs;
     }
 
@@ -283,19 +283,19 @@ public class GamePlatformIdentifierTest
     private static IFileSystem DiskGoldFs()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("Game/Foc/swfoc.exe", MockFileData.NullObject);
-        fs.AddFile("Game/Foc/fpupdate.exe", MockFileData.NullObject);
-        fs.AddFile("Game/Foc/LaunchEAWX.exe", MockFileData.NullObject);
-        fs.AddFile("Game/Foc/main.wav", MockFileData.NullObject);
+        fs.AddFile("Game/Foc/swfoc.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/Foc/fpupdate.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/Foc/LaunchEAWX.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/Foc/main.wav", new MockFileData(string.Empty));
         fs.AddDirectory("Game/Foc/Install");
         fs.AddDirectory("Game/Foc/Manuals");
 
-        fs.AddFile("Game/Eaw/GameData/sweaw.exe", MockFileData.NullObject);
-        fs.AddFile("Game/Eaw/GameData/fpupdate.exe", MockFileData.NullObject);
-        fs.AddFile("Game/Eaw/GameData/MCELaunch.exe", MockFileData.NullObject);
-        fs.AddFile("Game/Eaw/GameData/StubUpdate.exe", MockFileData.NullObject);
-        fs.AddFile("Game/Eaw/LaunchEAW.exe", MockFileData.NullObject);
-        fs.AddFile("Game/Eaw/main.wav", MockFileData.NullObject);
+        fs.AddFile("Game/Eaw/GameData/sweaw.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/Eaw/GameData/fpupdate.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/Eaw/GameData/MCELaunch.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/Eaw/GameData/StubUpdate.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/Eaw/LaunchEAW.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/Eaw/main.wav", new MockFileData(string.Empty));
         return fs;
     }
 
@@ -312,10 +312,10 @@ public class GamePlatformIdentifierTest
     private static IFileSystem OriginFs()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("Game/EAWX/swfoc.exe", MockFileData.NullObject);
-        fs.AddFile("Game/EAWX/EALaunchHelper.exe", MockFileData.NullObject);
+        fs.AddFile("Game/EAWX/swfoc.exe", new MockFileData(string.Empty));
+        fs.AddFile("Game/EAWX/EALaunchHelper.exe", new MockFileData(string.Empty));
 
-        fs.AddFile("Game/GameData/sweaw.exe", MockFileData.NullObject);
+        fs.AddFile("Game/GameData/sweaw.exe", new MockFileData(string.Empty));
         fs.AddDirectory("Game/Manuals");
         fs.AddDirectory("Game/__Installer");
         return fs;

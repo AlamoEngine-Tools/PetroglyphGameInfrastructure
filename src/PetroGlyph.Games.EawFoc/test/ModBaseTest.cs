@@ -9,6 +9,7 @@ using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Icon;
 using PetroGlyph.Games.EawFoc.Services.Language;
+using Semver;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test;
@@ -52,7 +53,7 @@ public class ModBaseTest
         var modinfo = new ModinfoData("Name")
         {
             Icon = "IconPath",
-            Version = new SemanticVersioning.Version(1, 0, 0),
+            Version = new SemVersion(1, 0, 0),
             Languages = new List<ILanguageInfo>(),
             Dependencies = new DependencyList(new List<IModReference>(), DependencyResolveLayout.ResolveLastItem)
         };

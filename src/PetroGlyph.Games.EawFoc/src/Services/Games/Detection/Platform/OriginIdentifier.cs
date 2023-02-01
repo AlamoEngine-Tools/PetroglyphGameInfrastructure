@@ -71,7 +71,7 @@ internal class OriginIdentifier : SpecificPlatformIdentifier
             Logger?.LogDebug($"Corrected path '{correctedPath}' does not exists.");
             return;
         }
-        location = location.FileSystem.DirectoryInfo.FromDirectoryName(correctedPath);
+        location = location.FileSystem.DirectoryInfo.New(correctedPath);
     }
 
     private static bool ParentContainsOriginDirectories(IDirectoryInfo gameLocation)

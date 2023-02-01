@@ -97,7 +97,7 @@ public class GameFactoryTest
         var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
         var fs = new MockFileSystem();
         fs.AddDirectory("GameData");
-        fs.AddFile("GameData/sweaw.exe", MockFileData.NullObject);
+        fs.AddFile("GameData/sweaw.exe", new MockFileData(string.Empty));
         var game = factory.CreateGame(identity, fs.DirectoryInfo.FromDirectoryName("GameData"), false);
         Assert.Equal(identity.Platform, game.Platform);
         Assert.Equal(identity.Type, game.Type);
@@ -115,7 +115,7 @@ public class GameFactoryTest
         var fs = new MockFileSystem();
         var detectionResult = new GameDetectionResult(identity, fs.DirectoryInfo.FromDirectoryName("GameData"));
         fs.AddDirectory("GameData");
-        fs.AddFile("GameData/sweaw.exe", MockFileData.NullObject);
+        fs.AddFile("GameData/sweaw.exe", new MockFileData(string.Empty));
         var game = factory.CreateGame(detectionResult);
         Assert.Equal(identity.Platform, game.Platform);
         Assert.Equal(identity.Type, game.Type);
