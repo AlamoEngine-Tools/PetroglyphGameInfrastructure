@@ -26,7 +26,7 @@ public class GameHelperTest
     {
         var fs = new MockFileSystem();
         var mock = new Mock<IGame>();
-        mock.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("SteamLib/Apps/common/32470/Game"));
+        mock.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("SteamLib/Apps/common/32470/Game"));
         mock.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
         fs.AddDirectory("SteamLib/Apps/common/32470/Game");
         fs.AddDirectory("workshop/content/32470");
@@ -42,7 +42,7 @@ public class GameHelperTest
     {
         var fs = new MockFileSystem();
         var mock = new Mock<IGame>();
-        mock.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        mock.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
         mock.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
         fs.AddDirectory("Game");
         Assert.Throws<SteamException>(() => _service.GetWorkshopsLocation(mock.Object));
@@ -53,7 +53,7 @@ public class GameHelperTest
     {
         var fs = new MockFileSystem();
         var mock = new Mock<IGame>();
-        mock.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        mock.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
         fs.AddDirectory("Game");
         Assert.Throws<GameException>(() => _service.GetWorkshopsLocation(mock.Object));
     }

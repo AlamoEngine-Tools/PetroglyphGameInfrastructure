@@ -40,8 +40,8 @@ public class FileSystemModFinderTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Exists()).Returns(true);
         game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Game"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods"));
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
         var mods = _service.FindMods(game.Object);
         Assert.Empty(mods);
     }
@@ -53,8 +53,8 @@ public class FileSystemModFinderTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Exists()).Returns(true);
         game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Game"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods"));
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
         var mods = _service.FindMods(game.Object);
         Assert.Empty(mods);
     }
@@ -66,10 +66,10 @@ public class FileSystemModFinderTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Exists()).Returns(true);
         game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/Game/Eaw/Mods"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
         _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-            .Returns(_fileSystem.DirectoryInfo.FromDirectoryName("wsDir"));
+            .Returns(_fileSystem.DirectoryInfo.New("wsDir"));
         var mods = _service.FindMods(game.Object);
         Assert.Empty(mods);
     }
@@ -81,8 +81,8 @@ public class FileSystemModFinderTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Exists()).Returns(true);
         game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Game"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods"));
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
         var mods = _service.FindMods(game.Object);
         var mod = Assert.Single(mods);
         Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/Mods/ModA" : "c:\\game\\mods\\moda", mod.Identifier);
@@ -97,8 +97,8 @@ public class FileSystemModFinderTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Exists()).Returns(true);
         game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Game"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods"));
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
         var mods = _service.FindMods(game.Object);
         Assert.Equal(2, mods.Count);
     }
@@ -110,10 +110,10 @@ public class FileSystemModFinderTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Exists()).Returns(true);
         game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/Game/Eaw/Mods"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
         _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-            .Returns(_fileSystem.DirectoryInfo.FromDirectoryName("path"));
+            .Returns(_fileSystem.DirectoryInfo.New("path"));
         var mods = _service.FindMods(game.Object);
         var mod = Assert.Single(mods);
         Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Lib/Game/Eaw/Mods/ModA" : "c:\\lib\\game\\eaw\\mods\\moda",
@@ -129,10 +129,10 @@ public class FileSystemModFinderTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Exists()).Returns(true);
         game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/Game/Eaw/Mods"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
         _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-            .Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/workshop/content/32470/"));
+            .Returns(_fileSystem.DirectoryInfo.New("Lib/workshop/content/32470/"));
 
         var mods = _service.FindMods(game.Object);
         Assert.Equal(2, mods.Count);
@@ -145,10 +145,10 @@ public class FileSystemModFinderTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Exists()).Returns(true);
         game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/Game/Eaw/Mods"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
         _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-            .Returns(_fileSystem.DirectoryInfo.FromDirectoryName("Lib/workshop/content/32470/"));
+            .Returns(_fileSystem.DirectoryInfo.New("Lib/workshop/content/32470/"));
 
         var mods = _service.FindMods(game.Object);
         var mod = Assert.Single(mods);

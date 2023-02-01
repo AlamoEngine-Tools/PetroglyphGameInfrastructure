@@ -37,9 +37,11 @@ public class DebugableClientBaseTest
             .Returns((IFileInfo)null);
         Assert.False(_service.IsDebugAvailable(game.Object));
         _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
-            .Returns(fs.FileInfo.FromFileName("test.exe"));
+            .Returns(fs.FileInfo.New("test.exe"));
         Assert.False(_service.IsDebugAvailable(game.Object));
-        fs.AddFile("test.exe", MockFileData.NullObject);
+        fs.AddFile("test.exe", new MockFileData(string.Empty));
+        _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
+            .Returns(fs.FileInfo.New("test.exe"));
         Assert.True(_service.IsDebugAvailable(game.Object));
     }
 
@@ -50,12 +52,12 @@ public class DebugableClientBaseTest
         game.Setup(g => g.Game).Returns(game.Object);
         game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
         var fs = new MockFileSystem();
-        fs.AddFile("release.exe", MockFileData.NullObject);
+        fs.AddFile("release.exe", new MockFileData(string.Empty));
 
         _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Debug))
-            .Returns(fs.FileInfo.FromFileName("debug.exe"));
+            .Returns(fs.FileInfo.New("debug.exe"));
         _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
-            .Returns(fs.FileInfo.FromFileName("release.exe"));
+            .Returns(fs.FileInfo.New("release.exe"));
 
         // Don't fallback - Throws.
         Assert.Throws<GameStartException>(() => _service.Debug(game.Object, ArgumentCollection.Empty, false));
@@ -69,7 +71,7 @@ public class DebugableClientBaseTest
         Assert.Equal(GameBuildType.Release, realProcess.ProcessInfo.BuildType);
 
         // Use Debug
-        fs.AddFile("debug.exe", MockFileData.NullObject);
+        fs.AddFile("debug.exe", new MockFileData(string.Empty));
         var debugProcess = new Mock<IGameProcess>();
         debugProcess.Setup(p => p.ProcessInfo)
             .Returns(new GameProcessInfo(game.Object, GameBuildType.Debug, ArgumentCollection.Empty));

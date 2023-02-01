@@ -330,14 +330,14 @@ public class ModDependencyTraverserIntegrationTest
     private TestMod CreateMod(string name)
     {
         _fileSystem.AddDirectory($"Game/Mods/{name}");
-        return new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName($"Game/Mods/{name}"), false, name, _serviceProvider);
+        return new TestMod(_game, _fileSystem.DirectoryInfo.New($"Game/Mods/{name}"), false, name, _serviceProvider);
     }
 
     private static IGame SetupGame(IMockFileDataAccessor fileSystem, IServiceProvider sp)
     {
         fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
         var game = new PetroglyphStarWarsGame(new GameIdentity(GameType.Foc, GamePlatform.Disk),
-            fileSystem.DirectoryInfo.FromDirectoryName("Game"), "Foc", sp);
+            fileSystem.DirectoryInfo.New("Game"), "Foc", sp);
         return game;
     }
 

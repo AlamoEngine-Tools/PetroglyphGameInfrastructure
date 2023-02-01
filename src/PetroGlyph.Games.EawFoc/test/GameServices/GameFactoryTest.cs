@@ -69,7 +69,7 @@ public class GameFactoryTest
         var culture = CultureInfo.GetCultureInfo("de");
         var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
         var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
-        Assert.Throws<GameException>(() => factory.CreateGame(identity, new MockFileSystem().DirectoryInfo.FromDirectoryName("Game")));
+        Assert.Throws<GameException>(() => factory.CreateGame(identity, new MockFileSystem().DirectoryInfo.New("Game")));
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class GameFactoryTest
         var culture = CultureInfo.GetCultureInfo("de");
         var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
         var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
-        var game = factory.CreateGame(identity, new MockFileSystem().DirectoryInfo.FromDirectoryName("Game"), false);
+        var game = factory.CreateGame(identity, new MockFileSystem().DirectoryInfo.New("Game"), false);
         Assert.Equal(identity.Platform, game.Platform);
         Assert.Equal(identity.Type, game.Type);
     }
@@ -98,7 +98,7 @@ public class GameFactoryTest
         var fs = new MockFileSystem();
         fs.AddDirectory("GameData");
         fs.AddFile("GameData/sweaw.exe", new MockFileData(string.Empty));
-        var game = factory.CreateGame(identity, fs.DirectoryInfo.FromDirectoryName("GameData"), false);
+        var game = factory.CreateGame(identity, fs.DirectoryInfo.New("GameData"), false);
         Assert.Equal(identity.Platform, game.Platform);
         Assert.Equal(identity.Type, game.Type);
     }
@@ -113,7 +113,7 @@ public class GameFactoryTest
         var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
         var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
         var fs = new MockFileSystem();
-        var detectionResult = new GameDetectionResult(identity, fs.DirectoryInfo.FromDirectoryName("GameData"));
+        var detectionResult = new GameDetectionResult(identity, fs.DirectoryInfo.New("GameData"));
         fs.AddDirectory("GameData");
         fs.AddFile("GameData/sweaw.exe", new MockFileData(string.Empty));
         var game = factory.CreateGame(detectionResult);

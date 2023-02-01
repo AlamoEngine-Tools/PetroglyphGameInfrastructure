@@ -59,7 +59,7 @@ public class CompositeDetectorTest
         innerDetector.Setup(i => i.Detect(options))
             .Returns(
                 new GameDetectionResult(new GameIdentity(GameType.EaW, GamePlatform.Disk),
-                    fs.DirectoryInfo.FromDirectoryName("Game")));
+                    fs.DirectoryInfo.New("Game")));
         var result = detector.Detect(options);
         Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game" : "C:\\Game", result.GameLocation?.FullName);
     }
@@ -77,7 +77,7 @@ public class CompositeDetectorTest
         innerDetectorB.Setup(i => i.Detect(options))
             .Returns(
                 new GameDetectionResult(new GameIdentity(GameType.EaW, GamePlatform.Disk),
-                    fs.DirectoryInfo.FromDirectoryName("Game")));
+                    fs.DirectoryInfo.New("Game")));
         var result = detector.Detect(options);
         Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game" : "C:\\Game", result.GameLocation?.FullName);
     }

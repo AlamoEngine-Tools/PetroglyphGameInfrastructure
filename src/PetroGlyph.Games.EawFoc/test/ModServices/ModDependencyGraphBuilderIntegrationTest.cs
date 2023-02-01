@@ -22,7 +22,7 @@ public class ModDependencyGraphBuilderIntegrationTest
         var game = SetupGame(fs, sp.Object);
 
         fs.AddDirectory("Game/Mods/Target");
-        var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, "Name", sp.Object);
+        var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
         var graphBuilder = new ModDependencyGraphBuilder();
@@ -39,7 +39,7 @@ public class ModDependencyGraphBuilderIntegrationTest
         var game = SetupGame(fs, sp.Object);
 
         fs.AddDirectory("Game/Mods/Target");
-        var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, "Name", sp.Object);
+        var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
         targetMod.DependencyAction(list => list.Add(new(targetMod)));
@@ -59,11 +59,11 @@ public class ModDependencyGraphBuilderIntegrationTest
         var game = SetupGame(fs, sp.Object);
 
         fs.AddDirectory("Game/Mods/Target");
-        var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, "Name", sp.Object);
+        var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep");
-        var depMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", sp.Object);
+        var depMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep"), false, "Name", sp.Object);
         depMod.SetStatus(DependencyResolveStatus.Resolved);
         depMod.DependencyAction(list => list.Add(new(targetMod)));
 
@@ -85,24 +85,24 @@ public class ModDependencyGraphBuilderIntegrationTest
         var game = SetupGame(fs, sp.Object);
 
         fs.AddDirectory("Game/Mods/dep1");
-        var dep1 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep1"), false, "Name", sp.Object);
+        var dep1 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep1"), false, "Name", sp.Object);
         dep1.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep2");
-        var dep2 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep2"), false, "Name", sp.Object);
+        var dep2 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep2"), false, "Name", sp.Object);
         dep2.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep3");
-        var dep3 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep3"), false, "Name", sp.Object);
+        var dep3 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep3"), false, "Name", sp.Object);
         dep3.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep4");
-        var dep4 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep4"), false, "Name", sp.Object);
+        var dep4 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep4"), false, "Name", sp.Object);
         dep4.SetStatus(DependencyResolveStatus.Resolved);
 
 
         fs.AddDirectory("Game/Mods/Target");
-        var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, "Name", sp.Object);
+        var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
         targetMod.DependencyAction(list =>
@@ -130,24 +130,24 @@ public class ModDependencyGraphBuilderIntegrationTest
         var game = SetupGame(fs, sp.Object);
 
         fs.AddDirectory("Game/Mods/dep1");
-        var dep1 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep1"), false, "Name", sp.Object);
+        var dep1 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep1"), false, "Name", sp.Object);
         dep1.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep2");
-        var dep2 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep2"), false, "Name", sp.Object);
+        var dep2 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep2"), false, "Name", sp.Object);
         dep2.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep3");
-        var dep3 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep3"), false, "Name", sp.Object);
+        var dep3 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep3"), false, "Name", sp.Object);
         dep3.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep4");
-        var dep4 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep4"), false, "Name", sp.Object);
+        var dep4 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep4"), false, "Name", sp.Object);
         dep4.SetStatus(DependencyResolveStatus.Resolved);
 
 
         fs.AddDirectory("Game/Mods/Target");
-        var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, "Name", sp.Object);
+        var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
         targetMod.DependencyAction(list =>
@@ -178,23 +178,23 @@ public class ModDependencyGraphBuilderIntegrationTest
         // 2: 3, 4, 5
 
         fs.AddDirectory("Game/Mods/dep1");
-        var dep1 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep1"), false, "Name", sp.Object);
+        var dep1 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep1"), false, "Name", sp.Object);
         dep1.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep2");
-        var dep2 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep2"), false, "Name", sp.Object);
+        var dep2 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep2"), false, "Name", sp.Object);
         dep2.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep3");
-        var dep3 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep3"), false, "Name", sp.Object);
+        var dep3 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep3"), false, "Name", sp.Object);
         dep3.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep4");
-        var dep4 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep4"), false, "Name", sp.Object);
+        var dep4 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep4"), false, "Name", sp.Object);
         dep4.SetStatus(DependencyResolveStatus.Resolved);
 
         fs.AddDirectory("Game/Mods/dep5");
-        var dep5 = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/dep5"), false, "Name", sp.Object);
+        var dep5 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep5"), false, "Name", sp.Object);
         dep5.SetStatus(DependencyResolveStatus.Resolved);
 
         dep2.DependencyAction(list =>
@@ -206,7 +206,7 @@ public class ModDependencyGraphBuilderIntegrationTest
 
 
         fs.AddDirectory("Game/Mods/Target");
-        var targetMod = new TestMod(game, fs.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, "Name", sp.Object);
+        var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
         targetMod.DependencyAction(list =>
@@ -229,7 +229,7 @@ public class ModDependencyGraphBuilderIntegrationTest
     {
         fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
         var game = new PetroglyphStarWarsGame(new GameIdentity(GameType.Foc, GamePlatform.Disk),
-            fileSystem.DirectoryInfo.FromDirectoryName("Game"), "Foc", sp);
+            fileSystem.DirectoryInfo.New("Game"), "Foc", sp);
         return game;
     }
 

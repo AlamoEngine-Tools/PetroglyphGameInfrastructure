@@ -23,7 +23,7 @@ public class ModTest
         Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, null, false, (IModinfoFile)null, null));
         Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, null, false, (string)null, null));
         var fs = new MockFileSystem();
-        var modDir = fs.DirectoryInfo.FromDirectoryName("Game/Mods/A");
+        var modDir = fs.DirectoryInfo.New("Game/Mods/A");
         Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (IModinfo)null, null));
         Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (IModinfoFile)null, null));
         Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (string)null, null));
@@ -45,7 +45,7 @@ public class ModTest
     {
         var game = new Mock<IGame>();
         var fs = new MockFileSystem();
-        var modDir = fs.DirectoryInfo.FromDirectoryName("Game/Mods/A");
+        var modDir = fs.DirectoryInfo.New("Game/Mods/A");
         var sp = new Mock<IServiceProvider>();
         var mod = new Mod(game.Object, modDir, false, "Name", sp.Object);
         Assert.Equal("Name", mod.Name);

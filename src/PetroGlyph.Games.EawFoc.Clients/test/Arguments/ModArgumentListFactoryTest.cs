@@ -83,11 +83,11 @@ public class ModArgumentListFactoryTest
     {
         var fs = new MockFileSystem();
         var game = new Mock<IGame>();
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("game"));
         var modA = new Mock<IPhysicalMod>();
         modA.Setup(m => m.Type).Returns(ModType.Default);
         modA.Setup(m => m.Game).Returns(game.Object);
-        modA.Setup(m => m.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("game/mods/a"));
+        modA.Setup(m => m.Directory).Returns(fs.DirectoryInfo.New("game/mods/a"));
 
         var modList = _service.BuildArgumentList(new List<IMod> { modA.Object }, false);
 
@@ -106,11 +106,11 @@ public class ModArgumentListFactoryTest
     {
         var fs = new MockFileSystem();
         var game = new Mock<IGame>();
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("game"));
         var modA = new Mock<IPhysicalMod>();
         modA.Setup(m => m.Type).Returns(ModType.Default);
         modA.Setup(m => m.Game).Returns(game.Object);
-        modA.Setup(m => m.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("d:\\a"));
+        modA.Setup(m => m.Directory).Returns(fs.DirectoryInfo.New("d:\\a"));
 
         var modList = _service.BuildArgumentList(new List<IMod> { modA.Object }, false);
 
@@ -133,7 +133,7 @@ public class ModArgumentListFactoryTest
 
         var fs = new MockFileSystem();
         var game = new Mock<IGame>();
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("game"));
         var modA = new Mock<IPhysicalMod>();
         modA.Setup(m => m.Type).Returns(ModType.Workshops);
         modA.Setup(m => m.Identifier).Returns("123");
@@ -206,12 +206,12 @@ public class ModArgumentListFactoryTest
     {
         var fs = new MockFileSystem();
         var game = new Mock<IGame>();
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("game"));
 
         var modA = new Mock<IPhysicalMod>();
         modA.Setup(m => m.Type).Returns(ModType.Default);
         modA.Setup(m => m.Game).Returns(game.Object); 
-        modA.Setup(m => m.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("d:\\path to mod\\a"));
+        modA.Setup(m => m.Directory).Returns(fs.DirectoryInfo.New("d:\\path to mod\\a"));
 
         _validator.Setup(v => v.CheckArgument(It.IsAny<IGameArgument>(), out It.Ref<string>.IsAny, out It.Ref<string>.IsAny))
             .Returns(ArgumentValidityStatus.InvalidData);
