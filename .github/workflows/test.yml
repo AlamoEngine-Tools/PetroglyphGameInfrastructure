@@ -12,25 +12,22 @@ jobs:
   build-test:
     name: Build & Test
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest]
-      fail-fast: false
-    
     runs-on: ${{ matrix.os }}
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: | 
-            3.1.x
-            5.0.x
-            6.0.x
         
-    - name: Build & Test in Release Mode
-      run: dotnet test --configuration Release --logger "GitHubActions"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+        
+      - name: Build & Test in Release Mode
+        run: dotnet test --configuration Release --logger "GitHubActions"
+
+      - name: Build & Test .NET Framework
+        if: matrix.os == 'windows-latest'
+        run: dotnet test --configuration Release -f net48 --logger "GitHubActions"
