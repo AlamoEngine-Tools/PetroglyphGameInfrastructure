@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO.Abstractions.TestingHelpers;
+using AnakinRaW.CommonUtilities.FileSystem;
 using Moq;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using Sklavenwalker.CommonUtilities.FileSystem;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Test.Arguments;
@@ -46,8 +46,8 @@ public class ArgumentValueSerializerTest
         var serializer = new ArgumentValueSerializer(helper.Object);
 
         var fs = new MockFileSystem();
-        var game = fs.DirectoryInfo.FromDirectoryName("game");
-        var mod = fs.DirectoryInfo.FromDirectoryName("game/mod");
+        var game = fs.DirectoryInfo.New("game");
+        var mod = fs.DirectoryInfo.New("game/mod");
 
         serializer.ShortenPath(mod, game);
 
@@ -61,8 +61,8 @@ public class ArgumentValueSerializerTest
         var serializer = new ArgumentValueSerializer();
 
         var fs = new MockFileSystem();
-        var game = fs.DirectoryInfo.FromDirectoryName("game");
-        var mod = fs.DirectoryInfo.FromDirectoryName("game/mod");
+        var game = fs.DirectoryInfo.New("game");
+        var mod = fs.DirectoryInfo.New("game/mod");
 
         serializer.ShortenPath(mod, game);
 

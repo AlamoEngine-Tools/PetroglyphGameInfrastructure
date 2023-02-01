@@ -56,7 +56,7 @@ public class RegistryGameDetectorTest
         var registry = new Mock<IGameRegistry>();
         registry.Setup(r => r.Exits).Returns(true);
         registry.Setup(r => r.Version).Returns(new Version(1, 0));
-        registry.Setup(r => r.ExePath).Returns(fs.FileInfo.FromFileName("Game/sweaw.exe"));
+        registry.Setup(r => r.ExePath).Returns(fs.FileInfo.New("Game/sweaw.exe"));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         var detector = new RegistryGameDetector(registry.Object, registry.Object, false, sp.Object);

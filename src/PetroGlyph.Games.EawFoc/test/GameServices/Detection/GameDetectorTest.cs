@@ -33,7 +33,7 @@ public class GameDetectorTest
         var options = new GameDetectorOptions(GameType.Foc);
 
         detector.Setup(d => d.FindGameLocation(options))
-            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.FromDirectoryName("Game") });
+            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
 
 
         var result = detector.Object.Detect(options);
@@ -62,7 +62,7 @@ public class GameDetectorTest
         var options = new GameDetectorOptions(GameType.Foc);
 
         detector.Setup(d => d.FindGameLocation(options))
-            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.FromDirectoryName("Game") });
+            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
 
 
         var result = detector.Object.Detect(options);
@@ -154,7 +154,7 @@ public class GameDetectorTest
 
         detector.SetupSequence(d => d.FindGameLocation(options))
             .Returns(new GameDetector.GameLocationData { InitializationRequired = true })
-            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.FromDirectoryName("Game") });
+            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
 
         var eventRaised = false;
         detector.Object.InitializationRequested += (_, args) =>
@@ -231,7 +231,7 @@ public class GameDetectorTest
         };
 
         detector.Setup(d => d.FindGameLocation(options))
-            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.FromDirectoryName("Game") });
+            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
 
 
         var result = detector.Object.Detect(options);

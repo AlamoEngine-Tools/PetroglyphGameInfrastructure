@@ -41,7 +41,7 @@ public class GameExecutableFileServiceTest
             .Returns("test.exe");
 
         var fs = new MockFileSystem();
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("."));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("."));
 
         var exeFile = _service.GetExecutableForGame(game.Object, GameBuildType.Debug);
         Assert.Null(exeFile);
@@ -58,8 +58,8 @@ public class GameExecutableFileServiceTest
             .Returns("test.exe");
 
         var fs = new MockFileSystem();
-        fs.AddFile("test.exe", MockFileData.NullObject);
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("."));
+        fs.AddFile("test.exe", new MockFileData(string.Empty));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("."));
 
         var exeFile = _service.GetExecutableForGame(game.Object, GameBuildType.Debug);
         Assert.NotNull(exeFile);

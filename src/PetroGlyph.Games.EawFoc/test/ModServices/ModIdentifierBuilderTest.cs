@@ -35,7 +35,7 @@ public class ModIdentifierBuilderTest
     public void TestDefaultMod()
     {
         _physicalMod.Setup(m => m.Type).Returns(ModType.Default);
-        _physicalMod.Setup(m => m.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("ModPath"));
+        _physicalMod.Setup(m => m.Directory).Returns(_fileSystem.DirectoryInfo.New("ModPath"));
 
         _pathHelper.Setup(p => p.NormalizePath(It.IsAny<string>(), PathNormalizeOptions.Full)).Returns("c:\\modpath");
 
@@ -47,7 +47,7 @@ public class ModIdentifierBuilderTest
     public void TestWorkshopMod()
     {
         _physicalMod.Setup(m => m.Type).Returns(ModType.Workshops);
-        _physicalMod.Setup(m => m.Directory).Returns(_fileSystem.DirectoryInfo.FromDirectoryName("12345"));
+        _physicalMod.Setup(m => m.Directory).Returns(_fileSystem.DirectoryInfo.New("12345"));
 
         var identifier = _service.Build(_physicalMod.Object);
         Assert.Equal("12345", identifier);

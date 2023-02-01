@@ -66,13 +66,13 @@ public class FileBasedLanguageFinderTest
         fileService.Setup(s => s.DataFiles("MasterTextFile_*.dat", "Text", false, false))
             .Returns(new List<IFileInfo>
             {
-                fs.FileInfo.FromFileName("Game/Text/MasterTextFile_English.dat"),
-                fs.FileInfo.FromFileName("Game/Text/MASTERTEXTFILE_GERMAN.DAT")
+                fs.FileInfo.New("Game/Text/MasterTextFile_English.dat"),
+                fs.FileInfo.New("Game/Text/MASTERTEXTFILE_GERMAN.DAT")
             });
 
         var game = new Mock<IGame>();
         game.Setup(g => g.FileService).Returns(fileService.Object);
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
 
         var finder = new FileBasedLanguageFinder();
         var actual = finder.GetTextLocalizations(game.Object);
@@ -96,15 +96,15 @@ public class FileBasedLanguageFinderTest
         fileService.Setup(s => s.DataFiles("sfx2d_*.meg", "Audio/SFX", false, false))
             .Returns(new List<IFileInfo>
             {
-                fs.FileInfo.FromFileName("Game/Audio/SFX/sfx2d_english.meg"),
-                fs.FileInfo.FromFileName("Game/Audio/SFX/SFX2D_GERMAN.MEG"),
-                fs.FileInfo.FromFileName("Game/Audio/SFX/sfx2d_non_localized.meg")
+                fs.FileInfo.New("Game/Audio/SFX/sfx2d_english.meg"),
+                fs.FileInfo.New("Game/Audio/SFX/SFX2D_GERMAN.MEG"),
+                fs.FileInfo.New("Game/Audio/SFX/sfx2d_non_localized.meg")
             });
 
         var game = new Mock<IGame>();
         game.Setup(g => g.FileService).Returns(fileService.Object);
         game.Setup(g => g.FileSystem).Returns(fs);
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
 
         var finder = new FileBasedLanguageFinder();
         var actual = finder.GetSfxMegLocalizations(game.Object);
@@ -128,15 +128,15 @@ public class FileBasedLanguageFinderTest
         fileService.Setup(s => s.DataFiles("*speech.meg", null, false, false))
             .Returns(new List<IFileInfo>
             {
-                fs.FileInfo.FromFileName("Game/EnglishSpeech.meg"),
-                fs.FileInfo.FromFileName("Game/GERMANSPEECH.MEG"),
-                fs.FileInfo.FromFileName("Game/SomeSpeech.meg")
+                fs.FileInfo.New("Game/EnglishSpeech.meg"),
+                fs.FileInfo.New("Game/GERMANSPEECH.MEG"),
+                fs.FileInfo.New("Game/SomeSpeech.meg")
             });
 
         var game = new Mock<IGame>();
         game.Setup(g => g.FileService).Returns(fileService.Object);
         game.Setup(g => g.FileSystem).Returns(fs);
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
 
         var finder = new FileBasedLanguageFinder();
         var actual = finder.GetSpeechLocalizationsFromMegs(game.Object);
@@ -158,12 +158,12 @@ public class FileBasedLanguageFinderTest
 
         var fileService = new Mock<IPhysicalFileService>();
         fileService.Setup(s => s.DataDirectory("Audio/Speech", false))
-            .Returns(fs.DirectoryInfo.FromDirectoryName("Game/Audio/Speech"));
+            .Returns(fs.DirectoryInfo.New("Game/Audio/Speech"));
 
         var game = new Mock<IGame>();
         game.Setup(g => g.FileService).Returns(fileService.Object);
         game.Setup(g => g.FileSystem).Returns(fs);
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
 
         var finder = new FileBasedLanguageFinder();
         var actual = finder.GetSpeechLocalizationsFromFolder(game.Object);
@@ -182,12 +182,12 @@ public class FileBasedLanguageFinderTest
 
         var fileService = new Mock<IPhysicalFileService>();
         fileService.Setup(s => s.DataDirectory("Audio/Speech", false))
-            .Returns(fs.DirectoryInfo.FromDirectoryName("Game/Audio/Speech"));
+            .Returns(fs.DirectoryInfo.New("Game/Audio/Speech"));
 
         var game = new Mock<IGame>();
         game.Setup(g => g.FileService).Returns(fileService.Object);
         game.Setup(g => g.FileSystem).Returns(fs);
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
 
         var finder = new FileBasedLanguageFinder();
         var actual = finder.GetSpeechLocalizationsFromFolder(game.Object);

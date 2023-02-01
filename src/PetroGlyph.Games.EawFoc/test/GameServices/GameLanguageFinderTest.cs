@@ -24,7 +24,7 @@ public class GameLanguageFinderTest
         fs.AddDirectory("Game");
 
         var game = new Mock<IGame>();
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
 
         var languageHelper = new Mock<ILanguageFinder>();
         languageHelper
@@ -46,7 +46,7 @@ public class GameLanguageFinderTest
         fs.AddDirectory("Game");
 
         var game = new Mock<IGame>();
-        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.FromDirectoryName("Game"));
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
 
         var langInfo = new Mock<ILanguageInfo>();
 

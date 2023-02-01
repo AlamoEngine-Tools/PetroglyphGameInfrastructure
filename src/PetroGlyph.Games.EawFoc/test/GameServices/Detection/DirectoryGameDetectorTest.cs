@@ -18,7 +18,7 @@ public class DirectoryGameDetectorTest
         var fs = new MockFileSystem();
         var sp = new Mock<IServiceProvider>();
         Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null, null));
-        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Game"), null));
+        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), null));
         Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null, sp.Object));
     }
 
@@ -31,7 +31,7 @@ public class DirectoryGameDetectorTest
         var fs = new MockFileSystem();
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Game"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
         var options = new GameDetectorOptions(GameType.EaW);
         var result = detector.Detect(options);
         Assert.Null(result.GameLocation);
@@ -47,7 +47,7 @@ public class DirectoryGameDetectorTest
         fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Game"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
         var options = new GameDetectorOptions(GameType.EaW);
         var result = detector.FindGameLocation(options);
         Assert.Null(result.Location);
@@ -63,7 +63,7 @@ public class DirectoryGameDetectorTest
         fs.AddFile("Game/sweaw.exe", new MockFileData(string.Empty));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Game"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
         var options = new GameDetectorOptions(GameType.Foc);
         var result = detector.FindGameLocation(options);
         Assert.Null(result.Location);
@@ -79,7 +79,7 @@ public class DirectoryGameDetectorTest
         fs.AddFile("Game/sweaw.exe", new MockFileData(string.Empty));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Game"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
         var options = new GameDetectorOptions(GameType.EaW);
         var result = detector.FindGameLocation(options);
         Assert.NotNull(result.Location);
@@ -95,7 +95,7 @@ public class DirectoryGameDetectorTest
         fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Game"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
         var options = new GameDetectorOptions(GameType.Foc);
         var result = detector.FindGameLocation(options);
         Assert.NotNull(result.Location);
@@ -111,7 +111,7 @@ public class DirectoryGameDetectorTest
         fs.AddFile("Dir/EAWX/swfoc.exe", new MockFileData(string.Empty));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Dir"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
         var options = new GameDetectorOptions(GameType.Foc);
         var result = detector.FindGameLocation(options);
         Assert.NotNull(result.Location);
@@ -127,7 +127,7 @@ public class DirectoryGameDetectorTest
         fs.AddFile("Dir/EAWX/sweaw.exe", new MockFileData(string.Empty));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Dir"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
         var options = new GameDetectorOptions(GameType.Foc);
         var result = detector.FindGameLocation(options);
         Assert.Null(result.Location);
@@ -143,7 +143,7 @@ public class DirectoryGameDetectorTest
         fs.AddFile("Dir/SomeDir/sweaw.exe", new MockFileData(string.Empty));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Dir"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
         var options = new GameDetectorOptions(GameType.Foc);
         var result = detector.FindGameLocation(options);
         Assert.Null(result.Location);
@@ -159,7 +159,7 @@ public class DirectoryGameDetectorTest
         fs.AddFile("Dir/GameData/sweaw.exe", new MockFileData(string.Empty));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Dir"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
         var options = new GameDetectorOptions(GameType.EaW);
         var result = detector.FindGameLocation(options);
         Assert.NotNull(result.Location);
@@ -175,7 +175,7 @@ public class DirectoryGameDetectorTest
         fs.AddFile("Dir/Sub/GameData/sweaw.exe", new MockFileData(string.Empty));
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Dir"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
         var options = new GameDetectorOptions(GameType.EaW);
         var result = detector.FindGameLocation(options);
         Assert.NotNull(result.Location);
@@ -197,7 +197,7 @@ public class DirectoryGameDetectorTest
         pi.Setup(i => i.GetGamePlatform(It.IsAny<GameType>(), ref It.Ref<IDirectoryInfo>.IsAny, It.IsAny<IList<GamePlatform>>()))
             .Returns(GamePlatform.GoG);
         sp.Setup(p => p.GetService(typeof(IGamePlatformIdentifier))).Returns(pi.Object);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.FromDirectoryName("Game"), sp.Object);
+        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
         var result = detector.Detect(options);
         Assert.NotNull(result.GameLocation);
         Assert.Equal(GamePlatform.GoG, result.GameIdentity.Platform);

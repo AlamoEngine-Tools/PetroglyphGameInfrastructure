@@ -21,7 +21,7 @@ public class GamePlatformIdentifierTest
         Assert.Throws<ArgumentNullException>(() => identifier.GetGamePlatform(default, ref nullRef!));
         Assert.Throws<ArgumentNullException>(() => identifier.GetGamePlatform(default, ref nullRef!, new List<GamePlatform>()));
         var fs = new MockFileSystem();
-        var locRef = fs.DirectoryInfo.FromDirectoryName("Game");
+        var locRef = fs.DirectoryInfo.New("Game");
         Assert.Throws<ArgumentNullException>(() => identifier.GetGamePlatform(default, ref locRef, null!));
     }
 
@@ -31,7 +31,7 @@ public class GamePlatformIdentifierTest
         var sp = new Mock<IServiceProvider>();
         var identifier = new GamePlatformIdentifier(sp.Object);
         var fs = new MockFileSystem();
-        var locRef = fs.DirectoryInfo.FromDirectoryName("Game");
+        var locRef = fs.DirectoryInfo.New("Game");
         var actual = identifier.GetGamePlatform(default, ref locRef, new List<GamePlatform>());
         Assert.Equal(GamePlatform.Undefined, actual);
     }
@@ -42,7 +42,7 @@ public class GamePlatformIdentifierTest
         var sp = new Mock<IServiceProvider>();
         var identifier = new GamePlatformIdentifier(sp.Object);
         var fs = new MockFileSystem();
-        var locRef = fs.DirectoryInfo.FromDirectoryName("Game");
+        var locRef = fs.DirectoryInfo.New("Game");
         var actual = identifier.GetGamePlatform(default, ref locRef);
         Assert.Equal(GamePlatform.Undefined, actual);
     }
@@ -220,14 +220,14 @@ public class GamePlatformIdentifierTest
     {
         var fs = new MockFileSystem();
         fs.AddFile("GameData/sweaw.exe", new MockFileData(string.Empty));
-        return fs.DirectoryInfo.FromDirectoryName("GameData");
+        return fs.DirectoryInfo.New("GameData");
     }
 
     private static IDirectoryInfo Disk_Foc()
     {
         var fs = new MockFileSystem();
         fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
-        return fs.DirectoryInfo.FromDirectoryName("Game");
+        return fs.DirectoryInfo.New("Game");
     }
 
     private static IFileSystem SteamFs()
@@ -248,12 +248,12 @@ public class GamePlatformIdentifierTest
 
     private static IDirectoryInfo Steam_Eaw()
     {
-        return SteamFs().DirectoryInfo.FromDirectoryName("Game/GameData");
+        return SteamFs().DirectoryInfo.New("Game/GameData");
     }
 
     private static IDirectoryInfo Steam_Foc()
     {
-        return SteamFs().DirectoryInfo.FromDirectoryName("Game/corruption");
+        return SteamFs().DirectoryInfo.New("Game/corruption");
     }
 
     private static IFileSystem GogFs()
@@ -272,12 +272,12 @@ public class GamePlatformIdentifierTest
 
     private static IDirectoryInfo Gog_Eaw()
     {
-        return GogFs().DirectoryInfo.FromDirectoryName("Game/GameData");
+        return GogFs().DirectoryInfo.New("Game/GameData");
     }
 
     private static IDirectoryInfo Gog_Foc()
     {
-        return GogFs().DirectoryInfo.FromDirectoryName("Game/EAWX");
+        return GogFs().DirectoryInfo.New("Game/EAWX");
     }
 
     private static IFileSystem DiskGoldFs()
@@ -301,12 +301,12 @@ public class GamePlatformIdentifierTest
 
     private static IDirectoryInfo DiskGold_Eaw()
     {
-        return DiskGoldFs().DirectoryInfo.FromDirectoryName("Game/Eaw/GameData");
+        return DiskGoldFs().DirectoryInfo.New("Game/Eaw/GameData");
     }
 
     private static IDirectoryInfo DiskGold_Foc()
     {
-        return DiskGoldFs().DirectoryInfo.FromDirectoryName("Game/Foc");
+        return DiskGoldFs().DirectoryInfo.New("Game/Foc");
     }
 
     private static IFileSystem OriginFs()
@@ -323,16 +323,16 @@ public class GamePlatformIdentifierTest
 
     private static IDirectoryInfo Origin_Eaw()
     {
-        return OriginFs().DirectoryInfo.FromDirectoryName("Game/GameData");
+        return OriginFs().DirectoryInfo.New("Game/GameData");
     }
 
     private static IDirectoryInfo Origin_Foc_Corrected()
     {
-        return OriginFs().DirectoryInfo.FromDirectoryName("Game/EAWX");
+        return OriginFs().DirectoryInfo.New("Game/EAWX");
     }
 
     private static IDirectoryInfo Origin_Foc_Registry()
     {
-        return OriginFs().DirectoryInfo.FromDirectoryName("Game/corruption");
+        return OriginFs().DirectoryInfo.New("Game/corruption");
     }
 }

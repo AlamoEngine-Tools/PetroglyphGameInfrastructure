@@ -34,7 +34,7 @@ public class ModDependencyResolverIntegrationTest
     public void TestNoDependencies()
     {
         _fileSystem.AddDirectory("Game/Mods/Target");
-        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, "Name", _serviceProvider);
+        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/Target"), false, "Name", _serviceProvider);
 
         var resolver = new ModDependencyResolver(_serviceProvider);
 
@@ -75,10 +75,10 @@ public class ModDependencyResolverIntegrationTest
             };
         }
 
-        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
+        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/Target"), false, targetInfo, _serviceProvider);
 
         _fileSystem.AddDirectory("Game/Mods/dep");
-        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", _serviceProvider);
+        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/dep"), false, "Name", _serviceProvider);
 
 
         _game.AddMod(targetMod);
@@ -126,10 +126,10 @@ public class ModDependencyResolverIntegrationTest
             };
         }
 
-        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
+        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/Target"), false, targetInfo, _serviceProvider);
 
         _fileSystem.AddDirectory("Game/Mods/dep");
-        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", _serviceProvider);
+        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/dep"), false, "Name", _serviceProvider);
         depMod.SetStatus(DependencyResolveStatus.Resolved);
         depMod.DependencyAction(l => l.Add(new ModDependencyEntry(targetMod)));
 
@@ -173,10 +173,10 @@ public class ModDependencyResolverIntegrationTest
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
-        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
+        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/Target"), false, targetInfo, _serviceProvider);
 
         _fileSystem.AddDirectory("Game/Mods/dep");
-        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, "Name", _serviceProvider);
+        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/dep"), false, "Name", _serviceProvider);
         depMod.SetStatus(DependencyResolveStatus.Resolved);
         depMod.DependencyAction(l => l.Add(new ModDependencyEntry(targetMod)));
 
@@ -220,7 +220,7 @@ public class ModDependencyResolverIntegrationTest
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
-        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
+        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/Target"), false, targetInfo, _serviceProvider);
 
         _fileSystem.AddDirectory("Game/Mods/dep");
         IModinfo depInfo;
@@ -244,10 +244,10 @@ public class ModDependencyResolverIntegrationTest
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
-        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, _serviceProvider);
+        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/dep"), false, depInfo, _serviceProvider);
 
         _fileSystem.AddDirectory("Game/Mods/subdep");
-        var subDepMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/subdep"), false, "SubDep", _serviceProvider);
+        var subDepMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/subdep"), false, "SubDep", _serviceProvider);
 
 
         _game.AddMod(targetMod);
@@ -300,7 +300,7 @@ public class ModDependencyResolverIntegrationTest
                 }, DependencyResolveLayout.ResolveLastItem)
             };
         }
-        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
+        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/Target"), false, targetInfo, _serviceProvider);
         targetMod.SetLayout(DependencyResolveLayout.ResolveLastItem);
 
         _fileSystem.AddDirectory("Game/Mods/dep");
@@ -325,13 +325,13 @@ public class ModDependencyResolverIntegrationTest
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
-        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, _serviceProvider);
+        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/dep"), false, depInfo, _serviceProvider);
 
         _fileSystem.AddDirectory("Game/Mods/dep2");
-        var dep2Mod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep2"), false, "Dep2", _serviceProvider);
+        var dep2Mod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/dep2"), false, "Dep2", _serviceProvider);
 
         _fileSystem.AddDirectory("Game/Mods/subdep");
-        var subDepMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/subdep"), false, "SubDep", _serviceProvider);
+        var subDepMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/subdep"), false, "SubDep", _serviceProvider);
 
 
         _game.AddMod(targetMod);
@@ -383,7 +383,7 @@ public class ModDependencyResolverIntegrationTest
                 }, DependencyResolveLayout.FullResolved)
             };
         }
-        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/Target"), false, targetInfo, _serviceProvider);
+        var targetMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/Target"), false, targetInfo, _serviceProvider);
         targetMod.SetLayout(DependencyResolveLayout.FullResolved);
 
         _fileSystem.AddDirectory("Game/Mods/dep");
@@ -408,13 +408,13 @@ public class ModDependencyResolverIntegrationTest
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
-        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep"), false, depInfo, _serviceProvider);
+        var depMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/dep"), false, depInfo, _serviceProvider);
 
         _fileSystem.AddDirectory("Game/Mods/dep2");
-        var dep2Mod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/dep2"), false, "Dep2", _serviceProvider);
+        var dep2Mod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/dep2"), false, "Dep2", _serviceProvider);
 
         _fileSystem.AddDirectory("Game/Mods/subdep");
-        var subDepMod = new TestMod(_game, _fileSystem.DirectoryInfo.FromDirectoryName("Game/Mods/subdep"), false, "SubDep", _serviceProvider);
+        var subDepMod = new TestMod(_game, _fileSystem.DirectoryInfo.New("Game/Mods/subdep"), false, "SubDep", _serviceProvider);
 
 
         _game.AddMod(targetMod);
@@ -444,7 +444,7 @@ public class ModDependencyResolverIntegrationTest
     {
         fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
         var game = new PetroglyphStarWarsGame(new GameIdentity(GameType.Foc, GamePlatform.Disk),
-            fileSystem.DirectoryInfo.FromDirectoryName("Game"), "Foc", sp);
+            fileSystem.DirectoryInfo.New("Game"), "Foc", sp);
         return game;
     }
 
