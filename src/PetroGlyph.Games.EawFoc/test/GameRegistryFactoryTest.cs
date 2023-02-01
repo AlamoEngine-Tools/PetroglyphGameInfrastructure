@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AnakinRaW.CommonUtilities.Registry;
+using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Games.Registry;
-using Sklavenwalker.CommonUtilities.Registry;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test;

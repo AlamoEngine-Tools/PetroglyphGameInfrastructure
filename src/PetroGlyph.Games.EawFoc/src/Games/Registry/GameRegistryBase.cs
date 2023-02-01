@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
+using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using Sklavenwalker.CommonUtilities.Registry;
 using Validation;
 #if NET
 using System.Diagnostics.CodeAnalysis;
@@ -92,9 +92,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
                 ThrowIfDisposed();
                 if (!_registryKey!.GetValueOrDefault(ExePathProperty, VersionKey, out string? value, null))
                     return null;
-                if (string.IsNullOrEmpty(value))
-                    return null;
-                return _fileSystem.FileInfo.FromFileName(value);
+                return string.IsNullOrEmpty(value) ? null : _fileSystem.FileInfo.New(value!);
             }
         }
 
@@ -118,9 +116,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
                 ThrowIfDisposed();
                 if (!_registryKey!.GetValueOrDefault(InstallPathProperty, VersionKey, out string? value, null))
                     return null;
-                if (string.IsNullOrEmpty(value))
-                    return null;
-                return _fileSystem.DirectoryInfo.FromDirectoryName(value);
+                return string.IsNullOrEmpty(value) ? null : _fileSystem.DirectoryInfo.New(value!);
             }
         }
 
@@ -134,7 +130,7 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
                     return null;
                 if (string.IsNullOrEmpty(value))
                     return null;
-                return _fileSystem.FileInfo.FromFileName(value);
+                return _fileSystem.FileInfo.New(value!);
             }
         }
 

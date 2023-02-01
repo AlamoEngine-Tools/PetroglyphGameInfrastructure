@@ -27,7 +27,7 @@ public sealed class DirectoryModNameResolver : ModNameResolverBase
         if (modReference is IPhysicalMod mod)
             return BeautifyDirectoryName(mod.Directory.Name);
         var fs = ServiceProvider.GetService<IFileSystem>() ?? new FileSystem();
-        var directoryName = fs.DirectoryInfo.FromDirectoryName(modReference.Identifier).Name;
+        var directoryName = fs.DirectoryInfo.New(modReference.Identifier).Name;
         var beautifiedName = BeautifyDirectoryName(directoryName);
         return string.IsNullOrWhiteSpace(beautifiedName) ? directoryName : beautifiedName;
     }

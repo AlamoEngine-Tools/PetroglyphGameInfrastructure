@@ -335,7 +335,7 @@ public class ModDependencyTraverserIntegrationTest
 
     private static IGame SetupGame(IMockFileDataAccessor fileSystem, IServiceProvider sp)
     {
-        fileSystem.AddFile("Game/swfoc.exe", MockFileData.NullObject);
+        fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
         var game = new PetroglyphStarWarsGame(new GameIdentity(GameType.Foc, GamePlatform.Disk),
             fileSystem.DirectoryInfo.FromDirectoryName("Game"), "Foc", sp);
         return game;

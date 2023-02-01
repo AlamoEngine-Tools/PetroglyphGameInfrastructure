@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using EawModinfo.Model;
 using EawModinfo.Spec;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;

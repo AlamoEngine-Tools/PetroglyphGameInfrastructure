@@ -9,8 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
+using Semver.Ranges;
 using Xunit;
-using Range = SemanticVersioning.Range;
 
 namespace PetroGlyph.Games.EawFoc.Test.ModServices;
 
@@ -60,7 +60,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>()
                 {
-                    new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x"))
+                    new ModReference("/Game/Mods/dep", ModType.Default, SemVersionRange.Parse("1.*"))
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
@@ -70,7 +70,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>()
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
+                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, SemVersionRange.Parse("1.*"))
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
@@ -92,7 +92,7 @@ public class ModDependencyResolverIntegrationTest
 
         Assert.Single(targetMod.Dependencies);
         Assert.Equal(depMod, targetMod.Dependencies.First().Mod);
-        Assert.Equal(Range.Parse("1.x"), targetMod.Dependencies.First().VersionRange);
+        Assert.Equal(SemVersionRange.Parse("1.*"), targetMod.Dependencies.First().VersionRange);
         Assert.Equal(DependencyResolveStatus.Resolved, targetMod.DependencyResolveStatus);
         Assert.Equal(DependencyResolveLayout.ResolveRecursive, targetMod.DependencyResolveLayout);
 
@@ -111,7 +111,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x"))
+                    new ModReference("/Game/Mods/dep", ModType.Default, SemVersionRange.Parse("1.*"))
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
@@ -121,7 +121,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
+                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, SemVersionRange.Parse("1.*"))
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
@@ -159,7 +159,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x"))
+                    new ModReference("/Game/Mods/dep", ModType.Default, SemVersionRange.Parse("1.*"))
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
@@ -169,7 +169,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
+                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, SemVersionRange.Parse("1.*"))
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
@@ -206,7 +206,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x"))
+                    new ModReference("/Game/Mods/dep", ModType.Default, SemVersionRange.Parse("1.*"))
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
@@ -216,7 +216,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x"))
+                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, SemVersionRange.Parse("1.*"))
                 }, DependencyResolveLayout.ResolveRecursive)
             };
         }
@@ -262,7 +262,7 @@ public class ModDependencyResolverIntegrationTest
 
         Assert.Single(targetMod.Dependencies);
         Assert.Equal(depMod, targetMod.Dependencies.First().Mod);
-        Assert.Equal(Range.Parse("1.x"), targetMod.Dependencies.First().VersionRange);
+        Assert.Equal(SemVersionRange.Parse("1.*"), targetMod.Dependencies.First().VersionRange);
         Assert.Equal(DependencyResolveStatus.Resolved, targetMod.DependencyResolveStatus);
         Assert.Equal(DependencyResolveLayout.ResolveRecursive, targetMod.DependencyResolveLayout);
 
@@ -284,7 +284,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x")),
+                    new ModReference("/Game/Mods/dep", ModType.Default, SemVersionRange.Parse("1.*")),
                     new ModReference("/Game/Mods/dep2", ModType.Default)
                 }, DependencyResolveLayout.ResolveLastItem)
             };
@@ -295,7 +295,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x")),
+                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, SemVersionRange.Parse("1.*")),
                     new ModReference("C:\\Game\\Mods\\dep2", ModType.Default)
                 }, DependencyResolveLayout.ResolveLastItem)
             };
@@ -347,7 +347,7 @@ public class ModDependencyResolverIntegrationTest
 
         Assert.Equal(2, targetMod.Dependencies.Count);
         Assert.Equal(depMod, targetMod.Dependencies.First().Mod);
-        Assert.Equal(Range.Parse("1.x"), targetMod.Dependencies.First().VersionRange);
+        Assert.Equal(SemVersionRange.Parse("1.*"), targetMod.Dependencies.First().VersionRange);
         Assert.Equal(DependencyResolveStatus.Resolved, targetMod.DependencyResolveStatus);
         Assert.Equal(DependencyResolveLayout.ResolveLastItem, targetMod.DependencyResolveLayout);
 
@@ -367,7 +367,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("/Game/Mods/dep", ModType.Default, Range.Parse("1.x")),
+                    new ModReference("/Game/Mods/dep", ModType.Default, SemVersionRange.Parse("1.*")),
                     new ModReference("/Game/Mods/dep2", ModType.Default)
                 }, DependencyResolveLayout.FullResolved)
             };
@@ -378,7 +378,7 @@ public class ModDependencyResolverIntegrationTest
             {
                 Dependencies = new DependencyList(new List<IModReference>
                 {
-                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, Range.Parse("1.x")),
+                    new ModReference("C:\\Game\\Mods\\dep", ModType.Default, SemVersionRange.Parse("1.*")),
                     new ModReference("C:\\Game\\Mods\\dep2", ModType.Default)
                 }, DependencyResolveLayout.FullResolved)
             };
@@ -430,7 +430,7 @@ public class ModDependencyResolverIntegrationTest
 
         Assert.Equal(2, targetMod.Dependencies.Count);
         Assert.Equal(depMod, targetMod.Dependencies.First().Mod);
-        Assert.Equal(Range.Parse("1.x"), targetMod.Dependencies.First().VersionRange);
+        Assert.Equal(SemVersionRange.Parse("1.*"), targetMod.Dependencies.First().VersionRange);
         Assert.Equal(DependencyResolveStatus.Resolved, targetMod.DependencyResolveStatus);
         Assert.Equal(DependencyResolveLayout.FullResolved, targetMod.DependencyResolveLayout);
 
@@ -442,7 +442,7 @@ public class ModDependencyResolverIntegrationTest
 
     private static IGame SetupGame(IMockFileDataAccessor fileSystem, IServiceProvider sp)
     {
-        fileSystem.AddFile("Game/swfoc.exe", MockFileData.NullObject);
+        fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
         var game = new PetroglyphStarWarsGame(new GameIdentity(GameType.Foc, GamePlatform.Disk),
             fileSystem.DirectoryInfo.FromDirectoryName("Game"), "Foc", sp);
         return game;

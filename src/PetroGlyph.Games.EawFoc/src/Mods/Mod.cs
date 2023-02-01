@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO.Abstractions;
+using AnakinRaW.CommonUtilities.FileSystem;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Detection;
 using PetroGlyph.Games.EawFoc.Services.FileService;
-using Sklavenwalker.CommonUtilities.FileSystem;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Mods;

@@ -1,8 +1,8 @@
 ﻿using System;
 using Moq;
 using PetroGlyph.Games.EawFoc.Mods;
+using Semver.Ranges;
 using Xunit;
-using Range = SemanticVersioning.Range;
 
 namespace PetroGlyph.Games.EawFoc.Test;
 
@@ -28,7 +28,7 @@ public class ModDependencyEntryTest
 
         var modC = new Mock<IMod>();
         modC.Setup(m => m.Equals(It.IsAny<IMod>())).Returns(true);
-        var entryC = new ModDependencyEntry(modA.Object, Range.Parse("1.x"));
+        var entryC = new ModDependencyEntry(modA.Object, SemVersionRange.Parse("1.*"));
 
         Assert.Equal(entryA, entryA);
         Assert.NotEqual(entryA, entryB);

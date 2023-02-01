@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
 using System.Linq;
+using AnakinRaW.CommonUtilities.FileSystem;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
@@ -59,7 +60,7 @@ public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
     private static IDirectoryInfo ResolveNormalMod(IModReference mod, IGame game)
     {
         var fs = game.Directory.FileSystem;
-        var pathUtilities = new Sklavenwalker.CommonUtilities.FileSystem.PathHelperService(fs);
+        var pathUtilities = new PathHelperService(fs);
         var modIdentifier = mod.Identifier;
 
         if (!pathUtilities.IsAbsolute(game.Directory.FullName))
@@ -73,10 +74,10 @@ public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
         // because may have custom features to still support these mods. 
 
         if (pathUtilities.IsAbsolute(modIdentifier))
-            return fs.DirectoryInfo.FromDirectoryName(modIdentifier);
+            return fs.DirectoryInfo.New(modIdentifier);
 
         var modLocationPath = fs.Path.Combine(game.Directory.FullName, modIdentifier);
-        var modLocation = fs.DirectoryInfo.FromDirectoryName(modLocationPath);
+        var modLocation = fs.DirectoryInfo.New(modLocationPath);
         if (modLocation is null || !modLocation.Exists)
             throw new ModNotFoundException(mod, game);
         return modLocation;

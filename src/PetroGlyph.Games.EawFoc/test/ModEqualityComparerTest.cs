@@ -3,7 +3,8 @@ using EawModinfo.Spec;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
-using SemanticVersioning;
+using Semver;
+using Semver.Ranges;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test;
@@ -93,7 +94,7 @@ public class ModEqualityComparerTest
         modidA.Setup(i => i.Name).Returns("N");
         modidB.Setup(i => i.Name).Returns("N");
         Assert.True(comparer.Equals(modidA.Object, modidB.Object));
-        modidB.Setup(i => i.Version).Returns(new Version(1, 0, 0));
+        modidB.Setup(i => i.Version).Returns(new SemVersion(1, 0, 0));
         Assert.False(comparer.Equals(modidA.Object, modidB.Object));
     }
 }

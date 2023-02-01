@@ -59,8 +59,8 @@ public class FileBasedLanguageFinderTest
     public void TestFindText_EnglishGerman()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("Game/Text/MasterTextFile_English.dat", MockFileData.NullObject);
-        fs.AddFile("Game/Text/MASTERTEXTFILE_GERMAN.DAT", MockFileData.NullObject);
+        fs.AddFile("Game/Text/MasterTextFile_English.dat", new MockFileData(string.Empty));
+        fs.AddFile("Game/Text/MASTERTEXTFILE_GERMAN.DAT", new MockFileData(string.Empty));
 
         var fileService = new Mock<IPhysicalFileService>();
         fileService.Setup(s => s.DataFiles("MasterTextFile_*.dat", "Text", false, false))
@@ -88,9 +88,9 @@ public class FileBasedLanguageFinderTest
     public void TestFindSFX_EnglishGerman()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("Game/Audio/SFX/sfx2d_english.meg", MockFileData.NullObject);
-        fs.AddFile("Game/Audio/SFX/SFX2D_GERMAN.MEG", MockFileData.NullObject);
-        fs.AddFile("Game/Audio/SFX/sfx2d_non_localized.meg", MockFileData.NullObject);
+        fs.AddFile("Game/Audio/SFX/sfx2d_english.meg", new MockFileData(string.Empty));
+        fs.AddFile("Game/Audio/SFX/SFX2D_GERMAN.MEG", new MockFileData(string.Empty));
+        fs.AddFile("Game/Audio/SFX/sfx2d_non_localized.meg", new MockFileData(string.Empty));
 
         var fileService = new Mock<IPhysicalFileService>();
         fileService.Setup(s => s.DataFiles("sfx2d_*.meg", "Audio/SFX", false, false))
@@ -120,9 +120,9 @@ public class FileBasedLanguageFinderTest
     public void TestFindSpeechMeg_EnglishGerman()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("Game/EnglishSpeech.meg", MockFileData.NullObject);
-        fs.AddFile("Game/GERMANSPEECH.MEG", MockFileData.NullObject);
-        fs.AddFile("Game/SomeSpeech.meg", MockFileData.NullObject);
+        fs.AddFile("Game/EnglishSpeech.meg", new MockFileData(string.Empty));
+        fs.AddFile("Game/GERMANSPEECH.MEG", new MockFileData(string.Empty));
+        fs.AddFile("Game/SomeSpeech.meg", new MockFileData(string.Empty));
 
         var fileService = new Mock<IPhysicalFileService>();
         fileService.Setup(s => s.DataFiles("*speech.meg", null, false, false))

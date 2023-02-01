@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO.Abstractions;
+using AnakinRaW.CommonUtilities.FileSystem;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
-using Sklavenwalker.CommonUtilities.FileSystem;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Steam;
@@ -41,7 +41,7 @@ public class SteamGameHelpers : ISteamGameHelpers
 
         var fs = game.Directory.FileSystem;
         var workshopDirPath = fs.Path.Combine(commonParent.FullName, "workshop/content/32470");
-        return fs.DirectoryInfo.FromDirectoryName(workshopDirPath);
+        return fs.DirectoryInfo.New(workshopDirPath);
     }
 
     /// <inheritdoc/>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using AnakinRaW.CommonUtilities.FileSystem;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Mods;
@@ -11,7 +12,6 @@ using PetroGlyph.Games.EawFoc.Services.Detection;
 using PetroGlyph.Games.EawFoc.Services.FileService;
 using PetroGlyph.Games.EawFoc.Services.Icon;
 using PetroGlyph.Games.EawFoc.Services.Language;
-using Sklavenwalker.CommonUtilities.FileSystem;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Games;
@@ -70,7 +70,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
             {
                 var fs = Directory.FileSystem;
                 var modsPath = fs.Path.Combine(Directory.FullName, "Mods");
-                _modLocation = fs.DirectoryInfo.FromDirectoryName(modsPath);
+                _modLocation = fs.DirectoryInfo.New(modsPath);
             }
             return _modLocation;
         }
