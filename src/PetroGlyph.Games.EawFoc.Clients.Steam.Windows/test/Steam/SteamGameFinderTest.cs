@@ -37,8 +37,8 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
             var lib1 = new Mock<ISteamLibrary>();
             var lib2 = new Mock<ISteamLibrary>();
 
-            var manifestLoc = _fileSystem.FileInfo.FromFileName("Lib2\\manifest.txt");
-            var gameLoc = _fileSystem.DirectoryInfo.FromDirectoryName("Lib2\\Game123");
+            var manifestLoc = _fileSystem.FileInfo.New("Lib2\\manifest.txt");
+            var gameLoc = _fileSystem.DirectoryInfo.New("Lib2\\Game123");
             var game = new SteamAppManifest(lib2.Object, manifestLoc, 123, "Game", gameLoc, SteamAppState.StateFullyInstalled,
                 new HashSet<uint>());
 

@@ -54,13 +54,13 @@ internal class SteamLibraryFinder : ISteamLibraryFinder
         if (steamInstallLocation is null)
             throw new SteamException("Unable to find an installation of Steam.");
 
-        var libraryLocationsFile = _fileSystem.FileInfo.FromFileName(
+        var libraryLocationsFile = _fileSystem.FileInfo.New(
             _fileSystem.Path.Combine(steamInstallLocation.FullName, "steamapps/libraryfolders.vdf"));
 
         if (libraryLocationsFile.Exists)
             return libraryLocationsFile;
 
-        libraryLocationsFile = _fileSystem.FileInfo.FromFileName(
+        libraryLocationsFile = _fileSystem.FileInfo.New(
             _fileSystem.Path.Combine(steamInstallLocation.FullName, "config/libraryfolders.vdf"));
 
         return libraryLocationsFile.Exists ? libraryLocationsFile : null;
