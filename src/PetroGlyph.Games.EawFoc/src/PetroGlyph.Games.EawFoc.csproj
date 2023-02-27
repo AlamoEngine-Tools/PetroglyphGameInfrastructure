@@ -22,7 +22,7 @@
 		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="4.0.1" />
 		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="4.0.1" />
 		<PackageReference Include="eaw.modinfo" Version="4.0.12-beta" />
-		<PackageReference Include="semver" Version="2.3.0-beta.0" />
+		<PackageReference Include="semver" Version="2.3.0" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
