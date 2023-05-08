@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<Description>Core implementation for the Petroglyph Game infrastructire, providing classes and services to detect and initialize PG Star Wars games (EaW, FoC) and their mods.</Description>
@@ -28,7 +28,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
 		<PackageReference Include="QuikGraph" Version="2.5.0" PrivateAssets="compile" />
-		<PackageReference Include="System.IO.Abstractions" Version="19.1.14" />
+		<PackageReference Include="System.IO.Abstractions" Version="19.2.22" />
 		<PackageReference Include="Validation" Version="2.5.51" PrivateAssets="compile"/>
 	</ItemGroup>
 
