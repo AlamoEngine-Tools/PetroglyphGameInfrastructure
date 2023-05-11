@@ -4,7 +4,6 @@ using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using Semver;
-using Semver.Ranges;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test;

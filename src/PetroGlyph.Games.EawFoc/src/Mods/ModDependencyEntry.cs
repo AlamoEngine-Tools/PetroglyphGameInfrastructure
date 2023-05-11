@@ -1,6 +1,6 @@
 ﻿using System;
 using EawModinfo.Spec;
-using Semver.Ranges;
+using Semver;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Mods;

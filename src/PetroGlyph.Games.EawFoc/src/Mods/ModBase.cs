@@ -12,7 +12,6 @@ using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Icon;
 using PetroGlyph.Games.EawFoc.Services.Language;
 using Semver;
-using Semver.Ranges;
 using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Mods;
