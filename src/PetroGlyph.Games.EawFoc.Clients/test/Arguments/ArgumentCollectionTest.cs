@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Castle.DynamicProxy.Generators;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 using Xunit;

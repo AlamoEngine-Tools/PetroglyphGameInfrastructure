@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
-using Semver.Ranges;
+using Semver;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test.ModServices;

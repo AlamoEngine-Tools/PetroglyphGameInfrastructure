@@ -1,7 +1,7 @@
 ﻿using System;
 using Moq;
 using PetroGlyph.Games.EawFoc.Mods;
-using Semver.Ranges;
+using Semver;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test;
