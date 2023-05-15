@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<Description>Provides tools for launching Petroglyph Star Wars games on various clients, such as Steam or Disk release.</Description>
@@ -23,7 +23,7 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
 		<PackageReference Include="AnakinRaw.CommonUtilities.FileSystem" Version="4.0.1" />
-		<PackageReference Include="AnakinRaw.CommonUtilities.Registry.Windows" Version="4.0.1" />
+		<PackageReference Include="AnakinRaw.CommonUtilities.Registry.Windows" Version="8.0.1" />
 		<PackageReference Include="System.IO.Abstractions" Version="19.1.14" />
 		<PackageReference Include="Validation" Version="2.5.51" PrivateAssets="compile"/>
 		<PackageReference Include="Gameloop.Vdf" Version="0.6.2" PrivateAssets="compile"/>
