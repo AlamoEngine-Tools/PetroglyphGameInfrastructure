@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using AnakinRaW.CommonUtilities.Registry;
-using AnakinRaW.CommonUtilities.Registry.Windows;
 using Microsoft.Extensions.DependencyInjection;
 #if NET
 using System.Diagnostics.CodeAnalysis;
@@ -98,10 +97,10 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
 
         public SteamRegistry(IServiceProvider serviceProvider)
         {
-            _registryKey = new WindowsRegistry()
+            _registryKey = serviceProvider.GetRequiredService<IRegistry>()
                 .OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
                 .CreateSubKey("Software\\Valve\\Steam");
-            _fileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
+            _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         }
 
 
