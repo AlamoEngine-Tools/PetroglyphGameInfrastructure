@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// Service to resolve a mods's name

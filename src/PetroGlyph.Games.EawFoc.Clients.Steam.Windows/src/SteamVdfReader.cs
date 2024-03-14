@@ -7,7 +7,6 @@ using Gameloop.Vdf;
 using Gameloop.Vdf.JsonConverter;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
-using PetroGlyph.Games.EawFoc;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 

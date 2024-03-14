@@ -1,7 +1,7 @@
 ﻿using System;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Language;
+namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
 /// <summary>
 /// Factory service to create the correct <see cref="IModLanguageFinder"/> for a given <see cref="IMod"/>.

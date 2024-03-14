@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc;
+﻿namespace PG.StarWarsGame.Infrastructure;
 
 /// <summary>
 /// Action for <see cref="ModCollectionChangedEventArgs"/>.

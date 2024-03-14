@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 using QuikGraph;
 using QuikGraph.Algorithms;
 
-namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
+namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 internal class ModDependencyGraph : AdjacencyGraph<ModDependencyEntry, IEdge<ModDependencyEntry>>, IModDependencyGraph
 {

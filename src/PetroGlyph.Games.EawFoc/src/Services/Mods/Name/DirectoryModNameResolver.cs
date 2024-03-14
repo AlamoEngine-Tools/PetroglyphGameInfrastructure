@@ -3,9 +3,9 @@ using System.Globalization;
 using System.IO.Abstractions;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// Resolves a mod's name by it's directory name. The name will be beautified by removing separator characters like '_'.

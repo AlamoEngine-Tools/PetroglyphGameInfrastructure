@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using PetroGlyph.Games.EawFoc.Mods;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 

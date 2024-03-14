@@ -1,6 +1,4 @@
-﻿using PetroGlyph.Games.EawFoc;
-
-namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
+﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// The exception that is thrown when a <see cref="IGameArgument"/> or handling it caused an error.

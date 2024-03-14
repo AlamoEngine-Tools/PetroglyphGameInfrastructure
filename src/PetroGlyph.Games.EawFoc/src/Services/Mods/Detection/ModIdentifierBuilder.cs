@@ -6,9 +6,9 @@ using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 internal class ModIdentifierBuilder : IModIdentifierBuilder
 {

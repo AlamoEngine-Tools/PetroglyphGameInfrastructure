@@ -1,6 +1,6 @@
 ﻿using EawModinfo.Model;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Services.Language;
+using PG.StarWarsGame.Infrastructure.Services.Language;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;

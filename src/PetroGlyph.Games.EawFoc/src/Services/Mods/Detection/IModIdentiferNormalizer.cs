@@ -1,9 +1,9 @@
 ﻿using System.IO.Abstractions;
 using EawModinfo.Model;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 internal interface IModIdentifierBuilder
 {

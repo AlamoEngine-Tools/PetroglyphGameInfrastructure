@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Icon;
+namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 
 /// <summary>
 /// Instance which takes other <see cref="IGameIconFinder"/>s and returns the first found icon.

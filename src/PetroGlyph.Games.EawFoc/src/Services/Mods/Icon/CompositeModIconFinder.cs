@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Icon;
+namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 
 /// <summary>
 /// Instance which takes other <see cref="IModIconFinder"/>s and returns the first found icon.

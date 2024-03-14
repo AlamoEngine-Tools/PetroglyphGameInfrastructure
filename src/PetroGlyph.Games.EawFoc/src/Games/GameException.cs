@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PetroGlyph.Games.EawFoc.Games;
+namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
 /// <see cref="PetroglyphException"/> for anything related to an <see cref="IGame"/>

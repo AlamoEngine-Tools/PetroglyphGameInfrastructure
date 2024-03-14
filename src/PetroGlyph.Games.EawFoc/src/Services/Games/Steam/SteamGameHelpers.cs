@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 #if NETSTANDARD2_0
 using AnakinRaW.CommonUtilities.FileSystem;
 #endif
 
-namespace PetroGlyph.Games.EawFoc.Services.Steam;
+namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 
 /// <inheritdoc cref="ISteamGameHelpers"/>
 public class SteamGameHelpers : ISteamGameHelpers

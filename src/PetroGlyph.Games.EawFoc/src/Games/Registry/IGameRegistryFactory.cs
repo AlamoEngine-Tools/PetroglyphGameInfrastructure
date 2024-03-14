@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PetroGlyph.Games.EawFoc.Games.Registry;
+namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 /// <summary>
 /// Factory service to create an <see cref="IGameRegistry"/>

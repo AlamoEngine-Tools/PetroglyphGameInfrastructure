@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using EawModinfo.Spec;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Language;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Language;
 using Testably.Abstractions.Testing;
 using Xunit;
 

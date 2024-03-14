@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using PetroGlyph.Games.EawFoc;
 #if NET
 using System.Diagnostics.CodeAnalysis;
 #endif

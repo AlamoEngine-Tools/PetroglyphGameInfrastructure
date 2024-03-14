@@ -1,5 +1,4 @@
 ﻿using System;
-using PetroGlyph.Games.EawFoc;
 
 namespace PG.StarWarsGame.Infrastructure.Clients;
 

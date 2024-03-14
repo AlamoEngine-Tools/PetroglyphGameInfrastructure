@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Games;
+﻿namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
 /// The type of the game can be either "Empire at War" of "Forces of Corruption"

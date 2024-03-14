@@ -1,14 +1,16 @@
 ﻿using System;
 using System.IO.Abstractions;
 using System.Linq;
-using AnakinRaW.CommonUtilities.FileSystem;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
+#if NETSTANDARD2_0
+using AnakinRaW.CommonUtilities.FileSystem;
+#endif
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <inheritdoc cref="IModReferenceLocationResolver"/>
 public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver

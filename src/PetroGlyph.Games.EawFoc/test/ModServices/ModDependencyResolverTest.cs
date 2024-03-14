@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;

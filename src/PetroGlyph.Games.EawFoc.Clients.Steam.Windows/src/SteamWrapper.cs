@@ -9,7 +9,6 @@ using AnakinRaW.CommonUtilities.Registry.Windows;
 using Gameloop.Vdf;
 using Gameloop.Vdf.JsonConverter;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
 using PG.StarWarsGame.Infrastructure.Clients.Steam.NativeMethods;
 using PG.StarWarsGame.Infrastructure.Clients.Steam.Threading;

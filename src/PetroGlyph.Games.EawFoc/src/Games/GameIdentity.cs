@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Games;
+﻿namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
 /// Minimal information to identify and distinguish Petroglyph Star Wars games from each other.

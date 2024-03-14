@@ -1,7 +1,8 @@
 ﻿using System;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-namespace PetroGlyph.Games.EawFoc.Games.Registry;
+
+namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 /// <inheritdoc cref="IGameRegistryFactory"/>
 public class GameRegistryFactory : IGameRegistryFactory

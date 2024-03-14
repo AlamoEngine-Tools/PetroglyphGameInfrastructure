@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Icon;
+namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 
 /// <summary>
 /// Provides a fallback implementation which searches a game's icon file in its root directory.
