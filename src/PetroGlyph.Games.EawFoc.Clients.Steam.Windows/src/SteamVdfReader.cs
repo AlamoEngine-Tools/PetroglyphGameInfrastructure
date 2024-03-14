@@ -7,28 +7,30 @@ using Gameloop.Vdf;
 using Gameloop.Vdf.JsonConverter;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
 internal class SteamVdfReader : ISteamAppManifestReader, ILibraryConfigReader
 {
     private readonly IFileSystem _fileSystem;
-    private readonly IPathHelperService _pathHelper;
 
     public SteamVdfReader(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _fileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
-        _pathHelper = serviceProvider.GetService<IPathHelperService>() ?? new PathHelperService(_fileSystem);
+        if (serviceProvider == null)
+            throw new ArgumentNullException(nameof(serviceProvider));
+
+        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
     }
 
     public SteamAppManifest ReadManifest(IFileInfo manifestFile, ISteamLibrary library)
     {
-        Requires.NotNull(manifestFile, nameof(manifestFile));
-        Requires.NotNull(library, nameof(library));
+        if (manifestFile == null) 
+            throw new ArgumentNullException(nameof(manifestFile));
+        if (library == null) 
+            throw new ArgumentNullException(nameof(library));
+
         var directory = manifestFile.Directory;
-        if (directory is null || !_pathHelper.IsChildOf(library.LibraryLocation.FullName, directory.FullName))
+        if (directory is null || !_fileSystem.Path.IsChildOf(library.LibraryLocation.FullName, directory.FullName))
             throw new SteamException("The game's manifest is not part of the given library");
         var manifestData = ReadFileAsJson(manifestFile);
         if (manifestData.Name != "AppState")

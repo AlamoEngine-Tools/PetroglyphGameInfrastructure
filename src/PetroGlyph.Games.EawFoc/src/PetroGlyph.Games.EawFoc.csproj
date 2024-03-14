@@ -5,7 +5,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 	</PropertyGroup>
@@ -19,16 +19,24 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="8.0.1" />
-		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="8.0.1" />
-		<PackageReference Include="eaw.modinfo" Version="4.0.13" />
+		<PackageReference Include="AnakinRaW.CommonUtilities" Version="10.0.2" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="10.0.2" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="10.0.2" />
+		<PackageReference Include="eaw.modinfo" Version="5.0.1" />
+		<PackageReference Include="IsExternalInit" Version="1.0.3">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Nullable" Version="1.3.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="semver" Version="2.3.0" />
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.59" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
 		<PackageReference Include="QuikGraph" Version="2.5.0" PrivateAssets="compile" />
-		<PackageReference Include="System.IO.Abstractions" Version="19.2.26" />
-		<PackageReference Include="Validation" Version="2.5.51" PrivateAssets="compile" />
+		<PackageReference Include="System.IO.Abstractions" Version="20.0.28" />
 	</ItemGroup>
 
 </Project>

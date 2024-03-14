@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using AnakinRaW.CommonUtilities.FileSystem;
+using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Mods;
@@ -12,7 +12,6 @@ using PetroGlyph.Games.EawFoc.Services.Detection;
 using PetroGlyph.Games.EawFoc.Services.FileService;
 using PetroGlyph.Games.EawFoc.Services.Icon;
 using PetroGlyph.Games.EawFoc.Services.Language;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Games;
 
@@ -27,12 +26,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     private readonly string _normalizedPath;
     private IPhysicalFileService? _fileService;
     private IDirectoryInfo? _modLocation;
-
-    /// <summary>
-    /// Service for handling file system paths.
-    /// </summary>
-    protected readonly IPathHelperService PathHelperService;
-
+    
     /// <summary>
     /// Shared Service provider instance.
     /// </summary>
@@ -83,7 +77,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
         {
             if (_fileService is not null)
                 return _fileService;
-            var fs = ServiceProvider.GetService<IPhysicalFileServiceTest>() ?? (IPhysicalFileService?)new DefaultFileService(this);
+            var fs = ServiceProvider.GetService<IPhysicalFileService>();
             _fileService = fs!;
             return _fileService;
         }
@@ -95,28 +89,34 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     /// <summary>
     /// Creates a new game instance.
     /// </summary>
-    /// <param name="gameIdentity"></param>
-    /// <param name="gameDirectory"></param>
-    /// <param name="name"></param>
-    /// <param name="serviceProvider"></param>
+    /// <param name="gameIdentity">The game identity.</param>
+    /// <param name="gameDirectory">The game directory</param>
+    /// <param name="name">The name of the game.</param>
+    /// <param name="serviceProvider">The service provider.</param>
     public PetroglyphStarWarsGame(
         IGameIdentity gameIdentity,
         IDirectoryInfo gameDirectory,
         string name,
         IServiceProvider serviceProvider)
     {
-        Requires.NotNullAllowStructs(gameIdentity, nameof(gameIdentity));
-        Requires.NotNullOrEmpty(name, nameof(name));
-        Requires.NotNull(gameDirectory, nameof(gameDirectory));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (gameDirectory == null) 
+            throw new ArgumentNullException(nameof(gameDirectory));
+        if (serviceProvider == null)
+            throw new ArgumentNullException(nameof(serviceProvider));
+        if (gameIdentity is null)
+            throw new ArgumentNullException(nameof(gameIdentity));
+        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
+
         Name = name;
         Type = gameIdentity.Type;
         Platform = gameIdentity.Platform;
         Directory = gameDirectory;
         ServiceProvider = serviceProvider;
-        PathHelperService = serviceProvider.GetService<IPathHelperService>() ??
-                            new PathHelperService(gameDirectory.FileSystem);
-        _normalizedPath = PathHelperService.NormalizePath(Directory.FullName, PathNormalizeOptions.Full);
+        _normalizedPath = PathNormalizer.Normalize(FileSystem.Path.GetFullPath(Directory.FullName), new PathNormalizeOptions
+        {
+            TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim,
+            UnifyCase = UnifyCasingKind.UpperCase
+        });
     }
 
     /// <inheritdoc/>
@@ -205,8 +205,11 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
             return false;
         if (Platform != other.Platform)
             return false;
-        var normalizedDirectory =
-            PathHelperService.NormalizePath(other.Directory.FullName, PathNormalizeOptions.Full);
+        var normalizedDirectory = PathNormalizer.Normalize(FileSystem.Path.GetFullPath(other.Directory.FullName), new PathNormalizeOptions
+        {
+            TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim,
+            UnifyCase = UnifyCasingKind.UpperCase
+        });
         return _normalizedPath.Equals(normalizedDirectory, StringComparison.Ordinal);
     }
 

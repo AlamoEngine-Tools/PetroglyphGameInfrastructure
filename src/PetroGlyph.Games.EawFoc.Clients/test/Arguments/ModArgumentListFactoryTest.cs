@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO.Abstractions.TestingHelpers;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -9,6 +8,7 @@ using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Steam;
+using Testably.Abstractions.Testing;
 using Xunit;
 #if NET
 using System;
@@ -97,7 +97,7 @@ public class ModArgumentListFactoryTest
             Assert.Equal("mods/a", arg.Value);
         else
 #endif
-        Assert.Equal("mods\\a", arg.Value);
+        Assert.Equal("MODS\\A", arg.Value);
         Assert.Equal(ArgumentNameCatalog.ModPathArg, arg.Name);
     }
 
@@ -120,7 +120,7 @@ public class ModArgumentListFactoryTest
             Assert.Equal("../d:/a", arg.Value);
         else
 #endif
-        Assert.Equal("d:\\a", arg.Value);
+        Assert.Equal("D:\\A", arg.Value);
         Assert.Equal(ArgumentNameCatalog.ModPathArg, arg.Name);
     }
 

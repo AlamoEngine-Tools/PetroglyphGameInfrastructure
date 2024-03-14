@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using EawModinfo.Spec;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test.ModServices;
@@ -21,7 +21,9 @@ public class ModDependencyGraphBuilderIntegrationTest
         var sp = new Mock<IServiceProvider>();
         var game = SetupGame(fs, sp.Object);
 
-        fs.AddDirectory("Game/Mods/Target");
+        fs.Initialize()
+            .WithSubdirectory("Game/Mods/Target");
+
         var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
@@ -38,7 +40,9 @@ public class ModDependencyGraphBuilderIntegrationTest
         var sp = new Mock<IServiceProvider>();
         var game = SetupGame(fs, sp.Object);
 
-        fs.AddDirectory("Game/Mods/Target");
+        fs.Initialize()
+            .WithSubdirectory("Game/Mods/Target");
+
         var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
@@ -58,11 +62,13 @@ public class ModDependencyGraphBuilderIntegrationTest
         var sp = new Mock<IServiceProvider>();
         var game = SetupGame(fs, sp.Object);
 
-        fs.AddDirectory("Game/Mods/Target");
+        fs.Initialize()
+            .WithSubdirectory("Game/Mods/Target")
+            .WithSubdirectory("Game/Mods/dep");
+
         var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep");
         var depMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep"), false, "Name", sp.Object);
         depMod.SetStatus(DependencyResolveStatus.Resolved);
         depMod.DependencyAction(list => list.Add(new(targetMod)));
@@ -84,24 +90,25 @@ public class ModDependencyGraphBuilderIntegrationTest
         var sp = new Mock<IServiceProvider>();
         var game = SetupGame(fs, sp.Object);
 
-        fs.AddDirectory("Game/Mods/dep1");
+        fs.Initialize()
+            .WithSubdirectory("Game/Mods/Target")
+            .WithSubdirectory("Game/Mods/dep1")
+            .WithSubdirectory("Game/Mods/dep2")
+            .WithSubdirectory("Game/Mods/dep3")
+            .WithSubdirectory("Game/Mods/dep4");
+
         var dep1 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep1"), false, "Name", sp.Object);
         dep1.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep2");
         var dep2 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep2"), false, "Name", sp.Object);
         dep2.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep3");
         var dep3 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep3"), false, "Name", sp.Object);
         dep3.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep4");
         var dep4 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep4"), false, "Name", sp.Object);
         dep4.SetStatus(DependencyResolveStatus.Resolved);
 
-
-        fs.AddDirectory("Game/Mods/Target");
         var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
@@ -129,24 +136,26 @@ public class ModDependencyGraphBuilderIntegrationTest
         var sp = new Mock<IServiceProvider>();
         var game = SetupGame(fs, sp.Object);
 
-        fs.AddDirectory("Game/Mods/dep1");
+        fs.Initialize()
+            .WithSubdirectory("Game/Mods/Target")
+            .WithSubdirectory("Game/Mods/dep1")
+            .WithSubdirectory("Game/Mods/dep2")
+            .WithSubdirectory("Game/Mods/dep3")
+            .WithSubdirectory("Game/Mods/dep4");
+
         var dep1 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep1"), false, "Name", sp.Object);
         dep1.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep2");
         var dep2 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep2"), false, "Name", sp.Object);
         dep2.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep3");
         var dep3 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep3"), false, "Name", sp.Object);
         dep3.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep4");
         var dep4 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep4"), false, "Name", sp.Object);
         dep4.SetStatus(DependencyResolveStatus.Resolved);
 
 
-        fs.AddDirectory("Game/Mods/Target");
         var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
@@ -174,26 +183,29 @@ public class ModDependencyGraphBuilderIntegrationTest
         var sp = new Mock<IServiceProvider>();
         var game = SetupGame(fs, sp.Object);
 
+        fs.Initialize()
+            .WithSubdirectory("Game/Mods/Target")
+            .WithSubdirectory("Game/Mods/dep1")
+            .WithSubdirectory("Game/Mods/dep2")
+            .WithSubdirectory("Game/Mods/dep3")
+            .WithSubdirectory("Game/Mods/dep4")
+            .WithSubdirectory("Game/Mods/dep5");
+
         // Target: 1, 2
         // 2: 3, 4, 5
 
-        fs.AddDirectory("Game/Mods/dep1");
         var dep1 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep1"), false, "Name", sp.Object);
         dep1.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep2");
         var dep2 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep2"), false, "Name", sp.Object);
         dep2.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep3");
         var dep3 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep3"), false, "Name", sp.Object);
         dep3.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep4");
         var dep4 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep4"), false, "Name", sp.Object);
         dep4.SetStatus(DependencyResolveStatus.Resolved);
 
-        fs.AddDirectory("Game/Mods/dep5");
         var dep5 = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/dep5"), false, "Name", sp.Object);
         dep5.SetStatus(DependencyResolveStatus.Resolved);
 
@@ -204,8 +216,6 @@ public class ModDependencyGraphBuilderIntegrationTest
             list.Add(new(dep5));
         });
 
-
-        fs.AddDirectory("Game/Mods/Target");
         var targetMod = new TestMod(game, fs.DirectoryInfo.New("Game/Mods/Target"), false, "Name", sp.Object);
         targetMod.SetStatus(DependencyResolveStatus.Resolved);
 
@@ -225,9 +235,9 @@ public class ModDependencyGraphBuilderIntegrationTest
     }
 
 
-    private static IGame SetupGame(IMockFileDataAccessor fileSystem, IServiceProvider sp)
+    private static IGame SetupGame(MockFileSystem fileSystem, IServiceProvider sp)
     {
-        fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        fileSystem.Initialize().WithFile("Game/swfoc.exe");
         var game = new PetroglyphStarWarsGame(new GameIdentity(GameType.Foc, GamePlatform.Disk),
             fileSystem.DirectoryInfo.New("Game"), "Foc", sp);
         return game;

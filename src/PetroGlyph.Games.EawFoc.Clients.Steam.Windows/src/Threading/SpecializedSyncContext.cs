@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
 
@@ -30,7 +29,7 @@ internal readonly struct SpecializedSyncContext : IDisposable
     {
         if (!_initialized) 
             return;
-        Report.If(_checkForChangesOnRevert && SynchronizationContext.Current != _appliedContext);
+        // TODO Report.If(_checkForChangesOnRevert && SynchronizationContext.Current != _appliedContext);
         SynchronizationContext.SetSynchronizationContext(_prior);
     }
 }

@@ -3,7 +3,6 @@ using System.Globalization;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Name;
 
@@ -28,8 +27,7 @@ public abstract class ModNameResolverBase : IModNameResolver
     /// <param name="serviceProvider">The Service provider.</param>
     protected ModNameResolverBase(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        ServiceProvider = serviceProvider;
+        ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         Logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
     }
 
@@ -49,8 +47,11 @@ public abstract class ModNameResolverBase : IModNameResolver
     /// <inheritdoc/>
     public string? ResolveName(IModReference modReference, CultureInfo culture)
     {
-        Requires.NotNull(modReference, nameof(modReference));
-        Requires.NotNull(culture, nameof(culture));
+        if (modReference == null)
+            throw new ArgumentNullException(nameof(modReference));
+        if (culture == null)
+            throw new ArgumentNullException(nameof(culture));
+
         string? modName = null;
         try
         {

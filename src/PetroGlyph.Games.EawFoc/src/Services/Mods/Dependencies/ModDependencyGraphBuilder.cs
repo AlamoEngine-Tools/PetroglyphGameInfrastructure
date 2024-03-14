@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using EawModinfo.Spec;
 using PetroGlyph.Games.EawFoc.Mods;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
 
@@ -16,7 +15,8 @@ public class ModDependencyGraphBuilder : IModDependencyGraphBuilder
     /// <inheritdoc/>
     public IModDependencyGraph Build(IMod rootMod)
     {
-        Requires.NotNull(rootMod, nameof(rootMod));
+        if (rootMod == null) 
+            throw new ArgumentNullException(nameof(rootMod));
         var graph = new ModDependencyGraph();
         AddToGraph(graph, rootMod, ResolvingDependenciesFactory);
         return graph;
@@ -25,7 +25,8 @@ public class ModDependencyGraphBuilder : IModDependencyGraphBuilder
     /// <inheritdoc/>
     public IModDependencyGraph BuildResolveFree(IMod rootMod)
     {
-        Requires.NotNull(rootMod, nameof(rootMod));
+        if (rootMod == null)
+            throw new ArgumentNullException(nameof(rootMod));
         var graph = new ModDependencyGraph();
         AddToGraph(graph, rootMod, mod =>
         {
@@ -38,7 +39,8 @@ public class ModDependencyGraphBuilder : IModDependencyGraphBuilder
     /// <inheritdoc/>
     public bool TryBuild(IMod rootMod, out IModDependencyGraph? graph)
     {
-        Requires.NotNull(rootMod, nameof(rootMod));
+        if (rootMod == null) 
+            throw new ArgumentNullException(nameof(rootMod));
         graph = default;
         try
         {
@@ -54,7 +56,8 @@ public class ModDependencyGraphBuilder : IModDependencyGraphBuilder
     /// <inheritdoc/>
     public bool TryBuildResolveFree(IMod rootMod, out IModDependencyGraph? graph)
     {
-        Requires.NotNull(rootMod, nameof(rootMod));
+        if (rootMod == null)
+            throw new ArgumentNullException(nameof(rootMod));
         graph = default;
         try
         {
@@ -70,7 +73,8 @@ public class ModDependencyGraphBuilder : IModDependencyGraphBuilder
     /// <inheritdoc/>
     public IList<ModDependencyEntry> GetModDependencyListResolveFree(IMod targetMod)
     {
-        Requires.NotNull(targetMod, nameof(targetMod));
+        if (targetMod == null)
+            throw new ArgumentNullException(nameof(targetMod));
         return ResolveFreeDependenciesFactory(targetMod).Item1;
     }
 
@@ -107,14 +111,14 @@ public class ModDependencyGraphBuilder : IModDependencyGraphBuilder
         }
     }
 
-    private static (IList<IMod>, DependencyResolveLayout) ResolvingDependenciesFactory(IMod source)
+    private static (IList<IMod> dependencies, DependencyResolveLayout resolveLayout) ResolvingDependenciesFactory(IMod source)
     {
         if (source.DependencyResolveStatus != DependencyResolveStatus.Resolved)
             throw new ModException(source, $"Mod {source} is not yet resolved.");
         return (source.Dependencies.Select(d => d.Mod).ToList(), source.DependencyResolveLayout);
     }
 
-    private (IList<ModDependencyEntry>, DependencyResolveLayout) ResolveFreeDependenciesFactory(IMod source)
+    private (IList<ModDependencyEntry> dependencies, DependencyResolveLayout resolveLayout) ResolveFreeDependenciesFactory(IMod source)
     {
         var layout = source.DependencyResolveLayout;
         if (source.DependencyResolveStatus == DependencyResolveStatus.Resolved)

@@ -4,7 +4,6 @@ using System.IO.Abstractions;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using PetroGlyph.Games.EawFoc.Games;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Detection;
 
@@ -25,8 +24,7 @@ public sealed class DirectoryGameDetector : GameDetector
     /// <param name="serviceProvider">The service provider.</param>
     public DirectoryGameDetector(IDirectoryInfo directory, IServiceProvider serviceProvider) : base(serviceProvider, false)
     {
-        Requires.NotNull(directory, nameof(directory));
-        _directory = directory;
+        _directory = directory ?? throw new ArgumentNullException(nameof(directory));
     }
 
     /// <summary>

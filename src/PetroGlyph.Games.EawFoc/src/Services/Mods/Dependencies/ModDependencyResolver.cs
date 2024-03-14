@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Mods;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
 
@@ -22,19 +21,20 @@ public class ModDependencyResolver : IDependencyResolver
     /// <param name="serviceProvider">The service provider.</param>
     public ModDependencyResolver(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _serviceProvider = serviceProvider;
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     /// <inheritdoc/>
     public IList<ModDependencyEntry> Resolve(IMod mod, DependencyResolverOptions options)
     {
-        Requires.NotNull(mod, nameof(mod));
-        Requires.NotNull(options, nameof(options));
+        if (mod == null) 
+            throw new ArgumentNullException(nameof(mod));
+        if (options == null) 
+            throw new ArgumentNullException(nameof(options));
 
         //_visitedMods.Add(mod);
 
-        var graphBuilder = _serviceProvider.GetService<IModDependencyGraphBuilder>() ?? new ModDependencyGraphBuilder();
+        var graphBuilder = _serviceProvider.GetRequiredService<IModDependencyGraphBuilder>();
         var dependencyGraph = graphBuilder.BuildResolveFree(mod);
 
         if (options.ResolveCompleteChain)

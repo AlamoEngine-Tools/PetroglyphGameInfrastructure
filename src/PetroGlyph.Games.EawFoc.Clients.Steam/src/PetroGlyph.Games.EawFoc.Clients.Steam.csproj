@@ -23,10 +23,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Validation" Version="2.5.51" PrivateAssets="compile" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
 		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
 	</ItemGroup>

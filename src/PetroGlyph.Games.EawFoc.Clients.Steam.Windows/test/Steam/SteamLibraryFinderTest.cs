@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
@@ -14,7 +14,6 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         private readonly Mock<ILibraryConfigReader> _reader;
         private readonly Mock<ISteamRegistry> _registry;
         private readonly MockFileSystem _fileSystem;
-
 
         public SteamLibraryFinderTest()
         {
@@ -38,7 +37,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestNoLibrariesFound()
         {
-            _fileSystem.AddDirectory("Steam");
+            _fileSystem.Initialize().WithSubdirectory("Steam");
             _registry.Setup(r => r.InstallationDirectory)
                 .Returns(_fileSystem.DirectoryInfo.New("Steam"));
 
@@ -50,8 +49,8 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestNoLibrary_MissingSteamDll()
         {
+            _fileSystem.Initialize().WithFile("Steam/steamapps/libraryfolders.vdf");
             var libraryLocation = _fileSystem.DirectoryInfo.New("Steam");
-            _fileSystem.AddFile("Steam/steamapps/libraryfolders.vdf", new MockFileData(string.Empty));
             _registry.Setup(r => r.InstallationDirectory)
                 .Returns(_fileSystem.DirectoryInfo.New("Steam"));
             _reader.Setup(r => r.ReadLibraryLocationsFromConfig(It.IsAny<IFileInfo>()))
@@ -65,9 +64,11 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestNoLibrary_NoConfigFile()
         {
+            _fileSystem.Initialize()
+                .WithFile("Steam/noValidConfigPath/libraryfolders.vdf")
+                .WithFile("Steam/steam.dll");
+
             var libraryLocation = _fileSystem.DirectoryInfo.New("Steam");
-            _fileSystem.AddFile("Steam/noValidConfigPath/libraryfolders.vdf", new MockFileData(string.Empty));
-            _fileSystem.AddFile("Steam/steam.dll", new MockFileData(string.Empty));
             _registry.Setup(r => r.InstallationDirectory)
                 .Returns(_fileSystem.DirectoryInfo.New("Steam"));
             _reader.Setup(r => r.ReadLibraryLocationsFromConfig(It.IsAny<IFileInfo>()))
@@ -81,9 +82,11 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestSingleLibrary()
         {
+            _fileSystem.Initialize()
+                .WithFile("Steam/steamapps/libraryfolders.vdf")
+                .WithFile("Steam/steam.dll");
+
             var libraryLocation = _fileSystem.DirectoryInfo.New("Steam");
-            _fileSystem.AddFile("Steam/steamapps/libraryfolders.vdf", new MockFileData(string.Empty));
-            _fileSystem.AddFile("Steam/steam.dll", new MockFileData(string.Empty));
             _registry.Setup(r => r.InstallationDirectory)
                 .Returns(_fileSystem.DirectoryInfo.New("Steam"));
             _reader.Setup(r => r.ReadLibraryLocationsFromConfig(It.IsAny<IFileInfo>()))
@@ -98,9 +101,11 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestSingleAlternateConfig()
         {
+            _fileSystem.Initialize()
+                .WithFile("Steam/config/libraryfolders.vdf")
+                .WithFile("Steam/steam.dll");
+
             var libraryLocation = _fileSystem.DirectoryInfo.New("Steam");
-            _fileSystem.AddFile("Steam/config/libraryfolders.vdf", new MockFileData(string.Empty));
-            _fileSystem.AddFile("Steam/steam.dll", new MockFileData(string.Empty));
             _registry.Setup(r => r.InstallationDirectory)
                 .Returns(_fileSystem.DirectoryInfo.New("Steam"));
             _reader.Setup(r => r.ReadLibraryLocationsFromConfig(It.IsAny<IFileInfo>()))
@@ -115,9 +120,11 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestUniqueResult()
         {
+            _fileSystem.Initialize()
+                .WithFile("Steam/config/libraryfolders.vdf")
+                .WithFile("Steam/steam.dll");
+
             var libraryLocation = _fileSystem.DirectoryInfo.New("Steam");
-            _fileSystem.AddFile("Steam/config/libraryfolders.vdf", new MockFileData(string.Empty));
-            _fileSystem.AddFile("Steam/steam.dll", new MockFileData(string.Empty));
             _registry.Setup(r => r.InstallationDirectory)
                 .Returns(_fileSystem.DirectoryInfo.New("Steam"));
             _reader.Setup(r => r.ReadLibraryLocationsFromConfig(It.IsAny<IFileInfo>()))

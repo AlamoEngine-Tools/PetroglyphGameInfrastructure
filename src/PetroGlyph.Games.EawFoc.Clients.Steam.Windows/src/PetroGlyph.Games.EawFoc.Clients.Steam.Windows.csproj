@@ -5,7 +5,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0-windows;net48</TargetFrameworks>
+		<TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
 		<RootNamespace>PetroGlyph.Games.EawFoc.Clients.Steam</RootNamespace>
 		<Nullable>enable</Nullable>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -20,11 +20,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AnakinRaW.CommonUtilities.Registry.Windows" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-		<PackageReference Include="AnakinRaw.CommonUtilities.FileSystem" Version="8.0.1" />
-		<PackageReference Include="System.IO.Abstractions" Version="19.2.26" />
-		<PackageReference Include="Validation" Version="2.5.51" PrivateAssets="compile" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.Registry.Windows" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+		<PackageReference Include="AnakinRaw.CommonUtilities.FileSystem" Version="10.0.2" />
+		<PackageReference Include="System.IO.Abstractions" Version="20.0.28" />
 		<PackageReference Include="Gameloop.Vdf" Version="0.6.2" PrivateAssets="compile" />
 		<PackageReference Include="Gameloop.Vdf.JsonConverter " Version="0.2.1" PrivateAssets="compile" />
 	</ItemGroup>

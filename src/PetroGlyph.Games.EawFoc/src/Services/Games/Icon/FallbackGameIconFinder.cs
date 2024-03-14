@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using PetroGlyph.Games.EawFoc.Games;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Icon;
 
@@ -20,7 +19,8 @@ public class FallbackGameIconFinder : IGameIconFinder
     /// </summary>
     public string? FindIcon(IGame game)
     {
-        Requires.NotNull(game, nameof(game));
+        if (game == null) 
+            throw new ArgumentNullException(nameof(game));
         var expectedFileName = game.Type switch
         {
             GameType.EaW => EawIconName,

@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Threading;
 using PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
 
@@ -19,7 +18,8 @@ internal class NoMessagePumpSyncContext : SynchronizationContext
 
     public override int Wait(IntPtr[] waitHandles, bool waitAll, int millisecondsTimeout)
     {
-        Requires.NotNull(waitHandles, nameof(waitHandles));
+        if (waitHandles == null)
+            throw new ArgumentNullException(nameof(waitHandles));
 
         // On .NET Framework we must take special care to NOT end up in a call to CoWait (which lets in RPC calls).
         // Off Windows, we can't p/invoke to kernel32, but it appears that .NET Core never calls CoWait, so we can rely on default behavior.

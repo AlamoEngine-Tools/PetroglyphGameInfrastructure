@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Globalization;
+using System.IO.Abstractions;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
 using PetroGlyph.Games.EawFoc.Services.Name;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test.ModServices;
@@ -14,6 +16,7 @@ public class DirectoryModNameResolverTest
     public void TestWithModsPath()
     {
         var sp = new Mock<IServiceProvider>();
+        sp.Setup(s => s.GetService(typeof(IFileSystem))).Returns(new MockFileSystem());
         var resolver = new DirectoryModNameResolver(sp.Object);
 
         var modRef = new ModReference("Mods/Name", ModType.Default);
@@ -28,6 +31,7 @@ public class DirectoryModNameResolverTest
     public void TestWithoutPath()
     {
         var sp = new Mock<IServiceProvider>();
+        sp.Setup(s => s.GetService(typeof(IFileSystem))).Returns(new MockFileSystem());
         var resolver = new DirectoryModNameResolver(sp.Object);
 
         var modRef = new ModReference("Name", ModType.Default);
@@ -42,6 +46,7 @@ public class DirectoryModNameResolverTest
     public void TestBeautify()
     {
         var sp = new Mock<IServiceProvider>();
+        sp.Setup(s => s.GetService(typeof(IFileSystem))).Returns(new MockFileSystem());
         var resolver = new DirectoryModNameResolver(sp.Object);
 
         var modRef = new ModReference("Name_Name", ModType.Default);
@@ -56,6 +61,7 @@ public class DirectoryModNameResolverTest
     public void TestBeautify_EdgeCase()
     {
         var sp = new Mock<IServiceProvider>();
+        sp.Setup(s => s.GetService(typeof(IFileSystem))).Returns(new MockFileSystem());
         var resolver = new DirectoryModNameResolver(sp.Object);
 
         var modRef = new ModReference("___", ModType.Default);

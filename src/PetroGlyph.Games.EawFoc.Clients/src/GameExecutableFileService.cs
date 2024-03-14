@@ -7,18 +7,11 @@ using PetroGlyph.Games.EawFoc.Games;
 
 namespace PetroGlyph.Games.EawFoc.Clients;
 
-internal class GameExecutableFileService : IGameExecutableFileService
+internal class GameExecutableFileService(IServiceProvider serviceProvider) : IGameExecutableFileService
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public GameExecutableFileService(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
     public IFileInfo? GetExecutableForGame(IGame game, GameBuildType buildType)
     {
-        var nameBuilder = _serviceProvider.GetRequiredService<IGameExecutableNameBuilder>();
+        var nameBuilder = serviceProvider.GetRequiredService<IGameExecutableNameBuilder>();
         var exeFileName = nameBuilder.GetExecutableFileName(game, buildType);
         if (string.IsNullOrEmpty(exeFileName))
             return null;

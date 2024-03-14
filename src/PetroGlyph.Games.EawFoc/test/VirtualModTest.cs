@@ -7,6 +7,7 @@ using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
+using PetroGlyph.Games.EawFoc.Services.Detection;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test;
@@ -40,6 +41,7 @@ public class VirtualModTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Equals(It.IsAny<IGame>())).Returns(true);
         var sp = new Mock<IServiceProvider>();
+        sp.Setup(s => s.GetService(typeof(IModIdentifierBuilder))).Returns(new Mock<IModIdentifierBuilder>().Object);
         var dep = new Mock<IMod>();
         dep.Setup(d => d.Game).Returns(game.Object);
         var mod = new VirtualMod("Name", game.Object, new List<ModDependencyEntry> { new(dep.Object) }, DependencyResolveLayout.ResolveLastItem, sp.Object);
@@ -56,6 +58,7 @@ public class VirtualModTest
         var game = new Mock<IGame>();
         game.Setup(g => g.Equals(It.IsAny<IGame>())).Returns(true);
         var sp = new Mock<IServiceProvider>();
+        sp.Setup(s => s.GetService(typeof(IModIdentifierBuilder))).Returns(new Mock<IModIdentifierBuilder>().Object);
         var dep = new Mock<IMod>();
         dep.Setup(d => d.Game).Returns(game.Object);
         var mod = new VirtualMod("Name", game.Object, new List<ModDependencyEntry> { new(dep.Object) }, DependencyResolveLayout.ResolveLastItem, sp.Object);

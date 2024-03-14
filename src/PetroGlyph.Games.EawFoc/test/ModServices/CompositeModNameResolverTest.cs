@@ -15,7 +15,7 @@ public class CompositeModNameResolverTest
     public void NullArgTest_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(null, null));
-        Assert.Throws<ArgumentException>(() => new CompositeModNameResolver(new List<IModNameResolver>(), null));
+        Assert.Throws<ArgumentException>(() => new CompositeModNameResolver(new List<IModNameResolver>(), new Mock<IServiceProvider>().Object));
         Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(new List<IModNameResolver> { null }, null));
         Assert.Throws<ArgumentNullException>(() => CompositeModNameResolver.CreateDefaultModNameResolver(null));
         var sp = new Mock<IServiceProvider>();

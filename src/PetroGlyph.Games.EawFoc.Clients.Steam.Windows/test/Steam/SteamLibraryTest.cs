@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
-using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using PG.TestingUtilities;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
@@ -71,7 +71,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestNoApps2()
         {
-            _fileSystem.AddDirectory("Library/steamapps");
+            _fileSystem.Initialize().WithSubdirectory("Library/steamapps");
             var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
 
             var app = new SteamAppManifest(lib, _fileSystem.FileInfo.New("file"), 123, "name",
@@ -89,7 +89,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestApps()
         {
-            _fileSystem.AddFile("Library/steamapps/test.acf", new MockFileData(string.Empty));
+            _fileSystem.Initialize().WithFile("Library/steamapps/test.acf");
             var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
 
             var app = new SteamAppManifest(lib, _fileSystem.FileInfo.New("file"), 123, "name",
@@ -107,8 +107,10 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestNoDuplicatesApps()
         {
-            _fileSystem.AddFile("Library/steamapps/test1.acf", new MockFileData(string.Empty));
-            _fileSystem.AddFile("Library/steamapps/test2.acf", new MockFileData(string.Empty));
+            _fileSystem.Initialize()
+                .WithFile("Library/steamapps/test1.acf")
+                .WithFile("Library/steamapps/test2.acf");
+
             var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
 
             var app = new SteamAppManifest(lib, _fileSystem.FileInfo.New("file"), 123, "name",
@@ -123,15 +125,18 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
             Assert.Same(app, result);
         }
 
-        [Fact]
-        public void TestLocations()
+        [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
+        public void TestLocations_Windows()
         {
             var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
+            Assert.Equal("C:\\Library\\steamapps\\common", lib.CommonLocation.FullName);
+        }
 
-            Assert.Equal(
-                RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                    ? "/Library/steamapps/common"
-                    : "C:\\Library\\steamapps\\common", lib.CommonLocation.FullName);
+        [PlatformSpecificFact(TestPlatformIdentifier.Linux)]
+        public void TestLocations_Linux()
+        {
+            var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
+            Assert.Equal("/Library/steamapps/common", lib.CommonLocation.FullName);
         }
     }
 }

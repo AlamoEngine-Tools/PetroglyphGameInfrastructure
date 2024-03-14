@@ -2,7 +2,6 @@
 using System.Linq;
 using EawModinfo.Spec;
 using PetroGlyph.Games.EawFoc.Mods;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Icon;
 
@@ -19,7 +18,9 @@ public class SimpleModIconFinder : IModIconFinder
     /// </summary>
     public string? FindIcon(IMod mod)
     {
-        Requires.NotNull(mod, nameof(mod));
+        if (mod == null) 
+            throw new ArgumentNullException(nameof(mod));
+
         if (mod is IPhysicalMod physicalMod)
             return physicalMod.FileService.DataFiles("*.ico", "..", false, false).FirstOrDefault()?.FullName;
         if (mod.Type == ModType.Virtual)

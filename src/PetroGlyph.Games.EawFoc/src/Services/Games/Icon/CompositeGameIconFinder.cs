@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using PetroGlyph.Games.EawFoc.Games;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Icon;
 
@@ -17,7 +17,7 @@ public class CompositeGameIconFinder : IGameIconFinder
     /// <param name="orderedFinders">Ordered list of <see cref="IGameIconFinder"/>s.</param>
     public CompositeGameIconFinder(IList<IGameIconFinder> orderedFinders)
     {
-        Requires.NotNullOrEmpty(orderedFinders, nameof(orderedFinders));
+        ThrowHelper.ThrowIfCollectionNullOrEmpty(orderedFinders);
         _orderedFinders = orderedFinders;
     }
 
@@ -28,7 +28,8 @@ public class CompositeGameIconFinder : IGameIconFinder
     /// <returns>The first found icon path or <see langword="null"/></returns>
     public string? FindIcon(IGame game)
     {
-        Requires.NotNull(game, nameof(game));
+        if (game == null) 
+            throw new ArgumentNullException(nameof(game));
         foreach (var finder in _orderedFinders)
         {
             var iconFile = finder.FindIcon(game);

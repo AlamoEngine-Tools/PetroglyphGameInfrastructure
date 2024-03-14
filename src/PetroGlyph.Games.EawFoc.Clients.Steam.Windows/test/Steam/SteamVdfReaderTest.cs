@@ -1,14 +1,9 @@
 ﻿using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
-using System.Runtime.InteropServices;
-using AnakinRaW.CommonUtilities.FileSystem;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Testably.Abstractions.Testing;
 using Xunit;
-#if NET
-using System;
-#endif
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam;
 
@@ -16,14 +11,11 @@ public class SteamVdfReaderTest
 {
     private readonly SteamVdfReader _service;
     private readonly MockFileSystem _fileSystem;
-    private readonly Mock<IPathHelperService> _pathHelper;
 
     public SteamVdfReaderTest()
     {
         var sc = new ServiceCollection();
         _fileSystem = new MockFileSystem();
-        _pathHelper = new Mock<IPathHelperService>();
-        sc.AddTransient(_ => _pathHelper.Object);
         sc.AddTransient<IFileSystem>(_ => _fileSystem);
         _service = new SteamVdfReader(sc.BuildServiceProvider());
     }
@@ -31,7 +23,7 @@ public class SteamVdfReaderTest
     [Fact]
     public void TestInvalidData_Throws()
     {
-        _fileSystem.AddFile("input.vdf", new MockFileData(string.Empty));
+        _fileSystem.Initialize().WithFile("input.vdf");
         var input = _fileSystem.FileInfo.New("input.vdf");
         Assert.Throws<SteamException>(() => _service.ReadLibraryLocationsFromConfig(input));
     }
@@ -59,7 +51,9 @@ public class SteamVdfReaderTest
         var expected1 = _fileSystem.DirectoryInfo.New("C:\\Lib1").FullName;
         var expected2 = _fileSystem.DirectoryInfo.New("C:\\Lib2").FullName;
         var expected3 = _fileSystem.DirectoryInfo.New("C:\\Lib3").FullName;
-        _fileSystem.AddFile("input.vdf", new MockFileData(data));
+
+        _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
+
         var input = _fileSystem.FileInfo.New("input.vdf");
         var locations = _service.ReadLibraryLocationsFromConfig(input).Select(l => l.FullName).ToList();
 
@@ -77,7 +71,8 @@ public class SteamVdfReaderTest
 	""contentstatsid""		""-6588270118365286089""
 }
 ";
-        _fileSystem.AddFile("input.vdf", new MockFileData(data));
+        _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
+
         var input = _fileSystem.FileInfo.New("input.vdf");
         Assert.Throws<SteamException>(() => _service.ReadLibraryLocationsFromConfig(input));
 
@@ -91,7 +86,8 @@ public class SteamVdfReaderTest
 	""contentstatsid""		""-6588270118365286089""
 }
 ";
-        _fileSystem.AddFile("input.vdf", new MockFileData(data));
+        _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
+
         var input = _fileSystem.FileInfo.New("input.vdf");
         var libs = _service.ReadLibraryLocationsFromConfig(input);
         Assert.Empty(libs);
@@ -100,8 +96,6 @@ public class SteamVdfReaderTest
     [Fact]
     public void TestReadAppManifest()
     {
-
-
         var data = @"""AppState""
 {
 	""appid""		""1230""
@@ -117,12 +111,11 @@ public class SteamVdfReaderTest
 }
 ";
         var lib = new Mock<ISteamLibrary>();
-        lib.Setup(l => l.LibraryLocation).Returns(_fileSystem.DirectoryInfo.New("./"));
-        lib.Setup(l => l.CommonLocation).Returns(_fileSystem.DirectoryInfo.New("./steamapps/common"));
+        lib.Setup(l => l.LibraryLocation).Returns(_fileSystem.DirectoryInfo.New("."));
+        lib.Setup(l => l.CommonLocation).Returns(_fileSystem.DirectoryInfo.New("steamapps/common"));
 
-        _pathHelper.Setup(h => h.IsChildOf(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        _fileSystem.Initialize().WithFile("steamapps/input.vdf").Which(d => d.HasStringContent(data));
 
-        _fileSystem.AddFile("steamapps/input.vdf", new MockFileData(data));
         var input = _fileSystem.FileInfo.New("steamapps/input.vdf");
         var app = _service.ReadManifest(input, lib.Object);
 
@@ -130,10 +123,9 @@ public class SteamVdfReaderTest
         Assert.Equal("GameName", app.Name);
         Assert.Equal(SteamAppState.StateFullyInstalled | SteamAppState.StateUpdatePaused, app.State);
 
-        Assert.Equal(
-            RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                ? "/steamapps/common/GamePath"
-                : "C:\\steamapps\\common\\GamePath", app.InstallDir.FullName);
+        var expectedGameFullPath = _fileSystem.Path.GetFullPath("steamapps/common/GamePath");
+
+        Assert.Equal(expectedGameFullPath, app.InstallDir.FullName);
 
         Assert.Contains(1231u, app.Depots);
         Assert.Contains(1232u, app.Depots);
@@ -160,9 +152,8 @@ public class SteamVdfReaderTest
         lib.Setup(l => l.LibraryLocation).Returns(_fileSystem.DirectoryInfo.New("./"));
         lib.Setup(l => l.CommonLocation).Returns(_fileSystem.DirectoryInfo.New("./steamapps/common"));
 
-        _pathHelper.Setup(h => h.IsChildOf(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        _fileSystem.Initialize().WithFile("steamapps/input.vdf").Which(d => d.HasStringContent(data));
 
-        _fileSystem.AddFile("steamapps/input.vdf", new MockFileData(data));
         var input = _fileSystem.FileInfo.New("steamapps/input.vdf");
         Assert.Throws<SteamException>(() => _service.ReadManifest(input, lib.Object));
     }

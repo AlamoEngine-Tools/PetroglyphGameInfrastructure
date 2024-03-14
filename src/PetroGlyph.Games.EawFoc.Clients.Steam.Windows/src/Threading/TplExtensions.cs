@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
 
@@ -15,7 +14,8 @@ internal static class TplExtensions
     internal static Task<bool> ToTask(this WaitHandle handle, int timeout = Timeout.Infinite,
         CancellationToken cancellationToken = default)
     {
-        Requires.NotNull(handle, nameof(handle));
+        if (handle == null) 
+            throw new ArgumentNullException(nameof(handle));
 
         // Check whether the handle is already signaled as an optimization.
         // But even for WaitOne(0) the CLR can pump messages if called on the UI thread, which the caller may not

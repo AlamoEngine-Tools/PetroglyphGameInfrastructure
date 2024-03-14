@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Detection;
 
@@ -33,8 +32,9 @@ public sealed class CompositeGameDetector : IGameDetector
     /// Default is <see langword="false"/></param>
     public CompositeGameDetector(IList<IGameDetector> sortedDetectors, IServiceProvider serviceProvider, bool disposeDetectors = false)
     {
-        Requires.NotNullOrEmpty(sortedDetectors, nameof(sortedDetectors));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
+        ThrowHelper.ThrowIfCollectionNullOrEmpty(sortedDetectors);
         SortedDetectors = sortedDetectors;
         _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
         _disposeDetectors = disposeDetectors;

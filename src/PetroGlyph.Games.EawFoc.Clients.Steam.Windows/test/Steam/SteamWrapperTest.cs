@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
@@ -67,7 +67,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
             Assert.False(_service.Installed);
             Assert.False(_service.Installed);
 
-            _fileSystem.AddFile("steam.exe", new MockFileData(string.Empty));
+            _fileSystem.Initialize().WithFile("steam.exe");
 
             Assert.True(_service.Installed);
         }
@@ -88,6 +88,8 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         [Fact]
         public void TestGameInstalled()
         {
+            _fileSystem.Initialize();
+
             SetupInstalledRegistry();
             var mFile = _fileSystem.FileInfo.New("manifest.acf");
 
@@ -110,24 +112,24 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
         public void TestWantsOffline()
         {
             SetupInstalledRegistry();
-           
+
             _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
 
             Assert.Null(_service.WantOfflineMode);
 
-            _fileSystem.AddFile("config/loginusers.vdf", new MockFileData(string.Empty));
+            _fileSystem.Initialize().WithFile("config/loginusers.vdf");
             Assert.Null(_service.WantOfflineMode);
 
-            _fileSystem.AddFile("config/loginusers.vdf", WantsNotOffline());
+            _fileSystem.File.WriteAllText("config/loginusers.vdf", WantsNotOffline());
             Assert.False(_service.WantOfflineMode);
 
-            _fileSystem.AddFile("config/loginusers.vdf", WantsOffline());
+            _fileSystem.File.WriteAllText("config/loginusers.vdf", WantsOffline());
             Assert.True(_service.WantOfflineMode);
         }
-        
+
         private void SetupInstalledRegistry()
         {
-            _fileSystem.AddFile("steam.exe", new MockFileData(string.Empty));
+            _fileSystem.Initialize().WithFile("steam.exe");
             _steamRegistry.Setup(r => r.ExeFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
         }
 

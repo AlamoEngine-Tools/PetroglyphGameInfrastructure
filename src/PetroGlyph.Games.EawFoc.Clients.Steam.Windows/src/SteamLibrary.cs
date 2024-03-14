@@ -3,9 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
-using AnakinRaW.CommonUtilities.FileSystem;
+using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using Microsoft.Extensions.DependencyInjection;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
@@ -21,8 +20,8 @@ internal class SteamLibrary : ISteamLibrary
         { KnownLibraryLocations.Workshops, new[] { "steamapps", "workshop" } }
     };
 
-    private readonly IPathHelperService _pathHelper;
     private readonly string _normalizedLocation;
+    private readonly IFileSystem _fileSystem;
 
     public IDirectoryInfo LibraryLocation { get; }
 
@@ -34,12 +33,15 @@ internal class SteamLibrary : ISteamLibrary
     
     public SteamLibrary(IDirectoryInfo libraryLocation, IServiceProvider serviceProvider)
     {
-        Requires.NotNull(libraryLocation, nameof(libraryLocation));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _serviceProvider = serviceProvider;
-        _pathHelper = serviceProvider.GetService<IPathHelperService>() ??
-                      new PathHelperService(libraryLocation.FileSystem);
-        _normalizedLocation = _pathHelper.NormalizePath(libraryLocation.FullName, PathNormalizeOptions.Full);
+        if (libraryLocation == null) 
+            throw new ArgumentNullException(nameof(libraryLocation));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+        _normalizedLocation = PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(libraryLocation.FullName), new PathNormalizeOptions
+        {
+            UnifyCase = UnifyCasingKind.UpperCase,
+            TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
+        });
         LibraryLocation = libraryLocation;
     }
 
@@ -72,8 +74,15 @@ internal class SteamLibrary : ISteamLibrary
             return false;
         if (ReferenceEquals(this, other))
             return true;
-        return _normalizedLocation.Equals(_pathHelper.NormalizePath(other.LibraryLocation.FullName,
-            PathNormalizeOptions.Full));
+
+        var normalizedOtherPath = PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(other.LibraryLocation.FullName),
+            new PathNormalizeOptions
+            {
+                UnifyCase = UnifyCasingKind.UpperCase,
+                TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
+            });
+
+        return _normalizedLocation.Equals(normalizedOtherPath);
     }
 
     public override string ToString()

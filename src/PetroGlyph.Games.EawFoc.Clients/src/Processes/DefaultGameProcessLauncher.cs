@@ -3,19 +3,12 @@ using System.Diagnostics;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Processes;
 
-internal class DefaultGameProcessLauncher : IGameProcessLauncher
+internal class DefaultGameProcessLauncher(IServiceProvider serviceProvider) : IGameProcessLauncher
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public DefaultGameProcessLauncher(IServiceProvider serviceProvider)
-    {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _serviceProvider = serviceProvider;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
     public IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo)
     {

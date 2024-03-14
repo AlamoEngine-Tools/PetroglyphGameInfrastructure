@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Language;
 
@@ -20,7 +19,8 @@ public class GameLanguageFinder : IGameLanguageFinder
     /// <param name="serviceProvider">The service provider.</param>
     public GameLanguageFinder(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
         _helper = serviceProvider.GetService<ILanguageFinder>() ?? new FileBasedLanguageFinder();
     }
 

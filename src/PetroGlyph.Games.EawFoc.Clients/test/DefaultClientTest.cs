@@ -1,9 +1,9 @@
 ﻿using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Games;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Test;
@@ -18,7 +18,7 @@ public class DefaultClientTest
     public DefaultClientTest()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("test.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("test.exe");
         var sc = new ServiceCollection();
         var fileService = new Mock<IGameExecutableFileService>();
         fileService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))

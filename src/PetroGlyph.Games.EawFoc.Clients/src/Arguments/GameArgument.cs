@@ -1,5 +1,4 @@
 ﻿using System;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
@@ -30,7 +29,8 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
     /// <param name="isDebug">Indicates whether this instance if for debug mode only.</param>
     protected GameArgument(T value, bool isDebug = false)
     {
-        Requires.NotNullAllowStructs(value, nameof(value));
+        if (value is null)
+            throw new ArgumentNullException(nameof(value));
         Value = value;
         DebugArgument = isDebug;
     }
@@ -43,7 +43,7 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
     /// <para>If this method returns <see langword="false"/>, <see cref="IsValid(out ArgumentValidityStatus)"/>
     /// with return <see langword="false"/> with reason <see cref="ArgumentValidityStatus.InvalidData"/>.</para>
     /// <para>
-    /// This methods gets called in the sequence of <see cref="IGameArgument.IsValid"/>. Returns <see langword="true"/> by default.
+    /// This method gets called in the sequence of <see cref="IGameArgument.IsValid"/>. Returns <see langword="true"/> by default.
     /// </para>
     /// </summary>
     /// <returns><see langword="true"/> if the data is valid; <see langword="false"/> otherwise.</returns>

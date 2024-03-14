@@ -1,11 +1,11 @@
 ﻿using System;
-using System.IO.Abstractions.TestingHelpers;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Detection;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test;
@@ -23,7 +23,7 @@ public class GameTest
         Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGame(id, loc, null!, null!));
         var nameEmpty = string.Empty;
         var name = "Name";
-        Assert.Throws<ArgumentException>(() => new PetroglyphStarWarsGame(id, loc, nameEmpty, null!));
+        Assert.Throws<ArgumentException>(() => new PetroglyphStarWarsGame(id, loc, nameEmpty, new Mock<IServiceProvider>().Object));
         Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGame(id, loc, name, null!));
     }
 
@@ -205,13 +205,13 @@ public class GameTest
     public void GetModDirTest()
     {
         var fs = new MockFileSystem();
+        fs.Initialize().WithSubdirectory("Game");
         var sp = new Mock<IServiceProvider>();
         var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
         var loc = fs.DirectoryInfo.New("Game");
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
-        fs.AddDirectory("Game");
         var dataLocation = game.ModsLocation;
-        Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/Mods" : "C:\\Game\\Mods", dataLocation.FullName);
+        Assert.Equal(fs.Path.GetFullPath("Game/Mods"), dataLocation.FullName);
     }
 }
