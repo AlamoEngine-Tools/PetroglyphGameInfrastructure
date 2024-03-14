@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetroGlyph.Games.EawFoc.Cli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApplication", "sample\SampleApplication\SampleApplication.csproj", "{8F295344-3D7B-4983-88FD-D0E5C692CBAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PG.TestingUtilities", "src\Testing\PG.TestingUtilities\PG.TestingUtilities.csproj", "{C8F51821-F25D-4C4E-8050-5C559ADD39DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PG.TestingUtilities", "src\Testing\PG.TestingUtilities\PG.TestingUtilities.csproj", "{C8F51821-F25D-4C4E-8050-5C559ADD39DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
