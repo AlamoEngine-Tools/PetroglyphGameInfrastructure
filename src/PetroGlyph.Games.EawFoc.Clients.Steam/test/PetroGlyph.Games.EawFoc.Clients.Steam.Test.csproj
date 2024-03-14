@@ -3,7 +3,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0</TargetFrameworks>
 		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net48</TargetFrameworks>
-		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
 		<IsTestable>true</IsTestable>
 	</PropertyGroup>
