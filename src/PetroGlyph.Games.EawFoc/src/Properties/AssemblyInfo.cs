@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("PetroGlyph.Games.EawFoc.Test")]
+[assembly: InternalsVisibleTo("PG.StarWarsGame.Infrastructure.Test")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

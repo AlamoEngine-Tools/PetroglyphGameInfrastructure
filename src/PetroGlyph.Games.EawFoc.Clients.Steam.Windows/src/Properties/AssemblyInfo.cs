@@ -1,4 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test")]
+[assembly: InternalsVisibleTo("PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.Test")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

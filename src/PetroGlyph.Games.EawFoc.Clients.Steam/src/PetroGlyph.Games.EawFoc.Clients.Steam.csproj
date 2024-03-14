@@ -1,13 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	
-	<PropertyGroup>
-		<Description>Steam abstraction layer for Petroglyph Star Wars games.</Description>
-	</PropertyGroup>
-
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<RootNamespace>PG.StarWarsGame.Infrastructure.Clients.Steam</RootNamespace>
+		<AssemblyName>PG.StarWarsGame.Infrastructure.Clients.Steam</AssemblyName>
+	</PropertyGroup>	
+	<PropertyGroup>
+		<Title>PG.StarWarsGame.Infrastructure.Clients.Steam</Title>
+		<Description>Steam abstraction layer for Petroglyph Star Wars games.</Description>
+		<PackageId>AlamoEngineTools.PG.StarWarsGame.Infrastructure.Clients.Steam</PackageId>
+		<PackageTags>alamo,petroglyph,glyphx</PackageTags>
+		<NeutralLanguage>en</NeutralLanguage>
 	</PropertyGroup>
-
 	<PropertyGroup>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -15,14 +18,11 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<InheritDocEnabled>true</InheritDocEnabled>
 	</PropertyGroup>
-
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1"/>
 	</ItemGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
 		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
 	</ItemGroup>
-
 </Project>

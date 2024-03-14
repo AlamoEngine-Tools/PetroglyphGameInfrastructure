@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<AssemblyName>PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.Test</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup>
 		<TargetFrameworks>net8.0-windows</TargetFrameworks>
 		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net48</TargetFrameworks>
 		<IsPackable>false</IsPackable>
