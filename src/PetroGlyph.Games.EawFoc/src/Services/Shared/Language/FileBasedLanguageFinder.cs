@@ -13,7 +13,6 @@ namespace PetroGlyph.Games.EawFoc.Services.Language;
 /// </summary>
 public sealed class FileBasedLanguageFinder : ILanguageFinder
 {
-    
     /// <inheritdoc/>
     public ISet<ILanguageInfo> GetTextLocalizations(IPhysicalPlayableObject playableObject)
     {

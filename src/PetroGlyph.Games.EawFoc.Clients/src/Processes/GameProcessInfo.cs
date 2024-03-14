@@ -1,5 +1,5 @@
-﻿using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using Validation;
+﻿using System;
+using PetroGlyph.Games.EawFoc.Clients.Arguments;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Processes;
 
@@ -32,10 +32,8 @@ public class GameProcessInfo
     /// <param name="arguments">The arguments of the game process.</param>
     public GameProcessInfo(IPlayableObject playedInstance, GameBuildType buildType, IArgumentCollection arguments)
     {
-        Requires.NotNull(playedInstance, nameof(playedInstance));
-        Requires.NotNull(arguments, nameof(arguments));
-        PlayedInstance = playedInstance;
+        PlayedInstance = playedInstance ?? throw new ArgumentNullException(nameof(playedInstance));
         BuildType = buildType;
-        Arguments = arguments;
+        Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
     }
 }

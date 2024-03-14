@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
@@ -11,7 +10,9 @@ internal class SteamGameFinder : ISteamGameFinder
 
     public SteamGameFinder(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
+
         _libraryFinder = serviceProvider.GetRequiredService<ISteamLibraryFinder>();
     }
 

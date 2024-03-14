@@ -22,32 +22,17 @@ public sealed class WindowedArgument : FlagArgument
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class SafeMode : FlagArgument
-{
-    public SafeMode() : base(ArgumentNameCatalog.SafeModeArg, true)
-    {
-    }
-}
+internal sealed class SafeMode() : FlagArgument(ArgumentNameCatalog.SafeModeArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class LowRamArgument : FlagArgument
-{
-    public LowRamArgument() : base(ArgumentNameCatalog.LowRamArg, true)
-    {
-    }
-}
+internal sealed class LowRamArgument() : FlagArgument(ArgumentNameCatalog.LowRamArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class MCEArgument : FlagArgument
-{
-    public MCEArgument() : base(ArgumentNameCatalog.LowRamArg, true, true)
-    {
-    }
-}
+internal sealed class MCEArgument() : FlagArgument(ArgumentNameCatalog.LowRamArg, true, true);
 
 #endregion
 
@@ -82,12 +67,7 @@ public sealed class NoArtProcessArgument : FlagArgument
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class RecordingArgument : FlagArgument
-{
-    public RecordingArgument() : base(ArgumentNameCatalog.RecordingArg, true)
-    {
-    }
-}
+internal sealed class RecordingArgument() : FlagArgument(ArgumentNameCatalog.RecordingArg, true);
 
 /// <summary>
 /// Indicates the game runs in multiple instances.
@@ -118,12 +98,7 @@ public sealed class PersistAssertsArgument : FlagArgument
 /// <summary>
 /// UNKNOWN BEHAVIOR! No Timeout when waiting for synchronization?!
 /// </summary>
-internal sealed class NoTimeoutArgument : FlagArgument
-{
-    public NoTimeoutArgument() : base(ArgumentNameCatalog.NoTimeoutArg, true)
-    {
-    }
-}
+internal sealed class NoTimeoutArgument() : FlagArgument(ArgumentNameCatalog.NoTimeoutArg, true);
 
 /// <summary>
 /// Skips logging to files.
@@ -141,22 +116,13 @@ public sealed class SuppressLogArgument : FlagArgument
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class PreValidateAudioMessagesArgument : FlagArgument
-{
-    public PreValidateAudioMessagesArgument() : base(ArgumentNameCatalog.PreValidateAudioMessagesArg, true)
-    {
-    }
-}
+internal sealed class PreValidateAudioMessagesArgument()
+    : FlagArgument(ArgumentNameCatalog.PreValidateAudioMessagesArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class LeftLeftArgument : FlagArgument
-{
-    public LeftLeftArgument() : base(ArgumentNameCatalog.LeftLeftArg, true)
-    {
-    }
-}
+internal sealed class LeftLeftArgument() : FlagArgument(ArgumentNameCatalog.LeftLeftArg, true);
 
 /// <summary>
 /// Game uses deep synchronization.
@@ -200,22 +166,12 @@ public sealed class NoIntroArgument : FlagArgument
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class SaveLoadDebugArgument : FlagArgument
-{
-    public SaveLoadDebugArgument() : base(ArgumentNameCatalog.SaveLoadDebugArg, true)
-    {
-    }
-}
+internal sealed class SaveLoadDebugArgument() : FlagArgument(ArgumentNameCatalog.SaveLoadDebugArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class RefCountTrackingArgument : FlagArgument
-{
-    public RefCountTrackingArgument() : base(ArgumentNameCatalog.RefCountTrackingArg, true)
-    {
-    }
-}
+internal sealed class RefCountTrackingArgument() : FlagArgument(ArgumentNameCatalog.RefCountTrackingArg, true);
 
 /// <summary>
 /// Indicates that no physical mouse device is used.
@@ -233,42 +189,23 @@ public sealed class NoHardwareMouseArgument : FlagArgument
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class ProcessEnglishAssetsAndExitArgument : FlagArgument
-{
-    public ProcessEnglishAssetsAndExitArgument() : base(ArgumentNameCatalog.ProcessEnglishAssetsAndExitArg, true)
-    {
-    }
-}
+internal sealed class ProcessEnglishAssetsAndExitArgument()
+    : FlagArgument(ArgumentNameCatalog.ProcessEnglishAssetsAndExitArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class ProcessAssetsAndExitArgument : FlagArgument
-{
-    public ProcessAssetsAndExitArgument() : base(ArgumentNameCatalog.ProcessAssetsAndExitArg, true)
-    {
-    }
-}
+internal sealed class ProcessAssetsAndExitArgument() : FlagArgument(ArgumentNameCatalog.ProcessAssetsAndExitArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class AttractArgument : FlagArgument
-{
-    public AttractArgument() : base(ArgumentNameCatalog.AttractArg, true)
-    {
-    }
-}
+internal sealed class AttractArgument() : FlagArgument(ArgumentNameCatalog.AttractArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class DebugUnitsArgument : FlagArgument
-{
-    public DebugUnitsArgument() : base(ArgumentNameCatalog.DebugUnitsArg, true)
-    {
-    }
-}
+internal sealed class DebugUnitsArgument() : FlagArgument(ArgumentNameCatalog.DebugUnitsArg, true);
 
 /// <summary>
 /// Completely disables the user interface from the game.
@@ -286,12 +223,7 @@ public sealed class NoMenuArgument : FlagArgument
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class FullScreenArgument : FlagArgument
-{
-    public FullScreenArgument() : base(ArgumentNameCatalog.FullScreenArg, true)
-    {
-    }
-}
+internal sealed class FullScreenArgument() : FlagArgument(ArgumentNameCatalog.FullScreenArg, true);
 
 #endregion
 
@@ -430,19 +362,12 @@ public sealed class FPSCapArgument : NamedArgument<uint>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class OriginalAssetPathArgument : NamedArgument<IDirectoryInfo>
+internal sealed class OriginalAssetPathArgument(IDirectoryInfo value, IDirectoryInfo gameDirectory)
+    : NamedArgument<IDirectoryInfo>(ArgumentNameCatalog.OriginalAssetPathArg, value, true)
 {
-    private readonly IDirectoryInfo _gameDirectory;
-
-    public OriginalAssetPathArgument(IDirectoryInfo value, IDirectoryInfo gameDirectory) :
-        base(ArgumentNameCatalog.OriginalAssetPathArg, value, true)
-    {
-        _gameDirectory = gameDirectory;
-    }
-
     public override string ValueToCommandLine()
     {
-        return new ArgumentValueSerializer().ShortenPath(Value, _gameDirectory);
+        return new ArgumentValueSerializer().ShortenPath(Value, gameDirectory);
     }
 }
     
@@ -469,12 +394,9 @@ public sealed class RandomSeedArgument : NamedArgument<uint>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class ExpCDKeyArgument : NamedArgument<string>
+internal sealed class ExpCDKeyArgument(string value)
+    : NamedArgument<string>(ArgumentNameCatalog.ExpCDKeyArg, value, true)
 {
-    public ExpCDKeyArgument(string value) : base(ArgumentNameCatalog.ExpCDKeyArg, value, true)
-    {
-    }
-
     public override string ValueToCommandLine()
     {
         return Value;
@@ -484,12 +406,8 @@ internal sealed class ExpCDKeyArgument : NamedArgument<string>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class CDKeyArgument : NamedArgument<string>
+internal sealed class CDKeyArgument(string value) : NamedArgument<string>(ArgumentNameCatalog.CDKeyArg, value, true)
 {
-    public CDKeyArgument(string value) : base(ArgumentNameCatalog.CDKeyArg, value, true)
-    {
-    }
-
     public override string ValueToCommandLine()
     {
         return Value;
@@ -499,19 +417,12 @@ internal sealed class CDKeyArgument : NamedArgument<string>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class MpPlaybackFileArgument : NamedArgument<IFileInfo>
+internal sealed class MpPlaybackFileArgument(IFileInfo value, IDirectoryInfo gameDir)
+    : NamedArgument<IFileInfo>(ArgumentNameCatalog.MPPlaybackFileArg, value, true)
 {
-    private readonly IDirectoryInfo _gameDir;
-
-    public MpPlaybackFileArgument(IFileInfo value, IDirectoryInfo gameDir) :
-        base(ArgumentNameCatalog.MPPlaybackFileArg, value, true)
-    {
-        _gameDir = gameDir;
-    }
-
     public override string ValueToCommandLine()
     {
-        return new ArgumentValueSerializer().ShortenPath(Value, _gameDir);
+        return new ArgumentValueSerializer().ShortenPath(Value, gameDir);
     }
 }
 
@@ -568,12 +479,9 @@ public sealed class SaveFolderArgument : NamedArgument<IDirectoryInfo>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class QuickLoadRecordingArgument : NamedArgument<string>
+internal sealed class QuickLoadRecordingArgument(string value)
+    : NamedArgument<string>(ArgumentNameCatalog.QuickLoadRecordingArg, value, true)
 {
-    public QuickLoadRecordingArgument(string value) : base(ArgumentNameCatalog.QuickLoadRecordingArg, value, true)
-    {
-    }
-
     public override string ValueToCommandLine()
     {
         return Value;
@@ -583,12 +491,9 @@ internal sealed class QuickLoadRecordingArgument : NamedArgument<string>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class QuickLoadArgument : NamedArgument<string>
+internal sealed class QuickLoadArgument(string value)
+    : NamedArgument<string>(ArgumentNameCatalog.QuickLoadArg, value, true)
 {
-    public QuickLoadArgument(string value) : base(ArgumentNameCatalog.QuickLoadArg, value, true)
-    {
-    }
-
     public override string ValueToCommandLine()
     {
         return Value;
@@ -598,12 +503,8 @@ internal sealed class QuickLoadArgument : NamedArgument<string>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class ConfigArgument : NamedArgument<string>
+internal sealed class ConfigArgument(string value) : NamedArgument<string>(ArgumentNameCatalog.ConfigArg, value, true)
 {
-    public ConfigArgument(string value) : base(ArgumentNameCatalog.ConfigArg, value, true)
-    {
-    }
-
     public override string ValueToCommandLine()
     {
         return Value;
@@ -659,12 +560,8 @@ public sealed class BCast2Argument : NamedArgument<uint>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class BCast3Argument : NamedArgument<uint>
+internal sealed class BCast3Argument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.BCast3Arg, value, true)
 {
-    public BCast3Argument(uint value) : base(ArgumentNameCatalog.BCast3Arg, value, true)
-    {
-    }
-
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -674,12 +571,8 @@ internal sealed class BCast3Argument : NamedArgument<uint>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class BCast4Argument : NamedArgument<uint>
+internal sealed class BCast4Argument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.BCast4Arg, value, true)
 {
-    public BCast4Argument(uint value) : base(ArgumentNameCatalog.BCast4Arg, value, true)
-    {
-    }
-
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -810,19 +703,12 @@ public sealed class LogFileArgument : NamedArgument<IFileInfo>
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class ConsoleCommandFileArgument : NamedArgument<IFileInfo>
+internal sealed class ConsoleCommandFileArgument(IFileInfo value, IDirectoryInfo gameDir)
+    : NamedArgument<IFileInfo>(ArgumentNameCatalog.ConsoleCommandFileArg, value, true)
 {
-    private readonly IDirectoryInfo _gameDir;
-
-    public ConsoleCommandFileArgument(IFileInfo value, IDirectoryInfo gameDir) : 
-        base(ArgumentNameCatalog.ConsoleCommandFileArg, value, true)
-    {
-        _gameDir = gameDir;
-    }
-
     public override string ValueToCommandLine()
     {
-        return new ArgumentValueSerializer().ShortenPath(Value, _gameDir);
+        return new ArgumentValueSerializer().ShortenPath(Value, gameDir);
     }
 }
 
@@ -850,12 +736,9 @@ public sealed class SyncLogFilterArgument : NamedArgument<ushort>
 /// <summary>
 /// UNKNOWN BEHAVIOR! Not sure it 'connects' to.
 /// </summary>
-internal sealed class ConnectPortArgument : NamedArgument<uint>
+internal sealed class ConnectPortArgument(uint value)
+    : NamedArgument<uint>(ArgumentNameCatalog.ConnectPortArg, value, true)
 {
-    public ConnectPortArgument(uint value) : base(ArgumentNameCatalog.ConnectPortArg, value, true)
-    {
-    }
-
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);
@@ -865,12 +748,9 @@ internal sealed class ConnectPortArgument : NamedArgument<uint>
 /// <summary>
 /// UNKNOWN BEHAVIOR! Not sure it 'connects' to.
 /// </summary>
-internal sealed class ConnectIPArgument : NamedArgument<string>
+internal sealed class ConnectIPArgument(string value)
+    : NamedArgument<string>(ArgumentNameCatalog.ConnectIPArg, value, true)
 {
-    public ConnectIPArgument(string value) : base(ArgumentNameCatalog.ConnectIPArg, value, true)
-    {
-    }
-
     public override string ValueToCommandLine()
     {
         return new ArgumentValueSerializer().Serialize(Value);

@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Steam;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Detection;
 
@@ -28,8 +27,10 @@ public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
     /// <inheritdoc/>
     public IDirectoryInfo ResolveLocation(IModReference mod, IGame game)
     {
-        Requires.NotNull(mod, nameof(mod));
-        Requires.NotNull(game, nameof(game));
+        if (mod == null)
+            throw new ArgumentNullException(nameof(mod));
+        if (game == null)
+            throw new ArgumentNullException(nameof(game));
 
         return mod.Type switch
         {
@@ -60,10 +61,9 @@ public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
     private static IDirectoryInfo ResolveNormalMod(IModReference mod, IGame game)
     {
         var fs = game.Directory.FileSystem;
-        var pathUtilities = new PathHelperService(fs);
         var modIdentifier = mod.Identifier;
 
-        if (!pathUtilities.IsAbsolute(game.Directory.FullName))
+        if (!fs.Path.IsPathFullyQualified(game.Directory.FullName))
             throw new GameException("Game path must be absolute");
 
         // Note about mod paths:
@@ -73,7 +73,7 @@ public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
         // For starting mods the path also must not contain any spaces, but that's not assured here,
         // because may have custom features to still support these mods. 
 
-        if (pathUtilities.IsAbsolute(modIdentifier))
+        if (fs.Path.IsPathFullyQualified(modIdentifier))
             return fs.DirectoryInfo.New(modIdentifier);
 
         var modLocationPath = fs.Path.Combine(game.Directory.FullName, modIdentifier);

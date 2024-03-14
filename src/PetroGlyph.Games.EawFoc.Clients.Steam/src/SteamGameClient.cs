@@ -4,7 +4,6 @@ using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Games;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
@@ -42,9 +41,10 @@ public sealed class SteamGameClient : DebugableClientBase
 
         public SteamGameLauncher(IServiceProvider serviceProvider)
         {
-            Requires.NotNull(serviceProvider, nameof(serviceProvider));
+            if (serviceProvider == null) 
+                throw new ArgumentNullException(nameof(serviceProvider));
             _steamWrapper = serviceProvider.GetRequiredService<ISteamWrapper>();
-            _internalLauncher = serviceProvider.GetService<IGameProcessLauncher>() ?? new DefaultGameProcessLauncher(serviceProvider);
+            _internalLauncher = serviceProvider.GetRequiredService<IGameProcessLauncher>();
         }
 
         public IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo)

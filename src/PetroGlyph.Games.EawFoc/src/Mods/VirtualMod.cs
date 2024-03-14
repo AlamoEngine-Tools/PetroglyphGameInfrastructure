@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Detection;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Mods;
 
@@ -65,7 +64,8 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     public VirtualMod(string name, IGame game, IList<ModDependencyEntry> dependencies, DependencyResolveLayout layout, IServiceProvider serviceProvider)
         : base(game, ModType.Virtual, name, serviceProvider)
     {
-        Requires.NotNull(dependencies, nameof(dependencies));
+        if (dependencies == null) 
+            throw new ArgumentNullException(nameof(dependencies));
         if (!dependencies.Any())
             throw new PetroglyphException("Virtual mods must be initialized with pre-defined dependencies");
 
@@ -121,7 +121,7 @@ public sealed class VirtualMod : ModBase, IVirtualMod
 
     private string CalculateIdentifier()
     {
-        var builder = ServiceProvider.GetService<IModIdentifierBuilder>() ?? new ModIdentifierBuilder(ServiceProvider);
+        var builder = ServiceProvider.GetRequiredService<IModIdentifierBuilder>();
         return builder.Build(this);
     }
 }

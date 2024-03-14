@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.Win32;
 using Microsoft.Win32.SafeHandles;
 using PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
 
@@ -34,7 +33,8 @@ internal static class AwaitExtensions
             RegistryChangeNotificationFilters.Value | RegistryChangeNotificationFilters.Subkey,
         CancellationToken cancellationToken = default)
     {
-        Requires.NotNull(registryKey, nameof(registryKey));
+        if (registryKey == null) 
+            throw new ArgumentNullException(nameof(registryKey));
 
         return WaitForRegistryChangeAsync(registryKey.Handle, watchSubtree, change, cancellationToken);
     }
@@ -94,7 +94,8 @@ internal static class AwaitExtensions
 
         internal static async Task<IDisposable> ExecuteOnDedicatedThreadAsync(Action action)
         {
-            Requires.NotNull(action, nameof(action));
+            if (action == null) 
+                throw new ArgumentNullException(nameof(action));
 
             var tcs = new TaskCompletionSource<EmptyStruct>();
             var keepAliveCountIncremented = false;
@@ -119,7 +120,9 @@ internal static class AwaitExtensions
 
                     if (_keepAliveCount == 1)
                     {
-                        Assumes.Null(_liveThread);
+                        if (_liveThread is not null)
+                            throw new InvalidOperationException("Internal error.");
+
                         _liveThread = new Thread(Worker, SmallThreadStackSize)
                         {
                             IsBackground = true,
@@ -179,7 +182,8 @@ internal static class AwaitExtensions
                         // This happens when keepAliveCount (at least temporarily)
                         // hits 0, so this thread must be assumed to be on its exit path,
                         // and another thread will be spawned to process new requests.
-                        Assumes.True(_liveThread is object || (_keepAliveCount == 0 && PendingWork.Count == 0));
+                        if (_liveThread is null && (_keepAliveCount != 0 || PendingWork.Count != 0))
+                            throw new InvalidOperationException();
                         return;
                     }
 

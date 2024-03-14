@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
@@ -34,7 +34,9 @@ public class KeyBasedArgumentCollectionBuilder : IArgumentCollectionBuilder
     /// <returns>This instance.</returns>
     public IArgumentCollectionBuilder Add(IGameArgument argument)
     {
-        Requires.NotNull(argument, nameof(argument));
+        if (argument == null) 
+            throw new ArgumentNullException(nameof(argument));
+
         _argumentDict[argument.Name] = argument;
         return this;
     }
@@ -42,7 +44,9 @@ public class KeyBasedArgumentCollectionBuilder : IArgumentCollectionBuilder
     /// <inheritdoc/>
     public IArgumentCollectionBuilder Remove(IGameArgument argument)
     {
-        Requires.NotNull(argument, nameof(argument));
+        if (argument == null)
+            throw new ArgumentNullException(nameof(argument));
+
         return Remove(argument.Name);
     }
 

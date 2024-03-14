@@ -1,11 +1,12 @@
 ﻿using System;
-using System.IO.Abstractions.TestingHelpers;
 using EawModinfo;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
+using PetroGlyph.Games.EawFoc.Services.Detection;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test;
@@ -26,8 +27,8 @@ public class ModTest
         var modDir = fs.DirectoryInfo.New("Game/Mods/A");
         Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (IModinfo)null, null));
         Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (IModinfoFile)null, null));
-        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (string)null, null));
-        Assert.Throws<ArgumentException>(() => new Mod(game.Object, modDir, false, string.Empty, null));
+        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (string)null, new Mock<IServiceProvider>().Object));
+        Assert.Throws<ArgumentException>(() => new Mod(game.Object, modDir, false, string.Empty, new Mock<IServiceProvider>().Object));
         var sp = new Mock<IServiceProvider>();
         Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (IModinfo)null, sp.Object));
         Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (IModinfoFile)null, sp.Object));
@@ -43,14 +44,19 @@ public class ModTest
     [Fact]
     public void ValidCtors_Properties()
     {
+        var modIdBuilder = new Mock<IModIdentifierBuilder>();
         var game = new Mock<IGame>();
         var fs = new MockFileSystem();
         var modDir = fs.DirectoryInfo.New("Game/Mods/A");
         var sp = new Mock<IServiceProvider>();
+        sp.Setup(s => s.GetService(typeof(IModIdentifierBuilder))).Returns(modIdBuilder.Object);
+
         var mod = new Mod(game.Object, modDir, false, "Name", sp.Object);
+        modIdBuilder.Setup(b => b.Build(mod)).Returns("somePath");
+
         Assert.Equal("Name", mod.Name);
         Assert.Equal(ModType.Default, mod.Type);
-        Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/Mods/A" : "c:\\game\\mods\\a", mod.Identifier);
+        Assert.Equal("somePath", mod.Identifier);
         Assert.NotNull(mod.FileService);
         Assert.NotNull(mod.FileSystem);
         Assert.Null(mod.ModinfoFile);
@@ -62,6 +68,6 @@ public class ModTest
         Assert.NotNull(modA.ModinfoFile);
 
         var modB = new Mod(game.Object, modDir, true, "Name", sp.Object);
-        Assert.Equal("A", modB.Identifier);
+        Assert.Equal("somePath", modB.Identifier);
     }
 }

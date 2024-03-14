@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
@@ -10,6 +9,7 @@ using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Mods;
+using Testably.Abstractions.Testing;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Test
 {
@@ -156,7 +156,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
 
             var fs = new MockFileSystem();
-            fs.AddFile("test.exe", new MockFileData(string.Empty));
+            fs.Initialize().WithFile("test.exe");
 
             _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
                 .Returns(fs.FileInfo.New("test.exe"));
@@ -180,7 +180,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release)).Returns(true);
 
             var fs = new MockFileSystem();
-            fs.AddFile("test.exe", new MockFileData(string.Empty));
+            fs.Initialize().WithFile("test.exe");
 
             _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
                 .Returns(fs.FileInfo.New("test.exe"));
@@ -232,7 +232,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release)).Returns(true);
 
             var fs = new MockFileSystem();
-            fs.AddFile("test.exe", new MockFileData(string.Empty));
+            fs.Initialize().WithFile("test.exe");
 
             _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
                 .Returns(fs.FileInfo.New("test.exe"));
@@ -272,7 +272,7 @@ namespace PetroGlyph.Games.EawFoc.Clients.Test
             _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release)).Returns(true);
 
             var fs = new MockFileSystem();
-            fs.AddFile("test.exe", new MockFileData(string.Empty));
+            fs.Initialize().WithFile("test.exe");
 
             _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
                 .Returns(fs.FileInfo.New("test.exe"));

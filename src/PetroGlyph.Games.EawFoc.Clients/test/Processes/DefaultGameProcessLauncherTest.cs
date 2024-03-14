@@ -1,9 +1,9 @@
-﻿using System.IO.Abstractions.TestingHelpers;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Games;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Test.Processes;
@@ -35,10 +35,11 @@ public class DefaultGameProcessLauncherTest
     {
         var fs = new MockFileSystem();
         var game = new Mock<IGame>();
-        game.Setup(g => g.Game).Returns(game.Object);
-        game.Setup(g => g.Directory).Returns(new MockDirectoryInfo(fs, "path"));
+        game.Setup(g => g.Game).Returns(game.Object); 
+        game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("path"));
         var process = new GameProcessInfo(game.Object, GameBuildType.Release, ArgumentCollection.Empty);
-        Assert.Throws<GameStartException>(() => _service.StartGameProcess(new MockFileInfo(fs, "test.exe"), process));
+        Assert.Throws<GameStartException>(() => _service.StartGameProcess(fs.FileInfo.New("test.exe"), process));
+
         _builder.Verify(b => b.BuildCommandLine(ArgumentCollection.Empty), Times.Exactly(1));
     }
 }

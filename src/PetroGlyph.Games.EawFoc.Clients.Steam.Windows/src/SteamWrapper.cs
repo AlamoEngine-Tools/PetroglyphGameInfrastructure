@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
 using PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
-using Validation;
 #if NET
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -81,11 +80,10 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam
 
         public SteamWrapper(IServiceProvider serviceProvider)
         {
-            Requires.NotNull(serviceProvider, nameof(serviceProvider));
-            _serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _registry = serviceProvider.GetRequiredService<ISteamRegistry>();
-            _processHelper = serviceProvider.GetService<IProcessHelper>() ?? new ProcessHelper();
-            _fileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
+            _processHelper = serviceProvider.GetRequiredService<IProcessHelper>();
+            _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         }
 
 #if NET

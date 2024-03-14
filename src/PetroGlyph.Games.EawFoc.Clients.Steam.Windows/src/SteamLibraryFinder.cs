@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
@@ -15,10 +14,9 @@ internal class SteamLibraryFinder : ISteamLibraryFinder
 
     public SteamLibraryFinder(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _serviceProvider = serviceProvider;
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _registry = serviceProvider.GetRequiredService<ISteamRegistry>();
-        _fileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
+        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         _configReader = serviceProvider.GetRequiredService<ILibraryConfigReader>();
     }
 

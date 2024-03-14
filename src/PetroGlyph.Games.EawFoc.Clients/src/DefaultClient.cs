@@ -33,6 +33,6 @@ public sealed class DefaultClient : ClientBase
     /// <returns>The <see cref="IGameProcessLauncher"/> instance.</returns>
     protected internal override IGameProcessLauncher GetGameLauncherService()
     { 
-        return ServiceProvider.GetService<IGameProcessLauncher>() ?? new DefaultGameProcessLauncher(ServiceProvider);
+        return ServiceProvider.GetRequiredService<IGameProcessLauncher>();
     }
 }

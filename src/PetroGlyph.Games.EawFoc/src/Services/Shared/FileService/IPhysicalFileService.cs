@@ -7,6 +7,7 @@ namespace PetroGlyph.Games.EawFoc.Services.FileService;
 /// <summary>
 /// Service to query files and directories of an <see cref="IPhysicalPlayableObject"/>
 /// </summary>
+// TODO: I don't think we need this interface
 public interface IPhysicalFileService
 {
     /// <summary>

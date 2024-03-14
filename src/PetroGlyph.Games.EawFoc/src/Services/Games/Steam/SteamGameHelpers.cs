@@ -1,16 +1,17 @@
 ﻿using System;
 using System.IO.Abstractions;
-using AnakinRaW.CommonUtilities.FileSystem;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
-using Validation;
+#if NETSTANDARD2_0
+using AnakinRaW.CommonUtilities.FileSystem;
+#endif
 
 namespace PetroGlyph.Games.EawFoc.Services.Steam;
 
 /// <inheritdoc cref="ISteamGameHelpers"/>
 public class SteamGameHelpers : ISteamGameHelpers
 {
-    private readonly IPathHelperService _pathHelper;
+    private readonly IFileSystem _fileSystem;
 
     /// <summary>
     /// Creates a new instance
@@ -18,19 +19,20 @@ public class SteamGameHelpers : ISteamGameHelpers
     /// <param name="serviceProvider">The service provider.</param>
     public SteamGameHelpers(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        var fs = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
-        _pathHelper = serviceProvider.GetService<IPathHelperService>() ?? new PathHelperService(fs);
+        if (serviceProvider == null)
+            throw new ArgumentNullException(nameof(serviceProvider));
+        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
     }
 
     /// <inheritdoc/>
     public IDirectoryInfo GetWorkshopsLocation(IGame game)
     {
-        Requires.NotNull(game, nameof(game));
+        if (game == null) 
+            throw new ArgumentNullException(nameof(game));
         if (game.Platform != GamePlatform.SteamGold)
             throw new GameException("Unable to get workshops location for non-Steam game.");
 
-        if (!_pathHelper.IsAbsolute(game.Directory.FullName))
+        if (!_fileSystem.Path.IsPathFullyQualified(game.Directory.FullName))
             throw new InvalidOperationException("Game path must be absolute");
 
         var gameDir = game.Directory;

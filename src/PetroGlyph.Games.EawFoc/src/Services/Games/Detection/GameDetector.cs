@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Detection.Platform;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Detection;
 
@@ -42,8 +41,7 @@ public abstract class GameDetector : IGameDetector
     /// When set to <see langword="false"/> the event will not be raised and initialization cannot be handled.</param>
     protected GameDetector(IServiceProvider serviceProvider, bool tryHandleInitialization)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        ServiceProvider = serviceProvider;
+        ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _tryHandleInitialization = tryHandleInitialization;
         Logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
         FileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();

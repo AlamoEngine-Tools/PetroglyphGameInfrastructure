@@ -5,7 +5,6 @@ using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Language;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
@@ -30,7 +29,8 @@ public sealed class SteamGameLanguageFinder : IGameLanguageFinder
     /// <param name="serviceProvider">The service provider.</param>
     public SteamGameLanguageFinder(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
         _steamWrapper = serviceProvider.GetRequiredService<ISteamWrapper>();
     }
 

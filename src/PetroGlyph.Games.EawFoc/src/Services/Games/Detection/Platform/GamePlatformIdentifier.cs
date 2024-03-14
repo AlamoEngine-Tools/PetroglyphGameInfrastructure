@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetroGlyph.Games.EawFoc.Games;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Detection.Platform;
 
@@ -38,23 +37,24 @@ public sealed class GamePlatformIdentifier : IGamePlatformIdentifier
     /// <param name="serviceProvider">Service Provider</param>
     public GamePlatformIdentifier(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _serviceProvider = serviceProvider;
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(GamePlatformIdentifier));
     }
 
     /// <inheritdoc/>
     public GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location)
     {
-        Requires.NotNull(location, nameof(location));
+        if (location == null) throw new ArgumentNullException(nameof(location));
         return GetGamePlatformCore(type, ref location, DefaultGamePlatformOrdering);
     }
 
     /// <inheritdoc/>
     public GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location, IList<GamePlatform> lookupPlatforms)
     {
-        Requires.NotNull(location, nameof(location));
-        Requires.NotNull(lookupPlatforms, nameof(lookupPlatforms));
+        if (location == null) 
+            throw new ArgumentNullException(nameof(location));
+        if (lookupPlatforms == null) 
+            throw new ArgumentNullException(nameof(lookupPlatforms));
         return GetGamePlatformCore(type, ref location, NormalizeLookupPlatforms(lookupPlatforms));
     }
 

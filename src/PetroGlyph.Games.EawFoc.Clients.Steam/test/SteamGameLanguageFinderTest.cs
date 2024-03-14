@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Abstractions.TestingHelpers;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Test;
@@ -55,8 +55,8 @@ public class SteamGameLanguageFinderTest
 
         var fs = new MockFileSystem();
 
-        var manifest = new SteamAppManifest(new Mock<ISteamLibrary>().Object, new MockFileInfo(fs, "test.path"), 123,
-            "name", new MockDirectoryInfo(fs, "path"), SteamAppState.StateFullyInstalled, new HashSet<uint>());
+        var manifest = new SteamAppManifest(new Mock<ISteamLibrary>().Object, fs.FileInfo.New("test.path"), 123,
+            "name", fs.DirectoryInfo.New("path"), SteamAppState.StateFullyInstalled, new HashSet<uint>());
 
         _steam.Setup(s => s.IsGameInstalled(32470u, out manifest)).Returns(true);
 
@@ -73,8 +73,8 @@ public class SteamGameLanguageFinderTest
 
         var fs = new MockFileSystem();
 
-        var manifest = new SteamAppManifest(new Mock<ISteamLibrary>().Object, new MockFileInfo(fs, "test.path"), 123,
-            "name", new MockDirectoryInfo(fs, "path"), SteamAppState.StateFullyInstalled, new HashSet<uint>
+        var manifest = new SteamAppManifest(new Mock<ISteamLibrary>().Object, fs.FileInfo.New("test.path"), 123,
+            "name", fs.DirectoryInfo.New("path"), SteamAppState.StateFullyInstalled, new HashSet<uint>
             {
                 32473, 32474, 32475, 32476
             });

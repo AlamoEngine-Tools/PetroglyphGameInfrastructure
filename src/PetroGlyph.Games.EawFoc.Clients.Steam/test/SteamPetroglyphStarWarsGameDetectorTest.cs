@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Test;
@@ -70,7 +70,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     public void TestNoGame3()
     {
         var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        _fileSystem.Initialize().WithFile("Game/swfoc.exe");
         var mFile = _fileSystem.FileInfo.New("manifest.acf");
         var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateInvalid,
             new HashSet<uint> { 32472 });
@@ -86,7 +86,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     public void TestNoGame4()
     {
         var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        _fileSystem.Initialize().WithFile("Game/swfoc.exe");
         var mFile = _fileSystem.FileInfo.New("manifest.acf");
         var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateInvalid,
             new HashSet<uint>());
@@ -102,7 +102,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     public void TestNoGame5()
     {
         var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        _fileSystem.Initialize().WithFile("Game/swfoc.exe");
         var mFile = _fileSystem.FileInfo.New("manifest.acf");
         var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
             new HashSet<uint> { 32472 });
@@ -118,7 +118,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     public void TestGameExists1()
     {
         var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.AddFile("Game/corruption/swfoc.exe", new MockFileData(string.Empty));
+        _fileSystem.Initialize().WithFile("Game/corruption/swfoc.exe");
         var mFile = _fileSystem.FileInfo.New("manifest.acf");
         var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
             new HashSet<uint> { 32472 });
@@ -140,7 +140,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     public void TestGameExists3()
     {
         var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.AddFile("Game/corruption/swfoc.exe", new MockFileData(string.Empty));
+        _fileSystem.Initialize().WithFile("Game/corruption/swfoc.exe");
         var mFile = _fileSystem.FileInfo.New("manifest.acf");
         var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation,
             SteamAppState.StateFullyInstalled | SteamAppState.StateAppRunning, new HashSet<uint> { 32472 });
@@ -162,7 +162,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     public void TestGameExists4()
     {
         var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.AddFile("Game/GameData/sweaw.exe", new MockFileData(string.Empty));
+        _fileSystem.Initialize().WithFile("Game/GameData/sweaw.exe");
         var mFile = _fileSystem.FileInfo.New("manifest.acf");
         var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
             new HashSet<uint> { 32472 });
@@ -184,7 +184,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     public void TestInvalidRegistry()
     {
         var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        _fileSystem.Initialize().WithFile("Game/swfoc.exe");
         var mFile = _fileSystem.FileInfo.New("manifest.acf");
         var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
             new HashSet<uint> { 32472 });
@@ -207,7 +207,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     public void TestGameRequiresInit()
     {
         var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        _fileSystem.Initialize().WithFile("Game/swfoc.exe");
         var mFile = _fileSystem.FileInfo.New("manifest.acf");
         var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
             new HashSet<uint> { 32472 });

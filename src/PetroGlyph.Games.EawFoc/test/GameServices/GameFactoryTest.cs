@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Globalization;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Moq;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services;
 using PetroGlyph.Games.EawFoc.Services.Detection;
 using PetroGlyph.Games.EawFoc.Services.Name;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Test.GameServices;
@@ -96,8 +96,9 @@ public class GameFactoryTest
         var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
         var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
         var fs = new MockFileSystem();
-        fs.AddDirectory("GameData");
-        fs.AddFile("GameData/sweaw.exe", new MockFileData(string.Empty));
+        fs.Initialize()
+            .WithSubdirectory("GameData")
+            .WithFile("GameData/sweaw.exe");
         var game = factory.CreateGame(identity, fs.DirectoryInfo.New("GameData"), false);
         Assert.Equal(identity.Platform, game.Platform);
         Assert.Equal(identity.Type, game.Type);
@@ -114,8 +115,9 @@ public class GameFactoryTest
         var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
         var fs = new MockFileSystem();
         var detectionResult = new GameDetectionResult(identity, fs.DirectoryInfo.New("GameData"));
-        fs.AddDirectory("GameData");
-        fs.AddFile("GameData/sweaw.exe", new MockFileData(string.Empty));
+        fs.Initialize()
+            .WithSubdirectory("GameData")
+            .WithFile("GameData/sweaw.exe");
         var game = factory.CreateGame(detectionResult);
         Assert.Equal(identity.Platform, game.Platform);
         Assert.Equal(identity.Type, game.Type);

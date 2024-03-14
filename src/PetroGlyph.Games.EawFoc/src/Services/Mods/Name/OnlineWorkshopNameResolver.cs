@@ -4,7 +4,6 @@ using EawModinfo.Spec;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Services.Steam;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Name;
 
@@ -39,7 +38,9 @@ public class OnlineWorkshopNameResolver : ModNameResolverBase
 
     private static string GetName(HtmlDocument htmlDocument)
     {
-        Requires.NotNull(htmlDocument, nameof(htmlDocument));
+        if (htmlDocument == null)
+            throw new ArgumentNullException(nameof(htmlDocument));
+
         var node = htmlDocument.DocumentNode.SelectSingleNode("//div[contains(@class, 'workshopItemTitle')]");
         if (node is null)
             throw new InvalidOperationException("Unable to get name form Workshop's web page. Mussing 'workshopItemTitle' node.");

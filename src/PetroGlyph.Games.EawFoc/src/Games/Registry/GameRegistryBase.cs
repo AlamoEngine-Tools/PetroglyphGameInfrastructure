@@ -2,7 +2,6 @@
 using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using Validation;
 #if NET
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -154,10 +153,9 @@ namespace PetroGlyph.Games.EawFoc.Games.Registry
         /// <param name="serviceProvider">Service provider for this instance.</param>
         public GameRegistry(GameType gameType, IRegistryKey registryKey, IServiceProvider serviceProvider)
         {
-            Requires.NotNull(registryKey, nameof(registryKey));
             Type = gameType;
-            _registryKey = registryKey;
-            _fileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
+            _registryKey = registryKey ?? throw new ArgumentNullException(nameof(registryKey));
+            _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         }
 
         /// <inheritdoc/>

@@ -2,7 +2,7 @@
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
-using AnakinRaW.CommonUtilities.FileSystem;
+using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +12,7 @@ namespace PetroGlyph.Games.EawFoc.Services.Detection;
 
 internal class ModIdentifierBuilder : IModIdentifierBuilder
 {
-    private readonly IPathHelperService _pathHelper;
+    private readonly IFileSystem _fileSystem;
 
     /// <summary>
     /// Creates a new instance.
@@ -20,8 +20,12 @@ internal class ModIdentifierBuilder : IModIdentifierBuilder
     /// <param name="serviceProvider">The service provider.</param>
     public ModIdentifierBuilder(IServiceProvider serviceProvider)
     {
-        var fs = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
-        _pathHelper = serviceProvider.GetService<IPathHelperService>() ?? new PathHelperService(fs);
+        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+    }
+
+    public string Build(IDirectoryInfo modDirectory, bool isWorkshop)
+    {
+        return isWorkshop ? BuildWorkshopsModId(modDirectory) : BuildDefaultModId(modDirectory);
     }
 
     /// <inheritdoc/>
@@ -54,7 +58,11 @@ internal class ModIdentifierBuilder : IModIdentifierBuilder
 
     private string BuildDefaultModId(string modDirPath)
     {
-        return _pathHelper.NormalizePath(modDirPath, PathNormalizeOptions.Full);
+        return PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(modDirPath), new PathNormalizeOptions
+        {
+            UnifyCase = UnifyCasingKind.UpperCase,
+            TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
+        });
     }
 
     private static string BuildWorkshopsModId(IDirectoryInfo modDir)

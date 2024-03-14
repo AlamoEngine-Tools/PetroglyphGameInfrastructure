@@ -7,7 +7,6 @@ using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Steam;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
 
@@ -26,8 +25,7 @@ public class ModArgumentListFactory : IModArgumentListFactory
     /// <param name="serviceProvider">The service provider.</param>
     public ModArgumentListFactory(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _serviceProvider = serviceProvider;
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     /// <inheritdoc/>

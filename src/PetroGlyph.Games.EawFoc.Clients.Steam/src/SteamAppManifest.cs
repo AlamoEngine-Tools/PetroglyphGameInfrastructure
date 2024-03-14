@@ -1,7 +1,7 @@
-﻿using System;
+﻿using AnakinRaW.CommonUtilities;
+using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam;
 
@@ -66,11 +66,16 @@ public class SteamAppManifest : IEquatable<SteamAppManifest>
         SteamAppState state, 
         ISet<uint> depots)
     {
-        Requires.NotNull(library, nameof(library));
-        Requires.NotNull(manifestFile, nameof(manifestFile));
-        Requires.NotNullOrEmpty(name, nameof(name));
-        Requires.NotNull(installDir, nameof(installDir));
-        Requires.NotNull(depots, nameof(depots));
+        if (library == null)
+            throw new ArgumentNullException(nameof(library));
+        if (manifestFile == null) 
+            throw new ArgumentNullException(nameof(manifestFile));
+        if (installDir == null)
+            throw new ArgumentNullException(nameof(installDir));
+        if (depots == null) 
+            throw new ArgumentNullException(nameof(depots));
+        ThrowHelper.ThrowIfNullOrEmpty(name);
+
         Library = library;
         ManifestFile = manifestFile;
         Id = id;

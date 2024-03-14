@@ -11,18 +11,16 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly Condition="'$(Configuration)' == 'Release'">False</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)AlamoEngineTools.snk</AssemblyOriginatorKeyFile>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">
       <PrivateAssets>all</PrivateAssets>
-      <Version>3.6.132</Version>
+      <Version>3.6.133</Version>
     </PackageReference>
-    <PackageReference Include="SauceControl.InheritDoc" Version="1.3.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+    <PackageReference Include="SauceControl.InheritDoc" Version="2.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

@@ -12,7 +12,6 @@ using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Detection;
 using PetroGlyph.Games.EawFoc.Services.Name;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services;
 
@@ -57,13 +56,13 @@ public class ModFactory : IModFactory
         CultureInfo culture,
         IServiceProvider serviceProvider)
     {
-        Requires.NotNull(defaultModinfoFileFinderFactory, nameof(defaultModinfoFileFinderFactory));
-        Requires.NotNull(culture, nameof(culture));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null)
+            throw new ArgumentNullException(nameof(serviceProvider));
+
         _referenceLocationResolver = serviceProvider.GetRequiredService<IModReferenceLocationResolver>();
-        _defaultModinfoFileFinderFactory = defaultModinfoFileFinderFactory;
+        _defaultModinfoFileFinderFactory = defaultModinfoFileFinderFactory ?? throw new ArgumentNullException(nameof(defaultModinfoFileFinderFactory));
         _nameResolver = serviceProvider.GetRequiredService<IModNameResolver>();
-        _culture = culture;
+        _culture = culture ?? throw new ArgumentNullException(nameof(culture));
         _serviceProvider = serviceProvider;
     }
 

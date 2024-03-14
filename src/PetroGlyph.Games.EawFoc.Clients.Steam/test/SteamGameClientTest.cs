@@ -1,9 +1,9 @@
 ﻿using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Games;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PetroGlyph.Games.EawFoc.Clients.Steam.Test;
@@ -19,7 +19,7 @@ public class SteamGameClientTest
     public SteamGameClientTest()
     {
         var fs = new MockFileSystem();
-        fs.AddFile("test.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("test.exe");
         var sc = new ServiceCollection();
         _steam = new Mock<ISteamWrapper>();
         sc.AddTransient(_ => _steam.Object);

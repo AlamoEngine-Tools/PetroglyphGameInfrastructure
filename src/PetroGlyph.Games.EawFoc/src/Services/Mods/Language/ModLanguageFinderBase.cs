@@ -6,7 +6,6 @@ using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
-using Validation;
 
 namespace PetroGlyph.Games.EawFoc.Services.Language;
 
@@ -45,8 +44,7 @@ public abstract class ModLanguageFinderBase : IModLanguageFinder
     /// dependency Resolving should already be performed. Otherwise the <paramref name="lookupInheritedLanguages"/> has no effect.</remarks> 
     protected ModLanguageFinderBase(IServiceProvider serviceProvider, bool lookupInheritedLanguages)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        ServiceProvider = serviceProvider;
+        ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _lookupInheritedLanguages = lookupInheritedLanguages;
         Helper = serviceProvider.GetService<ILanguageFinder>() ?? new FileBasedLanguageFinder();
     }
