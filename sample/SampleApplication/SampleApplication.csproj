@@ -11,10 +11,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows\src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows.csproj" />
-	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc.Clients.Steam\src\PetroGlyph.Games.EawFoc.Clients.Steam.csproj" />
-	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj" />
-	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
+	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows\src\PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.csproj" />
+	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc.Clients.Steam\src\PG.StarWarsGame.Infrastructure.Clients.Steam.csproj" />
+	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc.Clients\src\PG.StarWarsGame.Infrastructure.Clients.csproj" />
+	  <ProjectReference Include="..\..\src\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj" />
 	</ItemGroup>
 
 </Project>

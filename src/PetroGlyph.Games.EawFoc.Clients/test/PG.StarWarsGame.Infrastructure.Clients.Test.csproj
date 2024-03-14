@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AssemblyName>PG.StarWarsGame.Infrastructure.Clients.Steam.Test</AssemblyName>
+		<AssemblyName>PG.StarWarsGame.Infrastructure.Clients.Test</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -32,8 +32,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
-		<ProjectReference Include="..\src\PetroGlyph.Games.EawFoc.Clients.Steam.csproj" />
+		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\Testing\PG.TestingUtilities\PG.TestingUtilities.csproj" />
+		<ProjectReference Include="..\src\PG.StarWarsGame.Infrastructure.Clients.csproj" />
 	</ItemGroup>
 
 </Project>
