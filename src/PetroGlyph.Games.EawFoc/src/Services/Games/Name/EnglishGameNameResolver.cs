@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// English name resolver for games <see cref="IGameNameResolver"/>.

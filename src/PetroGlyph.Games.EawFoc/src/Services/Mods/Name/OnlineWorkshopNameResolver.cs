@@ -3,9 +3,9 @@ using System.Globalization;
 using EawModinfo.Spec;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// Resolves a mod's name by crawling the name from the mod's steam workshop page.

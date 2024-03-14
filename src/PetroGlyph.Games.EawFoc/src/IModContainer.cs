@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc;
+namespace PG.StarWarsGame.Infrastructure;
 
 /// <summary>
 /// This instance can be parent for one or many mods. 

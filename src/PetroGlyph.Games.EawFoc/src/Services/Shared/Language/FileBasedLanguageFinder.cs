@@ -6,7 +6,7 @@ using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Services.Language;
+namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
 /// <summary>
 /// Finds installed languages based on well-known file locations and names.

@@ -5,7 +5,7 @@ using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// <see cref="IModNameResolver"/> which takes a sorted list of <see cref="IModNameResolver"/> and returns the first valid result.

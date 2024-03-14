@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;

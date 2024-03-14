@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
+namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 /// <inheritdoc cref="IModDependencyTraverser"/>
 public class ModDependencyTraverser : IModDependencyTraverser

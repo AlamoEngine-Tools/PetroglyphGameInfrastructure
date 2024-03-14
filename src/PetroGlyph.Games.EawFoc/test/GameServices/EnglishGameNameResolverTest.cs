@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Name;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Name;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;

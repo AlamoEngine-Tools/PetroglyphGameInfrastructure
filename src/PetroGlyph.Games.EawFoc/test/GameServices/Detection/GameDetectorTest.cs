@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Detection;
-using PetroGlyph.Games.EawFoc.Services.Detection.Platform;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 using Testably.Abstractions.Testing;
 using Xunit;
 

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
-using PetroGlyph.Games.EawFoc.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 

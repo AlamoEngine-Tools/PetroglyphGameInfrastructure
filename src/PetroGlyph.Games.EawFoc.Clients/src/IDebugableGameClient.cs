@@ -1,7 +1,6 @@
-﻿using PetroGlyph.Games.EawFoc;
-using PetroGlyph.Games.EawFoc.Mods;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
+using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Clients;
 

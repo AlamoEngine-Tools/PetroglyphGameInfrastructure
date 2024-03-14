@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services;
+namespace PG.StarWarsGame.Infrastructure.Services;
 
 /// <summary>
 /// Factory to create one or more <see cref="IMod"/>

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.FileService;
-using PetroGlyph.Games.EawFoc.Services.Icon;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.FileService;
+using PG.StarWarsGame.Infrastructure.Services.Icon;
 using Testably.Abstractions.Testing;
 using Xunit;
 

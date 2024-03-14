@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO.Abstractions;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Steam;
+namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 
 /// <summary>
 /// Common helpers for Steam-based Games

@@ -1,8 +1,8 @@
 ﻿using System;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Language;
+namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
 /// <summary>
 /// Default factory implementation which returns separate <see cref="IModLanguageFinder"/> for Virtual and Physical Mods.

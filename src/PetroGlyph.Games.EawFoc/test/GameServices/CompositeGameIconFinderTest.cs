@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Icon;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Icon;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;

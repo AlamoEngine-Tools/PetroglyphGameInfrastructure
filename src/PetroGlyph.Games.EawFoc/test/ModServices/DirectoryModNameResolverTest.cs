@@ -4,7 +4,7 @@ using System.IO.Abstractions;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
-using PetroGlyph.Games.EawFoc.Services.Name;
+using PG.StarWarsGame.Infrastructure.Services.Name;
 using Testably.Abstractions.Testing;
 using Xunit;
 

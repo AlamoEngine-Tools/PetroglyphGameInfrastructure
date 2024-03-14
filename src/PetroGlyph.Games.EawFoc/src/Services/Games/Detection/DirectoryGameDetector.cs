@@ -3,9 +3,9 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
 /// Detects whether a given directory contains a Petroglyph Star Wars Game

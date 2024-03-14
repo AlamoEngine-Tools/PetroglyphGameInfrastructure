@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using PetroGlyph.Games.EawFoc;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 namespace PG.StarWarsGame.Infrastructure.Clients;

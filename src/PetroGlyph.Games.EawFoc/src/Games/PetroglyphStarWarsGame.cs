@@ -7,13 +7,13 @@ using System.Linq;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Detection;
-using PetroGlyph.Games.EawFoc.Services.FileService;
-using PetroGlyph.Games.EawFoc.Services.Icon;
-using PetroGlyph.Games.EawFoc.Services.Language;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.FileService;
+using PG.StarWarsGame.Infrastructure.Services.Icon;
+using PG.StarWarsGame.Infrastructure.Services.Language;
 
-namespace PetroGlyph.Games.EawFoc.Games;
+namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
 /// Represents a Petroglyph Star War Game, which is either Empire at War or Forces of Corruption.

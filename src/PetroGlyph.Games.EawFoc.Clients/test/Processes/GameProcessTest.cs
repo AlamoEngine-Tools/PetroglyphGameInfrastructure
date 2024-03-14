@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
+using PG.StarWarsGame.Infrastructure.Games;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Processes;

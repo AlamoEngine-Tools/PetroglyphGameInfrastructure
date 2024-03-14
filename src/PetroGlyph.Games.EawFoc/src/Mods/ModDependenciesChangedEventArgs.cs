@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// Events arguments used for <see cref="IMod.DependenciesChanged"/>.

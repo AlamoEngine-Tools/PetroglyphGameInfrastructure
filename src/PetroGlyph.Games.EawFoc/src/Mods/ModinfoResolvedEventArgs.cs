@@ -1,7 +1,7 @@
 ﻿using System;
 using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// Event arguments used for <see cref="IMod.ModinfoResolved"/>.

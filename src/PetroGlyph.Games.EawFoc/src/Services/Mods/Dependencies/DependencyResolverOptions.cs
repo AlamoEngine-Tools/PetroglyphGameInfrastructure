@@ -1,6 +1,6 @@
 ﻿using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
+namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 /// <summary>
 /// Options used by an <see cref="IDependencyResolver"/>.

@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using PetroGlyph.Games.EawFoc.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;

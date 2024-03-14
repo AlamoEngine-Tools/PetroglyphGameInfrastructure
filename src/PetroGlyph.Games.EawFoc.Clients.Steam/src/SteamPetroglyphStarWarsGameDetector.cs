@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Games.Registry;
-using PetroGlyph.Games.EawFoc.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Games.Registry;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 

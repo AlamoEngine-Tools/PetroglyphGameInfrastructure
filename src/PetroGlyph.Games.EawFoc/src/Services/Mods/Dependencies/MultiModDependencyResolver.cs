@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
+namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 /// <summary>
 /// Service which resolves dependencies of many mods coordinated by minimizing workload.

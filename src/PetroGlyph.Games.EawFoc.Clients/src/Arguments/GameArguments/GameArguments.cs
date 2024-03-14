@@ -1,6 +1,6 @@
 ﻿using System.IO.Abstractions;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Services.Language;
+using PG.StarWarsGame.Infrastructure.Services.Language;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 

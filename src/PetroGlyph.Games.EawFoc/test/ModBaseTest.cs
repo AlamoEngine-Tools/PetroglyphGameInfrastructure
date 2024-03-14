@@ -4,12 +4,11 @@ using EawModinfo;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
-using PetroGlyph.Games.EawFoc;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
-using PetroGlyph.Games.EawFoc.Services.Icon;
-using PetroGlyph.Games.EawFoc.Services.Language;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Icon;
+using PG.StarWarsGame.Infrastructure.Services.Language;
 using Semver;
 using Xunit;
 

@@ -1,13 +1,12 @@
-﻿#if NET
-using System.Linq;
-#endif
+﻿
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace PetroGlyph.Games.EawFoc.Services.FileService;
+namespace PG.StarWarsGame.Infrastructure.Services.FileService;
 
 /// <inheritdoc cref="IPhysicalFileService"/>
 public sealed class DefaultFileService : IPhysicalFileService

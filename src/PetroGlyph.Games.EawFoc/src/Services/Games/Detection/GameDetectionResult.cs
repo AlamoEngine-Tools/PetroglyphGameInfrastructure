@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO.Abstractions;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
 /// Result object used by <see cref="IGameDetector"/> containing all necessary information to create a game instance.

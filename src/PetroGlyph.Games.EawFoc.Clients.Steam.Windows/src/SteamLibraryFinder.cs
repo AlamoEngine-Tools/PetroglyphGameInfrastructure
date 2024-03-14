@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 

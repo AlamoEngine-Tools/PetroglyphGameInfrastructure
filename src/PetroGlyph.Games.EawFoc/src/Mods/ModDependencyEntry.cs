@@ -2,7 +2,7 @@
 using EawModinfo.Spec;
 using Semver;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// Object which represents an <see cref="IMod"/> in a <see cref="IMod.Dependencies"/> list,

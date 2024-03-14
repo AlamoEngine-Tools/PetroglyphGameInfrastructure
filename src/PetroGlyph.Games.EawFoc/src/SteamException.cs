@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PetroGlyph.Games.EawFoc;
+namespace PG.StarWarsGame.Infrastructure;
 
 /// <summary>
 /// Exception which gets thrown if anything Steam related failed.

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
 using Testably.Abstractions.Testing;
 using Xunit;
 

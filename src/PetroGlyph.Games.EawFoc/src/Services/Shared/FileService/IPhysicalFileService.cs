@@ -2,7 +2,7 @@
 using System.IO;
 using System.IO.Abstractions;
 
-namespace PetroGlyph.Games.EawFoc.Services.FileService;
+namespace PG.StarWarsGame.Infrastructure.Services.FileService;
 
 /// <summary>
 /// Service to query files and directories of an <see cref="IPhysicalPlayableObject"/>

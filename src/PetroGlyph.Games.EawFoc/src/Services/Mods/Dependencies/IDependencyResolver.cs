@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
+namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 /// <summary>
 /// Resolves mod dependencies specified in <see cref="IModIdentity.Dependencies"/> and returns them as an <see cref="T:IList&lt;IMod&gt;"/>.

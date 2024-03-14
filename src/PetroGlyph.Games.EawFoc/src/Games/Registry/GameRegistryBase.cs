@@ -1,12 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-#if NET
-using System.Diagnostics.CodeAnalysis;
-#endif
 
-namespace PetroGlyph.Games.EawFoc.Games.Registry;
+namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 /// <summary>
 /// Windows only registry wrapper for an Petroglyph Star Wars game.
