@@ -5,16 +5,16 @@ using Moq;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
-{
-    public class SteamGameFinderTest
-    {
-        private readonly SteamGameFinder _service;
-        private readonly MockFileSystem _fileSystem;
-        private readonly Mock<ISteamLibraryFinder> _libraryFinder;
+namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam;
 
-        public SteamGameFinderTest()
-        {
+public class SteamGameFinderTest
+{
+    private readonly SteamGameFinder _service;
+    private readonly MockFileSystem _fileSystem;
+    private readonly Mock<ISteamLibraryFinder> _libraryFinder;
+
+    public SteamGameFinderTest()
+    {
             var sc = new ServiceCollection();
             _fileSystem = new MockFileSystem();
             _libraryFinder = new Mock<ISteamLibraryFinder>();
@@ -23,17 +23,17 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
             _service = new SteamGameFinder(sc.BuildServiceProvider());
         }
 
-        [Fact]
-        public void TestGameNotFound()
-        {
+    [Fact]
+    public void TestGameNotFound()
+    {
             _libraryFinder.Setup(l => l.FindLibraries()).Returns(new List<ISteamLibrary>());
             var app = _service.FindGame(456);
             Assert.Null(app);
         }
 
-        [Fact]
-        public void TestGameFound()
-        {
+    [Fact]
+    public void TestGameFound()
+    {
             var lib1 = new Mock<ISteamLibrary>();
             var lib2 = new Mock<ISteamLibrary>();
 
@@ -49,5 +49,4 @@ namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam
             Assert.NotNull(app);
             Assert.Equal(game, app);
         }
-    }
 }

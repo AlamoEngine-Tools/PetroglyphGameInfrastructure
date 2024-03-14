@@ -11,297 +11,296 @@ using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Mods;
 using Testably.Abstractions.Testing;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test
+namespace PetroGlyph.Games.EawFoc.Clients.Test;
+
+public class ClientBaseTest
 {
-    public class ClientBaseTest
+    private readonly Mock<ClientBase> _client;
+    private readonly Mock<IGame> _game;
+    private readonly Mock<IModArgumentListFactory> _modListFactory;
+    private readonly Mock<IArgumentCollectionBuilder> _argBuilder;
+    private readonly Mock<IGameExecutableFileService> _exeService;
+    private readonly Mock<IGameProcessLauncher> _launcher;
+
+
+    public ClientBaseTest()
     {
-        private readonly Mock<ClientBase> _client;
-        private readonly Mock<IGame> _game;
-        private readonly Mock<IModArgumentListFactory> _modListFactory;
-        private readonly Mock<IArgumentCollectionBuilder> _argBuilder;
-        private readonly Mock<IGameExecutableFileService> _exeService;
-        private readonly Mock<IGameProcessLauncher> _launcher;
+        var sc = new ServiceCollection();
+        _modListFactory = new Mock<IModArgumentListFactory>();
+        _argBuilder = new Mock<IArgumentCollectionBuilder>();
+        _exeService = new Mock<IGameExecutableFileService>();
+        _launcher = new Mock<IGameProcessLauncher>();
+        sc.AddTransient(_ => _modListFactory.Object);
+        sc.AddTransient(_ => _argBuilder.Object);
+        sc.AddTransient(_ => _exeService.Object);
+        sc.AddTransient(_ => _launcher.Object);
+        _client = new Mock<ClientBase>(sc.BuildServiceProvider());
+        _client.Setup(c => c.GetGameLauncherService()).Returns(_launcher.Object);
+        _game = new Mock<IGame>();
+    }
 
+    [Fact]
+    public void TestPlatformNotSupported_Throws()
+    {
+        _game.Setup(g => g.Game).Returns(_game.Object);
+        _game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
 
-        public ClientBaseTest()
-        {
-            var sc = new ServiceCollection();
-            _modListFactory = new Mock<IModArgumentListFactory>();
-            _argBuilder = new Mock<IArgumentCollectionBuilder>();
-            _exeService = new Mock<IGameExecutableFileService>();
-            _launcher = new Mock<IGameProcessLauncher>();
-            sc.AddTransient(_ => _modListFactory.Object);
-            sc.AddTransient(_ => _argBuilder.Object);
-            sc.AddTransient(_ => _exeService.Object);
-            sc.AddTransient(_ => _launcher.Object);
-            _client = new Mock<ClientBase>(sc.BuildServiceProvider());
-            _client.Setup(c => c.GetGameLauncherService()).Returns(_launcher.Object);
-            _game = new Mock<IGame>();
-        }
-
-        [Fact]
-        public void TestPlatformNotSupported_Throws()
-        {
-            _game.Setup(g => g.Game).Returns(_game.Object);
-            _game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-
-            _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
+        _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
             
-            var e = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
-            Assert.StartsWith("Unable to start", e.Message);
-        }
+        var e = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
+        Assert.StartsWith("Unable to start", e.Message);
+    }
 
-        [Fact]
-        public void TestPlatformOnGameStartingCancels_Throws()
+    [Fact]
+    public void TestPlatformOnGameStartingCancels_Throws()
+    {
+        _game.Setup(g => g.Game).Returns(_game.Object);
+        _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+
+        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
+        _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+        _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(false);
+
+        var e = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
+        Assert.Equal("Game starting was aborted.", e.Message);
+    }
+
+    [Fact]
+    public void TestPlatformOnGameStartingEventCancel_Throws()
+    {
+        _game.Setup(g => g.Game).Returns(_game.Object);
+        _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+
+        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
+        _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+        _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
+
+        var handlerCalled = false;
+        _client.Object.GameStarting += (sender, args) =>
         {
-            _game.Setup(g => g.Game).Returns(_game.Object);
-            _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+            Assert.Empty(args.GameArguments);
+            Assert.Equal(GameBuildType.Release, args.BuildType);
+            args.Cancel = true;
+            handlerCalled = true;
+        };
 
-            _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(false);
+        var e = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
+        Assert.Equal("Game starting was aborted.", e.Message);
+        Assert.True(handlerCalled);
+    }
 
-            var e = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
-            Assert.Equal("Game starting was aborted.", e.Message);
-        }
+    [Fact]
+    public void TestModDependenciesAutoAddToArgs()
+    {
+        var mod = new Mock<IMod>();
+        mod.Setup(g => g.Game).Returns(_game.Object);
 
-        [Fact]
-        public void TestPlatformOnGameStartingEventCancel_Throws()
-        {
-            _game.Setup(g => g.Game).Returns(_game.Object);
-            _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+        var expectedModList = new ModArgumentList(new[]
+            { new ModArgument("path", false), new ModArgument("other", true) });
+        _modListFactory.Setup(f => f.BuildArgumentList(It.IsAny<IMod>(), false))
+            .Returns(expectedModList);
+        _argBuilder.Setup(b => b.AddAll(It.IsAny<IArgumentCollection>())).Returns(_argBuilder.Object);
+        _argBuilder.Setup(b => b.Add(It.IsAny<IGameArgument>())).Returns(_argBuilder.Object);
+        _argBuilder.Setup(b => b.Build())
+            .Returns(new ArgumentCollection(new List<IGameArgument> { expectedModList }));
 
-            _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
+        _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
-            var handlerCalled = false;
-            _client.Object.GameStarting += (sender, args) =>
+        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
+        _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+        var callbackTriggered = false;
+        _client.Setup(c => c.OnGameStarting(It.IsAny<IPlayableObject>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release))
+            .Callback((IPlayableObject _, IArgumentCollection args, GameBuildType _) =>
             {
-                Assert.Empty(args.GameArguments);
-                Assert.Equal(GameBuildType.Release, args.BuildType);
-                args.Cancel = true;
-                handlerCalled = true;
-            };
+                callbackTriggered = true;
+                Assert.Equal(new ArgumentCollection(new List<IGameArgument> { expectedModList }), args);
+            })
+            .Returns(true);
 
-            var e = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
-            Assert.Equal("Game starting was aborted.", e.Message);
-            Assert.True(handlerCalled);
-        }
+        Assert.Throws<GameStartException>(() => _client.Object.Play(mod.Object));
+        Assert.True(callbackTriggered);
+        _argBuilder.Verify(b => b.Build(), Times.Exactly(1));
+    }
 
-        [Fact]
-        public void TestModDependenciesAutoAddToArgs()
-        {
-            var mod = new Mock<IMod>();
-            mod.Setup(g => g.Game).Returns(_game.Object);
+    [Fact]
+    public void TestExeNotFound_Throws()
+    { 
+        _game.Setup(g => g.Game).Returns(_game.Object);
+        _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
-            var expectedModList = new ModArgumentList(new[]
-                { new ModArgument("path", false), new ModArgument("other", true) });
-            _modListFactory.Setup(f => f.BuildArgumentList(It.IsAny<IMod>(), false))
-                .Returns(expectedModList);
-            _argBuilder.Setup(b => b.AddAll(It.IsAny<IArgumentCollection>())).Returns(_argBuilder.Object);
-            _argBuilder.Setup(b => b.Add(It.IsAny<IGameArgument>())).Returns(_argBuilder.Object);
-            _argBuilder.Setup(b => b.Build())
-                .Returns(new ArgumentCollection(new List<IGameArgument> { expectedModList }));
+        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
+        _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+        _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
 
-            _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+        var e1 = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
+        Assert.StartsWith("Executable for", e1.Message);
 
-            _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
-            var callbackTriggered = false;
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IPlayableObject>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release))
-                .Callback((IPlayableObject _, IArgumentCollection args, GameBuildType _) =>
-                {
-                    callbackTriggered = true;
-                    Assert.Equal(new ArgumentCollection(new List<IGameArgument> { expectedModList }), args);
-                })
-                .Returns(true);
+        var fs = new MockFileSystem();
 
-            Assert.Throws<GameStartException>(() => _client.Object.Play(mod.Object));
-            Assert.True(callbackTriggered);
-            _argBuilder.Verify(b => b.Build(), Times.Exactly(1));
-        }
+        _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
+            .Returns(fs.FileInfo.New("test.exe"));
 
-        [Fact]
-        public void TestExeNotFound_Throws()
-        { 
-            _game.Setup(g => g.Game).Returns(_game.Object);
-            _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+        var e2 = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
+        Assert.StartsWith("Executable for", e2.Message);
+    }
 
-            _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
+    [Fact]
+    public void TesGameNotStarted_Throws()
+    {
+        _game.Setup(g => g.Game).Returns(_game.Object);
+        _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
-            var e1 = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
-            Assert.StartsWith("Executable for", e1.Message);
+        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
+        _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
+        _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
 
-            var fs = new MockFileSystem();
+        var fs = new MockFileSystem();
+        fs.Initialize().WithFile("test.exe");
 
-            _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
-                .Returns(fs.FileInfo.New("test.exe"));
+        _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
+            .Returns(fs.FileInfo.New("test.exe"));
 
-            var e2 = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
-            Assert.StartsWith("Executable for", e2.Message);
-        }
+        _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()))
+            .Throws(new GameStartException(_game.Object, "Test message"));
 
-        [Fact]
-        public void TesGameNotStarted_Throws()
-        {
-            _game.Setup(g => g.Game).Returns(_game.Object);
-            _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+        var e2 = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
+        Assert.Equal("Test message", e2.Message);
+    }
 
-            _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), ArgumentCollection.Empty, GameBuildType.Release)).Returns(true);
+    [Fact]
+    public void TestGameStarted()
+    {
+        _game.Setup(g => g.Game).Returns(_game.Object);
+        _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
-            var fs = new MockFileSystem();
-            fs.Initialize().WithFile("test.exe");
+        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
+        _client.Setup(c => c.DefaultArguments)
+            .Returns(new ArgumentCollection(new List<IGameArgument> { new WindowedArgument() }));
+        _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release)).Returns(true);
 
-            _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
-                .Returns(fs.FileInfo.New("test.exe"));
+        var fs = new MockFileSystem();
+        fs.Initialize().WithFile("test.exe");
 
-            _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()))
-                .Throws(new GameStartException(_game.Object, "Test message"));
+        _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
+            .Returns(fs.FileInfo.New("test.exe"));
 
-            var e2 = Assert.Throws<GameStartException>(() => _client.Object.Play(_game.Object));
-            Assert.Equal("Test message", e2.Message);
-        }
-
-        [Fact]
-        public void TestGameStarted()
-        {
-            _game.Setup(g => g.Game).Returns(_game.Object);
-            _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-
-            _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments)
-                .Returns(new ArgumentCollection(new List<IGameArgument> { new WindowedArgument() }));
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release)).Returns(true);
-
-            var fs = new MockFileSystem();
-            fs.Initialize().WithFile("test.exe");
-
-            _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
-                .Returns(fs.FileInfo.New("test.exe"));
-
-            var process = new Mock<IGameProcess>(); 
-            _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()))
-                .Callback((IFileInfo _, GameProcessInfo g) =>
-                {
-                    var arg = Assert.Single(g.Arguments);
-                    Assert.Equal(new WindowedArgument(), arg);
-                    process.Setup(p => p.ProcessInfo).Returns(g);
-                    process.Setup(p => p.State).Returns(GameProcessState.Running);
-                })
-                .Returns(process.Object);
-
-
-            _client.Setup(c => c.OnGameStarted(It.IsAny<IGameProcess>()))
-                .Callback((IGameProcess p) =>
-                {
-                    Assert.Equal(GameProcessState.Running, p.State);
-                });
-
-
-            var gameStarted = false;
-            _client.Object.GameStarted += (_, gameProcess) =>
+        var process = new Mock<IGameProcess>(); 
+        _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()))
+            .Callback((IFileInfo _, GameProcessInfo g) =>
             {
-                Assert.Equal(gameProcess.ProcessInfo, process.Object.ProcessInfo);
-                gameStarted = true;
-            };
+                var arg = Assert.Single(g.Arguments);
+                Assert.Equal(new WindowedArgument(), arg);
+                process.Setup(p => p.ProcessInfo).Returns(g);
+                process.Setup(p => p.State).Returns(GameProcessState.Running);
+            })
+            .Returns(process.Object);
+
+
+        _client.Setup(c => c.OnGameStarted(It.IsAny<IGameProcess>()))
+            .Callback((IGameProcess p) =>
+            {
+                Assert.Equal(GameProcessState.Running, p.State);
+            });
+
+
+        var gameStarted = false;
+        _client.Object.GameStarted += (_, gameProcess) =>
+        {
+            Assert.Equal(gameProcess.ProcessInfo, process.Object.ProcessInfo);
+            gameStarted = true;
+        };
            
             
-            var actualProcess = _client.Object.Play(_game.Object);
+        var actualProcess = _client.Object.Play(_game.Object);
 
-            Assert.Equal(actualProcess.ProcessInfo, process.Object.ProcessInfo);
-            Assert.True(gameStarted);
-            _launcher.Verify(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()), Times.Exactly(1));
-            _client.Verify(l => l.OnGameStarted(It.IsAny<IGameProcess>()), Times.Exactly(1));
-        }
+        Assert.Equal(actualProcess.ProcessInfo, process.Object.ProcessInfo);
+        Assert.True(gameStarted);
+        _launcher.Verify(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()), Times.Exactly(1));
+        _client.Verify(l => l.OnGameStarted(It.IsAny<IGameProcess>()), Times.Exactly(1));
+    }
 
-        [Fact]
-        public void TestRunningInstanceListUpdates()
+    [Fact]
+    public void TestRunningInstanceListUpdates()
+    {
+        _game.Setup(g => g.Game).Returns(_game.Object);
+        _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+
+        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
+        _client.Setup(c => c.DefaultArguments)
+            .Returns(new ArgumentCollection(new List<IGameArgument> { new WindowedArgument() }));
+        _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release)).Returns(true);
+
+        var fs = new MockFileSystem();
+        fs.Initialize().WithFile("test.exe");
+
+        _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
+            .Returns(fs.FileInfo.New("test.exe"));
+
+        var process = new Mock<IGameProcess>();
+        _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()))
+            .Returns(process.Object);
+
+
+        Assert.Empty(_client.Object.RunningInstances); 
+        _client.Object.Play(_game.Object);
+        Assert.Single(_client.Object.RunningInstances);
+
+        var closed = false;
+        _client.Object.GameClosed += (_, gameProcess) =>
         {
-            _game.Setup(g => g.Game).Returns(_game.Object);
-            _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+            Assert.Equal(gameProcess.ProcessInfo, process.Object.ProcessInfo);
+            closed = true;
+        };
 
-            _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments)
-                .Returns(new ArgumentCollection(new List<IGameArgument> { new WindowedArgument() }));
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release)).Returns(true);
-
-            var fs = new MockFileSystem();
-            fs.Initialize().WithFile("test.exe");
-
-            _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
-                .Returns(fs.FileInfo.New("test.exe"));
-
-            var process = new Mock<IGameProcess>();
-            _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()))
-                .Returns(process.Object);
+        process.Raise(p => p.Closed += null, EventArgs.Empty);
 
 
-            Assert.Empty(_client.Object.RunningInstances); 
-            _client.Object.Play(_game.Object);
-            Assert.Single(_client.Object.RunningInstances);
+        Assert.True(closed);
+        Assert.Empty(_client.Object.RunningInstances);
+    }
 
-            var closed = false;
-            _client.Object.GameClosed += (_, gameProcess) =>
+    [Fact]
+    public void TestGameStartedButClosedWhileInHandler()
+    {
+        _game.Setup(g => g.Game).Returns(_game.Object);
+        _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+
+        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
+        _client.Setup(c => c.DefaultArguments)
+            .Returns(new ArgumentCollection(new List<IGameArgument> { new WindowedArgument() }));
+        _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release)).Returns(true);
+
+        var fs = new MockFileSystem();
+        fs.Initialize().WithFile("test.exe");
+
+        _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
+            .Returns(fs.FileInfo.New("test.exe"));
+
+        var process = new Mock<IGameProcess>();
+        _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()))
+            .Returns(process.Object);
+
+
+        _client.Setup(c => c.OnGameStarted(It.IsAny<IGameProcess>()))
+            .Callback(() =>
             {
-                Assert.Equal(gameProcess.ProcessInfo, process.Object.ProcessInfo);
-                closed = true;
-            };
-
-            process.Raise(p => p.Closed += null, EventArgs.Empty);
+                process.Setup(p => p.State).Returns(GameProcessState.Closed);
+            });
 
 
-            Assert.True(closed);
-            Assert.Empty(_client.Object.RunningInstances);
-        }
-
-        [Fact]
-        public void TestGameStartedButClosedWhileInHandler()
+        var gameStarted = false;
+        _client.Object.GameStarted += (_, _) =>
         {
-            _game.Setup(g => g.Game).Returns(_game.Object);
-            _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-
-            _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-            _client.Setup(c => c.DefaultArguments)
-                .Returns(new ArgumentCollection(new List<IGameArgument> { new WindowedArgument() }));
-            _client.Setup(c => c.OnGameStarting(It.IsAny<IGame>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release)).Returns(true);
-
-            var fs = new MockFileSystem();
-            fs.Initialize().WithFile("test.exe");
-
-            _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Release))
-                .Returns(fs.FileInfo.New("test.exe"));
-
-            var process = new Mock<IGameProcess>();
-            _launcher.Setup(l => l.StartGameProcess(It.IsAny<IFileInfo>(), It.IsAny<GameProcessInfo>()))
-                .Returns(process.Object);
+            gameStarted = true;
+        };
 
 
-            _client.Setup(c => c.OnGameStarted(It.IsAny<IGameProcess>()))
-                .Callback(() =>
-                {
-                    process.Setup(p => p.State).Returns(GameProcessState.Closed);
-                });
+        var actualProcess = _client.Object.Play(_game.Object);
 
-
-            var gameStarted = false;
-            _client.Object.GameStarted += (_, _) =>
-            {
-                gameStarted = true;
-            };
-
-
-            var actualProcess = _client.Object.Play(_game.Object);
-
-            Assert.Equal(actualProcess.ProcessInfo, process.Object.ProcessInfo);
-            Assert.False(gameStarted);
-            _client.Verify(l => l.OnGameStarted(It.IsAny<IGameProcess>()), Times.Exactly(1));
-            Assert.Empty(_client.Object.RunningInstances);
-        }
+        Assert.Equal(actualProcess.ProcessInfo, process.Object.ProcessInfo);
+        Assert.False(gameStarted);
+        _client.Verify(l => l.OnGameStarted(It.IsAny<IGameProcess>()), Times.Exactly(1));
+        Assert.Empty(_client.Object.RunningInstances);
     }
 }
