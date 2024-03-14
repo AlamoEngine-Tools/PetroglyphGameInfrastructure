@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients.Threading;
+﻿namespace PG.StarWarsGame.Infrastructure.Clients.Threading;
 
 // From https://github.com/microsoft/vs-threading and https://github.com/dotnet/runtime
 

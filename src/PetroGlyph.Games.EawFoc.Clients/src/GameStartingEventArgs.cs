@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
+using PetroGlyph.Games.EawFoc;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
 /// Cancelable event handler when a game was requested to start.

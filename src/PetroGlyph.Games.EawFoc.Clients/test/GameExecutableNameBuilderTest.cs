@@ -1,5 +1,4 @@
 ﻿using Moq;
-using PetroGlyph.Games.EawFoc.Clients;
 using PetroGlyph.Games.EawFoc.Games;
 using Xunit;
 

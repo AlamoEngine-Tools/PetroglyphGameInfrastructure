@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
+using PetroGlyph.Games.EawFoc;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 ///  Create a <see cref="ModArgumentList"/> from a given mod instance

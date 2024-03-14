@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 internal class DefaultGameProcessLauncher(IServiceProvider serviceProvider) : IGameProcessLauncher
 {

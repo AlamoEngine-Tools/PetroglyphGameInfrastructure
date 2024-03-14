@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Factory service to create a <see cref="ModArgumentList"/> from a given mod instance.

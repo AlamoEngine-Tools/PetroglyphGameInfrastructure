@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients;
+﻿namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
 /// The game's build type identifier.

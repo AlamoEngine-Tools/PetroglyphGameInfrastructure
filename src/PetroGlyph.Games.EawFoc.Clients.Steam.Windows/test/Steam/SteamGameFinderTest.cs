@@ -2,7 +2,6 @@
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using Testably.Abstractions.Testing;
 using Xunit;
 

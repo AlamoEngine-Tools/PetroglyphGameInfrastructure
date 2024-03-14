@@ -1,7 +1,7 @@
 ﻿using System.IO.Abstractions;
 using PetroGlyph.Games.EawFoc.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
 /// Get the executable file of a Petroglyph Star Wars game.

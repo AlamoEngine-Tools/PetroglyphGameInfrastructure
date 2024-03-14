@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 internal interface IProcessHelper
 {

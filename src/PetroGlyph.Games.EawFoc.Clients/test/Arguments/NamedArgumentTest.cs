@@ -1,4 +1,4 @@
-﻿using PetroGlyph.Games.EawFoc.Clients.Arguments;
+﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;

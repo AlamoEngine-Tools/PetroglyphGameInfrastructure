@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;

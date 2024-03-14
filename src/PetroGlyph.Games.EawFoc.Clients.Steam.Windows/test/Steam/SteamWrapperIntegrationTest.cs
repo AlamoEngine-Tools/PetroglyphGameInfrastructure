@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.Test.Steam;

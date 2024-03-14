@@ -1,7 +1,8 @@
 ﻿using System;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
+using PetroGlyph.Games.EawFoc;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 /// <summary>
 /// Metadata for an <see cref="IGameProcess"/>.

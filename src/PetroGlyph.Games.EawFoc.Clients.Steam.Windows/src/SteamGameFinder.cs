@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 

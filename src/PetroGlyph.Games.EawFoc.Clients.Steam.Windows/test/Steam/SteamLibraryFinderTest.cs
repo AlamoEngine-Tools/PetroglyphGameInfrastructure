@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetroGlyph.Games.EawFoc;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using Testably.Abstractions.Testing;
 using Xunit;
 

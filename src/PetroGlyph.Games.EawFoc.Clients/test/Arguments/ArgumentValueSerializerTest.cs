@@ -1,5 +1,5 @@
 ﻿using System;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;

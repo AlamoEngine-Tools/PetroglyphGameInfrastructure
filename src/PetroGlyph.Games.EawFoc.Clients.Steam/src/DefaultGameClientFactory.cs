@@ -1,7 +1,7 @@
 ﻿using System;
 using PetroGlyph.Games.EawFoc.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
 /// <see cref="IGameClientFactory"/> which creates a <see cref="SteamGameClient"/> for the Steam platform
