@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam.NativeMethods;
 
 internal static class Kernel32
 {

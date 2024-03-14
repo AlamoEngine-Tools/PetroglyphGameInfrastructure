@@ -7,8 +7,10 @@ using Gameloop.Vdf;
 using Gameloop.Vdf.JsonConverter;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using PetroGlyph.Games.EawFoc;
+using PetroGlyph.Games.EawFoc.Clients.Steam;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 internal class SteamVdfReader : ISteamAppManifestReader, ILibraryConfigReader
 {

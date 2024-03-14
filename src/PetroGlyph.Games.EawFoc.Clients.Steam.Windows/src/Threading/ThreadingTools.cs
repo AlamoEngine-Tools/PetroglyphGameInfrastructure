@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Threading;
 
 // From https://github.com/microsoft/vs-threading
 internal static class ThreadingTools
