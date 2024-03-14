@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using EawModinfo.Spec;
+using PetroGlyph.Games.EawFoc;
 using PetroGlyph.Games.EawFoc.Games;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test;
+namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class PlayableObjectTest
 {

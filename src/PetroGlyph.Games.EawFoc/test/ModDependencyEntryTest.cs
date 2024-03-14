@@ -4,7 +4,7 @@ using PetroGlyph.Games.EawFoc.Mods;
 using Semver;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test;
+namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class ModDependencyEntryTest
 {

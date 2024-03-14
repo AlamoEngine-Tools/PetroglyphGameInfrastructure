@@ -3,7 +3,7 @@ using EawModinfo.Spec;
 using PetroGlyph.Games.EawFoc.Services.Language;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test;
+namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class LanguageInfoUtilitiesTest
 {

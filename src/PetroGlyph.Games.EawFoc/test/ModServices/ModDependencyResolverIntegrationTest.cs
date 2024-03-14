@@ -5,6 +5,7 @@ using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
+using PetroGlyph.Games.EawFoc;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Dependencies;
@@ -12,7 +13,7 @@ using Semver;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.ModServices;
+namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public class ModDependencyResolverIntegrationTest
 {

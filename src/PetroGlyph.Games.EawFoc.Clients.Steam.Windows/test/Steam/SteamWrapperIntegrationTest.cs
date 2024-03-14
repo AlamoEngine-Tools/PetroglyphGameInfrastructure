@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using PetroGlyph.Games.EawFoc.Clients;
+using PetroGlyph.Games.EawFoc.Clients.Steam;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.Test.Steam;
 
 public class SteamWrapperIntegrationTest
 {

@@ -2,6 +2,7 @@
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using PetroGlyph.Games.EawFoc;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 using PetroGlyph.Games.EawFoc.Games;
@@ -10,11 +11,9 @@ using PetroGlyph.Games.EawFoc.Services.Dependencies;
 using PetroGlyph.Games.EawFoc.Services.Steam;
 using Testably.Abstractions.Testing;
 using Xunit;
-#if NET
-using System;
-#endif
+using System.Runtime.InteropServices;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
 public class ModArgumentListFactoryTest
 {
@@ -92,12 +91,8 @@ public class ModArgumentListFactoryTest
         var modList = _service.BuildArgumentList(new List<IMod> { modA.Object }, false);
 
         var arg = Assert.Single(modList.Value);
-#if NET
-        if (!OperatingSystem.IsWindows())
-            Assert.Equal("mods/a", arg.Value);
-        else
-#endif
-        Assert.Equal("MODS\\A", arg.Value);
+
+        Assert.Equal(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "mods/a" : "MODS\\A", arg.Value);
         Assert.Equal(ArgumentNameCatalog.ModPathArg, arg.Name);
     }
 
@@ -115,12 +110,7 @@ public class ModArgumentListFactoryTest
         var modList = _service.BuildArgumentList(new List<IMod> { modA.Object }, false);
 
         var arg = Assert.Single(modList.Value);
-#if NET
-        if (!OperatingSystem.IsWindows())
-            Assert.Equal("../d:/a", arg.Value);
-        else
-#endif
-        Assert.Equal("D:\\A", arg.Value);
+        Assert.Equal(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "../d:/a" : "D:\\A", arg.Value);
         Assert.Equal(ArgumentNameCatalog.ModPathArg, arg.Name);
     }
 

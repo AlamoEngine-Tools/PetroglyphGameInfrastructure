@@ -5,7 +5,7 @@ using PetroGlyph.Games.EawFoc.Mods;
 using PetroGlyph.Games.EawFoc.Services.Icon;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.ModServices;
+namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public class CompositeModIconFinderTest
 {
