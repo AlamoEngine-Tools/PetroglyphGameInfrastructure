@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Attribute to indicate that an enum shall be serialized by its underlying value.

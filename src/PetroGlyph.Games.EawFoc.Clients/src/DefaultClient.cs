@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Clients.Processes;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
  
 /// <summary>
 /// Default client implementation for non-Steam games.

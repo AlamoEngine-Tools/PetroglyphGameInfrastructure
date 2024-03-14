@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
 /// Represents a Steam Library location.

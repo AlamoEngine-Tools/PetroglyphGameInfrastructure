@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using PetroGlyph.Games.EawFoc.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
 
 internal class GameExecutableFileService(IServiceProvider serviceProvider) : IGameExecutableFileService
 {

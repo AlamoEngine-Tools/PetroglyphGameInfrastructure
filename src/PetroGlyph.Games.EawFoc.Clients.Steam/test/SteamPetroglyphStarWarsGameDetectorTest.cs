@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;

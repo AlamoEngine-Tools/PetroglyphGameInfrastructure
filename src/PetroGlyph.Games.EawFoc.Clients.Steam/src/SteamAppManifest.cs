@@ -1,9 +1,9 @@
-﻿using AnakinRaW.CommonUtilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using AnakinRaW.CommonUtilities;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
 /// Manifest representing an installed Steam game.

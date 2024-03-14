@@ -5,7 +5,6 @@ using System.IO;
 using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 

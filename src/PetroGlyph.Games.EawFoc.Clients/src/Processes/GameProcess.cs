@@ -6,7 +6,7 @@ using AnakinRaW.CommonUtilities;
 #if !NET
 #endif
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 internal sealed class GameProcess : IGameProcess
 {

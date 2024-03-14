@@ -2,7 +2,7 @@
 using EawModinfo.Spec;
 using PetroGlyph.Games.EawFoc.Services.Language;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
 #region Flags Normal
 

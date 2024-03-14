@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 internal class ProcessHelper : IProcessHelper
 {

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;

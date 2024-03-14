@@ -1,10 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using PetroGlyph.Games.EawFoc;
 #if NET
 using System.Diagnostics.CodeAnalysis;
 #endif
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
 /// .NET Wrapper to interact with the Steam Client

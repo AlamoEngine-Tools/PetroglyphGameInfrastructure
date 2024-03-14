@@ -1,6 +1,7 @@
 ﻿using System;
+using PetroGlyph.Games.EawFoc;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
 /// The exception that is thrown when a game was not started successfully.

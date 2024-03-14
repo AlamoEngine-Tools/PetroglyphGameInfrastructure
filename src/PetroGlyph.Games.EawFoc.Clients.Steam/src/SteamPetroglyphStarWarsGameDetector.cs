@@ -5,7 +5,7 @@ using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Games.Registry;
 using PetroGlyph.Games.EawFoc.Services.Detection;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
 /// Searches an installation of a Petroglyph Star Wars game on the Steam client.

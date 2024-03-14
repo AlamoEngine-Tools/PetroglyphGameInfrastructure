@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+﻿namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 /// <summary>
 /// The sate of a game process.

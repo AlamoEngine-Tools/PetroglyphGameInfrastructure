@@ -1,10 +1,8 @@
 ﻿using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Clients;
-using PetroGlyph.Games.EawFoc.Clients.Processes;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
 using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Clients.Processes;
 using Testably.Abstractions.Testing;
 using Xunit;
 
