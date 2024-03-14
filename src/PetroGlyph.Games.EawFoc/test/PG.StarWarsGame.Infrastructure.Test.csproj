@@ -8,8 +8,7 @@
 		<TargetFrameworks>net8.0</TargetFrameworks>
 		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net48</TargetFrameworks>
 		<IsPackable>false</IsPackable>
-		<IsTestable>true</IsTestable>
-		<NoWarn>8600;8625;0162</NoWarn>
+		<IsTestable>true</IsTestable><NoWarn>8600;8625;0162</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
