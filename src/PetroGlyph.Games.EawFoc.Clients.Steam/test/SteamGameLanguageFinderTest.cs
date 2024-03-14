@@ -4,11 +4,12 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using PetroGlyph.Games.EawFoc.Clients.Steam;
 using PetroGlyph.Games.EawFoc.Games;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam.Test;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
 public class SteamGameLanguageFinderTest
 {

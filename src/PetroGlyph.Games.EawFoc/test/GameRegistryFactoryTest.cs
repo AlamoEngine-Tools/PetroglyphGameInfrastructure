@@ -6,7 +6,7 @@ using PetroGlyph.Games.EawFoc.Games.Registry;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test;
+namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class GameRegistryFactoryTest
 {

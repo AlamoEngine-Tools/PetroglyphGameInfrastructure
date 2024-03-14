@@ -4,10 +4,11 @@ using System.Globalization;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
+using PetroGlyph.Games.EawFoc;
 using PetroGlyph.Games.EawFoc.Services.Name;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.ModServices;
+namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public class CompositeModNameResolverTest
 {

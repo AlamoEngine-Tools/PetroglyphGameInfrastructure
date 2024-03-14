@@ -2,10 +2,12 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using PetroGlyph.Games.EawFoc;
+using PetroGlyph.Games.EawFoc.Clients.Steam;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.Test.Steam;
 
 public class SteamVdfReaderTest
 {

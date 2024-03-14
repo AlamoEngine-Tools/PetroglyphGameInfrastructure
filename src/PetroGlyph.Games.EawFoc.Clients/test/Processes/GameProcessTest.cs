@@ -1,14 +1,15 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
+using PetroGlyph.Games.EawFoc.Clients;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
 using PetroGlyph.Games.EawFoc.Games;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test.Processes;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test.Processes;
 
 public class GameProcessTest
 {
@@ -17,13 +18,7 @@ public class GameProcessTest
     {
         var game = new Mock<IGame>();
 
-        string processName;
-#if NET
-        if (!OperatingSystem.IsWindows())
-            processName = "bash";
-        else
-#endif
-        processName = "cmd";
+        var processName = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "bash" : "cmd";
 
         var p = Process.Start(processName);
         var gp = new GameProcess(p, new GameProcessInfo(game.Object, GameBuildType.Debug, ArgumentCollection.Empty));
@@ -43,13 +38,8 @@ public class GameProcessTest
     public async Task TestAlreadyExited()
     {
         var game = new Mock<IGame>();
-        string processName;
-#if NET
-        if (!OperatingSystem.IsWindows())
-            processName = "bash";
-        else
-#endif
-            processName = "cmd";
+        var processName = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "bash" : "cmd";
+
         var p = Process.Start(processName);
         p.Kill();
         var gp = new GameProcess(p, new GameProcessInfo(game.Object, GameBuildType.Debug, ArgumentCollection.Empty));

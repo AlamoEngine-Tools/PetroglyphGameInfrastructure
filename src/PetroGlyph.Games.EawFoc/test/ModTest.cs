@@ -9,7 +9,7 @@ using PetroGlyph.Games.EawFoc.Services.Detection;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test;
+namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class ModTest
 {

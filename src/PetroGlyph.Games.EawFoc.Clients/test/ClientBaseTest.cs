@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using Xunit;
+using PetroGlyph.Games.EawFoc;
+using PetroGlyph.Games.EawFoc.Clients;
 using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
+using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Mods;
 using Testably.Abstractions.Testing;
+using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test;
 
 public class ClientBaseTest
 {

@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using PetroGlyph.Games.EawFoc.Clients;
 using PetroGlyph.Games.EawFoc.Games;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test;
 
 public class GameExecutableFileServiceTest
 {

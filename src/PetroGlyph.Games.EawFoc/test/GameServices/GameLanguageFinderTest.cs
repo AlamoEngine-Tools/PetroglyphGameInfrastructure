@@ -7,7 +7,7 @@ using PetroGlyph.Games.EawFoc.Services.Language;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
 public class GameLanguageFinderTest
 {

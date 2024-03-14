@@ -4,7 +4,7 @@ using PetroGlyph.Games.EawFoc.Clients.Arguments;
 using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
 public class ArgumentValidatorTest
 {

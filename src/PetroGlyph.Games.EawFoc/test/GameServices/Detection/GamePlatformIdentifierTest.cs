@@ -7,7 +7,7 @@ using PetroGlyph.Games.EawFoc.Services.Detection.Platform;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
 public class GamePlatformIdentifierTest
 {

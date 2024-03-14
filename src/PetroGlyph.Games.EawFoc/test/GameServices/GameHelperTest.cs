@@ -1,12 +1,13 @@
 ﻿using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using PetroGlyph.Games.EawFoc;
 using PetroGlyph.Games.EawFoc.Games;
 using PetroGlyph.Games.EawFoc.Services.Steam;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
 public class GameHelperTest
 {
