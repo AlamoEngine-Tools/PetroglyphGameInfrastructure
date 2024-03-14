@@ -7,8 +7,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
 		<RootNamespace>PetroGlyph.Games.EawFoc.Clients.Steam</RootNamespace>
-		<Nullable>enable</Nullable>
-		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 	</PropertyGroup>
 
 	<PropertyGroup>
