@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
+using PetroGlyph.Games.EawFoc.Clients.Steam;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 internal class SteamGameFinder : ISteamGameFinder
 {

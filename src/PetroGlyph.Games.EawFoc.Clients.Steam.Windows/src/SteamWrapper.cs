@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
@@ -8,14 +9,13 @@ using AnakinRaW.CommonUtilities.Registry.Windows;
 using Gameloop.Vdf;
 using Gameloop.Vdf.JsonConverter;
 using Microsoft.Extensions.DependencyInjection;
+using PetroGlyph.Games.EawFoc;
 using PetroGlyph.Games.EawFoc.Clients.Processes;
-using PetroGlyph.Games.EawFoc.Clients.Steam.NativeMethods;
-using PetroGlyph.Games.EawFoc.Clients.Steam.Threading;
-#if NET
-using System.Diagnostics.CodeAnalysis;
-#endif
+using PetroGlyph.Games.EawFoc.Clients.Steam;
+using PG.StarWarsGame.Infrastructure.Clients.Steam.NativeMethods;
+using PG.StarWarsGame.Infrastructure.Clients.Steam.Threading;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 internal class SteamWrapper : ISteamWrapper
 {
