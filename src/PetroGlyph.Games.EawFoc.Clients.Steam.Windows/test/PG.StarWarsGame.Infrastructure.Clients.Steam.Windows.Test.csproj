@@ -32,9 +32,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj" />
+		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj" />
 		<ProjectReference Include="..\..\Testing\PG.TestingUtilities\PG.TestingUtilities.csproj" />
-		<ProjectReference Include="..\src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows.csproj" />
+		<ProjectReference Include="..\src\PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -5,23 +5,23 @@ VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DDF4836A-1257-4323-A288-B5F277242010}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetroGlyph.Games.EawFoc.Test", "src\PetroGlyph.Games.EawFoc\test\PetroGlyph.Games.EawFoc.Test.csproj", "{90490B07-F4E3-4D1E-B3E3-FD059A0DAB8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PG.StarWarsGame.Infrastructure.Test", "src\PetroGlyph.Games.EawFoc\test\PG.StarWarsGame.Infrastructure.Test.csproj", "{90490B07-F4E3-4D1E-B3E3-FD059A0DAB8D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetroGlyph.Games.EawFoc.Clients", "src\PetroGlyph.Games.EawFoc.Clients\src\PetroGlyph.Games.EawFoc.Clients.csproj", "{F622B36D-E5C9-4C14-B4B1-8871DCF1FF46}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PG.StarWarsGame.Infrastructure.Clients", "src\PetroGlyph.Games.EawFoc.Clients\src\PG.StarWarsGame.Infrastructure.Clients.csproj", "{F622B36D-E5C9-4C14-B4B1-8871DCF1FF46}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetroGlyph.Games.EawFoc.Clients.Steam.Windows", "src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows\src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows.csproj", "{3EB69B97-AD3F-4D72-BE49-D17547EE0895}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PG.StarWarsGame.Infrastructure.Clients.Steam.Windows", "src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows\src\PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.csproj", "{3EB69B97-AD3F-4D72-BE49-D17547EE0895}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetroGlyph.Games.EawFoc", "src\PetroGlyph.Games.EawFoc\src\PetroGlyph.Games.EawFoc.csproj", "{6A14A57C-60E6-4DDE-B8F0-55ADB3A20758}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PG.StarWarsGame.Infrastructure", "src\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj", "{6A14A57C-60E6-4DDE-B8F0-55ADB3A20758}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{91EC3980-0C87-484F-91E5-0FE684C1D2E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test", "src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows\test\PetroGlyph.Games.EawFoc.Clients.Steam.Windows.Test.csproj", "{9F5EB615-86CB-4AF1-88B9-A1DAF4EAF9F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.Test", "src\PetroGlyph.Games.EawFoc.Clients.Steam.Windows\test\PG.StarWarsGame.Infrastructure.Clients.Steam.Windows.Test.csproj", "{9F5EB615-86CB-4AF1-88B9-A1DAF4EAF9F2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetroGlyph.Games.EawFoc.Clients.Test", "src\PetroGlyph.Games.EawFoc.Clients\test\PetroGlyph.Games.EawFoc.Clients.Test.csproj", "{0D5DAC91-BB5F-46F4-9145-4296E9151DC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PG.StarWarsGame.Infrastructure.Clients.Test", "src\PetroGlyph.Games.EawFoc.Clients\test\PG.StarWarsGame.Infrastructure.Clients.Test.csproj", "{0D5DAC91-BB5F-46F4-9145-4296E9151DC3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetroGlyph.Games.EawFoc.Clients.Steam", "src\PetroGlyph.Games.EawFoc.Clients.Steam\src\PetroGlyph.Games.EawFoc.Clients.Steam.csproj", "{179786D1-8C85-46B3-9943-30A1902D92B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PG.StarWarsGame.Infrastructure.Clients.Steam", "src\PetroGlyph.Games.EawFoc.Clients.Steam\src\PG.StarWarsGame.Infrastructure.Clients.Steam.csproj", "{179786D1-8C85-46B3-9943-30A1902D92B4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetroGlyph.Games.EawFoc.Clients.Steam.Test", "src\PetroGlyph.Games.EawFoc.Clients.Steam\test\PetroGlyph.Games.EawFoc.Clients.Steam.Test.csproj", "{69666FB7-7F44-451B-8ABF-7F18DEC3AD45}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PG.StarWarsGame.Infrastructure.Clients.Steam.Test", "src\PetroGlyph.Games.EawFoc.Clients.Steam\test\PG.StarWarsGame.Infrastructure.Clients.Steam.Test.csproj", "{69666FB7-7F44-451B-8ABF-7F18DEC3AD45}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApplication", "sample\SampleApplication\SampleApplication.csproj", "{8F295344-3D7B-4983-88FD-D0E5C692CBAB}"
 EndProject

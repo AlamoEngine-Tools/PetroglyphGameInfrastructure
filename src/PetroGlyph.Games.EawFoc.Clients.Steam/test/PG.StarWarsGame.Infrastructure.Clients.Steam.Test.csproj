@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AssemblyName>PG.StarWarsGame.Infrastructure.Test</AssemblyName>
+		<AssemblyName>PG.StarWarsGame.Infrastructure.Clients.Steam.Test</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -9,7 +9,6 @@
 		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net48</TargetFrameworks>
 		<IsPackable>false</IsPackable>
 		<IsTestable>true</IsTestable>
-		<NoWarn>8600;8625;0162</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -20,7 +19,6 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
 		<PackageReference Include="Moq" Version="4.20.70" />
-		<PackageReference Include="QuikGraph" Version="2.5.0" />
 		<PackageReference Include="Testably.Abstractions.Testing" Version="2.6.1" />
 		<PackageReference Include="xunit" Version="2.7.0" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
@@ -34,8 +32,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Testing\PG.TestingUtilities\PG.TestingUtilities.csproj" />
-		<ProjectReference Include="..\src\PetroGlyph.Games.EawFoc.csproj" />
+		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj" />
+		<ProjectReference Include="..\src\PG.StarWarsGame.Infrastructure.Clients.Steam.csproj" />
 	</ItemGroup>
 
 </Project>
