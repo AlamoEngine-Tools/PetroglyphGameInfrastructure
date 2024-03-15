@@ -14,7 +14,7 @@ public interface ISteamGameHelpers
     /// </summary>
     /// <param name="game">The target game</param>
     /// <exception cref="GameException">If the game is not a Steam game</exception>
-    /// <exception cref="SteamException">If it was impossible to compute the workshop location.</exception>
+    /// <exception cref="GameException">If it was impossible to compute the workshop location.</exception>
     /// <exception cref="InvalidOperationException">If the game's directory info is not absolute.</exception>
     IDirectoryInfo GetWorkshopsLocation(IGame game);
 

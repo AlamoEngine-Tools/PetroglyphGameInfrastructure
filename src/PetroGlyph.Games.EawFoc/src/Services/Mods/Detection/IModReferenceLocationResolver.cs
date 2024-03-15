@@ -18,6 +18,5 @@ public interface IModReferenceLocationResolver
     /// <returns>The location information of the <paramref name="mod"/>.</returns>
     /// <exception cref="NotSupportedException">If the <paramref name="mod"/> is a virtual mod.</exception>
     /// <exception cref="PetroglyphException">If some constraints of the given params do not hold.</exception>
-    /// <exception cref="SteamException">If something Steam-related fails.</exception>
     IDirectoryInfo ResolveLocation(IModReference mod, IGame game);
 }
