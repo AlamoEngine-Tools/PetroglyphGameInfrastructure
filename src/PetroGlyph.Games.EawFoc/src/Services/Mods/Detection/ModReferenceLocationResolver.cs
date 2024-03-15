@@ -48,10 +48,10 @@ public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
     {
         var workshopPath = _steamHelper.GetWorkshopsLocation(game);
         if (!workshopPath.Exists)
-            throw new SteamException("Could not find workshops location");
+            throw new GameException("Could not find workshops location");
 
         if (!_steamHelper.ToSteamWorkshopsId(mod.Identifier, out var steamId))
-            throw new SteamException("Mod identifier cannot be interpreted as an Steam-ID");
+            throw new GameException("Mod identifier cannot be interpreted as an Steam-ID");
 
         var modLocation = workshopPath.EnumerateDirectories(steamId.ToString()).FirstOrDefault();
         if (modLocation is null || !modLocation.Exists)

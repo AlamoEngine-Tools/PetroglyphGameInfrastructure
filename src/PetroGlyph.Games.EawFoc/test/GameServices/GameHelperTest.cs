@@ -43,7 +43,7 @@ public class GameHelperTest
         var mock = new Mock<IGame>();
         mock.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
         mock.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-        Assert.Throws<SteamException>(() => _service.GetWorkshopsLocation(mock.Object));
+        Assert.Throws<GameException>(() => _service.GetWorkshopsLocation(mock.Object));
     }
 
     [Fact]
