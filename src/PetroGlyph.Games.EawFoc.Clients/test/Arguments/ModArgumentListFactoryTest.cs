@@ -5,6 +5,7 @@ using Moq;
 using Testably.Abstractions.Testing;
 using Xunit;
 using System.Runtime.InteropServices;
+using AET.SteamAbstraction;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.StarWarsGame.Infrastructure.Games;

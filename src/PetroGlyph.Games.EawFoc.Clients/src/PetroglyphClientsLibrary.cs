@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
-using PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 namespace PG.StarWarsGame.Infrastructure.Clients;
 
@@ -16,8 +15,6 @@ public class PetroglyphClientsLibrary
     /// <param name="serviceCollection">The service collection to be filled.</param>
     public static void InitializeLibraryWithDefaultServices(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<IProcessHelper>(_ => new ProcessHelper());
-
         serviceCollection.AddTransient<IGameExecutableFileService>(sp => new GameExecutableFileService(sp));
         serviceCollection.AddTransient<IGameExecutableNameBuilder>(_ => new GameExecutableNameBuilder());
             
