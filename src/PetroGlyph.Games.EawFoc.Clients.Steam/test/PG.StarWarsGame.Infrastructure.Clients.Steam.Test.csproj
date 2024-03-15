@@ -33,7 +33,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj" />
-		<ProjectReference Include="..\src\PG.StarWarsGame.Infrastructure.Clients.Steam.csproj" />
 	</ItemGroup>
 
 </Project>

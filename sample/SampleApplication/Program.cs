@@ -67,7 +67,6 @@ IServiceProvider SetupApplication()
     var sc = new ServiceCollection();
     PetroglyphGameInfrastructureLibrary.InitializeLibraryWithDefaultServices(sc);
     PetroglyphClientsLibrary.InitializeLibraryWithDefaultServices(sc);
-    PetroglyphWindowsSteamClientsLibrary.InitializeLibraryWithDefaultServices(sc);
 
     sc.AddSingleton(WindowsRegistry.Default);
     sc.AddTransient<IGameDetector>(sp => new SteamPetroglyphStarWarsGameDetector(sp));
