@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
+using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
