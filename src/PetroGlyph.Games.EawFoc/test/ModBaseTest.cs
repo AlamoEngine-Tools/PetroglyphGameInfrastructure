@@ -168,7 +168,7 @@ public class ModBaseTest
         var sp = new Mock<IServiceProvider>();
         var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
 
-        Assert.Equal(0, mod.Mods.Count);
+        Assert.Empty(mod.Mods);
 
         var modMock = new Mock<IMod>();
         modMock.Setup(m => m.Game).Returns(game.Object);
@@ -176,16 +176,16 @@ public class ModBaseTest
         var modA = modMock.Object;
 
         mod.AddMod(modA);
-        Assert.Equal(1, mod.Mods.Count);
+        Assert.Single( mod.Mods);
         mod.AddMod(modA);
-        Assert.Equal(1, mod.Mods.Count);
+        Assert.Single(mod.Mods);
         Assert.Single(mod);
 
         mod.RemoveMod(modA);
-        Assert.Equal(0, mod.Mods.Count);
+        Assert.Empty(mod.Mods);
 
         mod.RemoveMod(modA);
-        Assert.Equal(0, mod.Mods.Count);
+        Assert.Empty(mod.Mods);
         Assert.Empty(mod);
     }
 
