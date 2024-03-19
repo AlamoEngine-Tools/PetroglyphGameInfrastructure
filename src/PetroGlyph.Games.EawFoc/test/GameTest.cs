@@ -37,7 +37,7 @@ public class GameTest
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
 
-        Assert.Equal(0, game.Mods.Count);
+        Assert.Empty(game.Mods);
 
         var modMock = new Mock<IMod>();
         modMock.Setup(m => m.Game).Returns(game);
@@ -45,16 +45,16 @@ public class GameTest
         var modA = modMock.Object;
 
         game.AddMod(modA);
-        Assert.Equal(1, game.Mods.Count);
+        Assert.Single(game.Mods);
         game.AddMod(modA);
-        Assert.Equal(1, game.Mods.Count);
+        Assert.Single(game.Mods);
         Assert.Single(game);
 
         game.RemoveMod(modA);
-        Assert.Equal(0, game.Mods.Count);
+        Assert.Empty(game.Mods);
 
         game.RemoveMod(modA);
-        Assert.Equal(0, game.Mods.Count);
+        Assert.Empty(game.Mods);
         Assert.Empty(game);
     }
 
