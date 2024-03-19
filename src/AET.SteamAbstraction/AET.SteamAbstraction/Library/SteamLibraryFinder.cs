@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AET.SteamAbstraction;
+namespace AET.SteamAbstraction.Library;
 
 internal class SteamLibraryFinder : ISteamLibraryFinder
 {

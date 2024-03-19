@@ -56,9 +56,9 @@ public class ModArgumentListTest
         }
 
         public ArgumentKind Kind => ArgumentKind.Flag;
-        public bool DebugArgument { get; }
-        public string Name { get; }
-        public string Value { get; }
+        public bool DebugArgument => false;
+        public string Name => null!;
+        public string Value => null!;
 
         object IGameArgument.Value => Value;
 

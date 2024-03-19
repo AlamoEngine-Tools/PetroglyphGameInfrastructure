@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AET.SteamAbstraction;
+namespace AET.SteamAbstraction.Library;
 
 internal interface ISteamLibraryFinder
 {

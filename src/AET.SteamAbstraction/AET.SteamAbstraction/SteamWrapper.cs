@@ -7,22 +7,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.NativeMethods;
 using AET.SteamAbstraction.Utilities;
+using AnakinRaW.CommonUtilities;
 using Gameloop.Vdf;
 using Gameloop.Vdf.JsonConverter;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;
 
-internal abstract class SteamWrapper(IServiceProvider serviceProvider) : ISteamWrapper
+internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider serviceProvider) : DisposableObject, ISteamWrapper
 {
-
     private readonly IProcessHelper _processHelper = serviceProvider.GetRequiredService<IProcessHelper>();
 
-    protected ISteamRegistry Registry { get; } = serviceProvider.GetRequiredService<ISteamRegistry>();
+    protected ISteamRegistry Registry { get; } = registry ?? throw new ArgumentNullException(nameof(registry));
+
     protected IServiceProvider ServiceProvider { get; } = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+
     protected IFileSystem FileSystem { get; } = serviceProvider.GetRequiredService<IFileSystem>();
 
-    public bool Installed => Registry.ExeFile?.Exists ?? false;
+    public bool Installed => Registry.ExecutableFile?.Exists ?? false;
 
     public bool IsRunning
     {
@@ -102,7 +104,7 @@ internal abstract class SteamWrapper(IServiceProvider serviceProvider) : ISteamW
         {
             StartInfo =
             {
-                FileName = Registry.ExeFile!.FullName,
+                FileName = Registry.ExecutableFile!.FullName,
                 UseShellExecute = false
             }
         };
@@ -206,5 +208,11 @@ internal abstract class SteamWrapper(IServiceProvider serviceProvider) : ISteamW
     {
         if (!Installed)
             throw new SteamException("Steam is not installed!");
+    }
+
+    protected override void DisposeManagedResources()
+    {
+        Registry.Dispose();
+        base.DisposeManagedResources();
     }
 }

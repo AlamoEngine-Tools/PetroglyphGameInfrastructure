@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace AET.SteamAbstraction;
 
-internal class LinuxSteamWrapper(IServiceProvider serviceProvider) : SteamWrapper(serviceProvider)
+internal class LinuxSteamWrapper(ISteamRegistry registry, IServiceProvider serviceProvider) : SteamWrapper(registry, serviceProvider)
 {
     protected override Task WaitSteamUserLoggedInAsync(CancellationToken token)
     {

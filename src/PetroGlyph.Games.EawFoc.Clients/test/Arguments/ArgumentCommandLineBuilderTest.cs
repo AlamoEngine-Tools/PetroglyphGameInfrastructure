@@ -200,7 +200,7 @@ public class ArgumentCommandLineBuilderTest
         }
 
         public override ArgumentKind Kind => ArgumentKind.Flag;
-        public override string Name { get; }
+        public override string Name { get; } = null!;
         public override string ValueToCommandLine()
         {
             throw new NotImplementedException();
@@ -220,21 +220,21 @@ public class ArgumentCommandLineBuilderTest
 
         public bool Equals(IGameArgument? other)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public ArgumentKind Kind => ArgumentKind.ModList;
-        public bool DebugArgument { get; }
-        public string Name { get; }
-        public object Value { get; }
+        public bool DebugArgument { get; } = false;
+        public string Name { get; } = null!;
+        public object Value { get; } = null!;
         public string ValueToCommandLine()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public bool IsValid(out ArgumentValidityStatus reason)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

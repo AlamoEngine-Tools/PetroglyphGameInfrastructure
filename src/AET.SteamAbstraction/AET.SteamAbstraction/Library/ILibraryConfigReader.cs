@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions;
 
-namespace AET.SteamAbstraction;
+namespace AET.SteamAbstraction.Library;
 
 internal interface ILibraryConfigReader
 {

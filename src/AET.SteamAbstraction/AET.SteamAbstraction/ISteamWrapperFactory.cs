@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace AET.SteamAbstraction;
+﻿namespace AET.SteamAbstraction;
 
 internal interface ISteamWrapperFactory
 {
-    ISteamWrapper CreateWrapper(IServiceProvider serviceProvider);
+    ISteamWrapper CreateWrapper();
 }

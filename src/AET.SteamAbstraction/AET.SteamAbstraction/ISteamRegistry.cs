@@ -28,7 +28,7 @@ public interface ISteamRegistry : IDisposable
     /// <summary>
     /// The executable of the Steam client.
     /// </summary>
-    IFileInfo? ExeFile { get; }
+    IFileInfo? ExecutableFile { get; }
 
     /// <summary>
     /// The installation directory of the Steam client

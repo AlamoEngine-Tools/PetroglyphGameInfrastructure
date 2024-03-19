@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using AET.SteamAbstraction.Library;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Testably.Abstractions.Testing;

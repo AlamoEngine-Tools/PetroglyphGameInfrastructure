@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using AET.SteamAbstraction.Library;
 using AnakinRaW.CommonUtilities;
 
 namespace AET.SteamAbstraction;

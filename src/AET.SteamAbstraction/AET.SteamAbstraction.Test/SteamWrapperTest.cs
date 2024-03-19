@@ -56,7 +56,7 @@ namespace AET.SteamAbstraction.Test;
 //    [Fact]
 //    public void TestInstalled()
 //    {
-//        _steamRegistry.SetupSequence(r => r.ExeFile)
+//        _steamRegistry.SetupSequence(r => r.ExecutableFile)
 //            .Returns((IFileInfo?)null)
 //            .Returns(() => _fileSystem.FileInfo.New("steam.exe"))
 //            .Returns(() => _fileSystem.FileInfo.New("steam.exe"));
@@ -127,7 +127,7 @@ namespace AET.SteamAbstraction.Test;
 //    private void SetupInstalledRegistry()
 //    {
 //        _fileSystem.Initialize().WithFile("steam.exe");
-//        _steamRegistry.Setup(r => r.ExeFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+//        _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
 //    }
 
 //    private static string WantsNotOffline()

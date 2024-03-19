@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using Xunit;
 
@@ -47,30 +48,24 @@ public class GameArgumentTest
     }
 
 
-    private class Argument : GameArgument<string>
+    private class Argument(string value, bool isDebug = false) : GameArgument<string>(value, isDebug)
     {
-        public Argument(string value, bool isDebug = false) : base(value, isDebug)
-        {
-        }
-
-        public override ArgumentKind Kind { get; }
-        public override string Name { get; }
+        public override ArgumentKind Kind => ArgumentKind.Flag;
+        public override string Name => null!;
 
         protected override bool IsDataValid()
         {
-            if (Value == "valid")
-                return true;
-            return false;
+            return Value == "valid";
         }
 
         public override string ValueToCommandLine()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override bool Equals(IGameArgument? other)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }
