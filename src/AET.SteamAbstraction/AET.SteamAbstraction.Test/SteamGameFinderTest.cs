@@ -3,6 +3,7 @@ using AET.SteamAbstraction.Library;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Testably.Abstractions.Testing;
+using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 

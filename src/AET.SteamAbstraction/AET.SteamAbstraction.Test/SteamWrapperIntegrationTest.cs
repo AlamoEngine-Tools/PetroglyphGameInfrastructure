@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
