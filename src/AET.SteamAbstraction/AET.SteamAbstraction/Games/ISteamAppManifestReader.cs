@@ -1,7 +1,7 @@
 ﻿using System.IO.Abstractions;
 using AET.SteamAbstraction.Library;
 
-namespace AET.SteamAbstraction;
+namespace AET.SteamAbstraction.Games;
 
 internal interface ISteamAppManifestReader
 {

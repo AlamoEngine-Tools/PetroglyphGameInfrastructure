@@ -21,11 +21,16 @@ public class SteamLibraryFinderTest
         var sc = new ServiceCollection();
         _fileSystem = new MockFileSystem();
         sc.AddSingleton<IFileSystem>(_fileSystem);
-        sc.AddSingleton<ISteamRegistry>(sp => new WindowsSteamRegistry(sp));
+
+        _registry = new Mock<ISteamRegistry>();
+
+        var regFactory = new Mock<ISteamRegistryFactory>();
+        regFactory.Setup(f => f.CreateRegistry()).Returns(_registry.Object);
+
+        sc.AddSingleton(sp => regFactory.Object);
         _reader = new Mock<ILibraryConfigReader>();
         sc.AddTransient(_ => _reader.Object);
-        _registry = new Mock<ISteamRegistry>();
-        sc.AddTransient(_ => _registry.Object);
+        
         _service = new SteamLibraryFinder(sc.BuildServiceProvider());
     }
 

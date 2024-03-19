@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using AET.SteamAbstraction.Games;
 #if NET
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -22,6 +23,18 @@ public interface ISteamWrapper : IDisposable
     /// Returns <see langword="true"/> is Steam is currently running; <see langword="false"/> otherwise.
     /// </summary>
     bool IsRunning { get; }
+
+
+    /// <summary>
+    /// Gets whether a user is logged in. 
+    /// </summary>
+    bool IsUserLoggedIn { get; }
+
+    /// <summary>
+    /// Gets whether the current logged-in user has activated the offline mode.
+    /// <see langword="null"/> if Steam is not installed or the status could not be retrieved.
+    /// </summary>
+    bool? UserWantsOfflineMode { get; }
 
     /// <summary>
     /// Checks whether a given game is installed.

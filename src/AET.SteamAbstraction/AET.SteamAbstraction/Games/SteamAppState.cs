@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AET.SteamAbstraction;
+namespace AET.SteamAbstraction.Games;
 
 /// <summary>
 /// Indicates the State of a Steam game.

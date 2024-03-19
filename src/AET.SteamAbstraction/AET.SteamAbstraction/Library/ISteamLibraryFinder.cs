@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace AET.SteamAbstraction.Library;
 
-internal interface ISteamLibraryFinder
+internal interface ISteamLibraryFinder : IDisposable
 {
     IEnumerable<ISteamLibrary> FindLibraries();
 }
