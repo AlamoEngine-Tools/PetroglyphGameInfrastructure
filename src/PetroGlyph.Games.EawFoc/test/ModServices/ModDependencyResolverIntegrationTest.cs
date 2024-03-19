@@ -24,9 +24,9 @@ public class ModDependencyResolverIntegrationTest
     {
         _fileSystem = new MockFileSystem();
         var sc = new ServiceCollection();
+        PetroglyphGameInfrastructure.InitializeServices(sc);
         sc.AddSingleton<IFileSystem>(_fileSystem);
         sc.AddSingleton<IModDependencyGraphBuilder>(new ModDependencyGraphBuilder());
-        PetroglyphGameInfrastructureLibrary.InitializeLibraryWithDefaultServices(sc);
         _serviceProvider = sc.BuildServiceProvider();
         _game = SetupGame(_fileSystem, _serviceProvider);
     }
