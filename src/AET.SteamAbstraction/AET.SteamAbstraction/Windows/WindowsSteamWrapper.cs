@@ -6,7 +6,7 @@ using AnakinRaW.CommonUtilities.Registry.Windows;
 
 namespace AET.SteamAbstraction;
 
-internal class WindowsSteamWrapper(IServiceProvider serviceProvider) : SteamWrapper(serviceProvider)
+internal class WindowsSteamWrapper(ISteamRegistry registry, IServiceProvider serviceProvider) : SteamWrapper(registry, serviceProvider)
 {
     protected override async Task WaitSteamUserLoggedInAsync(CancellationToken token)
     {

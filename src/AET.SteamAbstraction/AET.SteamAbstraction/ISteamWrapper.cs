@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #if NET
@@ -10,7 +11,7 @@ namespace AET.SteamAbstraction;
 /// <summary>
 /// .NET Wrapper to interact with the Steam Client
 /// </summary>
-public interface ISteamWrapper
+public interface ISteamWrapper : IDisposable
 {
     /// <summary>
     /// Returns <see langword="true"/> is Steam is installed on this machine; <see langword="false"/> otherwise.

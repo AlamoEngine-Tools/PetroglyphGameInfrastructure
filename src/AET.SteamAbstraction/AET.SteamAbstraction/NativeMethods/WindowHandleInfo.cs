@@ -4,15 +4,8 @@ using System.Runtime.InteropServices;
 
 namespace AET.SteamAbstraction.NativeMethods;
 
-internal class WindowHandleInfo
+internal class WindowHandleInfo(IntPtr handle)
 {
-    private readonly IntPtr _mainHandle;
-
-    public WindowHandleInfo(IntPtr handle)
-    {
-        _mainHandle = handle;
-    }
-
     public List<IntPtr> GetAllChildHandles()
     {
         List<IntPtr> childHandles = new();
@@ -23,7 +16,7 @@ internal class WindowHandleInfo
         try
         {
             User32.EnumWindowProc childProc = EnumWindow;
-            User32.EnumChildWindows(_mainHandle, childProc, pointerChildHandlesList);
+            User32.EnumChildWindows(handle, childProc, pointerChildHandlesList);
         }
         finally
         {

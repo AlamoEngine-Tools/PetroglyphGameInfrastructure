@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AET.SteamAbstraction;
+using AET.SteamAbstraction.Library;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +46,7 @@ public class SteamGameLanguageFinderTest
     {
         var game = new Mock<IGame>();
         game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-        _steam.Setup(s => s.IsGameInstalled(32470u, out It.Ref<SteamAppManifest>.IsAny)).Returns(false);
+        _steam.Setup(s => s.IsGameInstalled(32470u, out It.Ref<SteamAppManifest>.IsAny!)).Returns(false);
         Assert.Throws<InvalidOperationException>(() => _service.FindInstalledLanguages(game.Object));
     }
 

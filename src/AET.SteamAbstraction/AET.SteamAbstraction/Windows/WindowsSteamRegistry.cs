@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using System;
 using System.Linq;
+using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;
 
-internal sealed class SteamRegistry : ISteamRegistry
+internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : DisposableObject, ISteamRegistry
 {
     private const string SteamExeKey = "SteamExe";
     private const string SteamPathKey = "SteamPath";
@@ -17,9 +18,11 @@ internal sealed class SteamRegistry : ISteamRegistry
     private const string SteamProcessNode = "ActiveProcess";
     private const string SteamAppsNode = "Apps";
 
-    private IRegistryKey? _registryKey;
-    private bool _disposed;
-    private readonly IFileSystem _fileSystem;
+    private IRegistryKey? _registryKey = serviceProvider.GetRequiredService<IRegistry>()
+        .OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
+        .CreateSubKey("Software\\Valve\\Steam");
+
+    private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
 
     public IRegistryKey? ActiveProcessKey
     {
@@ -54,7 +57,7 @@ internal sealed class SteamRegistry : ISteamRegistry
         }
     }
 
-    public IFileInfo? ExeFile
+    public IFileInfo? ExecutableFile
     {
         get
         {
@@ -92,52 +95,10 @@ internal sealed class SteamRegistry : ISteamRegistry
     }
 
 
-    public SteamRegistry(IServiceProvider serviceProvider)
+    protected override void DisposeManagedResources()
     {
-        _registryKey = serviceProvider.GetRequiredService<IRegistry>()
-            .OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
-            .CreateSubKey("Software\\Valve\\Steam");
-        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-    }
-
-
-    /// <inheritdoc/>
-    ~SteamRegistry()
-    {
-        Dispose(false);
-    }
-
-    /// <summary>
-    /// Disposed all managed resources acquired by this instance.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Disposed all managed resources acquired by this instance.
-    /// </summary>
-    /// <param name="disposing"><see langword="false"/> if called from the destructor; <see langword="true"/> otherwise.</param>
-    private void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _registryKey?.Dispose();
-            _registryKey = null;
-            _disposed = true;
-        }
-    }
-
-#if NET
-        [MemberNotNull(nameof(_registryKey))]
-#endif
-    private void ThrowIfDisposed()
-    {
-        if (_disposed)
-            throw new ObjectDisposedException(ToString());
-        if (_registryKey is null)
-            throw new Exception("registry must not be null in non-disposed state");
+        base.DisposeManagedResources();
+        _registryKey?.Dispose();
+        _registryKey = null;
     }
 }

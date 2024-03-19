@@ -6,7 +6,7 @@ using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AET.SteamAbstraction;
+namespace AET.SteamAbstraction.Library;
 
 internal class SteamLibrary : ISteamLibrary
 {

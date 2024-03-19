@@ -27,7 +27,7 @@ public class DefaultGameProcessLauncherTest
     {
         var game = new Mock<IGame>();
         var process = new GameProcessInfo(game.Object, GameBuildType.Release, ArgumentCollection.Empty);
-        Assert.Throws<GameStartException>(() => _service.StartGameProcess(null, process));
+        Assert.Throws<GameStartException>(() => _service.StartGameProcess(null!, process));
     }
 
     [Fact]

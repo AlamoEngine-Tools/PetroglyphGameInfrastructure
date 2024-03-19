@@ -34,7 +34,7 @@ public class DebugableClientBaseTest
         var fs = new MockFileSystem();
 
         _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
-            .Returns((IFileInfo)null);
+            .Returns((IFileInfo)null!);
         Assert.False(_service.IsDebugAvailable(game.Object));
         _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
             .Returns(fs.FileInfo.New("test.exe"));

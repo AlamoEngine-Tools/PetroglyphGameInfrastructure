@@ -28,9 +28,8 @@ public class GameProcessTest
         };
         p.Kill();
         var cts = new CancellationTokenSource(5000);
-        using (cts.Token.Register(() => tcs.TrySetCanceled(cts.Token))) 
-            await tcs.Task.ConfigureAwait(false);
-        Assert.True(tcs.Task.Result);
+        using (cts.Token.Register(() => tcs.TrySetCanceled(cts.Token)))
+            Assert.True(await tcs.Task);
     }
 
     [Fact]
@@ -47,7 +46,6 @@ public class GameProcessTest
         {
             tcs.SetResult(true);
         };
-        await tcs.Task.ConfigureAwait(false);
-        Assert.True(tcs.Task.Result);
+        Assert.True(await tcs.Task);
     }
 }

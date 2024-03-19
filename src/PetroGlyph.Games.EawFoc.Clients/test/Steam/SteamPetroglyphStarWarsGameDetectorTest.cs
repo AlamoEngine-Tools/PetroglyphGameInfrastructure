@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using AET.SteamAbstraction;
+using AET.SteamAbstraction.Library;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Clients.Steam;
@@ -39,7 +40,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     [Fact]
     public void TestInvalidCtor_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameDetector(null));
+        Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameDetector(null!));
     }
 
     [Fact]

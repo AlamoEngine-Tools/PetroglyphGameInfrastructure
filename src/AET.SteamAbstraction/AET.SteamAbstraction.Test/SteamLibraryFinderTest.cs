@@ -1,7 +1,9 @@
 ﻿using System.IO.Abstractions;
+using AET.SteamAbstraction.Library;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Testably.Abstractions.Testing;
+using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
@@ -17,7 +19,7 @@ public class SteamLibraryFinderTest
         var sc = new ServiceCollection();
         _fileSystem = new MockFileSystem();
         sc.AddSingleton<IFileSystem>(_fileSystem);
-        sc.AddSingleton<ISteamRegistry>(sp => new SteamRegistry(sp));
+        sc.AddSingleton<ISteamRegistry>(sp => new WindowsSteamRegistry(sp));
         _reader = new Mock<ILibraryConfigReader>();
         sc.AddTransient(_ => _reader.Object);
         _registry = new Mock<ISteamRegistry>();

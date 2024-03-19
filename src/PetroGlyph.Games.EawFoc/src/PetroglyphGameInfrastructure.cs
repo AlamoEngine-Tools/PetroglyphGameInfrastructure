@@ -8,14 +8,14 @@ namespace PG.StarWarsGame.Infrastructure;
 /// <summary>
 /// Provides initialization routines for this library.
 /// </summary>
-public static class PetroglyphGameInfrastructureLibrary
+public static class PetroglyphGameInfrastructure
 {
     /// <summary>
     /// Adds services provided by this library to the given <paramref name="serviceCollection"/>
     /// so that the library can be used in client applications. 
     /// </summary>
     /// <param name="serviceCollection">The service collection to be filled.</param>
-    public static void InitializeLibraryWithDefaultServices(IServiceCollection serviceCollection)
+    public static void InitializeServices(IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<IGameRegistryFactory>(_ => new GameRegistryFactory());
         serviceCollection.AddTransient<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
