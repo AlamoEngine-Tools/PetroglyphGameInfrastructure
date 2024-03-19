@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<AssemblyName>AET.SteamAbstraction.Test</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup>
 		<TargetFrameworks>net8.0</TargetFrameworks>
 		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net48</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-
 		<IsPackable>false</IsPackable>
-		<IsTestProject>true</IsTestProject>
+		<IsTestable>true</IsTestable>
 	</PropertyGroup>
 
 	<ItemGroup>
