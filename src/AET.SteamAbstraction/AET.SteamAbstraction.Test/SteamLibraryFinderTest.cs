@@ -1,4 +1,6 @@
-﻿using System.IO.Abstractions;
+﻿using System.Collections.Generic;
+using System.IO.Abstractions;
+using System.Linq;
 using AET.SteamAbstraction.Library;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
