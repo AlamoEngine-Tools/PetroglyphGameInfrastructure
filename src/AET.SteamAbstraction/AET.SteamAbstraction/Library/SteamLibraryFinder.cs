@@ -1,24 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction.Library;
 
-internal class SteamLibraryFinder : ISteamLibraryFinder
+internal class SteamLibraryFinder(IServiceProvider serviceProvider) : DisposableObject, ISteamLibraryFinder
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ISteamRegistry _registry;
-    private readonly IFileSystem _fileSystem;
-    private readonly ILibraryConfigReader _configReader;
-
-    public SteamLibraryFinder(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _registry = serviceProvider.GetRequiredService<ISteamRegistry>();
-        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-        _configReader = serviceProvider.GetRequiredService<ILibraryConfigReader>();
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    private readonly ISteamRegistry _registry = serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
+    private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+    private readonly ILibraryConfigReader _configReader = serviceProvider.GetRequiredService<ILibraryConfigReader>();
 
     public IEnumerable<ISteamLibrary> FindLibraries()
     {
@@ -62,5 +55,11 @@ internal class SteamLibraryFinder : ISteamLibraryFinder
             _fileSystem.Path.Combine(steamInstallLocation.FullName, "config/libraryfolders.vdf"));
 
         return libraryLocationsFile.Exists ? libraryLocationsFile : null;
+    }
+
+    protected override void DisposeManagedResources()
+    {
+        base.DisposeManagedResources();
+        _registry.Dispose();
     }
 }

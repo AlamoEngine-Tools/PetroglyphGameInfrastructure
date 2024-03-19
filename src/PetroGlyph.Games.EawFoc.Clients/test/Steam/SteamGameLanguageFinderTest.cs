@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AET.SteamAbstraction;
+using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
 using EawModinfo.Model;
 using EawModinfo.Spec;

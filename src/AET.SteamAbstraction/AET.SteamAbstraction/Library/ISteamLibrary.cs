@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using AET.SteamAbstraction.Games;
 
 namespace AET.SteamAbstraction.Library;
 

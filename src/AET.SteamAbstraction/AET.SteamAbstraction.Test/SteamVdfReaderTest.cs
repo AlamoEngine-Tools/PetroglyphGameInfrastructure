@@ -1,5 +1,6 @@
 ﻿using System.IO.Abstractions;
 using System.Linq;
+using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;

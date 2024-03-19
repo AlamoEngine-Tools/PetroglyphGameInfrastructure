@@ -1,6 +1,8 @@
-﻿namespace AET.SteamAbstraction;
+﻿using System;
 
-internal interface ISteamGameFinder
+namespace AET.SteamAbstraction.Games;
+
+internal interface ISteamGameFinder : IDisposable
 {
     SteamAppManifest? FindGame(uint gameId);
 }

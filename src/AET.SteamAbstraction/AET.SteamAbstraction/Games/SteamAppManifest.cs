@@ -4,7 +4,7 @@ using System.IO.Abstractions;
 using AET.SteamAbstraction.Library;
 using AnakinRaW.CommonUtilities;
 
-namespace AET.SteamAbstraction;
+namespace AET.SteamAbstraction.Games;
 
 /// <summary>
 /// Manifest representing an installed Steam game.

@@ -1,5 +1,6 @@
 ﻿using System;
 using AET.SteamAbstraction;
+using AET.SteamAbstraction.Games;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;

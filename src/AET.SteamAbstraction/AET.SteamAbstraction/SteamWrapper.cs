@@ -5,6 +5,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.NativeMethods;
 using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities;
@@ -37,7 +38,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         }
     }
 
-    public bool? WantOfflineMode
+    public bool? UserWantsOfflineMode
     {
         get
         {
@@ -70,7 +71,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         }
     }
 
-    internal bool IsUserLoggedIn
+    public bool IsUserLoggedIn
     {
         get
         {
@@ -90,7 +91,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         if (!apps.Contains(gameId))
             return false;
 
-        var gameFinder = ServiceProvider.GetRequiredService<ISteamGameFinder>();
+        using var gameFinder = ServiceProvider.GetRequiredService<ISteamGameFinder>();
         game = gameFinder.FindGame(gameId);
         return game is not null;
     }
@@ -118,7 +119,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         var running = IsRunning;
         if (!running)
         {
-            // Required because a taskmgr kill does not reset this value, so we have to do this manually
+            // Required because an external kill (e.g. by taskmgr) does not reset this value, so we have to do this manually
             Registry.ActiveUserId = 0;
             if (startIfNotRunning)
                 StartSteam();
@@ -128,7 +129,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         if (IsUserLoggedIn)
             return;
 
-        var wantsOffline = WantOfflineMode;
+        var wantsOffline = UserWantsOfflineMode;
         if (wantsOffline != null && wantsOffline.Value)
         {
             await Task.Delay(2000, cancellation);
@@ -207,7 +208,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
     private void ThrowIfSteamNotInstalled()
     {
         if (!Installed)
-            throw new SteamException("Steam is not installed!");
+            throw new SteamNotFoundException();
     }
 
     protected override void DisposeManagedResources()

@@ -22,3 +22,12 @@ public class SteamException : Exception
     {
     }
 }
+
+
+/// <summary>
+/// 
+/// </summary>
+public sealed class SteamNotFoundException : SteamException
+{
+
+}

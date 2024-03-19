@@ -8,7 +8,7 @@ namespace AET.SteamAbstraction;
 /// <summary>
 /// Registry representation for the Steam Client.
 /// </summary>
-public interface ISteamRegistry : IDisposable
+internal interface ISteamRegistry : IDisposable
 {
     /// <summary>
     /// Key to the ActiveProcess node
