@@ -31,8 +31,4 @@
 		<ProjectReference Include="..\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Using Include="Xunit" />
-	</ItemGroup>
-
 </Project>
