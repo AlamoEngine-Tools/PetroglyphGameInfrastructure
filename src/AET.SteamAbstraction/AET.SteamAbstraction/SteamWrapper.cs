@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.NativeMethods;
-using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities;
 using Gameloop.Vdf;
 using Gameloop.Vdf.JsonConverter;
@@ -17,7 +16,6 @@ namespace AET.SteamAbstraction;
 
 internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider serviceProvider) : DisposableObject, ISteamWrapper
 {
-    private readonly IProcessHelper _processHelper = serviceProvider.GetRequiredService<IProcessHelper>();
 
     protected ISteamRegistry Registry { get; } = registry ?? throw new ArgumentNullException(nameof(registry));
 
@@ -27,16 +25,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
 
     public bool Installed => Registry.ExecutableFile?.Exists ?? false;
 
-    public bool IsRunning
-    {
-        get
-        {
-            var pid = Registry.ProcessId;
-            if (pid is null or 0)
-                return false;
-            return _processHelper.GetProcessByPid(pid.Value) != null;
-        }
-    }
+    public abstract bool IsRunning { get; }
 
     public bool? UserWantsOfflineMode
     {
@@ -75,8 +64,9 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
     {
         get
         {
-            var userId = Registry.ActiveUserId;
-            return userId is not (null or 0);
+            if (!IsRunning)
+                return false;
+            return Registry.ActiveUserId is not (null or 0);
         }
     }
 
@@ -116,14 +106,18 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         CancellationToken cancellation = default)
     {
         ThrowIfSteamNotInstalled();
-        var running = IsRunning;
-        if (!running)
+        if (!IsRunning)
         {
             // Required because an external kill (e.g. by taskmgr) does not reset this value, so we have to do this manually
             Registry.ActiveUserId = 0;
             if (startIfNotRunning)
+            {
                 StartSteam();
-            await WaitSteamRunningAsync(cancellation);
+                await WaitSteamRunningAsync(cancellation).ConfigureAwait(false);
+            }
+
+            if (!IsRunning)
+                throw new SteamException("Steam is not running anymore.");
         }
 
         if (IsUserLoggedIn)
@@ -132,78 +126,21 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         var wantsOffline = UserWantsOfflineMode;
         if (wantsOffline != null && wantsOffline.Value)
         {
-            await Task.Delay(2000, cancellation);
-            await WaitSteamOfflineRunning(cancellation);
-            cancellation.ThrowIfCancellationRequested();
-            if (!IsRunning)
-                throw new SteamException("Steam is not running anymore.");
+            await WaitSteamOfflineRunning(cancellation).ConfigureAwait(false);
         }
         else
         {
-            await WaitSteamUserLoggedInAsync(cancellation);
+            await WaitSteamUserLoggedInAsync(cancellation).ConfigureAwait(false);
+            if (Registry.ActiveUserId == 0)
+                throw new SteamException("Login was not completed.");
         }
     }
 
-    private async Task WaitSteamOfflineRunning(CancellationToken token)
-    {
-        var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token);
-        var linkedToken = linkedCts.Token;
-        try
-        {
-            var mainWindowTask = Task.Run(() => WaitMainWindowIsSteamClient(linkedToken), token);
-            var userLoginTask = Task.Run(() => WaitSteamUserLoggedInAsync(linkedToken), token);
-            await Task.WhenAny(mainWindowTask, userLoginTask).ConfigureAwait(false);
-        }
-        finally
-        {
-            linkedCts.Cancel();
-            linkedCts.Dispose();
-        }
-    }
+    protected abstract Task WaitSteamOfflineRunning(CancellationToken token);
 
     protected abstract Task WaitSteamUserLoggedInAsync(CancellationToken token);
 
     protected abstract Task WaitSteamRunningAsync(CancellationToken token);
-
-    private async Task WaitMainWindowIsSteamClient(CancellationToken token)
-    {
-        while (IsRunning)
-        {
-            token.ThrowIfCancellationRequested();
-            var mainWindowHasChildren = GetSteamMainWindowHandle();
-            if (mainWindowHasChildren)
-                return;
-            // Just some arbitrary waiting 
-            await Task.Delay(750, token);
-        }
-
-
-        // If anybody knows a smarter way, let me know!
-        static bool GetSteamMainWindowHandle()
-        {
-            var p = Process.GetProcessesByName("steam").FirstOrDefault();
-            try
-            {
-                var handle = p?.MainWindowHandle;
-                if (handle is null)
-                    return false;
-                var c = new WindowHandleInfo(handle.Value).GetAllChildHandles();
-                var text = User32.GetWindowTitle(handle.Value);
-                    
-                // Empty string typically is the Installer/Updater dialog.
-                // We don't want to early-exit on this one!
-                if (string.IsNullOrEmpty(text))
-                    return false;
-
-                // The Steam-Client has children while the selection dialog (Go Online/Stay Offline) has none.
-                return c.Any();
-            }
-            finally
-            {
-                p?.Dispose();
-            }
-        }
-    }
 
     private void ThrowIfSteamNotInstalled()
     {
