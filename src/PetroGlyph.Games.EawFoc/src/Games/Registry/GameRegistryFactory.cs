@@ -1,9 +1,8 @@
 ﻿using System;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Games.Registry;
+namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 /// <inheritdoc cref="IGameRegistryFactory"/>
 public class GameRegistryFactory : IGameRegistryFactory
@@ -17,7 +16,8 @@ public class GameRegistryFactory : IGameRegistryFactory
     /// <inheritdoc/>
     public IGameRegistry CreateRegistry(GameType type, IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
         var registry = serviceProvider.GetRequiredService<IRegistry>();
         var baseKey = registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
 

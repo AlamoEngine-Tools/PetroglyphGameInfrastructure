@@ -1,7 +1,7 @@
 ﻿using System;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
 
 internal sealed class GameExecutableNameBuilder : IGameExecutableNameBuilder
 {

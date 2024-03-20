@@ -3,35 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities.FileSystem;
+using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
-
-/// <summary>
-/// Attribute to indicate that an enum shall be serialized by its name.
-/// </summary>
-[AttributeUsage(AttributeTargets.Enum)]
-public class SerializeEnumNameAttribute : Attribute { }
-
-/// <summary>
-/// Attribute to indicate that an enum shall be serialized by its underlying value.
-/// </summary>
-[AttributeUsage(AttributeTargets.Enum)]
-public class SerializeEnumValueAttribute : Attribute { }
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 internal class ArgumentValueSerializer
 {
-    private readonly IPathHelperService? _pathHelper;
-
     private static readonly Dictionary<string, (Type, TypeConverter?)> SpecialTypes;
-
-    public ArgumentValueSerializer()
-    {
-    }
-
-    internal ArgumentValueSerializer(IPathHelperService pathHelper)
-    {
-        _pathHelper = pathHelper;
-    }
 
     static ArgumentValueSerializer()
     {
@@ -70,15 +48,21 @@ internal class ArgumentValueSerializer
 
     public string ShortenPath(IFileSystemInfo target, IDirectoryInfo gameDir)
     {
-        var pathHelper = _pathHelper ?? new PathHelperService(gameDir.FileSystem);
+        var fileSystem = target.FileSystem;
 
-        var gamePath = pathHelper.EnsureTrailingSeparator(
-            pathHelper.NormalizePath(gameDir.FullName, PathNormalizeOptions.Full));
-        var targetPath = pathHelper.EnsureTrailingSeparator(
-            pathHelper.NormalizePath(target.FullName, PathNormalizeOptions.Full));
+        var gamePath = PathNormalizer.Normalize(fileSystem.Path.GetFullPath(gameDir.FullName),
+            PathNormalizeOptions.EnsureTrailingSeparator);
+
+        var targetPath = PathNormalizer.Normalize(fileSystem.Path.GetFullPath(target.FullName),
+            PathNormalizeOptions.EnsureTrailingSeparator);
 
         // It's important not to resolve, as that would give us an absolute path again.
-        return pathHelper.NormalizePath(pathHelper.GetRelativePath(gamePath, targetPath), PathNormalizeOptions.FullNoResolve);
+        return PathNormalizer.Normalize(fileSystem.Path.GetRelativePathEx(gamePath, targetPath), new PathNormalizeOptions
+        {
+            TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim,
+            UnifyCase = UnifyCasingKind.UpperCase, 
+            UnifyDirectorySeparators = true
+        });
     }
 
     private static TypeConverter? GetConverter(string typeName)

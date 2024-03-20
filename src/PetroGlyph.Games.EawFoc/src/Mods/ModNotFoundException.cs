@@ -1,6 +1,6 @@
 ﻿using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// Exception indicating a queried mod, <see cref="IMod"/> or <see cref="IModReference"/> was not found in some <see cref="IModContainer"/> instance.

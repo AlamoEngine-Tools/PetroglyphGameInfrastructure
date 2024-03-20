@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Globalization;
 using System.IO.Abstractions;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Detection;
-using PetroGlyph.Games.EawFoc.Services.Name;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Name;
 
-namespace PetroGlyph.Games.EawFoc.Services;
+namespace PG.StarWarsGame.Infrastructure.Services;
 
 /// <inheritdoc/>
 public class GameFactory : IGameFactory
@@ -42,18 +41,16 @@ public class GameFactory : IGameFactory
     /// <param name="serviceProvider">The service provider which gets passed to the game instances.</param>
     public GameFactory(IGameNameResolver nameResolver, CultureInfo nameCulture, IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        Requires.NotNull(nameResolver, nameof(nameResolver));
-        Requires.NotNull(nameCulture, nameof(nameCulture));
-        _nameResolver = nameResolver;
-        _nameCulture = nameCulture;
-        _serviceProvider = serviceProvider;
+        _nameResolver = nameResolver ?? throw new ArgumentNullException(nameof(nameResolver));
+        _nameCulture = nameCulture ?? throw new ArgumentNullException(nameof(nameCulture));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     /// <inheritdoc/>
     public IGame CreateGame(GameDetectionResult gameDetection)
     {
-        Requires.NotNull(gameDetection, nameof(gameDetection));
+        if (gameDetection == null)
+            throw new ArgumentNullException(nameof(gameDetection));
         if (gameDetection.Error is not null)
             throw new GameException("Unable to create a game from faulted detection result.");
         if (gameDetection.GameLocation is null)
@@ -64,7 +61,8 @@ public class GameFactory : IGameFactory
     /// <inheritdoc/>
     public IGame CreateGame(IGameIdentity identity, IDirectoryInfo location, bool checkGameExists)
     {
-        Requires.NotNull(location, nameof(location));
+        if (location == null) 
+            throw new ArgumentNullException(nameof(location));
         if (identity.Platform == GamePlatform.Undefined)
             throw new ArgumentException("Cannot create a game with undefined platform");
 

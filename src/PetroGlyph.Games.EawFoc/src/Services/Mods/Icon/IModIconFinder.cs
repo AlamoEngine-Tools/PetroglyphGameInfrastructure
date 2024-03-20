@@ -1,6 +1,6 @@
-﻿using PetroGlyph.Games.EawFoc.Mods;
+﻿using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Icon;
+namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 
 /// <summary>
 /// Service to find icons for <see cref="IMod"/>s.

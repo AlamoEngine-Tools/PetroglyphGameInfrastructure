@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Games;
+﻿namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
 /// Common constants for Petroglyph Star Wars game.

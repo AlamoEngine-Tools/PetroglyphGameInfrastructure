@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Represents a typed argument for a Petroglyph Star Wars game.

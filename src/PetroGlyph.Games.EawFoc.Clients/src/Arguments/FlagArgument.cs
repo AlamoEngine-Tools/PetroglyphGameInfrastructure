@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Argument which enables a game behavior because it exists.

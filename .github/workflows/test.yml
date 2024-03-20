@@ -18,16 +18,12 @@ jobs:
     runs-on: ${{ matrix.os }}
         
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-dotnet@v3
+      - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '8.0.x'
         
       - name: Build & Test in Release Mode
         run: dotnet test --configuration Release --logger "GitHubActions"
-
-      - name: Build & Test .NET Framework
-        if: matrix.os == 'windows-latest'
-        run: dotnet test --configuration Release -f net48 --logger "GitHubActions"

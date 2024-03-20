@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using AnakinRaW.CommonUtilities.Registry.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc;
-using PetroGlyph.Games.EawFoc.Clients;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
-using PetroGlyph.Games.EawFoc.Services.Detection;
-using PetroGlyph.Games.EawFoc.Services.Name;
+using PG.StarWarsGame.Infrastructure;
+using PG.StarWarsGame.Infrastructure.Clients;
+using PG.StarWarsGame.Infrastructure.Clients.Steam;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Name;
 
 
 var sp = SetupApplication();
@@ -65,9 +65,6 @@ IGame FindGame()
 IServiceProvider SetupApplication()
 {
     var sc = new ServiceCollection();
-    PetroglyphGameInfrastructureLibrary.InitializeLibraryWithDefaultServices(sc);
-    PetroglyphClientsLibrary.InitializeLibraryWithDefaultServices(sc);
-    PetroglyphWindowsSteamClientsLibrary.InitializeLibraryWithDefaultServices(sc);
 
     sc.AddSingleton(WindowsRegistry.Default);
     sc.AddTransient<IGameDetector>(sp => new SteamPetroglyphStarWarsGameDetector(sp));

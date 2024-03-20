@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 internal sealed class ArgumentValidator : IArgumentValidator
 {

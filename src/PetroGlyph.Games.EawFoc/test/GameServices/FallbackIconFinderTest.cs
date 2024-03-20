@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.FileService;
-using PetroGlyph.Games.EawFoc.Services.Icon;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.FileService;
+using PG.StarWarsGame.Infrastructure.Services.Icon;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
 public class FallbackIconFinderTest
 {
@@ -52,7 +52,7 @@ public class FallbackIconFinderTest
         game.Setup(g => g.FileService).Returns(fileService.Object);
         var finder = new FallbackGameIconFinder();
         var icon = finder.FindIcon(game.Object);
-        Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/foc.ico" : "C:\\Game\\foc.ico", icon);
+        Assert.Equal(fs.Path.GetFullPath("Game/foc.ico"), icon);
     }
 
     [Fact]
@@ -70,6 +70,6 @@ public class FallbackIconFinderTest
         game.Setup(g => g.FileService).Returns(fileService.Object);
         var finder = new FallbackGameIconFinder();
         var icon = finder.FindIcon(game.Object);
-        Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/eaw.ico" : "C:\\Game\\eaw.ico", icon);
+        Assert.Equal(fs.Path.GetFullPath("Game/eaw.ico"), icon);
     }
 }

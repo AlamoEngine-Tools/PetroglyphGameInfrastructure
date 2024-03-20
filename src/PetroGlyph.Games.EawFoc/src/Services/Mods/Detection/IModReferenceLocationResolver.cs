@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO.Abstractions;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
 /// Service to search for a physical location of a given <see cref="IModReference"/>.
@@ -18,6 +18,5 @@ public interface IModReferenceLocationResolver
     /// <returns>The location information of the <paramref name="mod"/>.</returns>
     /// <exception cref="NotSupportedException">If the <paramref name="mod"/> is a virtual mod.</exception>
     /// <exception cref="PetroglyphException">If some constraints of the given params do not hold.</exception>
-    /// <exception cref="SteamException">If something Steam-related fails.</exception>
     IDirectoryInfo ResolveLocation(IModReference mod, IGame game);
 }

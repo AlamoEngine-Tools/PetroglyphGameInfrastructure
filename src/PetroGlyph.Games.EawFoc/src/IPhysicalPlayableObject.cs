@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.IO.Abstractions;
-using PetroGlyph.Games.EawFoc.Services.FileService;
+using PG.StarWarsGame.Infrastructure.Services.FileService;
 
-namespace PetroGlyph.Games.EawFoc;
+namespace PG.StarWarsGame.Infrastructure;
 
 /// <summary>
 /// An <see cref="IPlayableObject"/> which has a file system and usually is installed on a machine.

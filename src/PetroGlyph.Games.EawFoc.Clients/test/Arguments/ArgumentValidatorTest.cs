@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
 public class ArgumentValidatorTest
 {
@@ -30,15 +30,15 @@ public class ArgumentValidatorTest
         {
             if (i is '\f' or '\n' or '\r' or '\t' or '\v' )
                 continue;
-            yield return new[] { $"abc{(char)i}" };
+            yield return [$"abc{(char)i}"];
         }
-        yield return new[] { "abc?" };
-        yield return new[] { "abc*" };
-        yield return new[] { "abc:" };
-        yield return new[] { "abc|" };
-        yield return new[] { "abc>" };
-        yield return new[] { "abc<" };
-        yield return new[] { $"abc{'\"'}" };
+        yield return ["abc?"];
+        yield return ["abc*"];
+        yield return ["abc:"];
+        yield return ["abc|"];
+        yield return ["abc>"];
+        yield return ["abc<"];
+        yield return [$"abc{'\"'}"];
     }
 
     [Theory]
@@ -53,11 +53,11 @@ public class ArgumentValidatorTest
 
     public static IEnumerable<object[]> GetEmptyDataValues()
     {
-        yield return new object[] { new StringArg(""), true };
-        yield return new object[] { new StringArg(string.Empty), true };
-        yield return new object[] { new StringArg("\0"), false };
-        yield return new object[] { new StringArg("abc"), false };
-        yield return new object[] { new StringArg("     "), false };
+        yield return [new StringArg(""), true];
+        yield return [new StringArg(string.Empty), true];
+        yield return [new StringArg("\0"), false];
+        yield return [new StringArg("abc"), false];
+        yield return [new StringArg("     "), false];
     }
 
     [Theory]
@@ -79,19 +79,19 @@ public class ArgumentValidatorTest
 
     public static IEnumerable<object[]> GetSpaceTestData()
     {
-        yield return new object[] { new StringArg(""), false };
-        yield return new object[] { new StringArg("testvalue"), false };
-        yield return new object[] { new StringArg("    "), true};
-        yield return new object[] { new StringArg(" "), true };
-        yield return new object[] { new StringArg("test\tvalue"), true };
-        yield return new object[] { new StringArg("test\fvalue"), true };
-        yield return new object[] { new StringArg("test\rvalue"), true };
-        yield return new object[] { new StringArg("test\nvalue"), true };
-        yield return new object[] { new StringArg("test\vvalue"), true };
-        yield return new object[] { new StringArg("\0"), false };
-        yield return new object[] { new StringArg("test value"), true };
-        yield return new object[] { new StringArg("testvalue "), true };
-        yield return new object[] { new StringArg("testvalue "), true };
+        yield return [new StringArg(""), false];
+        yield return [new StringArg("testvalue"), false];
+        yield return [new StringArg("    "), true];
+        yield return [new StringArg(" "), true];
+        yield return [new StringArg("test\tvalue"), true];
+        yield return [new StringArg("test\fvalue"), true];
+        yield return [new StringArg("test\rvalue"), true];
+        yield return [new StringArg("test\nvalue"), true];
+        yield return [new StringArg("test\vvalue"), true];
+        yield return [new StringArg("\0"), false];
+        yield return [new StringArg("test value"), true];
+        yield return [new StringArg("testvalue "), true];
+        yield return [new StringArg("testvalue "), true];
     }
 
     [Theory]
@@ -146,12 +146,12 @@ public class ArgumentValidatorTest
         }
 
         public ArgumentKind Kind => ArgumentKind.ModList;
-        public bool DebugArgument { get; }
+        public bool DebugArgument { get; } = false;
         public string Name => ArgumentNameCatalog.ModListArg;
         public object Value => "Some Value";
         public string ValueToCommandLine()
         {
-            return Value.ToString();
+            return Value.ToString()!;
         }
 
         public bool IsValid(out ArgumentValidityStatus reason)

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// This instance represents a mod for a Petroglyph Star Wars game.

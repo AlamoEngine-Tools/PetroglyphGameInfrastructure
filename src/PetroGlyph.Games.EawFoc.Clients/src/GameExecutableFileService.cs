@@ -3,22 +3,15 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
 
-internal class GameExecutableFileService : IGameExecutableFileService
+internal class GameExecutableFileService(IServiceProvider serviceProvider) : IGameExecutableFileService
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public GameExecutableFileService(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
     public IFileInfo? GetExecutableForGame(IGame game, GameBuildType buildType)
     {
-        var nameBuilder = _serviceProvider.GetRequiredService<IGameExecutableNameBuilder>();
+        var nameBuilder = serviceProvider.GetRequiredService<IGameExecutableNameBuilder>();
         var exeFileName = nameBuilder.GetExecutableFileName(game, buildType);
         if (string.IsNullOrEmpty(exeFileName))
             return null;

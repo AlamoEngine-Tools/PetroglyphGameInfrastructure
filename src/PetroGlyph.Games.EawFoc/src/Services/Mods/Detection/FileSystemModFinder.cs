@@ -2,23 +2,22 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
-using AnakinRaW.CommonUtilities.FileSystem;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Steam;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
 /// Searches for <see cref="IModReference"/>s on the file system.
 /// </summary>
 public class FileSystemModFinder : IModReferenceFinder
 {
-    private readonly IPathHelperService _pathHelperService;
     private readonly ISteamGameHelpers _steamHelper;
+    private readonly IFileSystem _fileSystem;
+    private readonly IModIdentifierBuilder _idBuilder;
 
     /// <summary>
     /// Creates a new instance.
@@ -26,9 +25,10 @@ public class FileSystemModFinder : IModReferenceFinder
     /// <param name="serviceProvider">The service provider</param>
     public FileSystemModFinder(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        var fs = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
-        _pathHelperService = serviceProvider.GetService<IPathHelperService>() ?? new PathHelperService(fs);
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
+        _idBuilder = serviceProvider.GetRequiredService<IModIdentifierBuilder>();
+        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
     }
 
@@ -41,7 +41,9 @@ public class FileSystemModFinder : IModReferenceFinder
     /// <exception cref="GameException">If the <paramref name="game"/> is not installed.</exception>
     public ISet<IModReference> FindMods(IGame game)
     {
-        Requires.NotNull(game, nameof(game));
+        if (game == null) 
+            throw new ArgumentNullException(nameof(game));
+
         if (!game.Exists())
             throw new GameException("The game does not exist");
 
@@ -69,11 +71,10 @@ public class FileSystemModFinder : IModReferenceFinder
             yield break;
 
         var type = isWorkshopsPath ? ModType.Workshops : ModType.Default;
+
         foreach (var modDirectory in lookupDirectory.EnumerateDirectories())
         {
-            var id = isWorkshopsPath
-                ? modDirectory.Name
-                : _pathHelperService.NormalizePath(modDirectory.FullName, PathNormalizeOptions.Full);
+            var id = _idBuilder.Build(modDirectory, isWorkshopsPath);
             yield return new ModReference(id, type);
         }
     }

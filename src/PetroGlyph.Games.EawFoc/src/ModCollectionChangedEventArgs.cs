@@ -1,7 +1,7 @@
 ﻿using System;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc;
+namespace PG.StarWarsGame.Infrastructure;
 
 /// <summary>
 /// <see cref="EventArgs"/> for a <see cref="IModContainer.ModsCollectionModified"/> event.

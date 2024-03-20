@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
 
-namespace PetroGlyph.Games.EawFoc.Games;
+namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
 /// Representation of a Petroglyph Star Wars Game.

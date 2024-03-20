@@ -4,7 +4,7 @@ using System.Threading;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Services.Language;
+namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
 /// <summary>
 /// Utilities for <see cref="ILanguageInfo"/>.

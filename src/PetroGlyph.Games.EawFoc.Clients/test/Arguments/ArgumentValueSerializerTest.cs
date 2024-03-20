@@ -1,11 +1,10 @@
 ﻿using System;
-using System.IO.Abstractions.TestingHelpers;
-using AnakinRaW.CommonUtilities.FileSystem;
-using Moq;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.TestingUtilities;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
 public class ArgumentValueSerializerTest
 {
@@ -39,24 +38,8 @@ public class ArgumentValueSerializerTest
         Assert.Throws<InvalidOperationException>(() => serializer.Serialize(-1));
     }
 
-    [Fact]
-    public void TestShortenCallsCorrectMethods()
-    {
-        var helper = new Mock<IPathHelperService>();
-        var serializer = new ArgumentValueSerializer(helper.Object);
-
-        var fs = new MockFileSystem();
-        var game = fs.DirectoryInfo.New("game");
-        var mod = fs.DirectoryInfo.New("game/mod");
-
-        serializer.ShortenPath(mod, game);
-
-        helper.Verify(h => h.GetRelativePath(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(1));
-        helper.Verify(h => h.NormalizePath(It.IsAny<string>(), PathNormalizeOptions.FullNoResolve), Times.Exactly(1));
-    }
-
-    [Fact]
-    public void TestShorten_Integration()
+    [PlatformSpecificFact(TestPlatformIdentifier.Linux)]
+    public void TestShorten_Integration_Linux()
     {
         var serializer = new ArgumentValueSerializer();
 
@@ -67,5 +50,19 @@ public class ArgumentValueSerializerTest
         serializer.ShortenPath(mod, game);
 
         Assert.Equal("mod", serializer.ShortenPath(mod, game));
+    }
+
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
+    public void TestShorten_Integration_Windows()
+    {
+        var serializer = new ArgumentValueSerializer();
+
+        var fs = new MockFileSystem();
+        var game = fs.DirectoryInfo.New("game");
+        var mod = fs.DirectoryInfo.New("game/mod");
+
+        serializer.ShortenPath(mod, game);
+
+        Assert.Equal("MOD", serializer.ShortenPath(mod, game));
     }
 }

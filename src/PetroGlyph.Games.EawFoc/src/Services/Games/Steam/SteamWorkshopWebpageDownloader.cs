@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
 
-namespace PetroGlyph.Games.EawFoc.Services.Steam;
+namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 
 internal class SteamWorkshopWebpageDownloader : ISteamWorkshopWebpageDownloader
 {

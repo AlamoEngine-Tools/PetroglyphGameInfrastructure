@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AET.SteamAbstraction;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
-using PetroGlyph.Games.EawFoc.Services.Steam;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 ///  Create a <see cref="ModArgumentList"/> from a given mod instance
@@ -26,8 +26,7 @@ public class ModArgumentListFactory : IModArgumentListFactory
     /// <param name="serviceProvider">The service provider.</param>
     public ModArgumentListFactory(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _serviceProvider = serviceProvider;
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     /// <inheritdoc/>

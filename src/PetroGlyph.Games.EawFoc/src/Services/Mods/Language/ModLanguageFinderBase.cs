@@ -4,11 +4,10 @@ using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
-namespace PetroGlyph.Games.EawFoc.Services.Language;
+namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
 /// <summary>
 /// Base implementation for a <see cref="IModLanguageFinder"/> service.
@@ -45,8 +44,7 @@ public abstract class ModLanguageFinderBase : IModLanguageFinder
     /// dependency Resolving should already be performed. Otherwise the <paramref name="lookupInheritedLanguages"/> has no effect.</remarks> 
     protected ModLanguageFinderBase(IServiceProvider serviceProvider, bool lookupInheritedLanguages)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        ServiceProvider = serviceProvider;
+        ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _lookupInheritedLanguages = lookupInheritedLanguages;
         Helper = serviceProvider.GetService<ILanguageFinder>() ?? new FileBasedLanguageFinder();
     }

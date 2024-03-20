@@ -3,10 +3,9 @@ using System.Globalization;
 using EawModinfo.Spec;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Services.Steam;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// Resolves a mod's name by crawling the name from the mod's steam workshop page.
@@ -39,7 +38,9 @@ public class OnlineWorkshopNameResolver : ModNameResolverBase
 
     private static string GetName(HtmlDocument htmlDocument)
     {
-        Requires.NotNull(htmlDocument, nameof(htmlDocument));
+        if (htmlDocument == null)
+            throw new ArgumentNullException(nameof(htmlDocument));
+
         var node = htmlDocument.DocumentNode.SelectSingleNode("//div[contains(@class, 'workshopItemTitle')]");
         if (node is null)
             throw new InvalidOperationException("Unable to get name form Workshop's web page. Mussing 'workshopItemTitle' node.");

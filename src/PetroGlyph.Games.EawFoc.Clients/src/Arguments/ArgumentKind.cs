@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Flag indication the kindness of an <see cref="IGameArgument"/>

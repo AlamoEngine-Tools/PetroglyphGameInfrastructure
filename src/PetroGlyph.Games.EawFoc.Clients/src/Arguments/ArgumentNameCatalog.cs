@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Collections of supported Argument Names

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Detection;
-using PetroGlyph.Games.EawFoc.Services.Detection.Platform;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
 public class GameDetectorTest
 {
@@ -19,7 +19,7 @@ public class GameDetectorTest
         const GameType type = GameType.Foc;
 
         var fs = new MockFileSystem();
-        fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("Game/swfoc.exe");
 
         var identifier = new Mock<IGamePlatformIdentifier>();
         identifier.Setup(i => i.GetGamePlatform(It.IsAny<GameType>(), ref It.Ref<IDirectoryInfo>.IsAny, It.IsAny<IList<GamePlatform>>()))
@@ -77,7 +77,7 @@ public class GameDetectorTest
         const GameType type = GameType.Foc;
 
         var fs = new MockFileSystem();
-        fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("Game/swfoc.exe");
 
         var identifier = new Mock<IGamePlatformIdentifier>();
         identifier.Setup(i => i.GetGamePlatform(It.IsAny<GameType>(), ref It.Ref<IDirectoryInfo>.IsAny, It.IsAny<IList<GamePlatform>>()))
@@ -106,7 +106,7 @@ public class GameDetectorTest
         const GameType type = GameType.Foc;
 
         var fs = new MockFileSystem();
-        fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("Game/swfoc.exe");
 
         var identifier = new Mock<IGamePlatformIdentifier>();
         identifier.Setup(i => i.GetGamePlatform(It.IsAny<GameType>(), ref It.Ref<IDirectoryInfo>.IsAny, It.IsAny<IList<GamePlatform>>()))
@@ -139,7 +139,7 @@ public class GameDetectorTest
         const GameType type = GameType.Foc;
 
         var fs = new MockFileSystem();
-        fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("Game/swfoc.exe");
 
         var identifier = new Mock<IGamePlatformIdentifier>();
         identifier.Setup(i => i.GetGamePlatform(It.IsAny<GameType>(), ref It.Ref<IDirectoryInfo>.IsAny, It.IsAny<IList<GamePlatform>>()))
@@ -177,7 +177,7 @@ public class GameDetectorTest
         const GameType type = GameType.Foc;
 
         var fs = new MockFileSystem();
-        fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("Game/swfoc.exe");
 
         var identifier = new Mock<IGamePlatformIdentifier>();
         identifier.Setup(i => i.GetGamePlatform(It.IsAny<GameType>(), ref It.Ref<IDirectoryInfo>.IsAny, It.IsAny<IList<GamePlatform>>()))
@@ -210,7 +210,7 @@ public class GameDetectorTest
         const GameType type = GameType.Foc;
 
         var fs = new MockFileSystem();
-        fs.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("Game/swfoc.exe");
 
         var identifier = new Mock<IGamePlatformIdentifier>();
         identifier.Setup(i => i.GetGamePlatform(It.IsAny<GameType>(), ref It.Ref<IDirectoryInfo>.IsAny,

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
 /// Service to search for <see cref="IModReference"/>s.

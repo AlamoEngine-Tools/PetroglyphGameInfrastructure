@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Language;
+namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
 /// <summary>
 /// Service to get installed mods. Implementations are aware of the modinfo specification

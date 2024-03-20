@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
+namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 /// <summary>
 /// Data Structure which represents a mod's dependency graph.

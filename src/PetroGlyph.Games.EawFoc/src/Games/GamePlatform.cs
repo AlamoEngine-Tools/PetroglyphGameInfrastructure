@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Games;
+﻿namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
 /// The platform the game was packaged for.

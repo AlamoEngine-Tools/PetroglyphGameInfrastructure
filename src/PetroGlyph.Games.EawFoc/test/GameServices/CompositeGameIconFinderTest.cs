@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Icon;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Icon;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
 public class CompositeGameIconFinderTest
 {

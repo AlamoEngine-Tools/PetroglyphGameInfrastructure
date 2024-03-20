@@ -2,11 +2,10 @@
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Detection.Platform;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
 /// Base implementation for an <see cref="IGameDetector"/>
@@ -42,8 +41,7 @@ public abstract class GameDetector : IGameDetector
     /// When set to <see langword="false"/> the event will not be raised and initialization cannot be handled.</param>
     protected GameDetector(IServiceProvider serviceProvider, bool tryHandleInitialization)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        ServiceProvider = serviceProvider;
+        ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _tryHandleInitialization = tryHandleInitialization;
         Logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
         FileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();

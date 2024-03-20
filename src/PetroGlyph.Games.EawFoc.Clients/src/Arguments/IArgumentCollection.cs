@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Represents a collection of <see cref="IGameArgument"/>s.

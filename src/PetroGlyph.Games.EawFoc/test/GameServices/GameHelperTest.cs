@@ -1,12 +1,12 @@
 ﻿using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
 public class GameHelperTest
 {
@@ -24,37 +24,35 @@ public class GameHelperTest
     [Fact]
     public void GetWorkshopDir_Success()
     {
-        var fs = new MockFileSystem();
+        _fileSystem.Initialize()
+            .WithSubdirectory("SteamLib/Apps/common/32470/Game")
+            .WithSubdirectory("workshop/content/32470");
+
         var mock = new Mock<IGame>();
-        mock.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("SteamLib/Apps/common/32470/Game"));
+        mock.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("SteamLib/Apps/common/32470/Game"));
         mock.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-        fs.AddDirectory("SteamLib/Apps/common/32470/Game");
-        fs.AddDirectory("workshop/content/32470");
         var wsDir = _service.GetWorkshopsLocation(mock.Object);
-        Assert.Equal(
-            TestUtils.IsUnixLikePlatform
-                ? "/SteamLib/Apps/workshop/content/32470"
-                : "C:\\SteamLib\\Apps\\workshop\\content\\32470", wsDir.FullName);
+        Assert.Equal(_fileSystem.Path.GetFullPath("SteamLib/Apps/workshop/content/32470"), wsDir.FullName);
     }
 
     [Fact]
     public void GetWorkshopDir_FailNotExisting()
     {
-        var fs = new MockFileSystem();
+        _fileSystem.Initialize()
+            .WithSubdirectory("Game");
         var mock = new Mock<IGame>();
-        mock.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
+        mock.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
         mock.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-        fs.AddDirectory("Game");
-        Assert.Throws<SteamException>(() => _service.GetWorkshopsLocation(mock.Object));
+        Assert.Throws<GameException>(() => _service.GetWorkshopsLocation(mock.Object));
     }
 
     [Fact]
     public void GetWorkshopDir_FailNoSteam()
     {
-        var fs = new MockFileSystem();
+        _fileSystem.Initialize()
+            .WithSubdirectory("Game");
         var mock = new Mock<IGame>();
-        mock.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
-        fs.AddDirectory("Game");
+        mock.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
         Assert.Throws<GameException>(() => _service.GetWorkshopsLocation(mock.Object));
     }
 }

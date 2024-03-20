@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using EawModinfo.Spec;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc;
+namespace PG.StarWarsGame.Infrastructure;
 
 /// <summary>
 /// Base class for <see cref="IPlayableObject"/> which supports one-time initialization

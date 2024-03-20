@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Abstractions.TestingHelpers;
 using EawModinfo.Spec;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Language;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Language;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
 public class GameLanguageFinderTest
 {
@@ -21,7 +21,7 @@ public class GameLanguageFinderTest
     public void TestEmptyResult()
     {
         var fs = new MockFileSystem();
-        fs.AddDirectory("Game");
+        fs.Initialize().WithSubdirectory("Game");
 
         var game = new Mock<IGame>();
         game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
@@ -43,7 +43,7 @@ public class GameLanguageFinderTest
     public void TestSomeResult()
     {
         var fs = new MockFileSystem();
-        fs.AddDirectory("Game");
+        fs.Initialize().WithSubdirectory("Game");
 
         var game = new Mock<IGame>();
         game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));

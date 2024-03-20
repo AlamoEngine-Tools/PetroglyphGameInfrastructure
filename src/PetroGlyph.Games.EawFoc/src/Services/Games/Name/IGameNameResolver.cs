@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// Service to resolve a game's name

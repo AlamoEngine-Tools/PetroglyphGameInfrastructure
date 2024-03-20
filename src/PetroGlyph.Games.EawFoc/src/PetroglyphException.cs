@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PetroGlyph.Games.EawFoc;
+namespace PG.StarWarsGame.Infrastructure;
 
 /// <summary>
 /// General exception for anything Petroglyph related.

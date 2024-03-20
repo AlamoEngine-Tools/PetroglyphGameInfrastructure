@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 #if NETSTANDARD2_0_OR_GREATER
 #endif
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 /// <summary>
 /// High-Level representation of a game process.

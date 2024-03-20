@@ -1,8 +1,8 @@
 ﻿using Moq;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test;
 
 public class GameExecutableNameBuilderTest
 {

@@ -1,7 +1,7 @@
 ﻿using System;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection.Platform;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 
 internal static class GamePlatformIdentifierFactory
 {

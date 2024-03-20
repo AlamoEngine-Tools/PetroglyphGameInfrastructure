@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
 /// <summary>
 /// Special argument which holds an ordered list of arguments to represent a mod chain.

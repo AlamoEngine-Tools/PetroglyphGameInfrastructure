@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection.Platform;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 
 internal class OriginIdentifier : SpecificPlatformIdentifier
 {

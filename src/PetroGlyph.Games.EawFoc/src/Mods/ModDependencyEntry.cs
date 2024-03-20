@@ -1,9 +1,8 @@
 ﻿using System;
 using EawModinfo.Spec;
 using Semver;
-using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// Object which represents an <see cref="IMod"/> in a <see cref="IMod.Dependencies"/> list,
@@ -39,8 +38,7 @@ public sealed class ModDependencyEntry : IEquatable<ModDependencyEntry>
     /// <param name="range">The original version range instance.</param>
     public ModDependencyEntry(IMod mod, SemVersionRange? range)
     {
-        Requires.NotNull(mod, nameof(mod));
-        Mod = mod;
+        Mod = mod ?? throw new ArgumentNullException(nameof(mod));
         VersionRange = range;
     }
 

@@ -1,6 +1,6 @@
 ﻿using System.IO.Abstractions;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 /// <summary>
 /// Low-Level service that actually starts the game process.

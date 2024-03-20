@@ -3,9 +3,9 @@ using System.Globalization;
 using System.IO.Abstractions;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Mods;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// Resolves a mod's name by it's directory name. The name will be beautified by removing separator characters like '_'.
@@ -26,7 +26,7 @@ public sealed class DirectoryModNameResolver : ModNameResolverBase
             throw new NotSupportedException("Cannot resolve name for virtual mods.");
         if (modReference is IPhysicalMod mod)
             return BeautifyDirectoryName(mod.Directory.Name);
-        var fs = ServiceProvider.GetService<IFileSystem>() ?? new FileSystem();
+        var fs = ServiceProvider.GetRequiredService<IFileSystem>();
         var directoryName = fs.DirectoryInfo.New(modReference.Identifier).Name;
         var beautifiedName = BeautifyDirectoryName(directoryName);
         return string.IsNullOrWhiteSpace(beautifiedName) ? directoryName : beautifiedName;

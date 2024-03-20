@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using PetroGlyph.Games.EawFoc.Games;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
 /// Query options for game detections. 
@@ -23,11 +23,7 @@ public record GameDetectorOptions(GameType Type)
     public IList<GamePlatform> TargetPlatforms
     {
         get => _targetPlatforms;
-        set
-        {
-            Requires.NotNull(value, nameof(value));
-            _targetPlatforms = value;
-        }
+        set => _targetPlatforms = value ?? throw new ArgumentNullException(nameof(value));
     }
 
     internal GameDetectorOptions Normalize()

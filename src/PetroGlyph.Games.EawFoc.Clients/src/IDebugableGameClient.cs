@@ -1,8 +1,8 @@
-﻿using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using PetroGlyph.Games.EawFoc.Clients.Processes;
-using PetroGlyph.Games.EawFoc.Mods;
+﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Processes;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
 /// <see cref="IGameClient"/> with additional support to start the debug builds of the games.

@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using EawModinfo.Spec;
-using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
+using Microsoft.Extensions.DependencyInjection;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.ModServices;
+namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public class ModDependencyTraverserIntegrationTest
 {
@@ -22,7 +23,10 @@ public class ModDependencyTraverserIntegrationTest
     public ModDependencyTraverserIntegrationTest()
     {
         _fileSystem = new MockFileSystem();
-        _serviceProvider = new Mock<IServiceProvider>().Object;
+        var sc = new ServiceCollection();
+        sc.AddSingleton<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
+        sc.AddSingleton<IFileSystem>(_fileSystem);
+        _serviceProvider = sc.BuildServiceProvider();
         _game = SetupGame(_fileSystem, _serviceProvider);
     }
 
@@ -329,13 +333,13 @@ public class ModDependencyTraverserIntegrationTest
 
     private TestMod CreateMod(string name)
     {
-        _fileSystem.AddDirectory($"Game/Mods/{name}");
+        _fileSystem.Initialize().WithSubdirectory($"Game/Mods/{name}");
         return new TestMod(_game, _fileSystem.DirectoryInfo.New($"Game/Mods/{name}"), false, name, _serviceProvider);
     }
 
-    private static IGame SetupGame(IMockFileDataAccessor fileSystem, IServiceProvider sp)
+    private static IGame SetupGame(MockFileSystem fileSystem, IServiceProvider sp)
     {
-        fileSystem.AddFile("Game/swfoc.exe", new MockFileData(string.Empty));
+        fileSystem.Initialize().WithFile("Game/swfoc.exe");
         var game = new PetroglyphStarWarsGame(new GameIdentity(GameType.Foc, GamePlatform.Disk),
             fileSystem.DirectoryInfo.New("Game"), "Foc", sp);
         return game;

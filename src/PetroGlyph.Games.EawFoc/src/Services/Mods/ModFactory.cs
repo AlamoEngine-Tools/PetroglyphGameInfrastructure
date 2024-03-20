@@ -8,13 +8,12 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Detection;
-using PetroGlyph.Games.EawFoc.Services.Name;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Name;
 
-namespace PetroGlyph.Games.EawFoc.Services;
+namespace PG.StarWarsGame.Infrastructure.Services;
 
 /// <inheritdoc/>
 public class ModFactory : IModFactory
@@ -57,13 +56,13 @@ public class ModFactory : IModFactory
         CultureInfo culture,
         IServiceProvider serviceProvider)
     {
-        Requires.NotNull(defaultModinfoFileFinderFactory, nameof(defaultModinfoFileFinderFactory));
-        Requires.NotNull(culture, nameof(culture));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null)
+            throw new ArgumentNullException(nameof(serviceProvider));
+
         _referenceLocationResolver = serviceProvider.GetRequiredService<IModReferenceLocationResolver>();
-        _defaultModinfoFileFinderFactory = defaultModinfoFileFinderFactory;
+        _defaultModinfoFileFinderFactory = defaultModinfoFileFinderFactory ?? throw new ArgumentNullException(nameof(defaultModinfoFileFinderFactory));
         _nameResolver = serviceProvider.GetRequiredService<IModNameResolver>();
-        _culture = culture;
+        _culture = culture ?? throw new ArgumentNullException(nameof(culture));
         _serviceProvider = serviceProvider;
     }
 
