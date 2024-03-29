@@ -6,14 +6,9 @@ using AnakinRaW.CommonUtilities.Registry;
 
 namespace AET.SteamAbstraction;
 
-internal class LinuxSteamRegistry : DisposableObject, ISteamRegistry
+internal class LinuxSteamRegistry(IServiceProvider serviceProvider) : DisposableObject, ISteamRegistry
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public LinuxSteamRegistry(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
     public IRegistryKey? ActiveProcessKey { get; }
 

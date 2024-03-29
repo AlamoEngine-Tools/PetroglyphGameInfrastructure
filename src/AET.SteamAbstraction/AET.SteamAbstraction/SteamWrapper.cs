@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.NativeMethods;
 using AnakinRaW.CommonUtilities;
 using Gameloop.Vdf;
 using Gameloop.Vdf.JsonConverter;
