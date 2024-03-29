@@ -255,9 +255,8 @@ public class SteamWrapperTest
         Assert.NotSame(task, completedTask);
     }
 
-
     [Fact]
-    public async Task TestWaitSteamRunningAndLoggedInAsync_WithOfflineMore()
+    public async Task TestWaitSteamRunningAndLoggedInAsync_WithOfflineMode()
     {
         _fileSystem.Initialize()
             .WithFile("steam.exe")
@@ -269,16 +268,19 @@ public class SteamWrapperTest
         var wrapper = new Mock<SteamWrapper>(_steamRegistry.Object, _serviceProvider);
         wrapper.Setup(s => s.IsRunning).Returns(true);
 
+        var tsc = new TaskCompletionSource<int>();
+
         wrapper.Protected().Setup<Task>("WaitSteamOfflineRunning", CancellationToken.None)
-            .Returns(Task.Delay(500));
+            .Returns(tsc.Task);
 
         var task = wrapper.Object.WaitSteamRunningAndLoggedInAsync(false);
         Assert.False(task.IsCompleted);
 
-        var completedTask = await Task.WhenAny(task, Task.Delay(5000));
-        Assert.Same(task, completedTask);
-    }
+        _ = Task.Run(async () => await Task.Delay(1000).ContinueWith(_ => tsc.SetResult(1)));
 
+        await task;
+        Assert.True(tsc.Task.IsCompleted);
+    }
 
     [Fact]
     public async Task TestWaitSteamRunningAndLoggedInAsync_Cancelled()
