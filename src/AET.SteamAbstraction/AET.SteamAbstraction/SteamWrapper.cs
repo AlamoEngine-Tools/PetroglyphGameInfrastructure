@@ -14,8 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace AET.SteamAbstraction;
 
 internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider serviceProvider) : DisposableObject, ISteamWrapper
-{
-
+{ 
     protected ISteamRegistry Registry { get; } = registry ?? throw new ArgumentNullException(nameof(registry));
 
     protected IServiceProvider ServiceProvider { get; } = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -69,17 +68,9 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         }
     }
 
-    public bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest? game)
+    public virtual bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest? game)
     {
         ThrowIfSteamNotInstalled();
-        game = null;
-        var apps = Registry.InstalledApps;
-        if (apps is null)
-            return false;
-
-        if (!apps.Contains(gameId))
-            return false;
-
         using var gameFinder = ServiceProvider.GetRequiredService<ISteamGameFinder>();
         game = gameFinder.FindGame(gameId);
         return game is not null;
@@ -141,7 +132,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
 
     protected abstract Task WaitSteamRunningAsync(CancellationToken token);
 
-    private void ThrowIfSteamNotInstalled()
+    protected void ThrowIfSteamNotInstalled()
     {
         if (!Installed)
             throw new SteamNotFoundException();

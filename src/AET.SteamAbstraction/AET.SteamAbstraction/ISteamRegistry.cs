@@ -11,19 +11,9 @@ namespace AET.SteamAbstraction;
 internal interface ISteamRegistry : IDisposable
 {
     /// <summary>
-    /// Key to the ActiveProcess node
-    /// </summary>
-    IRegistryKey? ActiveProcessKey { get; }
-
-    /// <summary>
     /// Id of the logged-in user.
     /// </summary>
     int? ActiveUserId { get; set; }
-
-    /// <summary>
-    /// PID of the Steam process.
-    /// </summary>
-    int? ProcessId { get; }
 
     /// <summary>
     /// The executable of the Steam client.
@@ -34,9 +24,13 @@ internal interface ISteamRegistry : IDisposable
     /// The installation directory of the Steam client
     /// </summary>
     IDirectoryInfo? InstallationDirectory { get; }
+}
 
-    /// <summary>
-    /// Set of installed app IDs.
-    /// </summary>
+internal interface IWindowsSteamRegistry : ISteamRegistry
+{
+    IRegistryKey? ActiveProcessKey { get; }
+    
+    int? ProcessId { get; }
+    
     ISet<uint>? InstalledApps { get; }
 }

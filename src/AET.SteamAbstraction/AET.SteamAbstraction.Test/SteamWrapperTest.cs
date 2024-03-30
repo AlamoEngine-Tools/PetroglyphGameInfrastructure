@@ -19,6 +19,7 @@ public class SteamWrapperTest
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly Mock<ISteamRegistry> _steamRegistry;
+    private readonly Mock<IWindowsSteamRegistry> _windowsSteamRegistry;
     private readonly MockFileSystem _fileSystem;
     private readonly Mock<ISteamGameFinder> _gameFinder;
 
@@ -26,6 +27,7 @@ public class SteamWrapperTest
     {
         var sc = new ServiceCollection();
         _steamRegistry = new Mock<ISteamRegistry>();
+        _windowsSteamRegistry = new Mock<IWindowsSteamRegistry>();
         _fileSystem = new MockFileSystem();
         _gameFinder = new Mock<ISteamGameFinder>();
         sc.AddTransient(_ => _steamRegistry.Object);
@@ -39,7 +41,7 @@ public class SteamWrapperTest
     public void TestInvalidArgs_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new WindowsSteamWrapper(null!, _serviceProvider));
-        Assert.Throws<ArgumentNullException>(() => new WindowsSteamWrapper(_steamRegistry.Object, null!));
+        Assert.Throws<ArgumentNullException>(() => new WindowsSteamWrapper(_windowsSteamRegistry.Object, null!));
         Assert.Throws<ArgumentNullException>(() => new LinuxSteamWrapper(null!, _serviceProvider));
         Assert.Throws<ArgumentNullException>(() => new LinuxSteamWrapper(_steamRegistry.Object, null!));
     }
@@ -63,6 +65,7 @@ public class SteamWrapperTest
         foreach (var steamWrapper in GetSteamWrappers())
         {
             _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+            _windowsSteamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
             Assert.True(steamWrapper.Installed);
         }
     }
@@ -70,12 +73,12 @@ public class SteamWrapperTest
     [Fact]
     public void TestDisposed()
     {
-        var counter = 0;
         foreach (var steamWrapper in GetSteamWrappers())
         {
             steamWrapper.Dispose();
-            _steamRegistry.Verify(r => r.Dispose(), Times.Exactly(++counter));
         }
+        _steamRegistry.Verify(r => r.Dispose(), Times.Once);
+        _windowsSteamRegistry.Verify(r => r.Dispose(), Times.Once);
     }
 
     [Fact]
@@ -88,6 +91,9 @@ public class SteamWrapperTest
 
         _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
         _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
+        
+        _windowsSteamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+        _windowsSteamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
 
 
         var mFile = _fileSystem.FileInfo.New("manifest.acf");
@@ -95,20 +101,28 @@ public class SteamWrapperTest
         var expectedApp = new SteamAppManifest(new Mock<ISteamLibrary>().Object, mFile, 1234, "name",
             _fileSystem.DirectoryInfo.New("Game"), SteamAppState.StateFullyInstalled,
             new HashSet<uint>());
-
-        _steamRegistry.Setup(r => r.InstalledApps).Returns(new HashSet<uint> { 1, 2, 3 });
+        
         _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("Steam"));
+        _windowsSteamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("Steam"));
 
         foreach (var steamWrapper in GetSteamWrappers())
         {
-            _gameFinder.SetupSequence(f => f.FindGame(It.IsAny<uint>()))
-                .Returns((SteamAppManifest?)null)
-                .Returns(expectedApp);
-
-            Assert.False(steamWrapper.IsGameInstalled(0, out _));
+            _gameFinder.Setup(f => f.FindGame(1u))
+                .Returns((SteamAppManifest?)null);
+            
             Assert.False(steamWrapper.IsGameInstalled(1, out _));
-            Assert.True(steamWrapper.IsGameInstalled(1, out var app));
 
+            if (steamWrapper is WindowsSteamWrapper)
+            {
+                _windowsSteamRegistry.Setup(r => r.InstalledApps).Returns(new HashSet<uint> { 1 });
+                _gameFinder.Setup(f => f.FindGame(1u)).Returns((SteamAppManifest?)null);
+                Assert.False(steamWrapper.IsGameInstalled(1, out _));
+            }
+            
+            _gameFinder.Setup(f => f.FindGame(1u))
+                .Returns(expectedApp);
+            
+            Assert.True(steamWrapper.IsGameInstalled(1, out var app));
             Assert.Same(expectedApp, app);
         }
     }
@@ -129,6 +143,9 @@ public class SteamWrapperTest
 
         _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
         _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
+        
+        _windowsSteamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+        _windowsSteamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
 
         foreach (var steamWrapper in GetSteamWrappers()) 
             Assert.Null((object?)steamWrapper.UserWantsOfflineMode);
@@ -313,9 +330,9 @@ public class SteamWrapperTest
         }
     }
 
-    public IEnumerable<ISteamWrapper> GetSteamWrappers()
+    private IEnumerable<ISteamWrapper> GetSteamWrappers()
     {
-        yield return new WindowsSteamWrapper(_steamRegistry.Object, _serviceProvider);
+        yield return new WindowsSteamWrapper(_windowsSteamRegistry.Object, _serviceProvider);
         yield return new LinuxSteamWrapper(_steamRegistry.Object, _serviceProvider);
     }
 

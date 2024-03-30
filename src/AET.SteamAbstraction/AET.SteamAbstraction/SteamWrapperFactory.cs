@@ -12,7 +12,11 @@ internal class SteamWrapperFactory(IServiceProvider serviceProvider) : ISteamWra
     {
         var registry = _registryFactory.CreateRegistry();
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return new WindowsSteamWrapper(registry, serviceProvider);
+        {
+            if (registry is not WindowsSteamRegistry windowsRegistry)
+                throw new InvalidOperationException("Expected Windows Registry on Windows systems.");
+            return new WindowsSteamWrapper(windowsRegistry, serviceProvider);
+        }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             return new LinuxSteamWrapper(registry, serviceProvider);
