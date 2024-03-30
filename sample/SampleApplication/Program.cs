@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
+using AET.SteamAbstraction;
 using AnakinRaW.CommonUtilities.Registry.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure;
@@ -11,7 +13,6 @@ using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.StarWarsGame.Infrastructure.Services.Name;
 
 
 var sp = SetupApplication();
@@ -67,14 +68,14 @@ IServiceProvider SetupApplication()
     var sc = new ServiceCollection();
 
     sc.AddSingleton(WindowsRegistry.Default);
+    sc.AddSingleton<IFileSystem>(_ => new FileSystem());
+
+    PetroglyphGameInfrastructure.InitializeServices(sc);
+    SteamAbstractionLayer.InitializeServices(sc);
+    PetroglyphGameClients.InitializeServices(sc);
+    
+    // The game detector to use for this application. 
     sc.AddTransient<IGameDetector>(sp => new SteamPetroglyphStarWarsGameDetector(sp));
-    sc.AddTransient<IGameFactory>(sp => new GameFactory(sp));
-    sc.AddTransient<IModReferenceFinder>(sp => new FileSystemModFinder(sp));
-    sc.AddTransient<IModFactory>(sp => new ModFactory(sp));
-    sc.AddTransient<IModReferenceLocationResolver>(sp => new ModReferenceLocationResolver(sp));
-    sc.AddTransient<IModNameResolver>(sp => new DirectoryModNameResolver(sp));
-    sc.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));
-    sc.AddTransient<IGameClientFactory>(sp => new DefaultGameClientFactory(sp));
 
     return sc.BuildServiceProvider();
 }

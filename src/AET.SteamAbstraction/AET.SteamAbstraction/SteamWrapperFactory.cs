@@ -19,7 +19,9 @@ internal class SteamWrapperFactory(IServiceProvider serviceProvider) : ISteamWra
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            return new LinuxSteamWrapper(registry, serviceProvider);
+        {
+            throw new NotImplementedException("Steam wrapper for Linux is not yet implemented.");
+        }
 
         throw new PlatformNotSupportedException($"The current platform is not supported.");
     }

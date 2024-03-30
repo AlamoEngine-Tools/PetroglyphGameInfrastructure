@@ -31,7 +31,7 @@ public class DefaultGameClientFactory : IGameClientFactory
     /// Gets or creates an <see cref="IGameClient"/> for the given <paramref name="gamePlatform"/>.
     /// </summary>
     /// <param name="gamePlatform">The requested game platform.</param>
-    /// <param name="serviceProvider">The service provider used to created the <see cref="IGameClient"/>.</param>
+    /// <param name="serviceProvider">The service provider used to create the <see cref="IGameClient"/>.</param>
     /// <returns></returns>
     public IGameClient CreateClient(GamePlatform gamePlatform, IServiceProvider serviceProvider)
     {

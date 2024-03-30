@@ -44,7 +44,7 @@ public sealed class SteamGameClient : DebugableClientBase
         {
             if (serviceProvider == null) 
                 throw new ArgumentNullException(nameof(serviceProvider));
-            _steamWrapper = serviceProvider.GetRequiredService<ISteamWrapper>();
+            _steamWrapper = serviceProvider.GetRequiredService<ISteamWrapperFactory>().CreateWrapper();
             _internalLauncher = serviceProvider.GetRequiredService<IGameProcessLauncher>();
         }
 

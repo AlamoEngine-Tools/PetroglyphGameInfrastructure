@@ -5,8 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;
 
-internal class SteamAbstractionLayer
+/// <summary>
+/// 
+/// </summary>
+public class SteamAbstractionLayer
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="serviceCollection"></param>
     public static void InitializeServices(IServiceCollection serviceCollection)
     {
         serviceCollection.AddSingleton<ISteamWrapperFactory>(sp => new SteamWrapperFactory(sp));

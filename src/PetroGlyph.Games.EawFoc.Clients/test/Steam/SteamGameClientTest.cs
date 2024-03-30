@@ -13,7 +13,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Test.Steam;
 public class SteamGameClientTest
 {
     private readonly SteamGameClient _service;
-    private readonly Mock<ISteamWrapper> _steam;
+    private readonly Mock<ISteamWrapperFactory> _steamFactory;
     private readonly Mock<IGame> _game;
     private readonly Mock<IGameProcessLauncher> _launcher;
 
@@ -23,8 +23,8 @@ public class SteamGameClientTest
         var fs = new MockFileSystem();
         fs.Initialize().WithFile("test.exe");
         var sc = new ServiceCollection();
-        _steam = new Mock<ISteamWrapper>();
-        sc.AddTransient(_ => _steam.Object);
+        _steamFactory = new Mock<ISteamWrapperFactory>();
+        sc.AddTransient(_ => _steamFactory.Object);
         var fileService = new Mock<IGameExecutableFileService>();
         fileService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
             .Returns(fs.FileInfo.New("test.exe"));
@@ -49,6 +49,10 @@ public class SteamGameClientTest
     [Fact]
     public void TestSteamNotRunning_Throws()
     {
+        var steam = new Mock<ISteamWrapper>();
+        steam.SetupGet(s => s.IsRunning).Returns(false);
+        _steamFactory.Setup(s => s.CreateWrapper()).Returns(steam.Object);
+
         _game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
         _game.Setup(g => g.Game).Returns(_game.Object);
         Assert.Throws<GameStartException>(() => _service.Play(_game.Object));
@@ -57,9 +61,12 @@ public class SteamGameClientTest
     [Fact]
     public void TestProcessCreated()
     {
+        var steam = new Mock<ISteamWrapper>();
+        steam.SetupGet(s => s.IsRunning).Returns(true);
+        _steamFactory.Setup(s => s.CreateWrapper()).Returns(steam.Object);
+
         _game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
         _game.Setup(g => g.Game).Returns(_game.Object);
-        _steam.Setup(s => s.IsRunning).Returns(true);
 
         var process = new Mock<IGameProcess>();
         process.Setup(p => p.State).Returns(GameProcessState.Closed);
