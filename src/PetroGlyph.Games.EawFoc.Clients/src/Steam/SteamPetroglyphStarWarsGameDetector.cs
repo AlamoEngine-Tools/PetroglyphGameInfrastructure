@@ -21,7 +21,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
     private const uint EaWGameId = 32470;
     private const uint FocDepotId = 32472;
 
-    private readonly ISteamWrapper _steamWrapper;
+    private readonly ISteamWrapperFactory _steamWrapperFactory;
     private readonly IGameRegistryFactory _registryFactory;
 
     /// <summary>
@@ -31,16 +31,18 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
     public SteamPetroglyphStarWarsGameDetector(IServiceProvider serviceProvider) : base(serviceProvider, true)
     {
         _registryFactory = ServiceProvider.GetRequiredService<IGameRegistryFactory>();
-        _steamWrapper = ServiceProvider.GetRequiredService<ISteamWrapper>();
+        _steamWrapperFactory = ServiceProvider.GetRequiredService<ISteamWrapperFactory>();
     }
 
     /// <inheritdoc/>
     protected override GameLocationData FindGameLocation(GameDetectorOptions options)
     {
-        if (!_steamWrapper.Installed)
+        using var steam = _steamWrapperFactory.CreateWrapper();
+
+        if (!steam.Installed)
             return default;
 
-        if (!_steamWrapper.IsGameInstalled(EaWGameId, out var game))
+        if (!steam.IsGameInstalled(EaWGameId, out var game))
             return default;
 
         if (!game!.State.HasFlag(SteamAppState.StateFullyInstalled))

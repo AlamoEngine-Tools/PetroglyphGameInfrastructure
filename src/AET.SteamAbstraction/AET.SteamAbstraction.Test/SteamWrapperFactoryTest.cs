@@ -12,15 +12,12 @@ namespace AET.SteamAbstraction.Test;
 
 public class SteamWrapperFactoryTest
 {
-    [Fact]
-    public void Test_CreateWrapper()
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
+    public void Test_CreateWrapper_Windows()
     {
         var regFactory = new Mock<ISteamRegistryFactory>();
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            regFactory.Setup(f => f.CreateRegistry()).Returns(new Mock<IWindowsSteamRegistry>().Object);
-        else 
-            regFactory.Setup(f => f.CreateRegistry()).Returns(new Mock<ISteamRegistry>().Object);
+        regFactory.Setup(f => f.CreateRegistry()).Returns(new Mock<IWindowsSteamRegistry>().Object);
 
         var sc = new ServiceCollection();
         sc.AddSingleton(_ => regFactory.Object);
@@ -30,15 +27,7 @@ public class SteamWrapperFactoryTest
 
         var wrapper = factory.CreateWrapper();
 
-        Type? expectedType = null;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) 
-            expectedType = typeof(WindowsSteamWrapper);
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            expectedType = typeof(LinuxSteamWrapper);
-
-        if (expectedType is null)
-            Assert.Fail("Platform was not supported");
-
+        var expectedType = typeof(WindowsSteamWrapper);
         Assert.IsType(expectedType, wrapper);
     }
 

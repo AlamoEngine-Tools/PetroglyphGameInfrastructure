@@ -29,6 +29,11 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         var sc = new ServiceCollection();
         _fileSystem = new MockFileSystem();
         _steamWrapper = new Mock<ISteamWrapper>();
+
+        var steamFactory = new Mock<ISteamWrapperFactory>();
+        steamFactory.Setup(f => f.CreateWrapper()).Returns(_steamWrapper.Object);
+        sc.AddSingleton(steamFactory.Object);
+
         _gameRegistryFactory = new Mock<IGameRegistryFactory>();
         _gameRegistry = new Mock<IGameRegistry>();
         sc.AddTransient<IFileSystem>(_ => _fileSystem);
