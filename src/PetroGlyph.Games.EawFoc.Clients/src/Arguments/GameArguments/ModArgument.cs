@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
+﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
 /// <summary>
 /// Dedicated argument to represent a mod

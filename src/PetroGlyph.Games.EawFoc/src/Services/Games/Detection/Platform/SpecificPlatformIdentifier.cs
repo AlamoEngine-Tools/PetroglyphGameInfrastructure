@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
-using Microsoft.Extensions.Logging;
-using PetroGlyph.Games.EawFoc.Games;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection.Platform;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 
 internal abstract class SpecificPlatformIdentifier : ISpecificPlatformIdentifier
 {

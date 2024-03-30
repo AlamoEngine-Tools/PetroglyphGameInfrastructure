@@ -1,4 +1,4 @@
-﻿namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Indicates the validity of a <see cref="IGameArgument"/>

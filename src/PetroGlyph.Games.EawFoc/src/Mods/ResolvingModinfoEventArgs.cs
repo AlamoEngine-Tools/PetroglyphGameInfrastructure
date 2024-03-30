@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// Cancellable event args when an <see cref="IMod.ResolvingModinfo"/> was raised.

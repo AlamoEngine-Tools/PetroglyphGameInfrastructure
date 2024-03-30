@@ -1,6 +1,6 @@
-﻿using PetroGlyph.Games.EawFoc.Games;
+﻿using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
 /// Service that gets the correct executable file name for a Petroglyph Star Wars game.

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Games.Registry;
-using PetroGlyph.Games.EawFoc.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Games.Registry;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
 public class RegistryGameDetectorTest
 {

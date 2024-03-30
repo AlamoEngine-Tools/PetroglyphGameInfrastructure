@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
+using AET.SteamAbstraction;
 using AnakinRaW.CommonUtilities.Registry.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc;
-using PetroGlyph.Games.EawFoc.Clients;
-using PetroGlyph.Games.EawFoc.Clients.Steam;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
-using PetroGlyph.Games.EawFoc.Services.Detection;
-using PetroGlyph.Games.EawFoc.Services.Name;
+using PG.StarWarsGame.Infrastructure;
+using PG.StarWarsGame.Infrastructure.Clients;
+using PG.StarWarsGame.Infrastructure.Clients.Steam;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
 
 
 var sp = SetupApplication();
@@ -65,19 +66,16 @@ IGame FindGame()
 IServiceProvider SetupApplication()
 {
     var sc = new ServiceCollection();
-    PetroglyphGameInfrastructureLibrary.InitializeLibraryWithDefaultServices(sc);
-    PetroglyphClientsLibrary.InitializeLibraryWithDefaultServices(sc);
-    PetroglyphWindowsSteamClientsLibrary.InitializeLibraryWithDefaultServices(sc);
 
     sc.AddSingleton(WindowsRegistry.Default);
+    sc.AddSingleton<IFileSystem>(_ => new FileSystem());
+
+    PetroglyphGameInfrastructure.InitializeServices(sc);
+    SteamAbstractionLayer.InitializeServices(sc);
+    PetroglyphGameClients.InitializeServices(sc);
+    
+    // The game detector to use for this application. 
     sc.AddTransient<IGameDetector>(sp => new SteamPetroglyphStarWarsGameDetector(sp));
-    sc.AddTransient<IGameFactory>(sp => new GameFactory(sp));
-    sc.AddTransient<IModReferenceFinder>(sp => new FileSystemModFinder(sp));
-    sc.AddTransient<IModFactory>(sp => new ModFactory(sp));
-    sc.AddTransient<IModReferenceLocationResolver>(sp => new ModReferenceLocationResolver(sp));
-    sc.AddTransient<IModNameResolver>(sp => new DirectoryModNameResolver(sp));
-    sc.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));
-    sc.AddTransient<IGameClientFactory>(sp => new DefaultGameClientFactory(sp));
 
     return sc.BuildServiceProvider();
 }

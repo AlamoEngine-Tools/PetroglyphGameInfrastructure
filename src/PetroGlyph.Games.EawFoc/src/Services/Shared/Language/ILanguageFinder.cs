@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Services.Language;
+namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
 /// <summary>
 /// Service to find evidence of installed languages for <see cref="IPhysicalPlayableObject"/>s. 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
 
-namespace PetroGlyph.Games.EawFoc.Games.Registry;
+namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 /// <summary>
 /// A Registry wrapper for an <see cref="IGame"/>.

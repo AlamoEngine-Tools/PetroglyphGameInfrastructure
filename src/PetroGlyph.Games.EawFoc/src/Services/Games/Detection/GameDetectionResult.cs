@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO.Abstractions;
-using PetroGlyph.Games.EawFoc.Games;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
 /// Result object used by <see cref="IGameDetector"/> containing all necessary information to create a game instance.
@@ -42,9 +41,8 @@ public class GameDetectionResult
     /// <param name="location">The actual location of the game. Must not be <see langword="null"/></param>
     public GameDetectionResult(IGameIdentity gameIdentity, IDirectoryInfo location)
     {
-        Requires.NotNull(location, nameof(location));
         GameIdentity = gameIdentity;
-        GameLocation = location;
+        GameLocation = location ?? throw new ArgumentNullException(nameof(location));
     }
 
     internal GameDetectionResult(GameType type, Exception error) : this(type)

@@ -7,14 +7,13 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Dependencies;
-using PetroGlyph.Games.EawFoc.Services.Icon;
-using PetroGlyph.Games.EawFoc.Services.Language;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Icon;
+using PG.StarWarsGame.Infrastructure.Services.Language;
 using Semver;
-using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// Base implementation for Mods
@@ -88,7 +87,7 @@ public abstract class ModBase : PlayableObject, IMod
     public SemVersion? Version => _modVersion ??= InitializeVersion();
 
     IModDependencyList IModIdentity.Dependencies =>
-        new DependencyList(Dependencies.OfType<IModReference>().ToList(), DependencyResolveLayout);
+        new DependencyList(Dependencies.Select(d => d.Mod).OfType<IModReference>().ToList(), DependencyResolveLayout);
 
     /// <inheritdoc cref="IMod.Dependencies"/>
     public IReadOnlyList<ModDependencyEntry> Dependencies => DependenciesInternal.ToList();
@@ -112,9 +111,11 @@ public abstract class ModBase : PlayableObject, IMod
     /// <param name="serviceProvider">The service provider.</param>
     protected ModBase(IGame game, ModType type, string name, IServiceProvider serviceProvider)
     {
-        Requires.NotNull(game, nameof(game));
-        Requires.NotNullOrEmpty(name, nameof(name));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (game == null) 
+            throw new ArgumentNullException(nameof(game));
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
+        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
         ServiceProvider = serviceProvider;
         Name = name;
         Game = game;
@@ -131,9 +132,12 @@ public abstract class ModBase : PlayableObject, IMod
     /// <exception cref="ModinfoException">when <paramref name="modinfo"/> is not valid.</exception>
     protected ModBase(IGame game, ModType type, IModinfo modinfo, IServiceProvider serviceProvider)
     {
-        Requires.NotNull(game, nameof(game));
-        Requires.NotNull(modinfo, nameof(modinfo));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (game == null) 
+            throw new ArgumentNullException(nameof(game));
+        if (modinfo == null)
+            throw new ArgumentNullException(nameof(modinfo));
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
         modinfo.Validate();
         _modInfo = modinfo;
         ServiceProvider = serviceProvider;
@@ -145,8 +149,10 @@ public abstract class ModBase : PlayableObject, IMod
     /// <inheritdoc/>
     public virtual void ResolveDependencies(IDependencyResolver resolver, DependencyResolverOptions options)
     {
-        Requires.NotNull(resolver, nameof(resolver));
-        Requires.NotNull(options, nameof(options));
+        if (resolver == null) 
+            throw new ArgumentNullException(nameof(resolver));
+        if (options == null)
+            throw new ArgumentNullException(nameof(options));
         if (DependencyResolveStatus == DependencyResolveStatus.Resolving)
             throw new ModDependencyCycleException(this, "Already resolving the current instance's dependencies. Is there a Cycle?");
 

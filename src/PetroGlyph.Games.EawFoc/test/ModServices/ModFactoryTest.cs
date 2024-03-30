@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services;
-using PetroGlyph.Games.EawFoc.Services.Detection;
-using PetroGlyph.Games.EawFoc.Services.Name;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Name;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.ModServices;
+namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public class ModFactoryTest
 {
@@ -49,7 +49,7 @@ public class ModFactoryTest
     [Fact]
     public void TestModInfoSpecCreation_NoModinfoFiles()
     {
-        _fileSystem.AddDirectory("Mods/Name");
+        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
@@ -69,7 +69,7 @@ public class ModFactoryTest
     [Fact]
     public void TestModInfoSpecCreation_MainModinfoFiles()
     {
-        _fileSystem.AddDirectory("Mods/Name");
+        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
@@ -94,7 +94,7 @@ public class ModFactoryTest
     [Fact]
     public void TestModInfoSpecCreation_VariantsOnly()
     {
-        _fileSystem.AddDirectory("Mods/Name");
+        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
@@ -131,7 +131,7 @@ public class ModFactoryTest
     [Fact]
     public void TestModCreation_NoModinfoFiles()
     {
-        _fileSystem.AddDirectory("Mods/Name");
+        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
@@ -152,7 +152,7 @@ public class ModFactoryTest
     [Fact]
     public void TestModCreation_WithModinfo()
     {
-        _fileSystem.AddDirectory("Mods/Name");
+        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
             
@@ -179,7 +179,7 @@ public class ModFactoryTest
     [Fact]
     public void TestModCreation_SearchMainModinfo()
     {
-        _fileSystem.AddDirectory("Mods/Name");
+        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
@@ -210,7 +210,7 @@ public class ModFactoryTest
     [Fact]
     public void TestModCreation_NoSearchMainModinfo()
     {
-        _fileSystem.AddDirectory("Mods/Name");
+        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
@@ -241,7 +241,7 @@ public class ModFactoryTest
     [Fact]
     public void TestVariantModCreation_NoVariants()
     {
-        _fileSystem.AddDirectory("Mods/Name");
+        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
@@ -267,7 +267,7 @@ public class ModFactoryTest
     [Fact]
     public void TestVariantModCreation_TwoVariants()
     {
-        _fileSystem.AddDirectory("Mods/Name");
+        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))

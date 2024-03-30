@@ -1,10 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Games.Registry;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Games.Registry;
 
-namespace PetroGlyph.Games.EawFoc.Services.Detection;
+namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
 /// Finds installed games from the registry.
@@ -26,10 +25,8 @@ public sealed class RegistryGameDetector : GameDetector, IDisposable
     public RegistryGameDetector(IGameRegistry eawRegistry, IGameRegistry focRegistry, bool tryHandleInitialization, IServiceProvider serviceProvider)
         : base(serviceProvider, tryHandleInitialization)
     {
-        Requires.NotNull(eawRegistry, nameof(eawRegistry));
-        Requires.NotNull(focRegistry, nameof(focRegistry));
-        _eawRegistry = eawRegistry;
-        _focRegistry = focRegistry;
+        _eawRegistry = eawRegistry ?? throw new ArgumentNullException(nameof(eawRegistry));
+        _focRegistry = focRegistry ?? throw new ArgumentNullException(nameof(focRegistry));
     }
 
     /// <inheritdoc/>

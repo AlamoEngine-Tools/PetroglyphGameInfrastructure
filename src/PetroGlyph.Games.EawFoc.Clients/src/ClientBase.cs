@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using PetroGlyph.Games.EawFoc.Clients.Processes;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Processes;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
 /// Base implementation for an <see cref="IGameClient"/> which handles registration and raising of the game events. 
@@ -54,8 +53,7 @@ public abstract class ClientBase : IGameClient
     /// <param name="serviceProvider">The service provider.</param>
     protected ClientBase(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        ServiceProvider = serviceProvider;
+        ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     /// <inheritdoc/>
@@ -94,9 +92,9 @@ public abstract class ClientBase : IGameClient
         var arguments = DefaultArguments;
         if (instance is IMod mod)
         {
-            var modArgFactory = ServiceProvider.GetService<IModArgumentListFactory>() ?? new ModArgumentListFactory(ServiceProvider);
+            var modArgFactory = ServiceProvider.GetRequiredService<IModArgumentListFactory>();
             var modArgs = modArgFactory.BuildArgumentList(mod, false);
-            var builder = ServiceProvider.GetService<IArgumentCollectionBuilder>() ?? new KeyBasedArgumentCollectionBuilder();
+            var builder = ServiceProvider.GetRequiredService<IArgumentCollectionBuilder>();
             arguments = builder.AddAll(DefaultArguments).Add(modArgs).Build();
         }
         return StartGame(instance, arguments, buildType);
@@ -120,8 +118,10 @@ public abstract class ClientBase : IGameClient
     /// </exception>
     protected IGameProcess StartGame(IPlayableObject instance, IArgumentCollection arguments, GameBuildType type)
     {
-        Requires.NotNull(instance, nameof(instance));
-        Requires.NotNull(arguments, nameof(arguments));
+        if (instance == null)
+            throw new ArgumentNullException(nameof(instance));
+        if (arguments == null) 
+            throw new ArgumentNullException(nameof(arguments));
 
         if (!SupportedPlatforms.Contains(instance.Game.Platform))
             throw new GameStartException(instance,

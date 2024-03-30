@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
-using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
 {
@@ -13,8 +12,9 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
 
     public ArgumentCommandLineBuilder(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _validator = serviceProvider.GetService<IArgumentValidator>() ?? new ArgumentValidator();
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
+        _validator = serviceProvider.GetRequiredService<IArgumentValidator>();
     }
 
     /// <summary>

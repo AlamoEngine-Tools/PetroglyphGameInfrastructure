@@ -1,7 +1,7 @@
 ﻿using System;
 using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// <see cref="PetroglyphException"/> for anything related to <see cref="IMod"/> or <see cref="IModReference"/>.

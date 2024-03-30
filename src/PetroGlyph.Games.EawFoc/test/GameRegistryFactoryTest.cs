@@ -1,19 +1,17 @@
-﻿using AnakinRaW.CommonUtilities.Registry;
+﻿using System.IO.Abstractions;
+using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Games.Registry;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Games.Registry;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test;
+namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class GameRegistryFactoryTest
 {
-    private readonly GameRegistryFactory _service;
-
-    public GameRegistryFactoryTest()
-    {
-        _service = new GameRegistryFactory();
-    }
+    private readonly GameRegistryFactory _service = new();
+    private readonly IFileSystem _fileSystem = new MockFileSystem();
 
     [Fact]
     public void TestNotFound()
@@ -28,6 +26,7 @@ public class GameRegistryFactoryTest
     public void TestEaWRegistryFound()
     {
         var sc = new ServiceCollection();
+        sc.AddSingleton(_fileSystem);
         var registry = new InMemoryRegistry();
         var lm = registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
         lm.CreateSubKey(GameRegistryFactory.EawRegistryPath);
@@ -42,6 +41,7 @@ public class GameRegistryFactoryTest
     public void TestFocRegistryFound()
     {
         var sc = new ServiceCollection();
+        sc.AddSingleton(_fileSystem);
         var registry = new InMemoryRegistry();
         var lm = registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
         lm.CreateSubKey(GameRegistryFactory.FocRegistryPath);

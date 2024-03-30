@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PetroGlyph.Games.EawFoc.Mods;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
+namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 /// <summary>
 /// Service which resolves dependencies of many mods coordinated by minimizing workload.
@@ -24,8 +23,7 @@ public class MultiModDependencyResolver
     /// <param name="resolver">The resolver that shall get used.</param>
     public MultiModDependencyResolver(IDependencyResolver resolver)
     {
-        Requires.NotNull(resolver, nameof(resolver));
-        _resolver = resolver;
+        _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
     }
 
     /// <summary>
@@ -44,8 +42,10 @@ public class MultiModDependencyResolver
         bool skipResolvedMods,
         bool abortOnError)
     {
-        Requires.NotNull(modsToResolve, nameof(modsToResolve));
-        Requires.NotNull(options, nameof(options));
+        if (modsToResolve == null) 
+            throw new ArgumentNullException(nameof(modsToResolve));
+        if (options == null) 
+            throw new ArgumentNullException(nameof(options));
 
         var result = new MultiResolveResult();
 
@@ -102,9 +102,8 @@ public class MultiModDependencyResolver
             
         internal void AddError(IMod mod, Exception error)
         {
-            Requires.NotNull(mod, nameof(mod));
-            Requires.NotNull(error, nameof(error));
-            _errorData[mod] = error;
+            if (mod == null) throw new ArgumentNullException(nameof(mod));
+            _errorData[mod] = error ?? throw new ArgumentNullException(nameof(error));
         }
     }
 }

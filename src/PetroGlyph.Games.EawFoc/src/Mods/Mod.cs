@@ -1,14 +1,12 @@
 ﻿using System;
 using System.IO.Abstractions;
-using AnakinRaW.CommonUtilities.FileSystem;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Detection;
-using PetroGlyph.Games.EawFoc.Services.FileService;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.FileService;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// An ordinary, physical mod.
@@ -19,11 +17,6 @@ public class Mod : ModBase, IPhysicalMod
     private string? _identifier;
 
     internal string InternalPath { get; }
-
-    /// <summary>
-    /// Service for handling file system paths.
-    /// </summary>
-    protected readonly IPathHelperService PathHelperService;
 
     /// <inheritdoc/>
     public IDirectoryInfo Directory { get; }
@@ -38,9 +31,7 @@ public class Mod : ModBase, IPhysicalMod
         {
             if (_fileService is not null)
                 return _fileService;
-            var fs = ServiceProvider.GetService<IPhysicalFileServiceTest>() ??
-                     (IPhysicalFileService?)new DefaultFileService(this);
-            _fileService = fs!;
+            _fileService = new DefaultFileService(this);
             return _fileService;
         }
     }
@@ -59,8 +50,7 @@ public class Mod : ModBase, IPhysicalMod
         {
             if (string.IsNullOrEmpty(_identifier))
             {
-                var identifierBuilder = ServiceProvider.GetService<IModIdentifierBuilder>()
-                                        ?? new ModIdentifierBuilder(ServiceProvider);
+                var identifierBuilder = ServiceProvider.GetRequiredService<IModIdentifierBuilder>();
                 _identifier = identifierBuilder.Build(this);
             }
             return _identifier!;
@@ -78,12 +68,10 @@ public class Mod : ModBase, IPhysicalMod
     public Mod(IGame game, IDirectoryInfo modDirectory, bool workshop, IModinfoFile modinfoFile, IServiceProvider serviceProvider)
         : base(game, workshop ? ModType.Workshops : ModType.Default, modinfoFile?.GetModinfo()!, serviceProvider)
     {
-        Requires.NotNull(modDirectory, nameof(modDirectory));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
         ModinfoFile = modinfoFile;
-        Directory = modDirectory;
-        PathHelperService = serviceProvider.GetService<IPathHelperService>() ??
-                            new PathHelperService(modDirectory.FileSystem);
+        Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
         InternalPath = CreateInternalPath(modDirectory);
     }
 
@@ -98,12 +86,12 @@ public class Mod : ModBase, IPhysicalMod
     public Mod(IGame game, IDirectoryInfo modDirectory, bool workshop, string name, IServiceProvider serviceProvider)
         : base(game, workshop ? ModType.Workshops : ModType.Default, name, serviceProvider)
     {
-        Requires.NotNull(modDirectory, nameof(modDirectory));
-        Requires.NotNullOrEmpty(name, nameof(name));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (modDirectory == null) 
+            throw new ArgumentNullException(nameof(modDirectory));
+        if (serviceProvider == null)
+            throw new ArgumentNullException(nameof(serviceProvider));
+        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
         Directory = modDirectory;
-        PathHelperService = serviceProvider.GetService<IPathHelperService>() ??
-                            new PathHelperService(modDirectory.FileSystem);
         InternalPath = CreateInternalPath(modDirectory);
     }
 
@@ -118,16 +106,14 @@ public class Mod : ModBase, IPhysicalMod
     public Mod(IGame game, IDirectoryInfo modDirectory, bool workshop, IModinfo modInfoData, IServiceProvider serviceProvider) :
         base(game, workshop ? ModType.Workshops : ModType.Default, modInfoData, serviceProvider)
     {
-        Requires.NotNull(modDirectory, nameof(modDirectory));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        Directory = modDirectory;
-        PathHelperService = serviceProvider.GetService<IPathHelperService>() ??
-                            new PathHelperService(modDirectory.FileSystem);
+        if (serviceProvider == null)
+            throw new ArgumentNullException(nameof(serviceProvider));
+        Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
         InternalPath = CreateInternalPath(modDirectory);
     }
 
     internal string CreateInternalPath(IDirectoryInfo directory)
     {
-        return PathHelperService.NormalizePath(directory.FullName, PathNormalizeOptions.Full);
+        return FileSystem.Path.GetFullPath(directory.FullName);
     }
 }

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using PetroGlyph.Games.EawFoc.Clients.Processes;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Processes;
+using PG.StarWarsGame.Infrastructure.Games;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test;
 
 public class DebugableClientBaseTest
 {
@@ -34,12 +34,14 @@ public class DebugableClientBaseTest
         var fs = new MockFileSystem();
 
         _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
-            .Returns((IFileInfo)null);
+            .Returns((IFileInfo)null!);
         Assert.False(_service.IsDebugAvailable(game.Object));
         _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
             .Returns(fs.FileInfo.New("test.exe"));
         Assert.False(_service.IsDebugAvailable(game.Object));
-        fs.AddFile("test.exe", new MockFileData(string.Empty));
+        
+        fs.Initialize().WithFile("test.exe");
+        
         _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), It.IsAny<GameBuildType>()))
             .Returns(fs.FileInfo.New("test.exe"));
         Assert.True(_service.IsDebugAvailable(game.Object));
@@ -52,7 +54,7 @@ public class DebugableClientBaseTest
         game.Setup(g => g.Game).Returns(game.Object);
         game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
         var fs = new MockFileSystem();
-        fs.AddFile("release.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("release.exe");
 
         _exeService.Setup(s => s.GetExecutableForGame(It.IsAny<IGame>(), GameBuildType.Debug))
             .Returns(fs.FileInfo.New("debug.exe"));
@@ -71,7 +73,7 @@ public class DebugableClientBaseTest
         Assert.Equal(GameBuildType.Release, realProcess.ProcessInfo.BuildType);
 
         // Use Debug
-        fs.AddFile("debug.exe", new MockFileData(string.Empty));
+        fs.Initialize().WithFile("debug.exe");
         var debugProcess = new Mock<IGameProcess>();
         debugProcess.Setup(p => p.ProcessInfo)
             .Returns(new GameProcessInfo(game.Object, GameBuildType.Debug, ArgumentCollection.Empty));
@@ -81,13 +83,8 @@ public class DebugableClientBaseTest
 
     }
 
-
-    private class TestDebugClient : DebugableClientBase
+    private class TestDebugClient(IServiceProvider serviceProvider) : DebugableClientBase(serviceProvider)
     {
-        public TestDebugClient(IServiceProvider serviceProvider) : base(serviceProvider)
-        {
-        }
-
         public override ISet<GamePlatform> SupportedPlatforms => new HashSet<GamePlatform> { GamePlatform.Disk };
         protected internal override IGameProcessLauncher GetGameLauncherService()
         {

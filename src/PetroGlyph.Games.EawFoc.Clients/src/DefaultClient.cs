@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Clients.Processes;
-using PetroGlyph.Games.EawFoc.Games;
+using PG.StarWarsGame.Infrastructure.Clients.Processes;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients;
  
 /// <summary>
 /// Default client implementation for non-Steam games.
@@ -33,6 +33,6 @@ public sealed class DefaultClient : ClientBase
     /// <returns>The <see cref="IGameProcessLauncher"/> instance.</returns>
     protected internal override IGameProcessLauncher GetGameLauncherService()
     { 
-        return ServiceProvider.GetService<IGameProcessLauncher>() ?? new DefaultGameProcessLauncher(ServiceProvider);
+        return ServiceProvider.GetRequiredService<IGameProcessLauncher>();
     }
 }

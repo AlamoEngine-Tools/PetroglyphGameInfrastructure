@@ -2,12 +2,11 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Validation;
+using AnakinRaW.CommonUtilities;
 #if !NET
-using PetroGlyph.Games.EawFoc.Clients.Threading;
 #endif
 
-namespace PetroGlyph.Games.EawFoc.Clients.Processes;
+namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 internal sealed class GameProcess : IGameProcess
 {
@@ -39,10 +38,8 @@ internal sealed class GameProcess : IGameProcess
 
     public GameProcess(Process process, GameProcessInfo info)
     {
-        Requires.NotNull(process, nameof(process));
-        Requires.NotNull(info, nameof(info));
-        Process = process;
-        ProcessInfo = info;
+        Process = process ?? throw new ArgumentNullException(nameof(process));
+        ProcessInfo = info ?? throw new ArgumentNullException(nameof(info));
         RegisterExitEvent(process);
     }
 

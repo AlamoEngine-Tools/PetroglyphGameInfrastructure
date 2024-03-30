@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+		<RootNamespace>PG.StarWarsGame.Infrastructure.Clients</RootNamespace>
+		<AssemblyName>PG.StarWarsGame.Infrastructure.Clients</AssemblyName>
+	</PropertyGroup>
+	<PropertyGroup>
+		<Title>PG.StarWarsGame.Infrastructure.Clients</Title>
+		<Description>Provides tools for launching Petroglyph Star Wars games on various clients, such as Steam or Disk release.</Description>
+		<PackageId>AlamoEngineTools.PG.StarWarsGame.Infrastructure.Clients</PackageId>
+		<PackageTags>alamo,petroglyph,glyphx</PackageTags>
+		<NeutralLanguage>en</NeutralLanguage>
+	</PropertyGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<InheritDocEnabled>true</InheritDocEnabled>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\AET.SteamAbstraction\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
+		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj" />
+	</ItemGroup>
+</Project>

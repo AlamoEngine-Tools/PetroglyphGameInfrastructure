@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Abstractions.TestingHelpers;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.GameServices.Detection;
+namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
 public class CompositeDetectorTest
 {
@@ -15,7 +15,7 @@ public class CompositeDetectorTest
     {
         Assert.Throws<ArgumentNullException>(() => new CompositeGameDetector(null, null));
         Assert.Throws<ArgumentNullException>(() => new CompositeGameDetector(new List<IGameDetector> { null }, null));
-        Assert.Throws<ArgumentException>(() => new CompositeGameDetector(new List<IGameDetector>(), null));
+        Assert.Throws<ArgumentException>(() => new CompositeGameDetector(new List<IGameDetector>(), new Mock<IServiceProvider>().Object));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class CompositeDetectorTest
                 new GameDetectionResult(new GameIdentity(GameType.EaW, GamePlatform.Disk),
                     fs.DirectoryInfo.New("Game")));
         var result = detector.Detect(options);
-        Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game" : "C:\\Game", result.GameLocation?.FullName);
+        Assert.Equal(fs.Path.GetFullPath("Game"), result.GameLocation?.FullName);
     }
 
     [Fact]
@@ -79,6 +79,6 @@ public class CompositeDetectorTest
                 new GameDetectionResult(new GameIdentity(GameType.EaW, GamePlatform.Disk),
                     fs.DirectoryInfo.New("Game")));
         var result = detector.Detect(options);
-        Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game" : "C:\\Game", result.GameLocation?.FullName);
+        Assert.Equal(fs.Path.GetFullPath("Game"), result.GameLocation?.FullName);
     }
 }

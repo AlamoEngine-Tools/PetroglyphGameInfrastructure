@@ -1,46 +1,53 @@
 ﻿using System.Collections.Generic;
-using System.IO.Abstractions.TestingHelpers;
-using AnakinRaW.CommonUtilities.FileSystem;
+using System.IO.Abstractions;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.TestingUtilities;
 using Semver;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test.ModServices;
+namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public class ModIdentifierBuilderTest
 {
     private readonly ModIdentifierBuilder _service;
-    private readonly Mock<IPathHelperService> _pathHelper;
     private readonly Mock<IPhysicalMod> _physicalMod;
     private readonly Mock<IVirtualMod> _virtualMod;
     private readonly MockFileSystem _fileSystem;
 
     public ModIdentifierBuilderTest()
     {
-        var sc = new ServiceCollection();
-        _pathHelper = new Mock<IPathHelperService>();
-        sc.AddTransient(sp => _pathHelper.Object);
-        _service = new ModIdentifierBuilder(sc.BuildServiceProvider());
         _physicalMod = new Mock<IPhysicalMod>();
         _virtualMod = new Mock<IVirtualMod>();
         _fileSystem = new MockFileSystem();
+        var sc = new ServiceCollection();
+        sc.AddSingleton<IFileSystem>(_fileSystem);
+        _service = new ModIdentifierBuilder(sc.BuildServiceProvider());
     }
 
-    [Fact]
-    public void TestDefaultMod()
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
+    public void TestDefaultMod_Windows()
     {
         _physicalMod.Setup(m => m.Type).Returns(ModType.Default);
         _physicalMod.Setup(m => m.Directory).Returns(_fileSystem.DirectoryInfo.New("ModPath"));
 
-        _pathHelper.Setup(p => p.NormalizePath(It.IsAny<string>(), PathNormalizeOptions.Full)).Returns("c:\\modpath");
+        var identifier = _service.Build(_physicalMod.Object);
+        Assert.Equal("C:\\MODPATH", identifier);
+    }
+
+    [PlatformSpecificFact(TestPlatformIdentifier.Linux)]
+    public void TestDefaultMod_Linux()
+    {
+        _physicalMod.Setup(m => m.Type).Returns(ModType.Default);
+        _physicalMod.Setup(m => m.Directory).Returns(_fileSystem.DirectoryInfo.New("ModPath"));
 
         var identifier = _service.Build(_physicalMod.Object);
-        Assert.Equal("c:\\modpath", identifier);
+        Assert.Equal("/ModPath", identifier);
     }
 
     [Fact]
@@ -66,12 +73,20 @@ public class ModIdentifierBuilderTest
         Assert.Equal("VirtualMod-1138-1138", identifier);
     }
 
-    [Fact]
-    public void TestNormalizeDefault()
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
+    public void TestNormalizeDefault_Windows()
     {
         var mRef = new ModReference("path", ModType.Default, SemVersionRange.Parse("1.*"));
-        var expected = new ModReference("c:\\path", ModType.Default, SemVersionRange.Parse("1.*"));
-        _pathHelper.Setup(p => p.NormalizePath(It.IsAny<string>(), PathNormalizeOptions.Full)).Returns("c:\\path");
+        var expected = new ModReference("C:\\PATH", ModType.Default, SemVersionRange.Parse("1.*"));
+        var normalizedRef = _service.Normalize(mRef);
+        Assert.Equal(expected, normalizedRef);
+    }
+
+    [PlatformSpecificFact(TestPlatformIdentifier.Linux)]
+    public void TestNormalizeDefault_Linux()
+    {
+        var mRef = new ModReference("path", ModType.Default, SemVersionRange.Parse("1.*"));
+        var expected = new ModReference("/path", ModType.Default, SemVersionRange.Parse("1.*"));
         var normalizedRef = _service.Normalize(mRef);
         Assert.Equal(expected, normalizedRef);
     }

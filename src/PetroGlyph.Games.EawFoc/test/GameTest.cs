@@ -1,14 +1,14 @@
 ﻿using System;
-using System.IO.Abstractions.TestingHelpers;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
-using PetroGlyph.Games.EawFoc.Games;
-using PetroGlyph.Games.EawFoc.Mods;
-using PetroGlyph.Games.EawFoc.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Test;
+namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class GameTest
 {
@@ -23,7 +23,7 @@ public class GameTest
         Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGame(id, loc, null!, null!));
         var nameEmpty = string.Empty;
         var name = "Name";
-        Assert.Throws<ArgumentException>(() => new PetroglyphStarWarsGame(id, loc, nameEmpty, null!));
+        Assert.Throws<ArgumentException>(() => new PetroglyphStarWarsGame(id, loc, nameEmpty, new Mock<IServiceProvider>().Object));
         Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGame(id, loc, name, null!));
     }
 
@@ -37,7 +37,7 @@ public class GameTest
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
 
-        Assert.Equal(0, game.Mods.Count);
+        Assert.Empty(game.Mods);
 
         var modMock = new Mock<IMod>();
         modMock.Setup(m => m.Game).Returns(game);
@@ -45,16 +45,16 @@ public class GameTest
         var modA = modMock.Object;
 
         game.AddMod(modA);
-        Assert.Equal(1, game.Mods.Count);
+        Assert.Single(game.Mods);
         game.AddMod(modA);
-        Assert.Equal(1, game.Mods.Count);
+        Assert.Single(game.Mods);
         Assert.Single(game);
 
         game.RemoveMod(modA);
-        Assert.Equal(0, game.Mods.Count);
+        Assert.Empty(game.Mods);
 
         game.RemoveMod(modA);
-        Assert.Equal(0, game.Mods.Count);
+        Assert.Empty(game.Mods);
         Assert.Empty(game);
     }
 
@@ -205,13 +205,13 @@ public class GameTest
     public void GetModDirTest()
     {
         var fs = new MockFileSystem();
+        fs.Initialize().WithSubdirectory("Game");
         var sp = new Mock<IServiceProvider>();
         var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
         var loc = fs.DirectoryInfo.New("Game");
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
-        fs.AddDirectory("Game");
         var dataLocation = game.ModsLocation;
-        Assert.Equal(TestUtils.IsUnixLikePlatform ? "/Game/Mods" : "C:\\Game\\Mods", dataLocation.FullName);
+        Assert.Equal(fs.Path.GetFullPath("Game/Mods"), dataLocation.FullName);
     }
 }

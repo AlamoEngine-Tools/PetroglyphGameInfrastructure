@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using PetroGlyph.Games.EawFoc.Clients.Arguments;
-using PetroGlyph.Games.EawFoc.Clients.Arguments.GameArguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using Xunit;
 
-namespace PetroGlyph.Games.EawFoc.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
 public class ModArgumentListTest
 {
@@ -56,9 +56,9 @@ public class ModArgumentListTest
         }
 
         public ArgumentKind Kind => ArgumentKind.Flag;
-        public bool DebugArgument { get; }
-        public string Name { get; }
-        public string Value { get; }
+        public bool DebugArgument => false;
+        public string Name => null!;
+        public string Value => null!;
 
         object IGameArgument.Value => Value;
 

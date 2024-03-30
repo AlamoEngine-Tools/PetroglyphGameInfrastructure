@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using PetroGlyph.Games.EawFoc.Mods;
-using Validation;
+using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PetroGlyph.Games.EawFoc.Services.Dependencies;
+namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 /// <inheritdoc cref="IModDependencyTraverser"/>
 public class ModDependencyTraverser : IModDependencyTraverser
@@ -18,8 +17,7 @@ public class ModDependencyTraverser : IModDependencyTraverser
     /// <param name="serviceProvider">The service provider.</param>
     public ModDependencyTraverser(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
-        _serviceProvider = serviceProvider;
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     /// <inheritdoc/>

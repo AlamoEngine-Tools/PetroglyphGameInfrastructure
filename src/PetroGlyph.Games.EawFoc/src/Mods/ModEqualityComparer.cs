@@ -5,7 +5,7 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using EawModinfo.Utilities;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// <see cref="IEqualityComparer{T}"/> for <see cref="IMod"/>, <see cref="IModIdentity"/> and <see cref="IModReference"/>.

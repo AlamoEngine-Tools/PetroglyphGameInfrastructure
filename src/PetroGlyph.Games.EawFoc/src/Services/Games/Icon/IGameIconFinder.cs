@@ -1,6 +1,6 @@
-﻿using PetroGlyph.Games.EawFoc.Games;
+﻿using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Icon;
+namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 
 /// <summary>
 /// Service to find the game's icon.

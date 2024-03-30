@@ -1,15 +1,12 @@
-﻿#if NET
-using System.Linq;
-#else
+﻿
 using System;
-#endif
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Runtime.InteropServices;
-using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Services.FileService;
+namespace PG.StarWarsGame.Infrastructure.Services.FileService;
 
 /// <inheritdoc cref="IPhysicalFileService"/>
 public sealed class DefaultFileService : IPhysicalFileService
@@ -23,8 +20,7 @@ public sealed class DefaultFileService : IPhysicalFileService
     /// <param name="playableObject">The <see cref="IPhysicalPlayableObject"/> this instance is associated to.</param>
     public DefaultFileService(IPhysicalPlayableObject playableObject)
     {
-        Requires.NotNull(playableObject, nameof(playableObject));
-        PlayableObject = playableObject;
+        PlayableObject = playableObject ?? throw new ArgumentNullException(nameof(playableObject));
     }
 
     /// <inheritdoc/>

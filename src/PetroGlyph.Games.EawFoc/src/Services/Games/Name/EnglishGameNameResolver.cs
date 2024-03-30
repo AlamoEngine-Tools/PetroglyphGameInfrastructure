@@ -1,8 +1,8 @@
-﻿using System.Globalization;
-using PetroGlyph.Games.EawFoc.Games;
-using Validation;
+﻿using System;
+using System.Globalization;
+using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// English name resolver for games <see cref="IGameNameResolver"/>.
@@ -14,7 +14,8 @@ public class EnglishGameNameResolver : IGameNameResolver
     /// </summary>
     public string ResolveName(IGameIdentity game)
     {
-        Requires.NotNull(game, nameof(game));
+        if (game == null) 
+            throw new ArgumentNullException(nameof(game));
         var gameName = game.Type == GameType.EaW
             ? PetroglyphStarWarsGameConstants.EmpireAtWarEnglishNameShort
             : PetroglyphStarWarsGameConstants.ForcesOfCorruptionEnglishNameShort;

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 
-namespace PetroGlyph.Games.EawFoc.Services.Steam;
+namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 
 internal interface ISteamWorkshopWebpageDownloader
 {

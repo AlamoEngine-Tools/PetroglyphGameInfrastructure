@@ -1,6 +1,6 @@
 ﻿using EawModinfo.Spec;
 
-namespace PetroGlyph.Games.EawFoc.Mods;
+namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
 /// A <see cref="ModException"/> which gets thrown whenever a dependency cycle was detected.

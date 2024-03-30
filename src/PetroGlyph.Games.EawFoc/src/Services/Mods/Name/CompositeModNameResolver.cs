@@ -4,9 +4,8 @@ using System.Globalization;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Validation;
 
-namespace PetroGlyph.Games.EawFoc.Services.Name;
+namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
 /// <see cref="IModNameResolver"/> which takes a sorted list of <see cref="IModNameResolver"/> and returns the first valid result.
@@ -23,8 +22,9 @@ public sealed class CompositeModNameResolver : IModNameResolver
     /// <param name="serviceProvider">The service provider.</param>
     public CompositeModNameResolver(IList<IModNameResolver> sortedResolvers, IServiceProvider serviceProvider)
     {
-        Requires.NotNullOrEmpty(sortedResolvers, nameof(sortedResolvers));
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null)
+            throw new ArgumentNullException(nameof(serviceProvider));
+        ThrowHelper.ThrowIfCollectionNullOrEmpty(sortedResolvers);
         _sortedResolvers = sortedResolvers;
         _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
     }
@@ -40,7 +40,8 @@ public sealed class CompositeModNameResolver : IModNameResolver
     /// <returns></returns>
     public static IModNameResolver CreateDefaultModNameResolver(IServiceProvider serviceProvider)
     {
-        Requires.NotNull(serviceProvider, nameof(serviceProvider));
+        if (serviceProvider == null)
+            throw new ArgumentNullException(nameof(serviceProvider));
         var resolvers = new List<IModNameResolver>
         {
             new OnlineWorkshopNameResolver(serviceProvider),
@@ -65,8 +66,10 @@ public sealed class CompositeModNameResolver : IModNameResolver
     /// <inheritdoc/>
     public string? ResolveName(IModReference modReference, CultureInfo culture)
     {
-        Requires.NotNull(modReference, nameof(modReference));
-        Requires.NotNull(culture, nameof(culture));
+        if (modReference == null)
+            throw new ArgumentNullException(nameof(modReference));
+        if (culture == null)
+            throw new ArgumentNullException(nameof(culture));
 
         foreach (var nameResolver in _sortedResolvers)
         {
