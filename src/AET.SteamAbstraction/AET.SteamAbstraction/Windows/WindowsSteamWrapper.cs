@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.NativeMethods;
 using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities.Registry.Windows;
@@ -11,19 +13,38 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;
 
-internal class WindowsSteamWrapper(ISteamRegistry registry, IServiceProvider serviceProvider) : SteamWrapper(registry, serviceProvider)
+internal class WindowsSteamWrapper : SteamWrapper
 {
-    private readonly IProcessHelper _processHelper = serviceProvider.GetRequiredService<IProcessHelper>();
+    private readonly IWindowsSteamRegistry _windowsRegistry;
+    private readonly IProcessHelper _processHelper;
 
     public override bool IsRunning
     {
         get
         {
-            var pid = Registry.ProcessId;
+            var pid = _windowsRegistry.ProcessId;
             if (pid is null or 0)
                 return false;
             return _processHelper.GetProcessByPid(pid.Value) != null;
         }
+    }
+
+    public WindowsSteamWrapper(IWindowsSteamRegistry registry, IServiceProvider serviceProvider) : base(registry, serviceProvider)
+    {
+        _windowsRegistry = registry;
+        _processHelper = serviceProvider.GetRequiredService<IProcessHelper>();
+    }
+
+    public override bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest? game)
+    {
+        ThrowIfSteamNotInstalled();
+        
+        game = null;
+        var apps = _windowsRegistry.InstalledApps;
+        if (apps is null || !apps.Contains(gameId))
+            return false;
+        
+        return base.IsGameInstalled(gameId, out game);
     }
 
     protected override async Task WaitSteamUserLoggedInAsync(CancellationToken token)
@@ -37,7 +58,7 @@ internal class WindowsSteamWrapper(ISteamRegistry registry, IServiceProvider ser
         while (!IsUserLoggedIn)
         {
             token.ThrowIfCancellationRequested();
-            var processKey = Registry.ActiveProcessKey;
+            var processKey = _windowsRegistry.ActiveProcessKey;
             if (processKey is null)
                 return;
             if (processKey is not WindowsRegistryKey windowsRegistryKey)
@@ -59,7 +80,7 @@ internal class WindowsSteamWrapper(ISteamRegistry registry, IServiceProvider ser
         while (!IsRunning)
         {
             token.ThrowIfCancellationRequested();
-            var processKey = Registry.ActiveProcessKey;
+            var processKey = _windowsRegistry.ActiveProcessKey;
             if (processKey is null)
                 return;
             if (processKey is not WindowsRegistryKey windowsRegistryKey)

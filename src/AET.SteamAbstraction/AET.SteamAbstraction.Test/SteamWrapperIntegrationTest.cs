@@ -38,6 +38,7 @@ public class SteamWrapperIntegrationTest
     public void Running()
     {
         var running = _service.IsRunning;
+        Assert.True(running);
     }
 
     //[Fact]
