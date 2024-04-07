@@ -11,12 +11,12 @@
 		<Copyright>Copyright © 2024 Alamo Engine Tools and contributors. All rights reserved.</Copyright>
 		<Company>Alamo Engine Tools</Company>
 		<PackageTags>petroglyph, alamo, glyphx, foc, eaw</PackageTags>
-		<PackageProjectUrl>https://github.com/AlamoEngine-Tools</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/AlamoEngine-Tools/PetroglyphGameInfrastructure</PackageProjectUrl>
 		<LicenseFile>$(MSBuildThisFileDirectory)LICENSE</LicenseFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<RepositoryUrl>https://github.com/AlamoEngine-Tools/PetroglyphTools</RepositoryUrl>
+		<RepositoryUrl>https://github.com/AlamoEngine-Tools/PetroglyphGameInfrastructure</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageIcon>aet.png</PackageIcon>
 	</PropertyGroup>
@@ -37,5 +37,9 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(IsPackable)' == 'true'">
+		<None Include="$(LicenseFile)" Pack="true" PackagePath=""/>
+		<None Include="$(MSBuildThisFileDirectory)aet.png" Pack="true" PackagePath=""/>
 	</ItemGroup>
 </Project>
