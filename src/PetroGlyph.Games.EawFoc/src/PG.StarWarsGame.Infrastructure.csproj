@@ -22,9 +22,9 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AnakinRaW.CommonUtilities" Version="10.1.2" />
-		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="10.1.2" />
-		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="10.1.2" />
+		<PackageReference Include="AnakinRaW.CommonUtilities" Version="11.0.1" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="11.0.1" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="11.0.1" />
 		<PackageReference Include="eaw.modinfo" Version="5.0.1" />
 		<PackageReference Include="IsExternalInit" Version="1.0.3">
 		  <PrivateAssets>all</PrivateAssets>
