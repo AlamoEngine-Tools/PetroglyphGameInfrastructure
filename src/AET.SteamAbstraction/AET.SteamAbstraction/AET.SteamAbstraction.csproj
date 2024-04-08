@@ -20,7 +20,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="11.0.1" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="11.1.5" />
 		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
 		<PackageReference Include="AnakinRaW.CommonUtilities" Version="11.1.5" />
 		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="11.1.5" />
