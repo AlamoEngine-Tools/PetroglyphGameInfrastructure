@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.Linq;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
 using AnakinRaW.CommonUtilities.FileSystem;
 using Gameloop.Vdf;
-using Gameloop.Vdf.JsonConverter;
+using Gameloop.Vdf.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 
 namespace AET.SteamAbstraction;
 
-internal class SteamVdfReader : ISteamAppManifestReader, ILibraryConfigReader
+internal class SteamVdfReader : ISteamVdfReader
 {
     private readonly IFileSystem _fileSystem;
 
@@ -23,6 +21,7 @@ internal class SteamVdfReader : ISteamAppManifestReader, ILibraryConfigReader
 
         _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
     }
+
 
     public SteamAppManifest ReadManifest(IFileInfo manifestFile, ISteamLibrary library)
     {
@@ -35,42 +34,40 @@ internal class SteamVdfReader : ISteamAppManifestReader, ILibraryConfigReader
         if (directory is null || !_fileSystem.Path.IsChildOf(library.LibraryLocation.FullName, directory.FullName))
             throw new SteamException("The game's manifest is not part of the given library");
         var manifestData = ReadFileAsJson(manifestFile);
-        if (manifestData.Name != "AppState")
-            throw new SteamException("Invalid Data: Expected 'AppState' as root.");
+
+        if (manifestData.Key != "AppState")
+            throw new VdfException("Invalid Data: Expected 'AppState' as root.");
 
         uint? id = null;
         string? name = null;
         SteamAppState? state = null;
         string? installDir = null;
         uint[]? depots = null;
-        foreach (var child in manifestData.Value.Children())
+        foreach (var child in manifestData.Value.Children<VProperty>())
         {
-            if (child is not JProperty property)
-                continue;
-            switch (property.Name.ToLower())
+            switch (child.Key.ToLower())
             {
                 case "appid":
-                    id = uint.Parse(property.Value.ToString());
+                    id = uint.Parse(child.Value.ToString());
                     break;
                 case "name":
-                    name = property.Value.ToString();
+                    name = child.Value.ToString();
                     break;
                 case "stateflags":
-                    state = (SteamAppState)int.Parse(property.Value.ToString());
+                    state = (SteamAppState)int.Parse(child.Value.ToString());
                     break;
                 case "installdir":
-                    installDir = property.Value.ToString();
+                    installDir = child.Value.ToString();
                     break;
                 case "installeddepots":
-                    var depotsObject = property.Value as JObject;
-                    if (depotsObject is null)
+                    if (child.Value is not VObject depotsObject)
                         break;
                     depots = new uint[depotsObject.Count];
                     var count = 0;
-                    foreach (var depot in depotsObject.Children())
-                        depots[count++] = uint.Parse(((JProperty)depot).Name);
+                    foreach (var depot in depotsObject.Children<VProperty>())
+                        depots[count++] = uint.Parse(depot.Key);
                     break;
-                default: 
+                default:
                     continue;
             }
         }
@@ -91,41 +88,97 @@ internal class SteamVdfReader : ISteamAppManifestReader, ILibraryConfigReader
     public IEnumerable<IDirectoryInfo> ReadLibraryLocationsFromConfig(IFileInfo configFile)
     {
         var libraryData = ReadFileAsJson(configFile);
-        if (libraryData.Name != "libraryfolders")
-            throw new SteamException("Invalid Data: Expected 'libraryfolders' as root.");
-        var paths = new HashSet<string>();
-        foreach (var childNode in libraryData.Value.Children())
+
+        if (libraryData.Key != "libraryfolders")
+            throw new VdfException("Invalid Data: Expected 'libraryfolders' as root.");
+
+        if (libraryData.Value is not VObject vLibs)
+            throw new VdfException("Invalid Data: Expected 'libraryfolders' to contain objects.");
+
+
+        foreach (var prop in vLibs.Children<VProperty>())
         {
             // Skipping everyChild which is not a number
-            if (childNode is not JProperty jProp || !int.TryParse(jProp.Name, out _))
+            if (!int.TryParse(prop.Key, out _))
                 continue;
-            foreach (var childProperty in childNode.Values())
-            {
-                if (childProperty is JProperty property)
-                {
-                    if (!property.Name.Equals("path") || property.Value is not JValue { Type: JTokenType.String } pathValue)
-                        continue;
-                    paths.Add((string)pathValue.Value!);
-                    break;
-                }
 
-                if (childProperty is not JValue { Type: JTokenType.String } childValue)
-                    continue;
-                paths.Add((string)childValue.Value!);
+            if (prop.Value is VValue pathValue)
+                yield return _fileSystem.DirectoryInfo.New(pathValue.Value<string>());
+            else if (prop.Value is VObject obj)
+            {
+                foreach (var childProperty in obj.Children<VProperty>())
+                {
+                    if (!childProperty.Key.Equals("path") || childProperty.Value is not VValue value)
+                        continue;
+                    yield return _fileSystem.DirectoryInfo.New(value.Value<string>());
+                }
             }
         }
-        return paths.Select(p => _fileSystem.DirectoryInfo.New(p));
     }
 
-    private static JProperty ReadFileAsJson(IFileInfo file)
+    public LoginUsers ReadLoginUsers(IFileInfo configFile)
+    {
+        if (configFile == null)
+            throw new ArgumentNullException(nameof(configFile));
+        var loginData = ReadFileAsJson(configFile);
+
+        
+        if (loginData.Key != "users")
+            throw new VdfException("Invalid Data: Expected 'users' as root.");
+
+        if (loginData.Value is not VObject vUsers)
+            throw new VdfException("Invalid Data: Expected 'users' to contain objects.");
+
+        var users = new List<SteamUserLoginMetadata>(vUsers.Count);
+
+        foreach (var user in vUsers.Children<VProperty>())
+        {
+            if (user.Value is not VObject userProps)
+                throw new VdfException("Invalid Data: Expected user data to contain an object.");
+
+            var wantsOffline = false;
+            var mostRecent = false;
+            foreach (var property in userProps.Children<VProperty>())
+            {
+                switch (property.Key)
+                {
+                    case "MostRecent":
+                        mostRecent = ParseBooleanNumberString(property);
+                        break;
+                    case "WantsOfflineMode":
+                        wantsOffline = ParseBooleanNumberString(property);
+                        break;
+                }
+            }
+
+            users.Add(new SteamUserLoginMetadata(mostRecent, wantsOffline));
+        }
+
+        return new LoginUsers(users);
+    }
+
+    private static bool ParseBooleanNumberString(VProperty property)
+    {
+        var value = ((VValue)property.Value).Value<string>();
+        if (!int.TryParse(value, out var numValue))
+            throw new VdfException($"Expected number string for property {property.Key}");
+        return numValue switch
+        {
+            0 => false,
+            1 => true,
+            _ => throw new VdfException($"Expected number string for property {property.Key}")
+        };
+    }
+
+    private static VProperty ReadFileAsJson(IFileInfo file)
     {
         try
         {
-            return VdfConvert.Deserialize(file.OpenText()).ToJson();
+            return VdfConvert.Deserialize(file.OpenText());
         }
         catch (VdfException e)
         {
-            throw new SteamException($"Failed reading {file.FullName}: {e.Message}", e);
+            throw new VdfException($"Failed reading {file.FullName}: {e.Message}");
         }
     }
 }

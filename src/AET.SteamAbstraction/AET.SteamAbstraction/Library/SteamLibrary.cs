@@ -51,7 +51,7 @@ internal class SteamLibrary : ISteamLibrary
         if (!SteamAppsLocation.Exists)
             return Array.Empty<SteamAppManifest>();
         var apps = new HashSet<SteamAppManifest>();
-        var manifestReader = _serviceProvider.GetRequiredService<ISteamAppManifestReader>();
+        var manifestReader = _serviceProvider.GetRequiredService<ISteamVdfReader>();
         foreach (var manifestFile in SteamAppsLocation.EnumerateFiles("*.acf", SearchOption.TopDirectoryOnly))
             apps.Add(manifestReader.ReadManifest(manifestFile, this));
         return apps;

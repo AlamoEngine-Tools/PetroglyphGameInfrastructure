@@ -34,6 +34,7 @@ public class SteamWrapperTest
         sc.AddTransient(_ => new Mock<IProcessHelper>().Object);
         sc.AddTransient(_ => _gameFinder.Object);
         sc.AddTransient<IFileSystem>(_ => _fileSystem);
+        sc.AddSingleton<ISteamVdfReader>(sp => new SteamVdfReader(sp));
         _serviceProvider = sc.BuildServiceProvider();
     }
 

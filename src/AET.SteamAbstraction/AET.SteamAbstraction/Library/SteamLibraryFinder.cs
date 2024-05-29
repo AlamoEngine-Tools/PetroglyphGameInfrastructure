@@ -11,7 +11,7 @@ internal class SteamLibraryFinder(IServiceProvider serviceProvider) : Disposable
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     private readonly ISteamRegistry _registry = serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
     private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-    private readonly ILibraryConfigReader _configReader = serviceProvider.GetRequiredService<ILibraryConfigReader>();
+    private readonly ISteamVdfReader _configReader = serviceProvider.GetRequiredService<ISteamVdfReader>();
 
     public IEnumerable<ISteamLibrary> FindLibraries()
     {

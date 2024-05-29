@@ -7,14 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Games;
 using AnakinRaW.CommonUtilities;
-using Gameloop.Vdf;
-using Gameloop.Vdf.JsonConverter;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;
 
 internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider serviceProvider) : DisposableObject, ISteamWrapper
-{ 
+{
     protected ISteamRegistry Registry { get; } = registry ?? throw new ArgumentNullException(nameof(registry));
 
     protected IServiceProvider ServiceProvider { get; } = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -39,17 +37,11 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
 
             try
             {
-                var config = VdfConvert.Deserialize(FileSystem.File.ReadAllText(configFile)).ToJson();
-                var usersWantingOffline = config.SelectTokens("$..[?(@.WantsOfflineMode=='1')]").ToList();
-                if (!usersWantingOffline.Any())
-                    return false;
 
-                var anyMostRecent = config.SelectTokens("$..[?(@.mostrecent)]");
-                if (!anyMostRecent.Any())
-                    return true;
+                var reader = serviceProvider.GetRequiredService<ISteamVdfReader>();
+                var config = reader.ReadLoginUsers(FileSystem.FileInfo.New(configFile));
 
-                var mostRecent = usersWantingOffline.FirstOrDefault(x => x.SelectToken("$..[?(@.mostrecent=='1')]") != null);
-                return mostRecent is not null;
+                return config.Users.Any(user => user.MostRecent && user.UserWantsOffline);
             }
             catch
             {

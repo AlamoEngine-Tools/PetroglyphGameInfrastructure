@@ -1,7 +1,10 @@
-﻿using System.IO.Abstractions;
+﻿using System;
+using System.Data.Common;
+using System.IO.Abstractions;
 using System.Linq;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
+using Gameloop.Vdf;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Testably.Abstractions.Testing;
@@ -27,7 +30,7 @@ public class SteamVdfReaderTest
     {
         _fileSystem.Initialize().WithFile("input.vdf");
         var input = _fileSystem.FileInfo.New("input.vdf");
-        Assert.Throws<SteamException>(() => _service.ReadLibraryLocationsFromConfig(input));
+        Assert.Throws<VdfException>(() => _service.ReadLibraryLocationsFromConfig(input).ToList());
     }
         
     [Fact]
@@ -35,18 +38,18 @@ public class SteamVdfReaderTest
     {
         var data = @"""libraryfolders""
 {
-	""contentstatsid""		""-6588270118365286089""
-	""0""
-	{
-		""path""		""C:\\Lib1""
-		""label""		""""
-	}
-	""1""
-	{
-		""label""		""""
-		""path""		""C:\\Lib2""
-	}
-	""2"" ""C:\\Lib3""
+    ""contentstatsid""		""-6588270118365286089""
+    ""0""
+    {
+        ""path""		""C:\\Lib1""
+        ""label""		""""
+    }
+    ""1""
+    {
+        ""label""		""""
+        ""path""		""C:\\Lib2""
+    }
+    ""2"" ""C:\\Lib3""
 }
 ";
 
@@ -70,14 +73,13 @@ public class SteamVdfReaderTest
     {
         var data = @"""invalidData""
 {
-	""contentstatsid""		""-6588270118365286089""
+    ""contentstatsid""		""-6588270118365286089""
 }
 ";
         _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
         var input = _fileSystem.FileInfo.New("input.vdf");
-        Assert.Throws<SteamException>(() => _service.ReadLibraryLocationsFromConfig(input));
-
+        Assert.Throws<VdfException>(() => _service.ReadLibraryLocationsFromConfig(input).ToList());
     }
 
     [Fact]
@@ -85,7 +87,7 @@ public class SteamVdfReaderTest
     {
         var data = @"""libraryfolders""
 {
-	""contentstatsid""		""-6588270118365286089""
+    ""contentstatsid""		""-6588270118365286089""
 }
 ";
         _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
@@ -100,16 +102,16 @@ public class SteamVdfReaderTest
     {
         var data = @"""AppState""
 {
-	""appid""		""1230""
-	""name""		""GameName""
-	""StateFlags""		""516""
-	""installdir""		""GamePath""
-	""InstalledDepots""
-	{
-		""1231"" { }
-		""1232"" { }
-		""1233"" { }
-	}
+    ""appid""		""1230""
+    ""name""		""GameName""
+    ""StateFlags""		""516""
+    ""installdir""		""GamePath""
+    ""InstalledDepots""
+    {
+        ""1231"" { }
+        ""1232"" { }
+        ""1233"" { }
+    }
 }
 ";
         var lib = new Mock<ISteamLibrary>();
@@ -139,15 +141,15 @@ public class SteamVdfReaderTest
     {
         var data = @"""AppState""
 {
-	""appid""		""1230""
-	""StateFlags""		""516""
-	""installdir""		""GamePath""
-	""InstalledDepots""
-	{
-		""1231"" { }
-		""1232"" { }
-		""1233"" { }
-	}
+    ""appid""		""1230""
+    ""StateFlags""		""516""
+    ""installdir""		""GamePath""
+    ""InstalledDepots""
+    {
+        ""1231"" { }
+        ""1232"" { }
+        ""1233"" { }
+    }
 }
 ";
         var lib = new Mock<ISteamLibrary>();
