@@ -12,7 +12,7 @@ namespace AET.SteamAbstraction.Test;
 public class SteamLibraryFinderTest
 {
     private readonly SteamLibraryFinder _service;
-    private readonly Mock<ILibraryConfigReader> _reader;
+    private readonly Mock<ISteamVdfReader> _reader;
     private readonly Mock<ISteamRegistry> _registry;
     private readonly MockFileSystem _fileSystem;
 
@@ -28,7 +28,7 @@ public class SteamLibraryFinderTest
         regFactory.Setup(f => f.CreateRegistry()).Returns(_registry.Object);
 
         sc.AddSingleton(sp => regFactory.Object);
-        _reader = new Mock<ILibraryConfigReader>();
+        _reader = new Mock<ISteamVdfReader>();
         sc.AddTransient(_ => _reader.Object);
         
         _service = new SteamLibraryFinder(sc.BuildServiceProvider());

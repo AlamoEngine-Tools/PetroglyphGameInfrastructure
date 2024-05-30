@@ -20,7 +20,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="11.0.1" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="11.1.5" />
 		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
 		<PackageReference Include="AnakinRaW.CommonUtilities" Version="11.1.5" />
 		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="11.1.5" />
@@ -31,6 +31,6 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Gameloop.Vdf" Version="0.6.2" PrivateAssets="compile" />
-		<PackageReference Include="Gameloop.Vdf.JsonConverter " Version="0.2.1" PrivateAssets="compile" />
+		<PackageReference Include="System.Text.Json" Version="8.0.3" />
 	</ItemGroup>
 </Project>

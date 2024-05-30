@@ -16,14 +16,14 @@ public class SteamLibraryTest
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly MockFileSystem _fileSystem;
-    private readonly Mock<ISteamAppManifestReader> _reader;
+    private readonly Mock<ISteamVdfReader> _reader;
 
     public SteamLibraryTest()
     {
         var sc = new ServiceCollection();
         _fileSystem = new MockFileSystem();
         sc.AddTransient<IFileSystem>(_ => _fileSystem);
-        _reader = new Mock<ISteamAppManifestReader>();
+        _reader = new Mock<ISteamVdfReader>();
         sc.AddTransient(_ => _reader.Object);
         _serviceProvider = sc.BuildServiceProvider();
     }
