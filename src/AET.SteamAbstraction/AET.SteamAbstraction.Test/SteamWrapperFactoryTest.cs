@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Abstractions;
-using System.Runtime.InteropServices;
 using AET.SteamAbstraction.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;

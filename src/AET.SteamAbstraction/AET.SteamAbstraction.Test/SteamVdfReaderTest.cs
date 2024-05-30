@@ -1,6 +1,4 @@
-﻿using System;
-using System.Data.Common;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using System.Linq;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
