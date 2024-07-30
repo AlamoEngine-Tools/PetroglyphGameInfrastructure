@@ -17,7 +17,7 @@ public class GameExecutableNameBuilderTest
     public void TestNames()
     {
         var eaw = new Mock<IGame>();
-        eaw.Setup(g => g.Type).Returns(GameType.EaW);
+        eaw.Setup(g => g.Type).Returns(GameType.Eaw);
         eaw.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
         var foc = new Mock<IGame>();
@@ -25,7 +25,7 @@ public class GameExecutableNameBuilderTest
         foc.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
         var eawSteam = new Mock<IGame>();
-        eawSteam.Setup(g => g.Type).Returns(GameType.EaW);
+        eawSteam.Setup(g => g.Type).Returns(GameType.Eaw);
         eawSteam.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
 
         var focSteam = new Mock<IGame>();

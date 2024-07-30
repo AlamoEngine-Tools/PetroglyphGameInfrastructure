@@ -32,8 +32,6 @@ public class ModDependencyResolver : IDependencyResolver
         if (options == null) 
             throw new ArgumentNullException(nameof(options));
 
-        //_visitedMods.Add(mod);
-
         var graphBuilder = _serviceProvider.GetRequiredService<IModDependencyGraphBuilder>();
         var dependencyGraph = graphBuilder.BuildResolveFree(mod);
 
@@ -75,7 +73,7 @@ public class ModDependencyResolver : IDependencyResolver
             {
                 // We should not pass options with ResolveCompleteChain set, which would be truly recursive. 
                 // This however would mean that in the event of a cycle
-                // the whole chain would be in a undefined state,
+                // the whole chain would be in an undefined state,
                 // where we could never trust the IMod.Dependencies property.
                 // This way we make sure the property always yields the correct 1st-level dependencies.
                 source.ResolveDependencies(this, new DependencyResolverOptions());

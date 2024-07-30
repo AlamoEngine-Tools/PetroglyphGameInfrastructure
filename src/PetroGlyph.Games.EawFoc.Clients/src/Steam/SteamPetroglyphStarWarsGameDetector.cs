@@ -57,7 +57,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
         fullGamePath = options.Type switch
         {
             GameType.Foc => FileSystem.Path.Combine(fullGamePath, "corruption"),
-            GameType.EaW => FileSystem.Path.Combine(fullGamePath, "GameData"),
+            GameType.Eaw => FileSystem.Path.Combine(fullGamePath, "GameData"),
             _ => fullGamePath
         };
 
@@ -65,7 +65,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
 
         try
         {
-            using var registry = _registryFactory.CreateRegistry(options.Type, ServiceProvider);
+            using var registry = _registryFactory.CreateRegistry(options.Type);
             if (registry.Type != options.Type)
                 throw new InvalidOperationException("Incompatible registry");
             if (registry.Version is null)

@@ -16,7 +16,7 @@ public class EnglishGameNameResolver : IGameNameResolver
     {
         if (game == null) 
             throw new ArgumentNullException(nameof(game));
-        var gameName = game.Type == GameType.EaW
+        var gameName = game.Type == GameType.Eaw
             ? PetroglyphStarWarsGameConstants.EmpireAtWarEnglishNameShort
             : PetroglyphStarWarsGameConstants.ForcesOfCorruptionEnglishNameShort;
         var platform = game.Platform.ToString();

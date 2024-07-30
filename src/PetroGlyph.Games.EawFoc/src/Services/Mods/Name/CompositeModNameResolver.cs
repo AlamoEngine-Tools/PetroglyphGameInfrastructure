@@ -4,6 +4,7 @@ using System.Globalization;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
@@ -51,20 +52,7 @@ public sealed class CompositeModNameResolver : IModNameResolver
     }
 
     /// <inheritdoc/>
-    public string ResolveName(IModReference modReference)
-    {
-        var name = ResolveName(modReference, CultureInfo.InvariantCulture);
-        if (string.IsNullOrEmpty(name))
-        {
-            var e = new PetroglyphException($"Unable to resolve the mod's name {modReference}");
-            _logger?.LogError(e, e.Message);
-            throw e;
-        }
-        return name!;
-    }
-
-    /// <inheritdoc/>
-    public string? ResolveName(IModReference modReference, CultureInfo culture)
+    public string ResolveName(IModReference modReference, CultureInfo culture)
     {
         if (modReference == null)
             throw new ArgumentNullException(nameof(modReference));
@@ -84,14 +72,15 @@ public sealed class CompositeModNameResolver : IModNameResolver
                 }
                 catch (Exception e)
                 {
-                    throw new PetroglyphException("Error while resolving a mod's name", e);
+                    throw new ModException(modReference, "Error while resolving a mod's name", e);
                 }
             }
-            catch (PetroglyphException e)
+            catch (ModException e)
             {
                 _logger?.LogDebug(e, e.Message);
             }
         }
-        return null;
+
+        throw new ModException(modReference, "Unable to resolve the mod's name.");
     }
 }

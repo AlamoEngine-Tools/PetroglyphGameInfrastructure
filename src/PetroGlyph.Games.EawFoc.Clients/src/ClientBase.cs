@@ -94,7 +94,7 @@ public abstract class ClientBase : IGameClient
         {
             var modArgFactory = ServiceProvider.GetRequiredService<IModArgumentListFactory>();
             var modArgs = modArgFactory.BuildArgumentList(mod, false);
-            var builder = ServiceProvider.GetRequiredService<IArgumentCollectionBuilder>();
+            var builder = new KeyBasedArgumentCollectionBuilder();
             arguments = builder.AddAll(DefaultArguments).Add(modArgs).Build();
         }
         return StartGame(instance, arguments, buildType);

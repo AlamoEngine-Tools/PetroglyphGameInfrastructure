@@ -19,7 +19,7 @@ internal abstract class SpecificPlatformIdentifier : ISpecificPlatformIdentifier
 
     public bool IsPlatform(GameType type, ref IDirectoryInfo location)
     {
-        return type == GameType.EaW ? IsPlatformEaw(ref location) : IsPlatformFoc(ref location);
+        return type == GameType.Eaw ? IsPlatformEaw(ref location) : IsPlatformFoc(ref location);
     }
 
     public abstract bool IsPlatformFoc(ref IDirectoryInfo location);

@@ -34,7 +34,7 @@ internal class SteamIdentifier : SpecificPlatformIdentifier
 
     public override bool IsPlatformEaw(ref IDirectoryInfo location)
     {
-        if (!GameDetector.GameExeExists(location, GameType.EaW))
+        if (!GameDetector.GameExeExists(location, GameType.Eaw))
             return false;
 
         if (!ContainsSteamExe(location))

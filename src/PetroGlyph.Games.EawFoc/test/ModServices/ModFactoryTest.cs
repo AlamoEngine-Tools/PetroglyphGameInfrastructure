@@ -36,14 +36,14 @@ public class ModFactoryTest
         sc.AddTransient(_ => _locationResolver.Object);
         sc.AddTransient<IFileSystem>(_ => _fileSystem);
 
-        _service = new ModFactory(_ => _modInfoFinder.Object, CultureInfo.InvariantCulture, sc.BuildServiceProvider());
+        _service = new ModFactory(sc.BuildServiceProvider(), _ => _modInfoFinder.Object);
     }
 
 
     [Fact]
     public void NullCtor_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new ModFactory(null, null, null));
+        Assert.Throws<ArgumentNullException>(() => new ModFactory(null));
     }
 
     [Fact]
@@ -55,14 +55,14 @@ public class ModFactoryTest
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
             .Returns(modLoc);
 
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
 
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc));
 
         var modRef = new ModReference("Mods/Name", ModType.Default);
 
-        var mods = _service.FromReference(game.Object, modRef);
+        var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
         Assert.Single(mods);
     }
 
@@ -87,7 +87,7 @@ public class ModFactoryTest
 
         var modRef = new ModReference("Mods/Name", ModType.Default);
 
-        var mods = _service.FromReference(game.Object, modRef);
+        var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
         Assert.Single(mods);
     }
 
@@ -121,10 +121,10 @@ public class ModFactoryTest
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object }));
 
-            
+
         var modRef = new ModReference("Mods/Name", ModType.Default);
 
-        var mods = _service.FromReference(game.Object, modRef);
+        var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
         Assert.Equal(2, mods.Count());
     }
 
@@ -137,14 +137,14 @@ public class ModFactoryTest
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
             .Returns(modLoc);
 
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
 
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc));
 
         var modRef = new ModReference("Mods/Name", ModType.Default);
 
-        var mod = _service.FromReference(game.Object, modRef, null);
+        var mod = _service.FromReference(game.Object, modRef, true, CultureInfo.CurrentCulture);
         Assert.NotNull(mod);
         Assert.Equal("Name", mod.Name);
     }
@@ -155,10 +155,10 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-            
+
         _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
             .Returns(modLoc);
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
 
         var modinfo = new Mock<IModinfo>();
         modinfo.Setup(m => m.Name).Returns("MyName");
@@ -171,7 +171,7 @@ public class ModFactoryTest
 
         var modRef = new ModReference("Mods/Name", ModType.Default);
 
-        var mod = _service.FromReference(game.Object, modRef, modinfo.Object);
+        var mod = _service.FromReference(game.Object, modRef, modinfo.Object, CultureInfo.CurrentCulture);
         Assert.NotNull(mod);
         Assert.Equal("MyName", mod.Name);
     }
@@ -191,7 +191,7 @@ public class ModFactoryTest
             .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
         modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
 
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
 
         var mainFile = new Mock<IModinfoFile>();
         mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
@@ -199,10 +199,10 @@ public class ModFactoryTest
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
 
-            
+
         var modRef = new ModReference("Mods/Name", ModType.Default);
 
-        var mod = _service.FromReference(game.Object, modRef, true);
+        var mod = _service.FromReference(game.Object, modRef, true, CultureInfo.CurrentCulture);
         Assert.NotNull(mod);
         Assert.Equal("MyName", mod.Name);
     }
@@ -222,7 +222,7 @@ public class ModFactoryTest
             .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
         modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
 
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
 
         var mainFile = new Mock<IModinfoFile>();
         mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
@@ -230,10 +230,10 @@ public class ModFactoryTest
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
 
-            
+
         var modRef = new ModReference("Mods/Name", ModType.Default);
 
-        var mod = _service.FromReference(game.Object, modRef, false);
+        var mod = _service.FromReference(game.Object, modRef, false, CultureInfo.CurrentCulture);
         Assert.NotNull(mod);
         Assert.Equal("Name", mod.Name);
     }
@@ -253,14 +253,14 @@ public class ModFactoryTest
             .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
         modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
 
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>())).Returns("Name");
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
 
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc));
-            
+
         var modRef = new ModReference("Mods/Name", ModType.Default);
 
-        var mods = _service.VariantsFromReference(game.Object, modRef);
+        var mods = _service.VariantsFromReference(game.Object, modRef, CultureInfo.CurrentCulture);
         Assert.Empty(mods);
     }
 
@@ -294,10 +294,10 @@ public class ModFactoryTest
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object }));
 
-            
+
         var modRef = new ModReference("Mods/Name", ModType.Default);
 
-        var mods = _service.VariantsFromReference(game.Object, modRef);
+        var mods = _service.VariantsFromReference(game.Object, modRef, CultureInfo.CurrentCulture);
         Assert.Equal(2, mods.Count());
     }
 }

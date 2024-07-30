@@ -37,7 +37,7 @@ internal class OriginIdentifier : SpecificPlatformIdentifier
 
     public override bool IsPlatformEaw(ref IDirectoryInfo location)
     {
-        if (!GameDetector.GameExeExists(location, GameType.EaW))
+        if (!GameDetector.GameExeExists(location, GameType.Eaw))
         {
             Logger?.LogWarning("Unable to find EaW Origin at first location. " +
                                "I don't know if the EAW path might be broken as well?!");

@@ -57,7 +57,7 @@ public sealed class DirectoryGameDetector : GameDetector
         var subDirectories = type switch
 #if NET
             {
-                GameType.EaW => _directory.EnumerateDirectories(KnownEawSubDirName,
+                GameType.Eaw => _directory.EnumerateDirectories(KnownEawSubDirName,
                     new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = true }),
                 GameType.Foc => _directory.EnumerateDirectories("*",
                         new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })
@@ -66,7 +66,7 @@ public sealed class DirectoryGameDetector : GameDetector
             };
 #else
         {
-            GameType.EaW => _directory.EnumerateDirectories(KnownEawSubDirName, SearchOption.AllDirectories),
+            GameType.Eaw => _directory.EnumerateDirectories(KnownEawSubDirName, SearchOption.AllDirectories),
             GameType.Foc => _directory.EnumerateDirectories()
                 .Where(d => KnownFocDirectoryNames.Contains(d.Name)),
             _ => throw new ArgumentOutOfRangeException()

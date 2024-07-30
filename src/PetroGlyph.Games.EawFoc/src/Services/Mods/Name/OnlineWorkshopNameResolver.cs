@@ -33,6 +33,7 @@ public class OnlineWorkshopNameResolver : ModNameResolverBase
         var modsWorkshopWebpage = downloader.GetSteamWorkshopsPageHtmlAsync(modId, culture).GetAwaiter().GetResult();
         if (modsWorkshopWebpage is null)
             throw new InvalidOperationException("Unable to get the mod's workshop web page.");
+
         return GetName(modsWorkshopWebpage);
     }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -58,7 +59,7 @@ public abstract class GameDetector : IGameDetector
         if (!directory.Exists)
             return false;
 
-        var exeFile = gameType == GameType.EaW
+        var exeFile = gameType == GameType.Eaw
             ? PetroglyphStarWarsGameConstants.EmpireAtWarExeFileName
             : PetroglyphStarWarsGameConstants.ForcesOfCorruptionExeFileName;
 
@@ -94,10 +95,7 @@ public abstract class GameDetector : IGameDetector
             if (!HandleInitialization(options, ref locationData))
                 return GameDetectionResult.RequiresInitialization(options.Type);
 
-#if DEBUG
-            if (locationData.Location is null)
-                throw new InvalidOperationException("Illegal operation state: Expected location to be not null!");
-#endif
+            Debug.Assert(locationData.Location is not null, "Illegal operation state: Expected location to be not null!");
 
             var location = locationData.Location!;
             var identifier = ServiceProvider.GetService<IGamePlatformIdentifier>() ?? new GamePlatformIdentifier(ServiceProvider);
@@ -171,7 +169,7 @@ public abstract class GameDetector : IGameDetector
     }
 
     /// <summary>
-    /// Internal state struct for representing the result of the abstract <see cref="GameDetector.FindGameLocation"/> method.
+    /// Internal state struct for representing the result of the abstract <see cref="FindGameLocation"/> method.
     /// </summary>
     protected internal struct GameLocationData
     {

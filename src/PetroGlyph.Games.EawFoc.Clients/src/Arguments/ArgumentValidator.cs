@@ -4,7 +4,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 internal sealed class ArgumentValidator : IArgumentValidator
 {
-    private static readonly char[] InvalidArgumentChars = { '\"', '<', '>', '|', ':', '*', '?'};
+    private static readonly char[] InvalidArgumentChars = ['\"', '<', '>', '|', ':', '*', '?', '&'];
 
     public ArgumentValidityStatus CheckArgument(IGameArgument argument, out string name, out string value)
     {

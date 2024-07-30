@@ -10,6 +10,11 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 public class GameDetectionResult
 {
     /// <summary>
+    /// Gets a value indicating whether this detection result points to an installed game.
+    /// </summary>
+    public bool Installed => GameLocation is not null && Error is null;
+
+    /// <summary>
     /// The actual identity of the found game. This might differ from the actual detection request.
     /// </summary>
     public IGameIdentity GameIdentity { get; }

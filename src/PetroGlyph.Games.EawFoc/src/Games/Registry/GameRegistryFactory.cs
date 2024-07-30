@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 /// <inheritdoc cref="IGameRegistryFactory"/>
-public class GameRegistryFactory : IGameRegistryFactory
+public class GameRegistryFactory(IServiceProvider serviceProvider) : IGameRegistryFactory
 {
     internal const string FocRegistryPath =
         @"SOFTWARE\LucasArts\Star Wars Empire at War Forces of Corruption";
@@ -14,7 +14,7 @@ public class GameRegistryFactory : IGameRegistryFactory
         @"SOFTWARE\LucasArts\Star Wars Empire at War";
 
     /// <inheritdoc/>
-    public IGameRegistry CreateRegistry(GameType type, IServiceProvider serviceProvider)
+    public IGameRegistry CreateRegistry(GameType type)
     {
         if (serviceProvider == null) 
             throw new ArgumentNullException(nameof(serviceProvider));
@@ -23,7 +23,7 @@ public class GameRegistryFactory : IGameRegistryFactory
 
         var gamePath = type switch
         {
-            GameType.EaW => EawRegistryPath,
+            GameType.Eaw => EawRegistryPath,
             GameType.Foc => FocRegistryPath,
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
 using AET.SteamAbstraction;
@@ -35,7 +36,7 @@ IEnumerable<IMod> FindMods()
 
     foreach (var modReference in modRefs)
     {
-        var mod = factory.FromReference(game, modReference);
+        var mod = factory.FromReference(game, modReference, true, CultureInfo.CurrentCulture);
         mods.AddRange(mod);
     }
 
@@ -59,7 +60,7 @@ IGame FindGame()
     var detector = sp.GetRequiredService<IGameDetector>();
     var detectionResult = detector.Detect(new GameDetectorOptions(GameType.Foc));
     var gameFactory = sp.GetRequiredService<IGameFactory>();
-    return gameFactory.CreateGame(detectionResult);
+    return gameFactory.CreateGame(detectionResult, CultureInfo.CurrentCulture);
 }
 
 

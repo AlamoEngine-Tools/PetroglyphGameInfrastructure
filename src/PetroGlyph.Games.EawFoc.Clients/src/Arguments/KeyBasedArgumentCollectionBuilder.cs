@@ -5,10 +5,10 @@ using System.Linq;
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-/// <see cref="IArgumentCollectionBuilder"/> which takes the argument's name as key.
+/// Service to build an <see cref="IArgumentCollection"/> which takes the argument's name as key.
 /// <para>Adding new arguments will update an existing, if an argument with the same name is already present.</para>
 /// </summary>
-public class KeyBasedArgumentCollectionBuilder : IArgumentCollectionBuilder
+public class KeyBasedArgumentCollectionBuilder
 {
     private readonly Dictionary<string, IGameArgument> _argumentDict = new();
 
@@ -32,7 +32,7 @@ public class KeyBasedArgumentCollectionBuilder : IArgumentCollectionBuilder
     /// </summary>
     /// <param name="argument">The argument to add or update.</param>
     /// <returns>This instance.</returns>
-    public IArgumentCollectionBuilder Add(IGameArgument argument)
+    public KeyBasedArgumentCollectionBuilder Add(IGameArgument argument)
     {
         if (argument == null) 
             throw new ArgumentNullException(nameof(argument));
@@ -42,7 +42,7 @@ public class KeyBasedArgumentCollectionBuilder : IArgumentCollectionBuilder
     }
 
     /// <inheritdoc/>
-    public IArgumentCollectionBuilder Remove(IGameArgument argument)
+    public KeyBasedArgumentCollectionBuilder Remove(IGameArgument argument)
     {
         if (argument == null)
             throw new ArgumentNullException(nameof(argument));
@@ -55,7 +55,7 @@ public class KeyBasedArgumentCollectionBuilder : IArgumentCollectionBuilder
     /// </summary>
     /// <param name="name">The name of the argument to remove.</param>
     /// <returns>This instance.</returns>
-    public IArgumentCollectionBuilder Remove(string name)
+    public KeyBasedArgumentCollectionBuilder Remove(string name)
     {
         _argumentDict.Remove(name);
         return this;
@@ -66,14 +66,17 @@ public class KeyBasedArgumentCollectionBuilder : IArgumentCollectionBuilder
     /// </summary>
     /// <param name="argumentCollection">The arguments to add or update.</param>
     /// <returns>This instance.</returns>
-    public IArgumentCollectionBuilder AddAll(IArgumentCollection argumentCollection)
+    public KeyBasedArgumentCollectionBuilder AddAll(IArgumentCollection argumentCollection)
     {
         foreach (var arg in argumentCollection)
             Add(arg);
         return this;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Creates an <see cref="IArgumentCollection"/> from this instance.
+    /// </summary>
+    /// <returns>The created <see cref="IArgumentCollection"/>.</returns>
     public IArgumentCollection Build()
     {
         return new ArgumentCollection(_argumentDict.Values.ToList());

@@ -3,7 +3,6 @@ using PG.StarWarsGame.Infrastructure.Games.Registry;
 using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.StarWarsGame.Infrastructure.Services.Name;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 namespace PG.StarWarsGame.Infrastructure;
@@ -20,19 +19,17 @@ public static class PetroglyphGameInfrastructure
     /// <param name="serviceCollection">The service collection to be filled.</param>
     public static void InitializeServices(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<IGameRegistryFactory>(_ => new GameRegistryFactory());
-        serviceCollection.AddTransient<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
-        serviceCollection.AddTransient<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
+        serviceCollection.AddSingleton<IGameRegistryFactory>(sp => new GameRegistryFactory(sp));
+        serviceCollection.AddSingleton<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
+        serviceCollection.AddSingleton<IGameFactory>(sp => new GameFactory(sp));
+        serviceCollection.AddSingleton<IModFactory>(sp => new ModFactory(sp));
+        serviceCollection.AddSingleton<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
+        serviceCollection.AddSingleton<IModReferenceFinder>(sp => new FileSystemModFinder(sp));
+        serviceCollection.AddSingleton<IModReferenceLocationResolver>(sp => new ModReferenceLocationResolver(sp));
+        serviceCollection.AddSingleton<IModDependencyGraphBuilder>(_ => new ModDependencyGraphBuilder());
+        serviceCollection.AddSingleton<IModDependencyTraverser>(sp => new ModDependencyTraverser(sp));
 
-        serviceCollection.AddTransient<IGameFactory>(sp => new GameFactory(sp));
-        serviceCollection.AddTransient<IGameRegistryFactory>(sp => new GameRegistryFactory());
-        serviceCollection.AddTransient<IModReferenceFinder>(sp => new FileSystemModFinder(sp));
-        serviceCollection.AddTransient<IModFactory>(sp => new ModFactory(sp));
-        serviceCollection.AddTransient<IModReferenceLocationResolver>(sp => new ModReferenceLocationResolver(sp));
-        serviceCollection.AddTransient<IModNameResolver>(sp => new DirectoryModNameResolver(sp));
-
+        // Must be transient
         serviceCollection.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));
-        serviceCollection.AddTransient<IModDependencyGraphBuilder>(sp => new ModDependencyGraphBuilder());
-        serviceCollection.AddTransient<IModDependencyTraverser>(sp => new ModDependencyTraverser(sp));
     }
 }

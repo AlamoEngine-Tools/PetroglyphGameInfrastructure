@@ -9,7 +9,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 /// <inheritdoc cref="IModDependencyGraphBuilder"/>
 public class ModDependencyGraphBuilder : IModDependencyGraphBuilder
 {
-    private static readonly IList<ModDependencyEntry> EmptyDependencyList = new List<ModDependencyEntry>();
+    private static readonly IList<ModDependencyEntry> EmptyDependencyList = Array.Empty<ModDependencyEntry>();
 
 
     /// <inheritdoc/>

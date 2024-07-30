@@ -23,7 +23,7 @@ public class FallbackGameIconFinder : IGameIconFinder
             throw new ArgumentNullException(nameof(game));
         var expectedFileName = game.Type switch
         {
-            GameType.EaW => EawIconName,
+            GameType.Eaw => EawIconName,
             GameType.Foc => FocIconName,
             _ => throw new ArgumentOutOfRangeException()
         };

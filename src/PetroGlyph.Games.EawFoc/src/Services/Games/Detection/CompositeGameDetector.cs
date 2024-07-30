@@ -78,9 +78,7 @@ public sealed class CompositeGameDetector : IGameDetector
     public bool TryDetect(GameDetectorOptions options, out GameDetectionResult result)
     {
         result = Detect(options);
-        if (result.Error is not null)
-            return false;
-        return result.GameLocation is not null;
+        return result.Installed;
     }
 
     private void PassThroughInitializationRequest(object? sender, GameInitializeRequestEventArgs e)

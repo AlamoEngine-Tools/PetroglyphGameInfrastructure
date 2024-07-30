@@ -66,7 +66,7 @@ public class FallbackIconFinderTest
         });
         var game = new Mock<IGame>();
         game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
-        game.Setup(g => g.Type).Returns(GameType.EaW);
+        game.Setup(g => g.Type).Returns(GameType.Eaw);
         game.Setup(g => g.FileService).Returns(fileService.Object);
         var finder = new FallbackGameIconFinder();
         var icon = finder.FindIcon(game.Object);

@@ -24,8 +24,8 @@ public class CompositeDetectorTest
         var sp = new Mock<IServiceProvider>();
         var innerDetector = new Mock<IGameDetector>();
         var detector = new CompositeGameDetector(new List<IGameDetector> { innerDetector.Object }, sp.Object);
-        var options = new GameDetectorOptions(GameType.EaW);
-        innerDetector.Setup(i => i.Detect(options)).Returns(new GameDetectionResult(GameType.EaW, new Exception()));
+        var options = new GameDetectorOptions(GameType.Eaw);
+        innerDetector.Setup(i => i.Detect(options)).Returns(new GameDetectionResult(GameType.Eaw, new Exception()));
         var success = detector.TryDetect(options, out var result);
         Assert.False(success);
         Assert.IsType<AggregateException>(result.Error);
@@ -37,9 +37,9 @@ public class CompositeDetectorTest
         var sp = new Mock<IServiceProvider>();
         var innerDetector = new Mock<IGameDetector>();
         var detector = new CompositeGameDetector(new List<IGameDetector> { innerDetector.Object }, sp.Object);
-        var options = new GameDetectorOptions(GameType.EaW);
+        var options = new GameDetectorOptions(GameType.Eaw);
         innerDetector
-            .Setup(i => i.Detect(options)).Returns(new GameDetectionResult(GameType.EaW, new Exception()))
+            .Setup(i => i.Detect(options)).Returns(new GameDetectionResult(GameType.Eaw, new Exception()))
             .Raises(d => d.InitializationRequested += null, this, new GameInitializeRequestEventArgs(options));
 
         var eventRaised = false;
@@ -55,10 +55,10 @@ public class CompositeDetectorTest
         var sp = new Mock<IServiceProvider>();
         var innerDetector = new Mock<IGameDetector>();
         var detector = new CompositeGameDetector(new List<IGameDetector> { innerDetector.Object }, sp.Object);
-        var options = new GameDetectorOptions(GameType.EaW);
+        var options = new GameDetectorOptions(GameType.Eaw);
         innerDetector.Setup(i => i.Detect(options))
             .Returns(
-                new GameDetectionResult(new GameIdentity(GameType.EaW, GamePlatform.Disk),
+                new GameDetectionResult(new GameIdentity(GameType.Eaw, GamePlatform.Disk),
                     fs.DirectoryInfo.New("Game")));
         var result = detector.Detect(options);
         Assert.Equal(fs.Path.GetFullPath("Game"), result.GameLocation?.FullName);
@@ -72,11 +72,11 @@ public class CompositeDetectorTest
         var innerDetectorA = new Mock<IGameDetector>();
         var innerDetectorB = new Mock<IGameDetector>();
         var detector = new CompositeGameDetector(new List<IGameDetector> { innerDetectorA.Object, innerDetectorB.Object }, sp.Object);
-        var options = new GameDetectorOptions(GameType.EaW);
-        innerDetectorA.Setup(i => i.Detect(options)).Returns(GameDetectionResult.NotInstalled(GameType.EaW));
+        var options = new GameDetectorOptions(GameType.Eaw);
+        innerDetectorA.Setup(i => i.Detect(options)).Returns(GameDetectionResult.NotInstalled(GameType.Eaw));
         innerDetectorB.Setup(i => i.Detect(options))
             .Returns(
-                new GameDetectionResult(new GameIdentity(GameType.EaW, GamePlatform.Disk),
+                new GameDetectionResult(new GameIdentity(GameType.Eaw, GamePlatform.Disk),
                     fs.DirectoryInfo.New("Game")));
         var result = detector.Detect(options);
         Assert.Equal(fs.Path.GetFullPath("Game"), result.GameLocation?.FullName);

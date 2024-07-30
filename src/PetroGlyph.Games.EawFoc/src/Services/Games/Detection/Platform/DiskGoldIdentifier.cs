@@ -42,7 +42,7 @@ internal class DiskGoldIdentifier : SpecificPlatformIdentifier
 
     public override bool IsPlatformEaw(ref IDirectoryInfo location)
     {
-        if (!GameDetector.GameExeExists(location, GameType.EaW))
+        if (!GameDetector.GameExeExists(location, GameType.Eaw))
             return false;
 
         if (!location.Name.Equals("GameData", StringComparison.InvariantCultureIgnoreCase))

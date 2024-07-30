@@ -16,7 +16,6 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 public class FileSystemModFinder : IModReferenceFinder
 {
     private readonly ISteamGameHelpers _steamHelper;
-    private readonly IFileSystem _fileSystem;
     private readonly IModIdentifierBuilder _idBuilder;
 
     /// <summary>
@@ -28,7 +27,6 @@ public class FileSystemModFinder : IModReferenceFinder
         if (serviceProvider == null) 
             throw new ArgumentNullException(nameof(serviceProvider));
         _idBuilder = serviceProvider.GetRequiredService<IModIdentifierBuilder>();
-        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
     }
 
@@ -61,7 +59,7 @@ public class FileSystemModFinder : IModReferenceFinder
     private IEnumerable<ModReference> GetWorkshopsMods(IGame game)
     {
         return game.Platform != GamePlatform.SteamGold
-            ? Enumerable.Empty<ModReference>()
+            ? []
             : GetAllModsFromPath(_steamHelper.GetWorkshopsLocation(game), true);
     }
 

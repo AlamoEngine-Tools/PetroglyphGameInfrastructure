@@ -16,14 +16,13 @@ public class PetroglyphGameClients
     /// <param name="serviceCollection">The service collection to be filled.</param>
     public static void InitializeServices(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<IGameProcessLauncher>(sp => new DefaultGameProcessLauncher(sp));
-        serviceCollection.AddTransient<IGameExecutableFileService>(sp => new GameExecutableFileService(sp));
-        serviceCollection.AddTransient<IGameExecutableNameBuilder>(_ => new GameExecutableNameBuilder());
+        serviceCollection.AddSingleton<IGameProcessLauncher>(sp => new DefaultGameProcessLauncher(sp));
+        serviceCollection.AddSingleton<IGameExecutableFileService>(sp => new GameExecutableFileService(sp));
+        serviceCollection.AddSingleton<IGameExecutableNameBuilder>(_ => new GameExecutableNameBuilder());
 
-        serviceCollection.AddTransient<IGameClientFactory>(sp => new DefaultGameClientFactory(sp));
-        serviceCollection.AddTransient<IModArgumentListFactory>(sp => new ModArgumentListFactory(sp));
-        serviceCollection.AddTransient<IArgumentCollectionBuilder>(sp => new KeyBasedArgumentCollectionBuilder());
-        serviceCollection.AddTransient<IArgumentValidator>(_ => new ArgumentValidator());
-        serviceCollection.AddTransient<IArgumentCommandLineBuilder>(sp => new ArgumentCommandLineBuilder(sp));
+        serviceCollection.AddSingleton<IGameClientFactory>(sp => new DefaultGameClientFactory(sp));
+        serviceCollection.AddSingleton<IModArgumentListFactory>(sp => new ModArgumentListFactory(sp));
+        serviceCollection.AddSingleton<IArgumentValidator>(_ => new ArgumentValidator());
+        serviceCollection.AddSingleton<IArgumentCommandLineBuilder>(sp => new ArgumentCommandLineBuilder(sp));
     }
 }
