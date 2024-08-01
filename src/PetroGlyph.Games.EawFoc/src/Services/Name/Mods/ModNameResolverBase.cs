@@ -41,7 +41,7 @@ public abstract class ModNameResolverBase : IModNameResolver
 
         try
         {
-            var name =  ResolveCore(modReference, culture);
+            var name = ResolveCore(modReference, culture);
             if (string.IsNullOrEmpty(name))
                 throw new PetroglyphException($"Unable to resolve the mod's name {modReference}");
             return name;

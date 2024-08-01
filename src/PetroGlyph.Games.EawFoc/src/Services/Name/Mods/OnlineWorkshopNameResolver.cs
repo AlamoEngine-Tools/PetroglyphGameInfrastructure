@@ -3,6 +3,7 @@ using System.Globalization;
 using EawModinfo.Spec;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Name;
@@ -13,11 +14,15 @@ namespace PG.StarWarsGame.Infrastructure.Services.Name;
 public sealed class OnlineWorkshopNameResolver : ModNameResolverBase
 {
     private readonly ISteamGameHelpers _steamHelper;
+    private readonly OfflineWorkshopNameResolver _offlineResolver;
+    private readonly ILogger? _logger;
 
     /// <inheritdoc/>
     public OnlineWorkshopNameResolver(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
+        _offlineResolver = new OfflineWorkshopNameResolver(serviceProvider);
+        _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
     }
 
     /// <inheritdoc/>
@@ -27,6 +32,16 @@ public sealed class OnlineWorkshopNameResolver : ModNameResolverBase
             throw new NotSupportedException("Can only resolve for Steam Workshop mods!");
         if (!_steamHelper.ToSteamWorkshopsId(modReference.Identifier, out var modId))
             throw new InvalidOperationException($"Cannot get SteamID from workshops object {modReference.Identifier}");
+
+        try
+        {
+            var name = _offlineResolver.ResolveCore(modReference, culture);
+            return name;
+        }
+        catch (PetroglyphException)
+        {
+            _logger?.LogTrace($"Unable to find SteamID '{modId}' in the offline name resolver.");
+        }
 
         var downloader = ServiceProvider.GetService<ISteamWorkshopWebpageDownloader>() ??
                          new SteamWorkshopWebpageDownloader();

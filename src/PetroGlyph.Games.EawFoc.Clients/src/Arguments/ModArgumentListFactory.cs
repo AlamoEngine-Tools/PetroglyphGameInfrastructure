@@ -89,7 +89,7 @@ internal class ModArgumentListFactory : IModArgumentListFactory
         {
             var validity = _validator.CheckArgument(argument, out _, out _);
             if (validity != ArgumentValidityStatus.Valid)
-                throw new ModException(mod, $"Create mod argument for {mod} is not valid: {validity}");
+                throw new ModException(mod, $"Created mod argument for {mod} is not valid: {validity}");
         }
 
         return argument;
