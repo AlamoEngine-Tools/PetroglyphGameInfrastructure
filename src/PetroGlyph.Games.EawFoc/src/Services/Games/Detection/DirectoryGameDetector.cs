@@ -10,7 +10,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <summary>
 /// Detects whether a given directory contains a Petroglyph Star Wars Game
 /// </summary>
-public sealed class DirectoryGameDetector : GameDetector
+public sealed class DirectoryGameDetector : GameDetectorBase
 {
     private const string KnownEawSubDirName = "GameData";
     private static readonly string[] KnownFocDirectoryNames = { "EAWX", "corruption", "Star Wars Empire at War Forces of Corruption" };

@@ -11,9 +11,9 @@ using PG.StarWarsGame.Infrastructure.Services.Steam;
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
-/// Searches for <see cref="IModReference"/>s on the file system.
+/// Searches for <see cref="IModReference"/>s for a give <see cref="IGame"/>.
 /// </summary>
-public class FileSystemModFinder : IModReferenceFinder
+internal class ModFinder : IModReferenceFinder
 {
     private readonly ISteamGameHelpers _steamHelper;
     private readonly IModIdentifierBuilder _idBuilder;
@@ -22,7 +22,7 @@ public class FileSystemModFinder : IModReferenceFinder
     /// Creates a new instance.
     /// </summary>
     /// <param name="serviceProvider">The service provider</param>
-    public FileSystemModFinder(IServiceProvider serviceProvider)
+    public ModFinder(IServiceProvider serviceProvider)
     {
         if (serviceProvider == null) 
             throw new ArgumentNullException(nameof(serviceProvider));

@@ -3,7 +3,9 @@ using PG.StarWarsGame.Infrastructure.Games.Registry;
 using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Utilities;
 
 namespace PG.StarWarsGame.Infrastructure;
 
@@ -24,10 +26,13 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IGameFactory>(sp => new GameFactory(sp));
         serviceCollection.AddSingleton<IModFactory>(sp => new ModFactory(sp));
         serviceCollection.AddSingleton<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
-        serviceCollection.AddSingleton<IModReferenceFinder>(sp => new FileSystemModFinder(sp));
+        serviceCollection.AddSingleton<IModReferenceFinder>(sp => new ModFinder(sp));
         serviceCollection.AddSingleton<IModReferenceLocationResolver>(sp => new ModReferenceLocationResolver(sp));
         serviceCollection.AddSingleton<IModDependencyGraphBuilder>(_ => new ModDependencyGraphBuilder());
         serviceCollection.AddSingleton<IModDependencyTraverser>(sp => new ModDependencyTraverser(sp));
+
+        serviceCollection.AddSingleton<IPlayableObjectFileService>(sp => new PlayableObjectFileService(sp));
+        serviceCollection.AddSingleton<IModLanguageFinderFactory>(sp => new ModLanguageFinderFactory(sp));
 
         // Must be transient
         serviceCollection.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));

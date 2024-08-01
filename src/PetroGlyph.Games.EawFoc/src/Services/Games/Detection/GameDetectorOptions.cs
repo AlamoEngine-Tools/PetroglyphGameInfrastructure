@@ -11,7 +11,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <remarks>If no <see cref="TargetPlatforms"/> is explicitly specified,
 /// the query will contain <see cref="GamePlatform.Undefined"/>, which means that any found platform shall match.</remarks>
 /// <param name="Type">The game type which shall be searched.</param>
-public record GameDetectorOptions(GameType Type)
+public sealed record GameDetectorOptions(GameType Type)
 {
     private static readonly GamePlatform[] AnyPlatform = { GamePlatform.Undefined };
 

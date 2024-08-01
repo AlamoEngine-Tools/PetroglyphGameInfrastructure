@@ -7,7 +7,7 @@ using PG.StarWarsGame.Infrastructure.Mods;
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 /// <inheritdoc cref="IModDependencyTraverser"/>
-public class ModDependencyTraverser : IModDependencyTraverser
+internal class ModDependencyTraverser : IModDependencyTraverser
 {
     private readonly IServiceProvider _serviceProvider;
 

@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Name;
 /// <summary>
 /// English name resolver for games <see cref="IGameNameResolver"/>.
 /// </summary>
-public class EnglishGameNameResolver : IGameNameResolver
+public sealed class EnglishGameNameResolver : IGameNameResolver
 {
     /// <summary>
     /// Returns the english name of the game.

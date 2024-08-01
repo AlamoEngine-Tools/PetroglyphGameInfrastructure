@@ -11,7 +11,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 /// <summary>
 /// Default implementation of the <see cref="IGamePlatformIdentifier"/> service.
 /// </summary>
-public sealed class GamePlatformIdentifier : IGamePlatformIdentifier
+internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger? _logger;

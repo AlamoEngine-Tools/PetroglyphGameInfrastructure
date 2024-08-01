@@ -19,15 +19,15 @@ public class ModBaseTest
     [Fact]
     public void InvalidCtor_Throws()
     {
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>((IGame)null, ModType.Default, (string)null, (IServiceProvider)null).Object);
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>((IGame)null, ModType.Default, (IModinfo)null, (IServiceProvider)null).Object);
+        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(null, ModType.Default, null, null).Object);
+        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(null, ModType.Default, null, null).Object);
         var game = new Mock<IGame>();
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, (string)null, (IServiceProvider)null).Object);
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, (IModinfo)null, (IServiceProvider)null).Object);
+        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, null, null).Object);
+        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, null, null).Object);
         var sp = new Mock<IServiceProvider>();
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, (string)null, sp.Object).Object);
+        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, null, sp.Object).Object);
         Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, string.Empty, sp.Object).Object);
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, (IModinfo)null, sp.Object).Object);
+        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, null, sp.Object).Object);
 
         Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, "abs", null).Object);
         Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, new Mock<IModinfo>().Object, null).Object);
@@ -137,7 +137,7 @@ public class ModBaseTest
         var flag = false;
         var sp = new Mock<IServiceProvider>();
         var resolver = new Mock<IModLanguageFinderFactory>();
-        resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>(), It.IsAny<IServiceProvider>())).Callback(() => flag = true).Returns(new Mock<IModLanguageFinder>().Object);
+        resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>())).Callback(() => flag = true).Returns(new Mock<IModLanguageFinder>().Object);
         var game = new Mock<IGame>();
         sp.Setup(p => p.GetService(typeof(IModLanguageFinderFactory))).Returns(resolver.Object);
         var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
@@ -153,7 +153,7 @@ public class ModBaseTest
         var finder = new Mock<IModLanguageFinder>();
         finder.Setup(f => f.FindInstalledLanguages(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo>());
         var resolver = new Mock<IModLanguageFinderFactory>();
-        resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>(), It.IsAny<IServiceProvider>())).Callback(() => flag = true).Returns(finder.Object);
+        resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>())).Callback(() => flag = true).Returns(finder.Object);
         var game = new Mock<IGame>();
         sp.Setup(p => p.GetService(typeof(IModLanguageFinderFactory))).Returns(resolver.Object);
         var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);

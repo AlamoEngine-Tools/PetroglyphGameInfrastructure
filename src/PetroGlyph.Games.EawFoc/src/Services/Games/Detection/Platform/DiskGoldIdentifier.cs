@@ -33,7 +33,7 @@ internal class DiskGoldIdentifier : SpecificPlatformIdentifier
     }
     public override bool IsPlatformFoc(ref IDirectoryInfo location)
     {
-        if (!GameDetector.GameExeExists(location, GameType.Foc))
+        if (!GameDetectorBase.GameExeExists(location, GameType.Foc))
             return false;
 
         return DirectoryContainsFiles(location, FocKnownGoldFiles) &&
@@ -42,7 +42,7 @@ internal class DiskGoldIdentifier : SpecificPlatformIdentifier
 
     public override bool IsPlatformEaw(ref IDirectoryInfo location)
     {
-        if (!GameDetector.GameExeExists(location, GameType.Eaw))
+        if (!GameDetectorBase.GameExeExists(location, GameType.Eaw))
             return false;
 
         if (!location.Name.Equals("GameData", StringComparison.InvariantCultureIgnoreCase))

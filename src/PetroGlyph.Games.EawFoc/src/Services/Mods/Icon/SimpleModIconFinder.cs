@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using EawModinfo.Spec;
+using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Utilities;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 
@@ -9,8 +11,10 @@ namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 /// Provides a very simple implementation which searches returns the first .ico file in a mod's directory.
 /// For virtual mods it returns the icon of the first physical dependency which has a icon.
 /// </summary>
-public class SimpleModIconFinder : IModIconFinder
+public class SimpleModIconFinder(IServiceProvider serviceProvider) : IModIconFinder
 {
+    private IPlayableObjectFileService _fileService = serviceProvider.GetRequiredService<IPlayableObjectFileService>();
+
     /// <summary>
     /// Searches for hardcoded icon names.
     /// "eaw.ico" for Empire at War and
@@ -22,7 +26,8 @@ public class SimpleModIconFinder : IModIconFinder
             throw new ArgumentNullException(nameof(mod));
 
         if (mod is IPhysicalMod physicalMod)
-            return physicalMod.FileService.DataFiles("*.ico", "..", false, false).FirstOrDefault()?.FullName;
+            return _fileService.DataFiles(physicalMod, "*.ico", "..", false, false)
+                .FirstOrDefault()?.FullName;
         if (mod.Type == ModType.Virtual)
             throw new NotImplementedException("TODO");
         return null;

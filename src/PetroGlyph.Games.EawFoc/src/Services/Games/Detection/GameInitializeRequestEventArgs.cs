@@ -5,7 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <summary>
 /// Event argument for game initialization request.
 /// </summary>
-public class GameInitializeRequestEventArgs : EventArgs
+public sealed class GameInitializeRequestEventArgs : EventArgs
 {
     /// <summary>
     /// The original options how the game was searched.

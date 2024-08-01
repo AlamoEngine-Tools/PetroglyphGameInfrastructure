@@ -14,12 +14,12 @@ internal class DiskIdentifier : SpecificPlatformIdentifier
     {
         // I don't know if there is a more precise way.
         // Thus DiskVersion should always be the lowest priority searching the platform.
-        return GameDetector.GameExeExists(location, GameType.Foc);
+        return GameDetectorBase.GameExeExists(location, GameType.Foc);
     }
 
     public override bool IsPlatformEaw(ref IDirectoryInfo location)
     {
-        if (!GameDetector.GameExeExists(location, GameType.Eaw))
+        if (!GameDetectorBase.GameExeExists(location, GameType.Eaw))
             return false;
 
         return location.Name.Equals("GameData", StringComparison.InvariantCultureIgnoreCase);

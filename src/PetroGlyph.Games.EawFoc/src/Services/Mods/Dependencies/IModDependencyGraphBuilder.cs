@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 /// <summary>
 /// Service to build an <see cref="IModDependencyGraph"/> for a given <see cref="IMod"/>
 /// </summary>
-public interface IModDependencyGraphBuilder
+internal interface IModDependencyGraphBuilder
 {
     /// <summary>
     /// Builds an <see cref="IModDependencyGraph"/> from a mod's resolved <see cref="IMod.Dependencies"/> list.

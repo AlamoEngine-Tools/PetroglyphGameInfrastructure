@@ -7,10 +7,10 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 /// <summary>
 /// Default factory implementation which returns separate <see cref="IModLanguageFinder"/> for Virtual and Physical Mods.
 /// </summary>
-public class ModLanguageFinderFactory : IModLanguageFinderFactory
+internal class ModLanguageFinderFactory(IServiceProvider serviceProvider) : IModLanguageFinderFactory
 {
     /// <inheritdoc/>
-    public IModLanguageFinder CreateLanguageFinder(IMod mod, IServiceProvider serviceProvider)
+    public IModLanguageFinder CreateLanguageFinder(IMod mod)
     {
         if (mod.Type == ModType.Virtual)
             return new VirtualModLanguageFinder(serviceProvider);

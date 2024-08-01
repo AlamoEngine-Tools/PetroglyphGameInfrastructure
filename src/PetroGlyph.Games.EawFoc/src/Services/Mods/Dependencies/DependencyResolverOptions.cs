@@ -5,7 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 /// <summary>
 /// Options used by an <see cref="IDependencyResolver"/>.
 /// </summary>
-public record DependencyResolverOptions
+public sealed record DependencyResolverOptions
 {
     /// <summary>
     /// When set to <see langword="true"/> the complete mod dependency chain gets resolved

@@ -5,24 +5,20 @@ using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 
-internal class OriginIdentifier : SpecificPlatformIdentifier
+internal class OriginIdentifier(IServiceProvider serviceProvider) : SpecificPlatformIdentifier(serviceProvider)
 {
     private static readonly string[] KnownOriginDirs = {
         "Manuals",
         "__Installer"
     };
 
-    public OriginIdentifier(IServiceProvider serviceProvider) : base(serviceProvider)
-    {
-    }
-
     public override bool IsPlatformFoc(ref IDirectoryInfo location)
     {
-        if (!GameDetector.GameExeExists(location, GameType.Foc))
+        if (!GameDetectorBase.GameExeExists(location, GameType.Foc))
         {
             Logger?.LogWarning("Unable to find FoC Origin at first location. Trying to fix broken registry path");
             TryFixBrokenFocLocation(ref location);
-            if (!GameDetector.GameExeExists(location, GameType.Foc))
+            if (!GameDetectorBase.GameExeExists(location, GameType.Foc))
             {
                 Logger?.LogWarning("Origin location fix was unsuccessful. This is not a Origin installation.");
                 return false;
@@ -37,7 +33,7 @@ internal class OriginIdentifier : SpecificPlatformIdentifier
 
     public override bool IsPlatformEaw(ref IDirectoryInfo location)
     {
-        if (!GameDetector.GameExeExists(location, GameType.Eaw))
+        if (!GameDetectorBase.GameExeExists(location, GameType.Eaw))
         {
             Logger?.LogWarning("Unable to find EaW Origin at first location. " +
                                "I don't know if the EAW path might be broken as well?!");

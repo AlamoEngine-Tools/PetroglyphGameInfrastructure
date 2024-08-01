@@ -11,7 +11,6 @@ namespace PG.StarWarsGame.Infrastructure.Services;
 /// <inheritdoc/>
 public sealed class GameFactory : IGameFactory
 {
-    private static readonly IGameNameResolver FallbackNameResolver = new EnglishGameNameResolver();
     private readonly IGameNameResolver _nameResolver;
     private readonly IServiceProvider _serviceProvider;
 
@@ -22,7 +21,7 @@ public sealed class GameFactory : IGameFactory
     public GameFactory(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _nameResolver = serviceProvider.GetService<IGameNameResolver>() ?? FallbackNameResolver;
+        _nameResolver = serviceProvider.GetService<IGameNameResolver>() ?? new EnglishGameNameResolver();
     }
     
     /// <inheritdoc/>

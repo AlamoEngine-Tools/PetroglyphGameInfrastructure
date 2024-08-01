@@ -2,14 +2,11 @@
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
-#if NETSTANDARD2_0
-using AnakinRaW.CommonUtilities.FileSystem;
-#endif
 
 namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 
 /// <inheritdoc cref="ISteamGameHelpers"/>
-public class SteamGameHelpers : ISteamGameHelpers
+internal class SteamGameHelpers : ISteamGameHelpers
 {
     private readonly IFileSystem _fileSystem;
 
@@ -32,18 +29,14 @@ public class SteamGameHelpers : ISteamGameHelpers
         if (game.Platform != GamePlatform.SteamGold)
             throw new GameException("Unable to get workshops location for non-Steam game.");
 
-        if (!_fileSystem.Path.IsPathFullyQualified(game.Directory.FullName))
-            throw new InvalidOperationException("Game path must be absolute");
-
         var gameDir = game.Directory;
 
         var commonParent = gameDir.Parent?.Parent?.Parent;
         if (commonParent is null)
             throw new GameException("Unable to get workshops location.");
 
-        var fs = game.Directory.FileSystem;
-        var workshopDirPath = fs.Path.Combine(commonParent.FullName, "workshop/content/32470");
-        return fs.DirectoryInfo.New(workshopDirPath);
+        var workshopDirPath = _fileSystem.Path.Combine(commonParent.FullName, "workshop/content/32470");
+        return _fileSystem.DirectoryInfo.New(workshopDirPath);
     }
 
     /// <inheritdoc/>

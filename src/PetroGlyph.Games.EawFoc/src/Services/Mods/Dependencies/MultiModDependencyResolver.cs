@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
@@ -8,7 +9,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 /// <summary>
 /// Service which resolves dependencies of many mods coordinated by minimizing workload.
 /// </summary>
-public class MultiModDependencyResolver
+public sealed class MultiModDependencyResolver
 {
     /// <summary>
     /// Pass-Through event from <see cref="IMod.DependenciesChanged"/> for every processed mod by this instance.
@@ -20,10 +21,10 @@ public class MultiModDependencyResolver
     /// <summary>
     /// Creates a new instance
     /// </summary>
-    /// <param name="resolver">The resolver that shall get used.</param>
-    public MultiModDependencyResolver(IDependencyResolver resolver)
+    /// <param name="serviceProvider">The service provider.</param>
+    public MultiModDependencyResolver(IServiceProvider serviceProvider)
     {
-        _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
+        _resolver = serviceProvider.GetRequiredService<IDependencyResolver>();
     }
 
     /// <summary>
@@ -34,7 +35,7 @@ public class MultiModDependencyResolver
     /// <param name="options">The resolve options for the internal resolver.</param>
     /// <param name="skipResolvedMods">When set to <see langword="true"/> the methods does not resolve a mod which has its <see cref="IMod.DependencyResolveStatus"/> set to <see cref="DependencyResolveStatus.Resolved"/>.</param>
     /// <param name="abortOnError">When set to <see langword="true"/> the operation aborts immediately if an exception was thrown.
-    /// Otherwise the operation will continue resolving mod dependencies.</param>
+    /// Otherwise, the operation will continue resolving mod dependencies.</param>
     /// <returns>Information if and errors happened during the operation.</returns>
     public MultiResolveResult ResolveDependenciesForMods(
         IEnumerable<IMod> modsToResolve, 
@@ -81,7 +82,7 @@ public class MultiModDependencyResolver
     /// <summary>
     /// Data to represent errors during resolve operation.
     /// </summary>
-    public class MultiResolveResult
+    public sealed class MultiResolveResult
     {
         private readonly Dictionary<IMod, Exception> _errorData = new();
             

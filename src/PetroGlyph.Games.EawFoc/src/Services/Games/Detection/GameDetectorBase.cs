@@ -11,7 +11,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <summary>
 /// Base implementation for an <see cref="IGameDetector"/>
 /// </summary>
-public abstract class GameDetector : IGameDetector
+public abstract class GameDetectorBase : IGameDetector
 {
     /// <inheritdoc/>
     public event EventHandler<GameInitializeRequestEventArgs>? InitializationRequested;
@@ -40,7 +40,7 @@ public abstract class GameDetector : IGameDetector
     /// <param name="tryHandleInitialization">
     /// Indicates whether this instance shall raise the <see cref="InitializationRequested"/>event.
     /// When set to <see langword="false"/> the event will not be raised and initialization cannot be handled.</param>
-    protected GameDetector(IServiceProvider serviceProvider, bool tryHandleInitialization)
+    protected GameDetectorBase(IServiceProvider serviceProvider, bool tryHandleInitialization)
     {
         ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _tryHandleInitialization = tryHandleInitialization;

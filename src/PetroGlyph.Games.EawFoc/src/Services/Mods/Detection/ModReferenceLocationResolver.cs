@@ -13,7 +13,7 @@ using AnakinRaW.CommonUtilities.FileSystem;
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <inheritdoc cref="IModReferenceLocationResolver"/>
-public sealed class ModReferenceLocationResolver : IModReferenceLocationResolver
+internal class ModReferenceLocationResolver : IModReferenceLocationResolver
 {
     private readonly ISteamGameHelpers _steamHelper;
 

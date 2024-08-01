@@ -57,7 +57,6 @@ public class ModTest
         Assert.Equal("Name", mod.Name);
         Assert.Equal(ModType.Default, mod.Type);
         Assert.Equal("somePath", mod.Identifier);
-        Assert.NotNull(mod.FileService);
         Assert.NotNull(mod.FileSystem);
         Assert.Null(mod.ModinfoFile);
         Assert.Null(mod.ModInfo);

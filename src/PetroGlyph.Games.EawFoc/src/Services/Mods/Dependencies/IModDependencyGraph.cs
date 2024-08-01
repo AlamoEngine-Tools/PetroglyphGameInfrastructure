@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 /// Data Structure which represents a mod's dependency graph.
 /// Enumerating this instance yields all Mods in this graph in arbitrary order.
 /// </summary>
-public interface IModDependencyGraph : IEnumerable<ModDependencyEntry>
+internal interface IModDependencyGraph : IEnumerable<ModDependencyEntry>
 {
     /// <summary>
     /// Checks if this graph has a cycle.

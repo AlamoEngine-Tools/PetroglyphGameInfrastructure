@@ -16,7 +16,7 @@ using PG.StarWarsGame.Infrastructure.Services.Name;
 namespace PG.StarWarsGame.Infrastructure.Services;
 
 /// <inheritdoc/>
-public class ModFactory : IModFactory
+internal class ModFactory : IModFactory
 {
     private readonly Func<IDirectoryInfo, IModinfoFileFinder> _finderFunc;
     private readonly IModReferenceLocationResolver _referenceLocationResolver;

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 /// <inheritdoc cref="IGameRegistryFactory"/>
-public class GameRegistryFactory(IServiceProvider serviceProvider) : IGameRegistryFactory
+internal class GameRegistryFactory(IServiceProvider serviceProvider) : IGameRegistryFactory
 {
     internal const string FocRegistryPath =
         @"SOFTWARE\LucasArts\Star Wars Empire at War Forces of Corruption";

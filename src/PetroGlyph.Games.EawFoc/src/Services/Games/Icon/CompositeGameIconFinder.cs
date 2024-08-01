@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 /// <summary>
 /// Instance which takes other <see cref="IGameIconFinder"/>s and returns the first found icon.
 /// </summary>
-public class CompositeGameIconFinder : IGameIconFinder
+public sealed class CompositeGameIconFinder : IGameIconFinder
 {
     private readonly IList<IGameIconFinder> _orderedFinders;
 

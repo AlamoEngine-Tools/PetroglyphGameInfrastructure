@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <summary>
 /// Result object used by <see cref="IGameDetector"/> containing all necessary information to create a game instance.
 /// </summary>
-public class GameDetectionResult
+public sealed class GameDetectionResult
 {
     /// <summary>
     /// Gets a value indicating whether this detection result points to an installed game.

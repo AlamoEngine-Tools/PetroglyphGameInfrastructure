@@ -8,7 +8,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <summary>
 /// Finds installed games from the registry.
 /// </summary>
-public sealed class RegistryGameDetector : GameDetector, IDisposable
+public sealed class RegistryGameDetector : GameDetectorBase, IDisposable
 {
     private readonly IGameRegistry _eawRegistry;
     private readonly IGameRegistry _focRegistry;
@@ -20,7 +20,7 @@ public sealed class RegistryGameDetector : GameDetector, IDisposable
     /// <param name="eawRegistry">The registry instance for Empire at War.</param>
     /// <param name="focRegistry">The registry instance for Forces of Corruption.</param>
     /// <param name="tryHandleInitialization">
-    /// Indicates whether this instance shall raise the <see cref="GameDetector.InitializationRequested"/>event.
+    /// Indicates whether this instance shall raise the <see cref="GameDetectorBase.InitializationRequested"/>event.
     /// When set to <see langword="false"/> the event will not be raised and initialization cannot be handled.</param>
     public RegistryGameDetector(IGameRegistry eawRegistry, IGameRegistry focRegistry, bool tryHandleInitialization, IServiceProvider serviceProvider)
         : base(serviceProvider, tryHandleInitialization)

@@ -5,7 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 /// <summary>
 /// Cancellable event args when an <see cref="IMod.ResolvingModinfo"/> was raised.
 /// </summary>
-public class ResolvingModinfoEventArgs : CancelEventArgs
+public sealed class ResolvingModinfoEventArgs : CancelEventArgs
 {
     /// <summary>
     /// The <see cref="IMod"/> which raised the event.

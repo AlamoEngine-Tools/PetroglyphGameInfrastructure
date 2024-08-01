@@ -10,7 +10,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 /// Resolves mod dependencies specified in <see cref="IModIdentity.Dependencies"/> and returns them as an <see cref="T:IList&lt;IMod&gt;"/>.
 /// </summary>
 /// <remarks>Note, that this instance is not Thread-Safe!</remarks>
-public class ModDependencyResolver : IDependencyResolver
+internal class ModDependencyResolver : IDependencyResolver
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly HashSet<IMod> _visitedMods = new(ModEqualityComparer.ExcludeDependencies);

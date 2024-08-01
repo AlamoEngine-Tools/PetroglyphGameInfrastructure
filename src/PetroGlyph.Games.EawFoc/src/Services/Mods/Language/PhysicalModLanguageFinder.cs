@@ -8,7 +8,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 /// <summary>
 /// Searches the mod's files for evidences of installed languages.
 /// </summary>
-public class PhysicalModLanguageFinder : ModLanguageFinderBase
+internal class PhysicalModLanguageFinder : ModLanguageFinderBase
 {
     /// <summary>
     /// Creates a new instance.
@@ -17,7 +17,7 @@ public class PhysicalModLanguageFinder : ModLanguageFinderBase
     /// <param name="lookupInheritedLanguages">When set to <see langword="true"/>the target mod's dependency
     /// languages will also be considered if, and only if, the target mod would only return ENGLISH - FullLocalized.</param>
     /// <remarks>When <paramref name="lookupInheritedLanguages"/> is set to <see langword="true"/>,
-    /// dependency Resolving should already be performed. Otherwise the <paramref name="lookupInheritedLanguages"/> has no effect.</remarks> 
+    /// dependency Resolving should already be performed. Otherwise, the <paramref name="lookupInheritedLanguages"/> has no effect.</remarks> 
     public PhysicalModLanguageFinder(IServiceProvider serviceProvider, bool lookupInheritedLanguages)
         : base(serviceProvider, lookupInheritedLanguages)
     {

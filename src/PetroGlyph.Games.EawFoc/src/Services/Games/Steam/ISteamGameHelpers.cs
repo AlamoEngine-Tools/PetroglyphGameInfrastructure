@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Steam;
@@ -10,12 +9,11 @@ namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 public interface ISteamGameHelpers
 {
     /// <summary>
-    /// Get's the game's workshop directory.
+    /// Gets the game's workshop directory.
     /// </summary>
     /// <param name="game">The target game</param>
     /// <exception cref="GameException">If the game is not a Steam game</exception>
     /// <exception cref="GameException">If it was impossible to compute the workshop location.</exception>
-    /// <exception cref="InvalidOperationException">If the game's directory info is not absolute.</exception>
     IDirectoryInfo GetWorkshopsLocation(IGame game);
 
     /// <summary>

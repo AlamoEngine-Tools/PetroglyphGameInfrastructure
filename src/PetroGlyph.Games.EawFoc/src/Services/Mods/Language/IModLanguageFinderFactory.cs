@@ -1,5 +1,4 @@
-﻿using System;
-using PG.StarWarsGame.Infrastructure.Mods;
+﻿using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
@@ -12,7 +11,6 @@ public interface IModLanguageFinderFactory
     /// Create the correct <see cref="IModLanguageFinder"/>.
     /// </summary>
     /// <param name="mod">The target mod.</param>
-    /// <param name="serviceProvider">The service provider.</param>
     /// <returns>The <see cref="IModLanguageFinder"/> instance.</returns>
-    IModLanguageFinder CreateLanguageFinder(IMod mod, IServiceProvider serviceProvider);
+    IModLanguageFinder CreateLanguageFinder(IMod mod);
 }

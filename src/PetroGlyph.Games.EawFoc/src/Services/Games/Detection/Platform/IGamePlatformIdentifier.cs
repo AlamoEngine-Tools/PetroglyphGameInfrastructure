@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 /// <summary>
 /// Service that identifies which <see cref="GamePlatform"/> is present at a given installation location.
 /// </summary>
-public interface IGamePlatformIdentifier
+internal interface IGamePlatformIdentifier
 {
     /// <summary>
     /// Identifies the <see cref="GamePlatform"/> using a default lookup strategy

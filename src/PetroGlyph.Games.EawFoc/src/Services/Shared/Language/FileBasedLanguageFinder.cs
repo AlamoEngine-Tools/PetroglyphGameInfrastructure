@@ -5,19 +5,23 @@ using System.IO.Abstractions;
 using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
+using Microsoft.Extensions.DependencyInjection;
+using PG.StarWarsGame.Infrastructure.Utilities;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
 /// <summary>
 /// Finds installed languages based on well-known file locations and names.
 /// </summary>
-public sealed class FileBasedLanguageFinder : ILanguageFinder
+public sealed class FileBasedLanguageFinder(IServiceProvider serviceProvider) : ILanguageFinder
 {
+    private readonly IPlayableObjectFileService _fileService = serviceProvider.GetRequiredService<IPlayableObjectFileService>();
+
     /// <inheritdoc/>
     public ISet<ILanguageInfo> GetTextLocalizations(IPhysicalPlayableObject playableObject)
     {
         return TryGetLanguageFromFiles(
-            () => playableObject.FileService.DataFiles("MasterTextFile_*.dat", "Text", false, false),
+            () => _fileService.DataFiles(playableObject, "MasterTextFile_*.dat", "Text", false, false),
             GetTextLangName, LanguageSupportLevel.Text);
 
         string GetTextLangName(string textFileName)
@@ -32,7 +36,7 @@ public sealed class FileBasedLanguageFinder : ILanguageFinder
     public ISet<ILanguageInfo> GetSfxMegLocalizations(IPhysicalPlayableObject playableObject)
     {
         return TryGetLanguageFromFiles(
-            () => playableObject.FileService.DataFiles("sfx2d_*.meg", "Audio/SFX", false, false),
+            () => _fileService.DataFiles(playableObject, "sfx2d_*.meg", "Audio/SFX", false, false),
             fileName => GetSfxLangName(fileName, playableObject.FileSystem), LanguageSupportLevel.SFX);
 
         static string? GetSfxLangName(string fileName, IFileSystem fs)
@@ -52,7 +56,7 @@ public sealed class FileBasedLanguageFinder : ILanguageFinder
     {
         // TODO: When merged into PG repo, try to get real path from megafiles.xml
         return TryGetLanguageFromFiles(
-            () => playableObject.FileService.DataFiles("*speech.meg", null, false, false),
+            () => _fileService.DataFiles(playableObject, "*speech.meg", null, false, false),
             GetSpeechLangName, LanguageSupportLevel.Speech);
 
         static string GetSpeechLangName(string megFileName)
@@ -67,7 +71,7 @@ public sealed class FileBasedLanguageFinder : ILanguageFinder
     /// <inheritdoc/>
     public ISet<ILanguageInfo> GetSpeechLocalizationsFromFolder(IPhysicalPlayableObject playableObject)
     {
-        var speechDir = playableObject.FileService.DataDirectory("Audio/Speech", false);
+        var speechDir = _fileService.DataDirectory(playableObject, "Audio/Speech");
         if (!speechDir.Exists)
             return new HashSet<ILanguageInfo>();
 

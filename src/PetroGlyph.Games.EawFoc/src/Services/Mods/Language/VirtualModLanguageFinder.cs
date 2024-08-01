@@ -9,7 +9,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 /// Searches installed languages for non-virtual mod dependencies.
 /// <remarks>Dependency Resolving should already be performed. Otherwise only ENGLISH - FullLocalized will be returned.</remarks> 
 /// </summary>
-public class VirtualModLanguageFinder : ModLanguageFinderBase
+internal class VirtualModLanguageFinder : ModLanguageFinderBase
 {
     /// <summary>
     /// Creates a new instance.

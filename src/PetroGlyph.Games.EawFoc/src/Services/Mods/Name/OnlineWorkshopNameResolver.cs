@@ -10,7 +10,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Name;
 /// <summary>
 /// Resolves a mod's name by crawling the name from the mod's steam workshop page.
 /// </summary>
-public class OnlineWorkshopNameResolver : ModNameResolverBase
+public sealed class OnlineWorkshopNameResolver : ModNameResolverBase
 {
     private readonly ISteamGameHelpers _steamHelper;
 

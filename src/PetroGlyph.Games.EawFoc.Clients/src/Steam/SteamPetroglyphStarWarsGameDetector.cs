@@ -16,7 +16,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 /// this instance will raise an <see cref="IGameDetector.InitializationRequested"/> event.
 /// </para>
 /// </summary>
-public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
+public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
 {
     private const uint EaWGameId = 32470;
     private const uint FocDepotId = 32472;

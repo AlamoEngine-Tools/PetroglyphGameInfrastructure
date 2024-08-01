@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Utilities;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 
 /// <summary>
 /// Provides a fallback implementation which searches a game's icon file in its root directory.
 /// </summary>
-public class FallbackGameIconFinder : IGameIconFinder
+public sealed class FallbackGameIconFinder(IServiceProvider serviceProvider) : IGameIconFinder
 {
     private const string EawIconName = "eaw.ico";
     private const string FocIconName = "foc.ico";
+
+    private readonly IPlayableObjectFileService _fileService = serviceProvider.GetRequiredService<IPlayableObjectFileService>();
 
     /// <summary>
     /// Searches for hardcoded icon names.
@@ -27,6 +31,7 @@ public class FallbackGameIconFinder : IGameIconFinder
             GameType.Foc => FocIconName,
             _ => throw new ArgumentOutOfRangeException()
         };
-        return game.FileService.DataFiles(expectedFileName, "..", false, false).FirstOrDefault()?.FullName;
+        return _fileService.DataFiles(game, expectedFileName, "..", false, false)
+            .FirstOrDefault()?.FullName;
     }
 }

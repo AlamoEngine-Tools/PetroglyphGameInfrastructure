@@ -11,14 +11,14 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-public class FileSystemModFinderTest
+public class ModFinderTest
 {
-    private readonly FileSystemModFinder _service;
+    private readonly ModFinder _service;
     private readonly Mock<ISteamGameHelpers> _steamHelper;
     private readonly MockFileSystem _fileSystem;
     private readonly Mock<IModIdentifierBuilder> _idBuilder;
 
-    public FileSystemModFinderTest()
+    public ModFinderTest()
     {
         var sc = new ServiceCollection();
         _steamHelper = new Mock<ISteamGameHelpers>();
@@ -27,7 +27,7 @@ public class FileSystemModFinderTest
         sc.AddTransient(_ => _steamHelper.Object);
         sc.AddSingleton<IFileSystem>(_ => _fileSystem);
         sc.AddSingleton(_ => _idBuilder.Object);
-        _service = new FileSystemModFinder(sc.BuildServiceProvider());
+        _service = new ModFinder(sc.BuildServiceProvider());
     }
 
     [Fact]

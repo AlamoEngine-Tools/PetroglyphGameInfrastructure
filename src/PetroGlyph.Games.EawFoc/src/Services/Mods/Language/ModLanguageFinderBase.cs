@@ -46,7 +46,7 @@ public abstract class ModLanguageFinderBase : IModLanguageFinder
     {
         ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _lookupInheritedLanguages = lookupInheritedLanguages;
-        Helper = serviceProvider.GetService<ILanguageFinder>() ?? new FileBasedLanguageFinder();
+        Helper = serviceProvider.GetService<ILanguageFinder>() ?? new FileBasedLanguageFinder(serviceProvider);
     }
 
     /// <inheritdoc/>

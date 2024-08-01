@@ -9,7 +9,6 @@ using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.StarWarsGame.Infrastructure.Services.FileService;
 using PG.StarWarsGame.Infrastructure.Services.Icon;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 
@@ -24,7 +23,6 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     public event EventHandler<ModCollectionChangedEventArgs>? ModsCollectionModified;
 
     private readonly string _normalizedPath;
-    private IPhysicalFileService? _fileService;
     private IDirectoryInfo? _modLocation;
     
     /// <summary>
@@ -67,19 +65,6 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
                 _modLocation = fs.DirectoryInfo.New(modsPath);
             }
             return _modLocation;
-        }
-    }
-
-    /// <inheritdoc/>
-    public virtual IPhysicalFileService FileService
-    {
-        get
-        {
-            if (_fileService is not null)
-                return _fileService;
-            var fs = ServiceProvider.GetService<IPhysicalFileService>();
-            _fileService = fs!;
-            return _fileService;
         }
     }
 
@@ -258,7 +243,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     /// <returns>Resolve icon path or <see langword="null"/>.</returns>
     protected override string? ResolveIconFile()
     {
-        var finder = ServiceProvider.GetService<IGameIconFinder>() ?? new FallbackGameIconFinder();
+        var finder = ServiceProvider.GetService<IGameIconFinder>() ?? new FallbackGameIconFinder(ServiceProvider);
         return finder.FindIcon(this);
     }
 

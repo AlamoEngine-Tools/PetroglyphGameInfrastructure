@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 /// <summary>
 /// Events arguments used for <see cref="IMod.DependenciesChanged"/>.
 /// </summary>
-public class ModDependenciesChangedEventArgs : EventArgs
+public sealed class ModDependenciesChangedEventArgs : EventArgs
 {
     /// <summary>
     /// The mods which raised the event.
