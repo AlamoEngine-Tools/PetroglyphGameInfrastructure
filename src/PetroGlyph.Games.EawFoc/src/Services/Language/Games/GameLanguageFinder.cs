@@ -9,7 +9,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 /// <summary>
 /// Search for installed game languages by analyzing installed game files, such as .meg archives.
 /// </summary>
-public sealed class GameLanguageFinder : IGameLanguageFinder
+internal class GameLanguageFinder : IGameLanguageFinder
 {
     private readonly ILanguageFinder _helper;
 
@@ -21,7 +21,7 @@ public sealed class GameLanguageFinder : IGameLanguageFinder
     {
         if (serviceProvider == null) 
             throw new ArgumentNullException(nameof(serviceProvider));
-        _helper = serviceProvider.GetService<ILanguageFinder>() ?? new FileBasedLanguageFinder(serviceProvider);
+        _helper = serviceProvider.GetRequiredService<ILanguageFinder>();
     }
 
     /// <inheritdoc/>

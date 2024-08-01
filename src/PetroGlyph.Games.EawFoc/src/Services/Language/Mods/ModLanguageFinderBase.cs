@@ -13,7 +13,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 /// Base implementation for a <see cref="IModLanguageFinder"/> service.
 /// This class handles the modinfo spec and dependency language lookup.
 /// </summary>
-public abstract class ModLanguageFinderBase : IModLanguageFinder
+internal abstract class ModLanguageFinderBase : IModLanguageFinder
 {
     /// <summary>
     /// Shared service provider instance.
@@ -46,7 +46,7 @@ public abstract class ModLanguageFinderBase : IModLanguageFinder
     {
         ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _lookupInheritedLanguages = lookupInheritedLanguages;
-        Helper = serviceProvider.GetService<ILanguageFinder>() ?? new FileBasedLanguageFinder(serviceProvider);
+        Helper = serviceProvider.GetRequiredService<ILanguageFinder>();
     }
 
     /// <inheritdoc/>

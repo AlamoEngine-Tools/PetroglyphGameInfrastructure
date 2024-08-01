@@ -16,12 +16,12 @@ public class CompositeModNameResolverTest
     public void NullArgTest_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(null, null));
-        Assert.Throws<ArgumentException>(() => new CompositeModNameResolver(new List<IModNameResolver>(), new Mock<IServiceProvider>().Object));
-        Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(new List<IModNameResolver> { null }, null));
-        Assert.Throws<ArgumentNullException>(() => CompositeModNameResolver.CreateDefaultModNameResolver(null));
+        Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(new Mock<IServiceProvider>().Object, _ => null));
+        Assert.Throws<ArgumentException>(() => new CompositeModNameResolver(new Mock<IServiceProvider>().Object, _ => []));
+        Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(null, _ => [null]));
         var sp = new Mock<IServiceProvider>();
-        Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(new List<IModNameResolver> { null }, sp.Object).ResolveName(null, CultureInfo.CurrentCulture));
-        Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(new List<IModNameResolver> { null }, sp.Object).ResolveName(new ModReference(), null));
+        Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(sp.Object, _ => [null]).ResolveName(null, CultureInfo.CurrentCulture));
+        Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(sp.Object, _ => [null]).ResolveName(new ModReference(), null));
     }
 
 
@@ -36,7 +36,7 @@ public class CompositeModNameResolverTest
 
         var modRef = new ModReference("Id", ModType.Default);
 
-        var resolver = new CompositeModNameResolver(new List<IModNameResolver> { internalResolver.Object }, sp.Object);
+        var resolver = new CompositeModNameResolver(sp.Object, _ => [internalResolver.Object]);
 
         var name1 = resolver.ResolveName(modRef, CultureInfo.InvariantCulture);
 
@@ -54,7 +54,7 @@ public class CompositeModNameResolverTest
 
         var modRef = new ModReference("Id", ModType.Default);
 
-        var resolver = new CompositeModNameResolver(new List<IModNameResolver> { internalResolver.Object }, sp.Object);
+        var resolver = new CompositeModNameResolver(sp.Object, _ => [internalResolver.Object]);
 
         Assert.Throws<ModException>(() => resolver.ResolveName(modRef, CultureInfo.InvariantCulture));
     }
@@ -75,8 +75,7 @@ public class CompositeModNameResolverTest
 
         var modRef = new ModReference("Id", ModType.Default);
 
-        var resolver = new CompositeModNameResolver(
-            new List<IModNameResolver> { internalResolverA.Object, internalResolverB.Object }, sp.Object);
+        var resolver = new CompositeModNameResolver(sp.Object, _ => [internalResolverA.Object, internalResolverB.Object]);
 
         var name1 = resolver.ResolveName(modRef, CultureInfo.InvariantCulture);
 
@@ -94,7 +93,7 @@ public class CompositeModNameResolverTest
 
         var modRef = new ModReference("Id", ModType.Default);
 
-        var resolver = new CompositeModNameResolver(new List<IModNameResolver> { internalResolver.Object }, sp.Object);
+        var resolver = new CompositeModNameResolver(sp.Object, _ => [internalResolver.Object]);
 
         Assert.Throws<ModException>(() => resolver.ResolveName(modRef, CultureInfo.InvariantCulture));
     }

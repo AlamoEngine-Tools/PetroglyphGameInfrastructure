@@ -5,7 +5,7 @@ using PG.StarWarsGame.Infrastructure.Mods;
 namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
-/// Service to resolve a mods's name
+/// Service to resolve a mod's name
 /// </summary>
 public interface IModNameResolver
 {

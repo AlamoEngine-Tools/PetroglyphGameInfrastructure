@@ -32,7 +32,7 @@ public sealed class CompositeGameDetector : IGameDetector
     /// Default is <see langword="false"/></param>
     public CompositeGameDetector(IList<IGameDetector> sortedDetectors, IServiceProvider serviceProvider, bool disposeDetectors = false)
     {
-        if (serviceProvider == null) 
+        if (serviceProvider == null)
             throw new ArgumentNullException(nameof(serviceProvider));
         ThrowHelper.ThrowIfCollectionNullOrEmpty(sortedDetectors);
         SortedDetectors = sortedDetectors;

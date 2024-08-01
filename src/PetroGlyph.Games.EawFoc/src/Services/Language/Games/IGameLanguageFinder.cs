@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 /// <summary>
 /// Service to identify which languages a game has installed.
 /// </summary>
-public interface IGameLanguageFinder
+internal interface IGameLanguageFinder
 {
     /// <summary>
     /// Finds all installed languages of a game.

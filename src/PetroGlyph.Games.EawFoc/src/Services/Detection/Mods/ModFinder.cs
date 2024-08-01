@@ -24,7 +24,7 @@ internal class ModFinder : IModReferenceFinder
     /// <param name="serviceProvider">The service provider</param>
     public ModFinder(IServiceProvider serviceProvider)
     {
-        if (serviceProvider == null) 
+        if (serviceProvider == null)
             throw new ArgumentNullException(nameof(serviceProvider));
         _idBuilder = serviceProvider.GetRequiredService<IModIdentifierBuilder>();
         _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
@@ -39,7 +39,7 @@ internal class ModFinder : IModReferenceFinder
     /// <exception cref="GameException">If the <paramref name="game"/> is not installed.</exception>
     public ISet<IModReference> FindMods(IGame game)
     {
-        if (game == null) 
+        if (game == null)
             throw new ArgumentNullException(nameof(game));
 
         if (!game.Exists())

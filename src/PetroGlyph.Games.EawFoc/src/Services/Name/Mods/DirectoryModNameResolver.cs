@@ -8,7 +8,7 @@ using PG.StarWarsGame.Infrastructure.Mods;
 namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
-/// Resolves a mod's name by it's directory name. The name will be beautified by removing separator characters like '_'.
+/// Resolves a mod's name by its directory name. The name will be beautified by removing separator characters like '_'.
 /// This instance is always culture invariant.
 /// This instance does not work with virtual mods. 
 /// </summary>

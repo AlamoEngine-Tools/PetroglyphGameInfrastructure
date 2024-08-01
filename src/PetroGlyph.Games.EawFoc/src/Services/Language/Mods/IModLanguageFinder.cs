@@ -8,7 +8,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 /// Service to get installed mods. Implementations are aware of the modinfo specification
 /// <see href="https://github.com/AlamoEngine-Tools/eaw.modinfo#the-languages-property"/>
 /// </summary>
-public interface IModLanguageFinder
+internal interface IModLanguageFinder
 {
     /// <summary>
     /// Finds all installed languages for this <see cref="IMod"/> instance.

@@ -5,7 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 /// <summary>
 /// Factory service to create the correct <see cref="IModLanguageFinder"/> for a given <see cref="IMod"/>.
 /// </summary>
-public interface IModLanguageFinderFactory
+internal interface IModLanguageFinderFactory
 {
     /// <summary>
     /// Create the correct <see cref="IModLanguageFinder"/>.

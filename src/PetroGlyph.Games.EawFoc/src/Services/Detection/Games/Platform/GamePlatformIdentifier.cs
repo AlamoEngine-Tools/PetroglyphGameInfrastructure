@@ -51,9 +51,9 @@ internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
     /// <inheritdoc/>
     public GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location, IList<GamePlatform> lookupPlatforms)
     {
-        if (location == null) 
+        if (location == null)
             throw new ArgumentNullException(nameof(location));
-        if (lookupPlatforms == null) 
+        if (lookupPlatforms == null)
             throw new ArgumentNullException(nameof(lookupPlatforms));
         return GetGamePlatformCore(type, ref location, NormalizeLookupPlatforms(lookupPlatforms));
     }

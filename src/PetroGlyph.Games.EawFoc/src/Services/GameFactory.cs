@@ -9,7 +9,7 @@ using PG.StarWarsGame.Infrastructure.Services.Name;
 namespace PG.StarWarsGame.Infrastructure.Services;
 
 /// <inheritdoc/>
-public sealed class GameFactory : IGameFactory
+internal sealed class GameFactory : IGameFactory
 {
     private readonly IGameNameResolver _nameResolver;
     private readonly IServiceProvider _serviceProvider;

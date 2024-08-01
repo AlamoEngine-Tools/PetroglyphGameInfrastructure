@@ -34,8 +34,8 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
         _steamWrapperFactory = ServiceProvider.GetRequiredService<ISteamWrapperFactory>();
     }
 
-    /// <inheritdoc/>
-    protected override GameLocationData FindGameLocation(GameDetectorOptions options)
+    /// <inheritdoc />
+    protected internal override GameLocationData FindGameLocation(GameDetectorOptions options)
     {
         using var steam = _steamWrapperFactory.CreateWrapper();
 

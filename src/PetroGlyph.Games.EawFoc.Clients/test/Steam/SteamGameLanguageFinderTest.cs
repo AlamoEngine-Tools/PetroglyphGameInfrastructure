@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Clients.Steam;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Language;
 using Testably.Abstractions.Testing;
 using Xunit;
 
@@ -17,13 +18,14 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Test.Steam;
 public class SteamGameLanguageFinderTest
 {
     private readonly SteamGameLanguageFinder _service;
-    private readonly Mock<ISteamWrapper> _steam;
+    private readonly Mock<ISteamWrapper> _steam = new();
+    private readonly Mock<ILanguageFinder> _languageFinder = new();
 
     public SteamGameLanguageFinderTest()
     {
         var sc = new ServiceCollection();
-        _steam = new Mock<ISteamWrapper>();
         sc.AddTransient(_ => _steam.Object);
+        sc.AddTransient(_ => _languageFinder.Object);
         _service = new SteamGameLanguageFinder(sc.BuildServiceProvider());
     }
 
@@ -35,20 +37,28 @@ public class SteamGameLanguageFinderTest
     }
 
     [Fact]
-    public void TestNotSteamGame_Throws()
+    public void TestNotSteamGame_Fallback()
     {
         var game = new Mock<IGame>();
         game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-        Assert.Throws<InvalidOperationException>(() => _service.FindInstalledLanguages(game.Object));
+
+        _languageFinder.Setup(f => f.Merge(It.IsAny<IEnumerable<ILanguageInfo>[]>())).Returns(new HashSet<ILanguageInfo>{new LanguageInfo("de", LanguageSupportLevel.SFX)});
+
+        var result = _service.FindInstalledLanguages(game.Object);
+        Assert.Equivalent(new HashSet<ILanguageInfo>{new LanguageInfo("de", LanguageSupportLevel.SFX)},result);
     }
 
     [Fact]
-    public void TestGameNotInstalled_Throws()
+    public void TestGameNotInstalled_Fallback()
     {
         var game = new Mock<IGame>();
         game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
         _steam.Setup(s => s.IsGameInstalled(32470u, out It.Ref<SteamAppManifest>.IsAny!)).Returns(false);
-        Assert.Throws<InvalidOperationException>(() => _service.FindInstalledLanguages(game.Object));
+
+        _languageFinder.Setup(f => f.Merge(It.IsAny<IEnumerable<ILanguageInfo>[]>())).Returns(new HashSet<ILanguageInfo> { new LanguageInfo("de", LanguageSupportLevel.SFX) });
+
+        var result = _service.FindInstalledLanguages(game.Object);
+        Assert.Equivalent(new HashSet<ILanguageInfo> { new LanguageInfo("de", LanguageSupportLevel.SFX) }, result);
     }
 
     [Fact]

@@ -31,8 +31,11 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IModDependencyGraphBuilder>(_ => new ModDependencyGraphBuilder());
         serviceCollection.AddSingleton<IModDependencyTraverser>(sp => new ModDependencyTraverser(sp));
 
+        serviceCollection.AddSingleton<ILanguageFinder>(sp => new FileBasedLanguageFinder(sp));
         serviceCollection.AddSingleton<IPlayableObjectFileService>(sp => new PlayableObjectFileService(sp));
         serviceCollection.AddSingleton<IModLanguageFinderFactory>(sp => new ModLanguageFinderFactory(sp));
+
+        serviceCollection.AddSingleton<IGameLanguageFinder>(sp => new GameLanguageFinder(sp));
 
         // Must be transient
         serviceCollection.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));

@@ -4,6 +4,17 @@ using System.IO.Abstractions;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;
+/* Nicht gemergte Änderung aus Projekt "PG.StarWarsGame.Infrastructure (net8.0)"
+Vor:
+using PG.StarWarsGame.Infrastructure.Games;
+Nach:
+using PG;
+using PG.StarWarsGame;
+using PG.StarWarsGame.Infrastructure;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services;
+using PG.StarWarsGame.Infrastructure.Services.StarWarsGame.Infrastructure.Services.Detection.Games;
+*/
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
@@ -56,14 +67,14 @@ public sealed class DirectoryGameDetector : GameDetectorBase
     {
         var subDirectories = type switch
 #if NET
-            {
-                GameType.Eaw => _directory.EnumerateDirectories(KnownEawSubDirName,
-                    new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = true }),
-                GameType.Foc => _directory.EnumerateDirectories("*",
-                        new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })
-                    .Where(d => KnownFocDirectoryNames.Contains(d.Name)),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+        {
+            GameType.Eaw => _directory.EnumerateDirectories(KnownEawSubDirName,
+                new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = true }),
+            GameType.Foc => _directory.EnumerateDirectories("*",
+                    new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })
+                .Where(d => KnownFocDirectoryNames.Contains(d.Name)),
+            _ => throw new ArgumentOutOfRangeException()
+        };
 #else
         {
             GameType.Eaw => _directory.EnumerateDirectories(KnownEawSubDirName, SearchOption.AllDirectories),

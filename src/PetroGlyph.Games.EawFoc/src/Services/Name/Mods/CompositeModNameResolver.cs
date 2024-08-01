@@ -13,42 +13,23 @@ namespace PG.StarWarsGame.Infrastructure.Services.Name;
 /// </summary>
 public sealed class CompositeModNameResolver : IModNameResolver
 {
-    private readonly IList<IModNameResolver> _sortedResolvers;
+    private readonly IList<IModNameResolver> _resolvers;
     private readonly ILogger? _logger;
 
     /// <summary>
     /// Create a new instance.
     /// </summary>
-    /// <param name="sortedResolvers">Prioritized list of <see cref="IModNameResolver"/>.</param>
     /// <param name="serviceProvider">The service provider.</param>
-    public CompositeModNameResolver(IList<IModNameResolver> sortedResolvers, IServiceProvider serviceProvider)
+    /// <param name="resolverFactory">Factory method to create a list of <see cref="IModNameResolver"/>.</param>
+    public CompositeModNameResolver(IServiceProvider serviceProvider, Func<IServiceProvider, IList<IModNameResolver>> resolverFactory)
     {
         if (serviceProvider == null)
             throw new ArgumentNullException(nameof(serviceProvider));
-        ThrowHelper.ThrowIfCollectionNullOrEmpty(sortedResolvers);
-        _sortedResolvers = sortedResolvers;
+        if (resolverFactory == null) throw new ArgumentNullException(nameof(resolverFactory));
+        var resolvers = resolverFactory(serviceProvider);
+        ThrowHelper.ThrowIfCollectionNullOrEmpty(resolvers);
+        _resolvers = resolvers;
         _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
-    }
-
-    /// <summary>
-    /// Create a new <see cref="IModNameResolver"/> which resolves the name from:
-    /// <br/>
-    /// 1. The mod's Steam Workshops page (if applicable)
-    /// <br/>
-    /// 2. The mod's directory name.
-    /// </summary>
-    /// <param name="serviceProvider"></param>
-    /// <returns></returns>
-    public static IModNameResolver CreateDefaultModNameResolver(IServiceProvider serviceProvider)
-    {
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
-        var resolvers = new List<IModNameResolver>
-        {
-            new OnlineWorkshopNameResolver(serviceProvider),
-            new DirectoryModNameResolver(serviceProvider)
-        };
-        return new CompositeModNameResolver(resolvers, serviceProvider);
     }
 
     /// <inheritdoc/>
@@ -59,7 +40,7 @@ public sealed class CompositeModNameResolver : IModNameResolver
         if (culture == null)
             throw new ArgumentNullException(nameof(culture));
 
-        foreach (var nameResolver in _sortedResolvers)
+        foreach (var nameResolver in _resolvers)
         {
             try
             {

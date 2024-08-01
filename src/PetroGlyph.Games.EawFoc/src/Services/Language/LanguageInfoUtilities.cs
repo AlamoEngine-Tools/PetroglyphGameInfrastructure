@@ -83,6 +83,4 @@ public static class LanguageInfoUtilities
             throw new CultureNotFoundException($"Unable to get culture for language {englishLanguageName}");
         return new LanguageInfo(culture.TwoLetterISOLanguageName, supportLevel);
     }
-
-
 }

@@ -232,9 +232,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     /// <returns>Set of resolved languages.</returns>
     protected override ISet<ILanguageInfo> ResolveInstalledLanguages()
     {
-        return ServiceProvider.GetService<IGameLanguageFinder>()?
-                   .FindInstalledLanguages(this) ??
-               new HashSet<ILanguageInfo>();
+        return ServiceProvider.GetRequiredService<IGameLanguageFinder>().FindInstalledLanguages(this);
     }
 
     /// <summary>
