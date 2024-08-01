@@ -110,7 +110,7 @@ public class ArgumentValidatorTest
     {
         var validator = new ArgumentValidator();
         Assert.Equal(ArgumentValidityStatus.InvalidData, validator.CheckArgument(new InvalidModList(), out _, out _));
-        Assert.Equal(ArgumentValidityStatus.Valid, validator.CheckArgument(new ModArgumentList(Array.Empty<IGameArgument<string>>()), out _, out _));
+        Assert.Equal(ArgumentValidityStatus.Valid, validator.CheckArgument(new ModArgumentList(Array.Empty<ModArgument>()), out _, out _));
     }
 
 

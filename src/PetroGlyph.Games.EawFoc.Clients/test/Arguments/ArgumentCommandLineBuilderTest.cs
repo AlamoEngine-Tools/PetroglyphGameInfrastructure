@@ -112,7 +112,7 @@ public class ArgumentCommandLineBuilderTest
     [Fact]
     public void TestModListEmpty()
     {
-        var arg = new ModArgumentList(Array.Empty<IGameArgument<string>>());
+        var arg = new ModArgumentList(Array.Empty<ModArgument>());
         var command = _service.ToCommandLine(arg, "MODLIST", string.Empty);
         Assert.Empty(command);
     }
@@ -121,22 +121,7 @@ public class ArgumentCommandLineBuilderTest
     public void TestModListHasInvalidArg_Throws()
     {
         var modArg = new ModArgument("path", false);
-        var arg = new ModArgumentList(new List<IGameArgument<string>>
-        {
-            modArg
-        });
-
-        _validator.Setup(v => v.CheckArgument(modArg, out It.Ref<string>.IsAny, out It.Ref<string>.IsAny))
-            .Returns(ArgumentValidityStatus.InvalidData);
-
-        Assert.Throws<GameArgumentException>(() => _service.ToCommandLine(arg, "MODLIST", string.Empty));
-    }
-
-    [Fact]
-    public void TestModListHasInvalidArg2_Throws()
-    {
-        var modArg = new InvalidModArg();
-        var arg = new ModArgumentList(new List<IGameArgument<string>>
+        var arg = new ModArgumentList(new List<ModArgument>
         {
             modArg
         });
@@ -153,7 +138,7 @@ public class ArgumentCommandLineBuilderTest
         var name = "MODPATH";
         var value = "path";
         var modArg = new ModArgument("path", false);
-        var arg = new ModArgumentList(new List<IGameArgument<string>>
+        var arg = new ModArgumentList(new List<ModArgument>
         {
             modArg
         });
@@ -173,7 +158,7 @@ public class ArgumentCommandLineBuilderTest
         var name2 = "STEAMID";
         var value2 = "123";
         var modArg2 = new ModArgument("path", true);
-        var arg = new ModArgumentList(new List<IGameArgument<string>>
+        var arg = new ModArgumentList(new List<ModArgument>
         {
             modArg1,
             modArg2
@@ -186,38 +171,10 @@ public class ArgumentCommandLineBuilderTest
         Assert.Equal("MODPATH=path STEAMID=123", command);
     }
 
-    private class DisabledFlag : FlagArgument
-    {
-        public DisabledFlag(bool dashed) : base("FLAG", false, dashed)
-        {
-        }
-    }
-
-    private class InvalidModArg : GameArgument<string>
-    {
-        public InvalidModArg() : base("value")
-        {
-        }
-
-        public override ArgumentKind Kind => ArgumentKind.Flag;
-        public override string Name { get; } = null!;
-        public override string ValueToCommandLine()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool Equals(IGameArgument? other)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    private class DisabledFlag(bool dashed) : FlagArgument("FLAG", false, dashed);
 
     private class InvalidModListArg : IGameArgument
-    {
-        public InvalidModListArg() 
-        {
-        }
-
+    { 
         public bool Equals(IGameArgument? other)
         {
             throw new NotImplementedException();
