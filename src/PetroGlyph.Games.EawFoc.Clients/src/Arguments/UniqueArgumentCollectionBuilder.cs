@@ -5,34 +5,34 @@ using System.Linq;
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-/// Service to build an <see cref="IArgumentCollection"/> which takes the argument's name as key.
-/// <para>Adding new arguments will update an existing, if an argument with the same name is already present.</para>
+/// Service to build an <see cref="IArgumentCollection"/> which uses the argument's name as unique identifier. Arguments with the same name will be replaced.
 /// </summary>
-public class KeyBasedArgumentCollectionBuilder
+public class UniqueArgumentCollectionBuilder
 {
     private readonly Dictionary<string, IGameArgument> _argumentDict = new();
 
     /// <summary>
-    /// Initializes an <see cref="KeyBasedArgumentCollectionBuilder"/> with no arguments.
+    /// Initializes an <see cref="UniqueArgumentCollectionBuilder"/> with no arguments.
     /// </summary>
-    public KeyBasedArgumentCollectionBuilder()
+    public UniqueArgumentCollectionBuilder()
     {
     }
 
     /// <summary>
-    /// Initializes an <see cref="KeyBasedArgumentCollectionBuilder"/> with a given <paramref name="argumentCollection"/>.
+    /// Initializes an <see cref="UniqueArgumentCollectionBuilder"/> with a given <paramref name="argumentCollection"/>.
     /// </summary>
-    public KeyBasedArgumentCollectionBuilder(IArgumentCollection argumentCollection)
+    public UniqueArgumentCollectionBuilder(IArgumentCollection argumentCollection)
     {
         AddAll(argumentCollection);
     }
 
     /// <summary>
-    /// Adds or updates an argument to the this instance. 
+    /// Adds or updates an argument to this instance. 
     /// </summary>
     /// <param name="argument">The argument to add or update.</param>
     /// <returns>This instance.</returns>
-    public KeyBasedArgumentCollectionBuilder Add(IGameArgument argument)
+    /// <exception cref="ArgumentNullException"><paramref name="argument"/> is <see langword="null"/>.</exception>
+    public UniqueArgumentCollectionBuilder Add(IGameArgument argument)
     {
         if (argument == null) 
             throw new ArgumentNullException(nameof(argument));
@@ -41,8 +41,13 @@ public class KeyBasedArgumentCollectionBuilder
         return this;
     }
 
-    /// <inheritdoc/>
-    public KeyBasedArgumentCollectionBuilder Remove(IGameArgument argument)
+    /// <summary>
+    /// Removes the argument if present from this instance.
+    /// </summary>
+    /// <param name="argument">The argument to remove.</param>
+    /// <returns>This instance.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="argument"/> is <see langword="null"/>.</exception>
+    public UniqueArgumentCollectionBuilder Remove(IGameArgument argument)
     {
         if (argument == null)
             throw new ArgumentNullException(nameof(argument));
@@ -55,8 +60,11 @@ public class KeyBasedArgumentCollectionBuilder
     /// </summary>
     /// <param name="name">The name of the argument to remove.</param>
     /// <returns>This instance.</returns>
-    public KeyBasedArgumentCollectionBuilder Remove(string name)
+    /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
+    public UniqueArgumentCollectionBuilder Remove(string name)
     {
+        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
         _argumentDict.Remove(name);
         return this;
     }
@@ -66,7 +74,7 @@ public class KeyBasedArgumentCollectionBuilder
     /// </summary>
     /// <param name="argumentCollection">The arguments to add or update.</param>
     /// <returns>This instance.</returns>
-    public KeyBasedArgumentCollectionBuilder AddAll(IArgumentCollection argumentCollection)
+    public UniqueArgumentCollectionBuilder AddAll(IArgumentCollection argumentCollection)
     {
         foreach (var arg in argumentCollection)
             Add(arg);

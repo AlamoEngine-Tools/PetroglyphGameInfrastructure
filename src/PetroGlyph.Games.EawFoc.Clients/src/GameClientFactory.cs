@@ -11,7 +11,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients;
 /// If this factory already created an instance for a matching <see cref="GamePlatform"/> it will reuse the instance. 
 /// </para>
 /// </summary>
-public class DefaultGameClientFactory : IGameClientFactory
+internal class GameClientFactory : IGameClientFactory
 {
     private readonly IServiceProvider _serviceProvider;
 
@@ -22,7 +22,7 @@ public class DefaultGameClientFactory : IGameClientFactory
     /// Creates a new instance.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
-    public DefaultGameClientFactory(IServiceProvider serviceProvider)
+    public GameClientFactory(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }

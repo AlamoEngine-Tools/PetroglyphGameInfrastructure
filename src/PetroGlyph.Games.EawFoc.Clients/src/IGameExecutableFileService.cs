@@ -6,7 +6,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients;
 /// <summary>
 /// Get the executable file of a Petroglyph Star Wars game.
 /// </summary>
-public interface IGameExecutableFileService
+internal interface IGameExecutableFileService
 {
     /// <summary>
     /// Finds the <paramref name="game"/>'s executable

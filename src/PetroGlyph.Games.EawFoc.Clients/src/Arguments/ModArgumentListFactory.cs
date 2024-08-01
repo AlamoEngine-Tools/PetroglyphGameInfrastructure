@@ -12,10 +12,10 @@ using PG.StarWarsGame.Infrastructure.Services.Steam;
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-///  Create a <see cref="ModArgumentList"/> from a given mod instance
+/// Create a <see cref="ModArgumentList"/> from a given mod instance
 /// by using a registered service instance of <see cref="IModDependencyTraverser"/>
 /// </summary>
-public class ModArgumentListFactory : IModArgumentListFactory
+internal class ModArgumentListFactory : IModArgumentListFactory
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IArgumentValidator _validator;

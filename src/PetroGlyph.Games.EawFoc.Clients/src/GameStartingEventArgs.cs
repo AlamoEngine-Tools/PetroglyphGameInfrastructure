@@ -6,7 +6,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients;
 /// <summary>
 /// Cancelable event handler when a game was requested to start.
 /// </summary>
-public class GameStartingEventArgs : CancelEventArgs
+public sealed class GameStartingEventArgs : CancelEventArgs
 {
     /// <summary>
     /// The instance requested to start.

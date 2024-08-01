@@ -5,7 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients;
 /// <summary>
 /// Service that gets the correct executable file name for a Petroglyph Star Wars game.
 /// </summary>
-public interface IGameExecutableNameBuilder
+internal interface IGameExecutableNameBuilder
 {
     /// <summary>
     /// Converts <paramref name="game"/> and <paramref name="buildType"/> into the correct executable file name.

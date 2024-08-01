@@ -18,7 +18,7 @@ public enum ArgumentValidityStatus
     /// </summary>
     IllegalCharacter,
     /// <summary>
-    /// The argument contains a space character. This not legal e.g. for filesystem paths.
+    /// The argument contains a space character. This is not legal for e.g, filesystem paths.
     /// </summary>
     PathContainsSpaces,
     /// <summary>

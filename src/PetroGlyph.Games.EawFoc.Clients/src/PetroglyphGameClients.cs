@@ -22,7 +22,7 @@ public class PetroglyphGameClients
         serviceCollection.AddSingleton<IGameExecutableFileService>(sp => new GameExecutableFileService(sp));
         serviceCollection.AddSingleton<IGameExecutableNameBuilder>(_ => new GameExecutableNameBuilder());
 
-        serviceCollection.AddSingleton<IGameClientFactory>(sp => new DefaultGameClientFactory(sp));
+        serviceCollection.AddSingleton<IGameClientFactory>(sp => new GameClientFactory(sp));
         serviceCollection.AddSingleton<IModArgumentListFactory>(sp => new ModArgumentListFactory(sp));
         serviceCollection.AddSingleton<IArgumentValidator>(_ => new ArgumentValidator());
         serviceCollection.AddSingleton<IArgumentCommandLineBuilder>(sp => new ArgumentCommandLineBuilder(sp));
