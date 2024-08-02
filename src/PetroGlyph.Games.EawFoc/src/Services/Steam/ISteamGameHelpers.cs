@@ -6,7 +6,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 /// <summary>
 /// Common helpers for Steam-based Games
 /// </summary>
-public interface ISteamGameHelpers
+internal interface ISteamGameHelpers
 {
     /// <summary>
     /// Gets the game's workshop directory.

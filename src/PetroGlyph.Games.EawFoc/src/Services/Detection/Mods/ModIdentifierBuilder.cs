@@ -7,12 +7,14 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 internal class ModIdentifierBuilder : IModIdentifierBuilder
 {
     private readonly IFileSystem _fileSystem;
+    private readonly ISteamGameHelpers _steamGameHelper;
 
     /// <summary>
     /// Creates a new instance.
@@ -21,6 +23,7 @@ internal class ModIdentifierBuilder : IModIdentifierBuilder
     public ModIdentifierBuilder(IServiceProvider serviceProvider)
     {
         _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+        _steamGameHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
     }
 
     public string Build(IDirectoryInfo modDirectory, bool isWorkshop)
@@ -65,8 +68,10 @@ internal class ModIdentifierBuilder : IModIdentifierBuilder
         });
     }
 
-    private static string BuildWorkshopsModId(IDirectoryInfo modDir)
+    private string BuildWorkshopsModId(IDirectoryInfo modDir)
     {
+        if (!_steamGameHelper.ToSteamWorkshopsId(modDir.Name, out _))
+            throw new InvalidOperationException($"{modDir} is not a valid Steam Workshop directory.");
         return modDir.Name;
     }
 

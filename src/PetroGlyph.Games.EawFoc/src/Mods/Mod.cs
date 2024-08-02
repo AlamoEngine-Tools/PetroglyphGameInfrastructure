@@ -98,6 +98,12 @@ public class Mod : ModBase, IPhysicalMod
         InternalPath = CreateInternalPath(modDirectory);
     }
 
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"{Name}:{Type} @{Directory.FullName}";
+    }
+
     internal string CreateInternalPath(IDirectoryInfo directory)
     {
         return FileSystem.Path.GetFullPath(directory.FullName);

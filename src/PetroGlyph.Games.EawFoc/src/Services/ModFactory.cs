@@ -12,6 +12,7 @@ using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Name;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Services;
 
@@ -22,6 +23,7 @@ internal class ModFactory : IModFactory
     private readonly IModReferenceLocationResolver _referenceLocationResolver;
     private readonly IModNameResolver _nameResolver;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IModGameTypeResolver _modGameTypeResolver;
 
     /// <summary>
     /// Creates a new mod factory.
@@ -36,20 +38,20 @@ internal class ModFactory : IModFactory
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _referenceLocationResolver = serviceProvider.GetRequiredService<IModReferenceLocationResolver>();
-        _nameResolver = serviceProvider.GetService<IModNameResolver>() ?? new DirectoryModNameResolver(serviceProvider);
-
+        _nameResolver = serviceProvider.GetRequiredService<IModNameResolver>();
+        _modGameTypeResolver = serviceProvider.GetRequiredService<IModGameTypeResolver>();
         _finderFunc = finderFunc;
     } 
 
     /// <inheritdoc/>
     public IEnumerable<IPhysicalMod> FromReference(IGame game, IModReference modReference, CultureInfo culture)
     {
-        var modReferenceLocation = _referenceLocationResolver.ResolveLocation(modReference, game);
+        var modReferenceLocation = _referenceLocationResolver.ResolveLocation(modReference, game, false);
         var modinfoFinder = _finderFunc(modReferenceLocation);
         var searchResult = modinfoFinder.Find(FindOptions.FindAny);
 
         return !searchResult.HasVariantModinfoFiles
-            ? [CreateModFromDirectory(game, modReference, modReferenceLocation, searchResult.MainModinfo, culture)]
+            ? [CreateModFromDirectoryWithTypeCheck(game, modReference, modReferenceLocation, searchResult.MainModinfo, culture)]
             : CreateVariants(game, modReference, modReferenceLocation, searchResult.Variants, culture);
     }
 
@@ -57,14 +59,14 @@ internal class ModFactory : IModFactory
     /// <inheritdoc/>
     public IPhysicalMod FromReference(IGame game, IModReference modReference, IModinfo? modinfo, CultureInfo culture)
     {
-        var modReferenceLocation = _referenceLocationResolver.ResolveLocation(modReference, game);
+        var modReferenceLocation = _referenceLocationResolver.ResolveLocation(modReference, game, false);
         return CreateModFromDirectory(game, modReference, modReferenceLocation, modinfo, culture);
     }
 
     /// <inheritdoc/>
     public IPhysicalMod FromReference(IGame game, IModReference modReference, bool searchModinfoFile, CultureInfo culture)
     {
-        var modReferenceLocation = _referenceLocationResolver.ResolveLocation(modReference, game);
+        var modReferenceLocation = _referenceLocationResolver.ResolveLocation(modReference, game, false);
 
         IModinfoFile? mainModinfoFile = null;
         if (searchModinfoFile)
@@ -73,14 +75,14 @@ internal class ModFactory : IModFactory
             mainModinfoFile = modinfoFinder.Find(FindOptions.FindMain).MainModinfo;
         }
 
-        return CreateModFromDirectory(game, modReference, modReferenceLocation, mainModinfoFile, culture);
+        return CreateModFromDirectoryWithTypeCheck(game, modReference, modReferenceLocation, mainModinfoFile, culture);
     }
 
     /// <inheritdoc/>
     public IEnumerable<IPhysicalMod> VariantsFromReference(IGame game, IModReference modReference, CultureInfo culture)
     {
         var mods = new HashSet<IPhysicalMod>();
-        var modReferenceLocation = _referenceLocationResolver.ResolveLocation(modReference, game);
+        var modReferenceLocation = _referenceLocationResolver.ResolveLocation(modReference, game, false);
         var variants = _finderFunc(modReferenceLocation).Find(FindOptions.FindVariants);
         var variantMods = CreateVariants(game, modReference, modReferenceLocation, variants, culture);
         foreach (var mod in variantMods)
@@ -97,7 +99,10 @@ internal class ModFactory : IModFactory
     /// <inheritdoc/>
     public IVirtualMod CreateVirtualVariant(IGame game, IModinfo virtualModInfo)
     {
-        return new VirtualMod(game, virtualModInfo, _serviceProvider);
+        var mod = new VirtualMod(game, virtualModInfo, _serviceProvider);
+        if (_modGameTypeResolver.TryGetGameType(ModType.Virtual, virtualModInfo, out var gameType) && gameType != game.Type)
+            throw new ModException(mod, $"Unable to create mod of game type '{gameType}' for game '{game}'");
+        return mod;
     }
 
     /// <inheritdoc/>
@@ -110,7 +115,9 @@ internal class ModFactory : IModFactory
     public IVirtualMod CreateVirtualVariant(IGame game, string name, IList<IModReference> dependencies, DependencyResolveLayout resolveLayout)
     {
         var modinfo = new ModinfoData(name)
-            { Dependencies = new DependencyList(dependencies, resolveLayout) };
+        {
+            Dependencies = new DependencyList(dependencies, resolveLayout)
+        };
         return CreateVirtualVariant(game, modinfo);
     }
 
@@ -125,7 +132,12 @@ internal class ModFactory : IModFactory
             if (variant.FileKind == ModinfoFileKind.MainFile)
                 throw new ModException(modReference, "Cannot create a variant mod from a main modinfo file.");
 
-            var mod = CreateModFromDirectory(game, modReference, modReferenceLocation, variant, culture);
+            var variantInfo = variant.GetModinfo();
+
+            if (_modGameTypeResolver.TryGetGameType(modReferenceLocation, modReference.Type, variantInfo, out var gameType) && gameType != game.Type)
+                continue;
+
+            var mod = CreateModFromDirectory(game, modReference, modReferenceLocation, variantInfo, culture);
             if (!variants.Add(mod) || !names.Add(mod.Name))
                 throw new ModException(
                     mod, $"Unable to create variant mod of name {mod.Name}, because it already exists");
@@ -134,8 +146,11 @@ internal class ModFactory : IModFactory
         return variants;
     }
 
-    private IPhysicalMod CreateModFromDirectory(IGame game, IModReference modReference, IDirectoryInfo directory, IModinfoFile? modinfoFile, CultureInfo culture)
+    private IPhysicalMod CreateModFromDirectoryWithTypeCheck(IGame game, IModReference modReference, IDirectoryInfo directory, IModinfoFile? modinfoFile, CultureInfo culture)
     {
+        var modInfo = modinfoFile?.GetModinfo();
+        if (_modGameTypeResolver.TryGetGameType(directory, modReference.Type, modInfo, out var gameType) && gameType != game.Type)
+            throw new ModException(modReference, $"Unable to create mod of game type '{gameType}' for game '{game}'");
         return CreateModFromDirectory(game, modReference, directory, modinfoFile?.GetModinfo(), culture);
     }
 
@@ -146,14 +161,16 @@ internal class ModFactory : IModFactory
         if (!directory.Exists)
             throw new DirectoryNotFoundException($"Unable to find mod location '{directory.FullName}'");
 
+        var isWorkshop = modReference.Type == ModType.Workshops;
+
         if (modinfo == null)
         {
             var name = GetModName(modReference, cultureInfo);
-            return new Mod(game, directory, modReference.Type == ModType.Workshops, name, _serviceProvider);
+            return new Mod(game, directory, isWorkshop, name, _serviceProvider);
         }
 
         modinfo.Validate();
-        return new Mod(game, directory, modReference.Type == ModType.Workshops, modinfo, _serviceProvider);
+        return new Mod(game, directory, isWorkshop, modinfo, _serviceProvider);
     }
 
     private string GetModName(IModReference modReference, CultureInfo culture)

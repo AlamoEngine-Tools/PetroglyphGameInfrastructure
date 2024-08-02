@@ -21,7 +21,7 @@ internal sealed class GameFactory : IGameFactory
     public GameFactory(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _nameResolver = serviceProvider.GetService<IGameNameResolver>() ?? new EnglishGameNameResolver();
+        _nameResolver = serviceProvider.GetRequiredService<IGameNameResolver>();
     }
     
     /// <inheritdoc/>

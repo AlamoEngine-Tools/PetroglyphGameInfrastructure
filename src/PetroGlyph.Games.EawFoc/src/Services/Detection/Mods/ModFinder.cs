@@ -17,6 +17,7 @@ internal class ModFinder : IModReferenceFinder
 {
     private readonly ISteamGameHelpers _steamHelper;
     private readonly IModIdentifierBuilder _idBuilder;
+    private readonly IModGameTypeResolver _gameTypeResolver;
 
     /// <summary>
     /// Creates a new instance.
@@ -28,6 +29,7 @@ internal class ModFinder : IModReferenceFinder
             throw new ArgumentNullException(nameof(serviceProvider));
         _idBuilder = serviceProvider.GetRequiredService<IModIdentifierBuilder>();
         _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
+        _gameTypeResolver = serviceProvider.GetRequiredService<IModGameTypeResolver>();
     }
 
     /// <summary>
@@ -53,17 +55,17 @@ internal class ModFinder : IModReferenceFinder
 
     private IEnumerable<ModReference> GetNormalMods(IGame game)
     {
-        return GetAllModsFromPath(game.ModsLocation, false);
+        return GetAllModsFromPath(game.ModsLocation, false, game.Type);
     }
 
     private IEnumerable<ModReference> GetWorkshopsMods(IGame game)
     {
         return game.Platform != GamePlatform.SteamGold
             ? []
-            : GetAllModsFromPath(_steamHelper.GetWorkshopsLocation(game), true);
+            : GetAllModsFromPath(_steamHelper.GetWorkshopsLocation(game), true, game.Type);
     }
 
-    private IEnumerable<ModReference> GetAllModsFromPath(IDirectoryInfo lookupDirectory, bool isWorkshopsPath)
+    private IEnumerable<ModReference> GetAllModsFromPath(IDirectoryInfo lookupDirectory, bool isWorkshopsPath, GameType requestedGameType)
     {
         if (!lookupDirectory.Exists)
             yield break;
@@ -72,6 +74,11 @@ internal class ModFinder : IModReferenceFinder
 
         foreach (var modDirectory in lookupDirectory.EnumerateDirectories())
         {
+            // If the type resolver was unable to find the type, we have to assume that the current mod matches to the game.
+            // Otherwise, we'd produce false negatives. Only if the resolver was able to determine a result, we use that finding.
+            if (_gameTypeResolver.TryGetGameType(modDirectory, type, true, out var actualGameType) && requestedGameType != actualGameType)
+                continue;
+
             var id = _idBuilder.Build(modDirectory, isWorkshopsPath);
             yield return new ModReference(id, type);
         }

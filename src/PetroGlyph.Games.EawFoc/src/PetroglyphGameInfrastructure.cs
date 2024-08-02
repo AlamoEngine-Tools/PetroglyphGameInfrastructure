@@ -4,6 +4,7 @@ using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Language;
+using PG.StarWarsGame.Infrastructure.Services.Name;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Utilities;
 
@@ -36,6 +37,13 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IModLanguageFinderFactory>(sp => new ModLanguageFinderFactory(sp));
 
         serviceCollection.AddSingleton<IGameLanguageFinder>(sp => new GameLanguageFinder(sp));
+        serviceCollection.AddSingleton<ISteamWorkshopCache>(_ => new KnownSteamWorkshopCache());
+
+        serviceCollection.AddSingleton<IModNameResolver>(sp => new DirectoryModNameResolver(sp));
+        serviceCollection.AddSingleton<IGameNameResolver>(_ => new EnglishGameNameResolver());
+        serviceCollection.AddSingleton<IModGameTypeResolver>(sp => new OfflineModGameTypeResolver(sp));
+
+        serviceCollection.AddSingleton<ISteamWorkshopWebpageDownloader>(_ => new SteamWorkshopWebpageDownloader());
 
         // Must be transient
         serviceCollection.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));

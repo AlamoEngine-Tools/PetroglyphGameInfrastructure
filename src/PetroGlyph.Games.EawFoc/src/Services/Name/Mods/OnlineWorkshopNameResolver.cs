@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using EawModinfo.Spec;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Name;
@@ -14,15 +18,14 @@ namespace PG.StarWarsGame.Infrastructure.Services.Name;
 public sealed class OnlineWorkshopNameResolver : ModNameResolverBase
 {
     private readonly ISteamGameHelpers _steamHelper;
-    private readonly OfflineWorkshopNameResolver _offlineResolver;
-    private readonly ILogger? _logger;
+
+    private readonly ConcurrentDictionary<ulong, string?> _nameCache;
 
     /// <inheritdoc/>
     public OnlineWorkshopNameResolver(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
-        _offlineResolver = new OfflineWorkshopNameResolver(serviceProvider);
-        _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
+        _nameCache = new ConcurrentDictionary<ulong, string?>();
     }
 
     /// <inheritdoc/>
@@ -30,26 +33,23 @@ public sealed class OnlineWorkshopNameResolver : ModNameResolverBase
     {
         if (modReference.Type != ModType.Workshops)
             throw new NotSupportedException("Can only resolve for Steam Workshop mods!");
+
         if (!_steamHelper.ToSteamWorkshopsId(modReference.Identifier, out var modId))
-            throw new InvalidOperationException($"Cannot get SteamID from workshops object {modReference.Identifier}");
+            throw new ModException(modReference, $"Cannot get SteamID from workshops object {modReference.Identifier}");
 
-        try
+        return _nameCache.GetOrAdd(modId, id =>
         {
-            var name = _offlineResolver.ResolveCore(modReference, culture);
-            return name;
-        }
-        catch (PetroglyphException)
-        {
-            _logger?.LogTrace($"Unable to find SteamID '{modId}' in the offline name resolver.");
-        }
+            if (_nameCache.TryGetValue(modId, out var name))
+                return name!;
 
-        var downloader = ServiceProvider.GetService<ISteamWorkshopWebpageDownloader>() ??
-                         new SteamWorkshopWebpageDownloader();
-        var modsWorkshopWebpage = downloader.GetSteamWorkshopsPageHtmlAsync(modId, culture).GetAwaiter().GetResult();
-        if (modsWorkshopWebpage is null)
-            throw new InvalidOperationException("Unable to get the mod's workshop web page.");
+            var downloader = ServiceProvider.GetService<ISteamWorkshopWebpageDownloader>() ??
+                             new SteamWorkshopWebpageDownloader();
+            var modsWorkshopWebpage = downloader.GetSteamWorkshopsPageHtmlAsync(modId, culture).GetAwaiter().GetResult();
+            if (modsWorkshopWebpage is null)
+                throw new InvalidOperationException("Unable to get the mod's workshop web page.");
 
-        return GetName(modsWorkshopWebpage);
+            return GetName(modsWorkshopWebpage);
+        })!;
     }
 
     private static string GetName(HtmlDocument htmlDocument)
@@ -59,7 +59,7 @@ public sealed class OnlineWorkshopNameResolver : ModNameResolverBase
 
         var node = htmlDocument.DocumentNode.SelectSingleNode("//div[contains(@class, 'workshopItemTitle')]");
         if (node is null)
-            throw new InvalidOperationException("Unable to get name form Workshop's web page. Mussing 'workshopItemTitle' node.");
+            throw new InvalidOperationException("Unable to get name form Workshop's web page. Missing 'workshopItemTitle' node.");
         return node.InnerHtml;
     }
 }
