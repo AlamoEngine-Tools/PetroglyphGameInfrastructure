@@ -12,9 +12,12 @@ using PG.StarWarsGame.Infrastructure.Services.Steam;
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
-/// 
+/// Performs offline checks to determine a mod's associated game type based on most common Steam Workshop identifiers and available modinfo data.
 /// </summary>
-/// <param name="serviceProvider"></param>
+/// <remarks>
+/// The class will not do any file system-based heuristics as the false-negative rate might be too high.
+/// </remarks>
+/// <param name="serviceProvider">The service provider.</param>
 public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider) : IModGameTypeResolver
 {
     private readonly ISteamWorkshopCache _cache = serviceProvider.GetRequiredService<ISteamWorkshopCache>();
@@ -40,19 +43,19 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
 
 
     /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo directory, ModType modType, bool searchModInfo, out GameType gameType)
+    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, bool searchModInfo, out GameType gameType)
     {
         gameType = default;
         
         if (modType == ModType.Virtual)
             throw new NotSupportedException("Virtual mods do not support the file system.");
 
-        if (HandleWorkshop(directory, modType, out gameType))
+        if (HandleWorkshop(modLocation, modType, out gameType))
             return true;
 
         if (searchModInfo)
         {
-            var modinfoFinder = new ModinfoFileFinder(directory);
+            var modinfoFinder = new ModinfoFileFinder(modLocation);
             var result = modinfoFinder.Find(FindOptions.FindAny);
 
             if (result is { HasMainModinfoFile: false, HasVariantModinfoFiles: false })
@@ -83,14 +86,14 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
     }
 
     /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo directory, ModType modType, IModinfo? modinfo, out GameType gameType)
+    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out GameType gameType)
     {
         gameType = default;
 
         if (modType == ModType.Virtual)
             throw new NotSupportedException("Virtual mods do not support the file system.");
 
-        if (HandleWorkshop(directory, modType, out gameType))
+        if (HandleWorkshop(modLocation, modType, out gameType))
             return true;
 
         if (modinfo is not null)

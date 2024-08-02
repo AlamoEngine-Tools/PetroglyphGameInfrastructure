@@ -69,7 +69,6 @@ internal class ModReferenceLocationResolver : IModReferenceLocationResolver
         if (checkGameType) 
             CheckModGameType(mod, modLocation, ModType.Workshops, game);
 
-
         return modLocation;
     }
 
@@ -86,10 +85,9 @@ internal class ModReferenceLocationResolver : IModReferenceLocationResolver
 
         // Note about mod paths:
         // The path can be absolute or relative. 
-        //  a) If absolute the mod may be located anywhere, even on different volumes.
-        //  b) If relative the path must be relative to the game's root directory.
+        //  a) If absolute, the mod may be located anywhere, even on different volumes.
+        //  b) If relative, the path is treated relative to the game's root directory.
         // For starting mods the path also must not contain any spaces, but that's not assured here.
-
 
         IDirectoryInfo modLocation;
         if (_fileSystem.Path.IsPathFullyQualified(modIdentifier))

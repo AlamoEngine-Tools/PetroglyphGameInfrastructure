@@ -12,9 +12,10 @@ using PG.StarWarsGame.Infrastructure.Services.Steam;
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
-/// 
+/// Performs first offline and then online checks to determine a mod's associated game type based on most common Steam Workshop identifiers and available modinfo data.
+/// The online checks queries the tags specified by the mod creators. The results are cached for the runtime of the application.
 /// </summary>
-/// <param name="serviceProvider"></param>
+/// <param name="serviceProvider">The service provider.</param>
 public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) : IModGameTypeResolver
 {
     private readonly OfflineModGameTypeResolver _offlineResolver = new(serviceProvider);
@@ -24,25 +25,25 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
     private readonly ConcurrentDictionary<ulong, GameType?> _gameTypeCache = new ConcurrentDictionary<ulong, GameType?>();
 
     /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo directory, ModType modType, bool searchModInfo, out GameType gameType)
+    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, bool searchModInfo, out GameType gameType)
     {
-        if (_offlineResolver.TryGetGameType(directory, modType, searchModInfo, out gameType))
+        if (_offlineResolver.TryGetGameType(modLocation, modType, searchModInfo, out gameType))
             return true;
 
         if (modType != ModType.Workshops)
             return false;
-        return GetGameTypeFromSteamPage(directory.Name, out gameType);
+        return GetGameTypeFromSteamPage(modLocation.Name, out gameType);
     }
 
     /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo directory, ModType modType, IModinfo? modinfo, out GameType gameType)
+    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out GameType gameType)
     {
-        if (_offlineResolver.TryGetGameType(directory, modType, modinfo, out gameType))
+        if (_offlineResolver.TryGetGameType(modLocation, modType, modinfo, out gameType))
             return true;
 
         if (modType != ModType.Workshops)
             return false;
-        return GetGameTypeFromSteamPage(directory.Name, out gameType);
+        return GetGameTypeFromSteamPage(modLocation.Name, out gameType);
     }
 
     /// <inheritdoc />

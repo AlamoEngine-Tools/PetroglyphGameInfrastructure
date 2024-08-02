@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
