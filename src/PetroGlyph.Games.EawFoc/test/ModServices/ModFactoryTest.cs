@@ -22,6 +22,7 @@ public class ModFactoryTest
     private readonly Mock<IModNameResolver> _nameResolver;
     private readonly Mock<IModinfoFileFinder> _modInfoFinder;
     private readonly Mock<IModReferenceLocationResolver> _locationResolver;
+    private readonly Mock<IModGameTypeResolver> _gameTypeResolver;
     private readonly MockFileSystem _fileSystem;
 
     public ModFactoryTest()
@@ -30,11 +31,13 @@ public class ModFactoryTest
         _nameResolver = new Mock<IModNameResolver>();
         _modInfoFinder = new Mock<IModinfoFileFinder>();
         _locationResolver = new Mock<IModReferenceLocationResolver>();
+        _gameTypeResolver = new Mock<IModGameTypeResolver>();
         _fileSystem = new MockFileSystem();
 
-        sc.AddTransient(_ => _nameResolver.Object);
-        sc.AddTransient(_ => _locationResolver.Object);
-        sc.AddTransient<IFileSystem>(_ => _fileSystem);
+        sc.AddSingleton(_ => _nameResolver.Object);
+        sc.AddSingleton(_ => _locationResolver.Object);
+        sc.AddSingleton(_ => _gameTypeResolver.Object);
+        sc.AddSingleton<IFileSystem>(_ => _fileSystem);
 
         _service = new ModFactory(sc.BuildServiceProvider(), _ => _modInfoFinder.Object);
     }
@@ -52,7 +55,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
             .Returns(modLoc);
 
         _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
@@ -72,7 +75,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
             .Returns(modLoc);
         var modinfo = new Mock<IModinfo>();
         modinfo.Setup(m => m.Name).Returns("MyName");
@@ -97,7 +100,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
             .Returns(modLoc);
 
         var variantA = new Mock<IModinfo>();
@@ -134,7 +137,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
             .Returns(modLoc);
 
         _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
@@ -156,7 +159,7 @@ public class ModFactoryTest
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
 
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
             .Returns(modLoc);
         _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
 
@@ -182,7 +185,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
             .Returns(modLoc);
 
         var modinfo = new Mock<IModinfo>();
@@ -213,7 +216,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
             .Returns(modLoc);
 
         var modinfo = new Mock<IModinfo>();
@@ -244,7 +247,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
             .Returns(modLoc);
 
         var modinfo = new Mock<IModinfo>();
@@ -270,7 +273,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
             .Returns(modLoc);
 
         var variantA = new Mock<IModinfo>();
