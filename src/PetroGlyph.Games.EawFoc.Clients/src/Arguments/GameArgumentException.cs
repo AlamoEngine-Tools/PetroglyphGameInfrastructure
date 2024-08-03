@@ -3,7 +3,7 @@
 /// <summary>
 /// The exception that is thrown when a <see cref="IGameArgument"/> or handling it caused an error.
 /// </summary>
-public class GameArgumentException : PetroglyphException
+public sealed class GameArgumentException : PetroglyphException
 {
     /// <summary>
     /// The argument which caused the error.

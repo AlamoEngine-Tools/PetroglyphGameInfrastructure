@@ -135,7 +135,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _steamWrapper.Setup(s => s.Installed).Returns(true);
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
 
-        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc, It.IsAny<IServiceProvider>()))
+        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc))
             .Returns(_gameRegistry.Object);
         _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
         _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
@@ -157,7 +157,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _steamWrapper.Setup(s => s.Installed).Returns(true);
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
 
-        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc, It.IsAny<IServiceProvider>()))
+        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc))
             .Returns(_gameRegistry.Object);
         _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
         _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
@@ -179,12 +179,12 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _steamWrapper.Setup(s => s.Installed).Returns(true);
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
 
-        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.EaW, It.IsAny<IServiceProvider>()))
+        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Eaw))
             .Returns(_gameRegistry.Object);
-        _gameRegistry.Setup(r => r.Type).Returns(GameType.EaW);
+        _gameRegistry.Setup(r => r.Type).Returns(GameType.Eaw);
         _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
 
-        var options = new GameDetectorOptions(GameType.EaW);
+        var options = new GameDetectorOptions(GameType.Eaw);
         var result = _service.Detect(options);
         Assert.NotNull(result.GameLocation);
     }
@@ -202,9 +202,9 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _steamWrapper.Setup(s => s.Installed).Returns(true);
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
 
-        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc, It.IsAny<IServiceProvider>()))
+        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc))
             .Returns(_gameRegistry.Object);
-        _gameRegistry.Setup(r => r.Type).Returns(GameType.EaW);
+        _gameRegistry.Setup(r => r.Type).Returns(GameType.Eaw);
         _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
 
         var options = new GameDetectorOptions(GameType.Foc);
@@ -224,7 +224,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _steamWrapper.Setup(s => s.Installed).Returns(true);
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
 
-        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc, It.IsAny<IServiceProvider>()))
+        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc))
             .Returns(_gameRegistry.Object);
         _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
 

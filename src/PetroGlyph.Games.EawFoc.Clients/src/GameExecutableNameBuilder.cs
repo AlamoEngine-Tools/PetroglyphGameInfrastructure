@@ -15,7 +15,7 @@ internal sealed class GameExecutableNameBuilder : IGameExecutableNameBuilder
             return GetSteamFileName(buildType);
         return game.Type switch
         {
-            GameType.EaW => PetroglyphStarWarsGameConstants.EmpireAtWarExeFileName,
+            GameType.Eaw => PetroglyphStarWarsGameConstants.EmpireAtWarExeFileName,
             GameType.Foc => PetroglyphStarWarsGameConstants.ForcesOfCorruptionExeFileName,
             _ => throw new ArgumentOutOfRangeException()
         };

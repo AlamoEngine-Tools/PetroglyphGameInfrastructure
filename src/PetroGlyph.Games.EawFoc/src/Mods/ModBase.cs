@@ -290,7 +290,7 @@ public abstract class ModBase : PlayableObject, IMod
         var iconFile = ModInfo?.Icon;
         if (iconFile is not null)
             return iconFile;
-        var finder = ServiceProvider.GetService<IModIconFinder>() ?? new SimpleModIconFinder();
+        var finder = ServiceProvider.GetService<IModIconFinder>() ?? new SimpleModIconFinder(ServiceProvider);
         return finder.FindIcon(this);
     }
 
@@ -298,12 +298,12 @@ public abstract class ModBase : PlayableObject, IMod
     /// <summary>
     /// Resolves the installed languages of this mod.
     /// </summary>
-    /// <remarks>The implementation returns the value an <see cref="IModLanguageFinderFactory"/> service. As fallback returns the value from <see cref="ModLanguageFinderFactory"/>.</remarks>
+    /// <remarks>The implementation returns the value an <see cref="IModLanguageFinderFactory"/> service.</remarks>
     /// <returns>The resolved languages.</returns>
     protected override ISet<ILanguageInfo> ResolveInstalledLanguages()
     {
-        var factory = ServiceProvider.GetService<IModLanguageFinderFactory>() ?? new ModLanguageFinderFactory();
-        var finder = factory.CreateLanguageFinder(this, ServiceProvider);
+        var factory = ServiceProvider.GetRequiredService<IModLanguageFinderFactory>();
+        var finder = factory.CreateLanguageFinder(this);
         return finder.FindInstalledLanguages(this);
     }
 

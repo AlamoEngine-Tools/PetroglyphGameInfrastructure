@@ -39,7 +39,7 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
     public abstract string ValueToCommandLine();
 
     /// <summary>
-    /// This method shall only perform semantical checks on the <see cref="Value"/> property.
+    /// This method shall only perform semantic checks on the <see cref="Value"/> property.
     /// <para>If this method returns <see langword="false"/>, <see cref="IsValid(out ArgumentValidityStatus)"/>
     /// with return <see langword="false"/> with reason <see cref="ArgumentValidityStatus.InvalidData"/>.</para>
     /// <para>

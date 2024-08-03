@@ -16,7 +16,7 @@ public class GameTest
     public void InvalidCtor_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGame(null!, null!, null!, null!));
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGame(id, null!, null!, null!));
         var fs = new MockFileSystem();
         var loc = fs.DirectoryInfo.New("Game");
@@ -32,7 +32,7 @@ public class GameTest
     {
         var fs = new MockFileSystem();
         var sp = new Mock<IServiceProvider>();
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         var loc = fs.DirectoryInfo.New("Game");
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
@@ -63,7 +63,7 @@ public class GameTest
     {
         var fs = new MockFileSystem();
         var sp = new Mock<IServiceProvider>();
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         var loc = fs.DirectoryInfo.New("Game");
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
@@ -78,7 +78,7 @@ public class GameTest
     {
         var fs = new MockFileSystem();
         var sp = new Mock<IServiceProvider>();
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         var loc = fs.DirectoryInfo.New("Game");
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
@@ -103,7 +103,7 @@ public class GameTest
     {
         var fs = new MockFileSystem();
         var sp = new Mock<IServiceProvider>();
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         var loc = fs.DirectoryInfo.New("Game");
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
@@ -132,7 +132,7 @@ public class GameTest
         var sp = new Mock<IServiceProvider>();
         var builder = new Mock<IModIdentifierBuilder>();
         sp.Setup(p => p.GetService(typeof(IModIdentifierBuilder))).Returns(builder.Object);
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         var loc = fs.DirectoryInfo.New("Game");
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
@@ -158,7 +158,7 @@ public class GameTest
         builder.Setup(b => b.Normalize(It.IsAny<IModReference>()))
             .Returns(new ModReference("bla", ModType.Virtual));
         sp.Setup(p => p.GetService(typeof(IModIdentifierBuilder))).Returns(builder.Object);
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         var loc = fs.DirectoryInfo.New("Game");
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);
@@ -177,9 +177,9 @@ public class GameTest
     {
         var fs = new MockFileSystem();
         var sp = new Mock<IServiceProvider>();
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         var iF = new GameIdentity(GameType.Foc, GamePlatform.SteamGold);
-        var ig = new GameIdentity(GameType.EaW, GamePlatform.Disk);
+        var ig = new GameIdentity(GameType.Eaw, GamePlatform.Disk);
         var loc = fs.DirectoryInfo.New("Game");
         var locC = fs.DirectoryInfo.New("Game/");
         var locE = fs.DirectoryInfo.New("Dir");
@@ -207,7 +207,7 @@ public class GameTest
         var fs = new MockFileSystem();
         fs.Initialize().WithSubdirectory("Game");
         var sp = new Mock<IServiceProvider>();
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         var loc = fs.DirectoryInfo.New("Game");
         var name = "Name";
         var game = new PetroglyphStarWarsGame(id, loc, name, sp.Object);

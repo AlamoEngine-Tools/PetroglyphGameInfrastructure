@@ -9,6 +9,7 @@ using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 using Testably.Abstractions.Testing;
 using Xunit;
 
@@ -26,6 +27,7 @@ public class ModDependencyTraverserIntegrationTest
         var sc = new ServiceCollection();
         sc.AddSingleton<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
         sc.AddSingleton<IFileSystem>(_fileSystem);
+        sc.AddSingleton<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
         _serviceProvider = sc.BuildServiceProvider();
         _game = SetupGame(_fileSystem, _serviceProvider);
     }

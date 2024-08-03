@@ -6,7 +6,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 /// <summary>
 /// Collections of supported Argument Names
 /// </summary>
-public static class ArgumentNameCatalog
+internal static class ArgumentNameCatalog
 {
     internal const string ModListArg = "MODLIST";
     internal const string WindowedArg = "WINDOWED";

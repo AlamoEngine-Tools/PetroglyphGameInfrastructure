@@ -9,6 +9,13 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 internal class ArgumentValueSerializer
 {
+    private static readonly PathNormalizeOptions NormalizeOptions = new()
+    {
+        TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim,
+        UnifyCase = UnifyCasingKind.UpperCase,
+        UnifyDirectorySeparators = true
+    };
+
     private static readonly Dictionary<string, (Type, TypeConverter?)> SpecialTypes;
 
     static ArgumentValueSerializer()
@@ -50,19 +57,10 @@ internal class ArgumentValueSerializer
     {
         var fileSystem = target.FileSystem;
 
-        var gamePath = PathNormalizer.Normalize(fileSystem.Path.GetFullPath(gameDir.FullName),
-            PathNormalizeOptions.EnsureTrailingSeparator);
+        if (!fileSystem.Path.IsChildOf(gameDir.FullName, target.FullName))
+            return PathNormalizer.Normalize(target.FullName, NormalizeOptions);
 
-        var targetPath = PathNormalizer.Normalize(fileSystem.Path.GetFullPath(target.FullName),
-            PathNormalizeOptions.EnsureTrailingSeparator);
-
-        // It's important not to resolve, as that would give us an absolute path again.
-        return PathNormalizer.Normalize(fileSystem.Path.GetRelativePathEx(gamePath, targetPath), new PathNormalizeOptions
-        {
-            TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim,
-            UnifyCase = UnifyCasingKind.UpperCase, 
-            UnifyDirectorySeparators = true
-        });
+        return PathNormalizer.Normalize(fileSystem.Path.GetRelativePathEx(gameDir.FullName, target.FullName), NormalizeOptions);
     }
 
     private static TypeConverter? GetConverter(string typeName)

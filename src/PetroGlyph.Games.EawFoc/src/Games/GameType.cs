@@ -8,7 +8,7 @@ public enum GameType
     /// <summary>
     /// Empire at War
     /// </summary>
-    EaW,
+    Eaw,
     /// <summary>
     /// Forces of Corruption
     /// </summary>

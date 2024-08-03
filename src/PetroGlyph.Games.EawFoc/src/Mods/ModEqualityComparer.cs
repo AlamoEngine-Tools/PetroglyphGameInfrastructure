@@ -12,7 +12,7 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 /// </summary>
 /// <remarks>For <see cref="IModIdentity"/> all operations are <see cref="IModIdentity.Version"/>-aware.
 /// For <see cref="IModReference"/> all operations are not <see cref="IModReference.VersionRange"/>-aware.</remarks>
-public class ModEqualityComparer : IEqualityComparer<IMod>, IEqualityComparer<IModIdentity>, IEqualityComparer<IModReference>
+public sealed class ModEqualityComparer : IEqualityComparer<IMod>, IEqualityComparer<IModIdentity>, IEqualityComparer<IModReference>
 {
     /// <summary>
     /// Default instance which checks for dependency and game equality.

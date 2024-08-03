@@ -5,7 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 /// <summary>
 /// A <see cref="ModException"/> which gets thrown whenever a dependency cycle was detected.
 /// </summary>
-public class ModDependencyCycleException : ModException
+public sealed class ModDependencyCycleException : ModException
 {
     /// <summary>
     /// Creates a new exception where <paramref name="rootMod"/> is the root mod of the requested dependency chain.

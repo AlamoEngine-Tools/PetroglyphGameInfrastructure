@@ -18,7 +18,6 @@ public class ClientBaseTest
     private readonly Mock<ClientBase> _client;
     private readonly Mock<IGame> _game;
     private readonly Mock<IModArgumentListFactory> _modListFactory;
-    private readonly Mock<IArgumentCollectionBuilder> _argBuilder;
     private readonly Mock<IGameExecutableFileService> _exeService;
     private readonly Mock<IGameProcessLauncher> _launcher;
 
@@ -27,13 +26,11 @@ public class ClientBaseTest
     {
         var sc = new ServiceCollection();
         _modListFactory = new Mock<IModArgumentListFactory>();
-        _argBuilder = new Mock<IArgumentCollectionBuilder>();
         _exeService = new Mock<IGameExecutableFileService>();
         _launcher = new Mock<IGameProcessLauncher>();
-        sc.AddTransient(_ => _modListFactory.Object);
-        sc.AddTransient(_ => _argBuilder.Object);
-        sc.AddTransient(_ => _exeService.Object);
-        sc.AddTransient(_ => _launcher.Object);
+        sc.AddSingleton(_ => _modListFactory.Object);
+        sc.AddSingleton(_ => _exeService.Object);
+        sc.AddSingleton(_ => _launcher.Object);
         _client = new Mock<ClientBase>(sc.BuildServiceProvider());
         _client.Setup(c => c.GetGameLauncherService()).Returns(_launcher.Object);
         _game = new Mock<IGame>();
@@ -100,10 +97,6 @@ public class ClientBaseTest
             { new ModArgument("path", false), new ModArgument("other", true) });
         _modListFactory.Setup(f => f.BuildArgumentList(It.IsAny<IMod>(), false))
             .Returns(expectedModList);
-        _argBuilder.Setup(b => b.AddAll(It.IsAny<IArgumentCollection>())).Returns(_argBuilder.Object);
-        _argBuilder.Setup(b => b.Add(It.IsAny<IGameArgument>())).Returns(_argBuilder.Object);
-        _argBuilder.Setup(b => b.Build())
-            .Returns(new ArgumentCollection(new List<IGameArgument> { expectedModList }));
 
         _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
 
@@ -120,7 +113,6 @@ public class ClientBaseTest
 
         Assert.Throws<GameStartException>(() => _client.Object.Play(mod.Object));
         Assert.True(callbackTriggered);
-        _argBuilder.Verify(b => b.Build(), Times.Exactly(1));
     }
 
     [Fact]

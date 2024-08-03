@@ -5,8 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 /// <summary>
 /// Argument which enables a game behavior because it exists.
 /// </summary>
-/// <remarks>This argument can be explicitly unset by setting the value to <see langword="false"/>.
-/// On the command line it will just omitted.</remarks>
+/// <remarks>This argument can be explicitly unset by setting the value to <see langword="false"/>. In this case, on the command line it will be omitted.</remarks>
 public abstract class FlagArgument : GameArgument<bool>
 {
     /// <summary>

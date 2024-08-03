@@ -9,7 +9,7 @@ namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 /// <summary>
 /// Windows only registry wrapper for an Petroglyph Star Wars game.
 /// </summary>
-public sealed class GameRegistry : IGameRegistry
+internal sealed class GameRegistry : IGameRegistry
 {
     private IRegistryKey? _registryKey;
 
@@ -192,9 +192,8 @@ public sealed class GameRegistry : IGameRegistry
     }
         
 
-#if NET
+
     [MemberNotNull(nameof(_registryKey))]
-#endif
     private void ThrowIfDisposed()
     {
         if (_disposed)

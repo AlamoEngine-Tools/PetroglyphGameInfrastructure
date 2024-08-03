@@ -38,7 +38,8 @@ public class ArgumentValidatorTest
         yield return ["abc|"];
         yield return ["abc>"];
         yield return ["abc<"];
-        yield return [$"abc{'\"'}"];
+        yield return ["abc&calc.exe"];
+        yield return ["abc{'\"'}"];
     }
 
     [Theory]
@@ -90,8 +91,9 @@ public class ArgumentValidatorTest
         yield return [new StringArg("test\vvalue"), true];
         yield return [new StringArg("\0"), false];
         yield return [new StringArg("test value"), true];
+        yield return [new StringArg("test\\path with space\\"), true];
         yield return [new StringArg("testvalue "), true];
-        yield return [new StringArg("testvalue "), true];
+        yield return [new DoubleArg(1.2), false];
     }
 
     [Theory]
@@ -108,7 +110,7 @@ public class ArgumentValidatorTest
     {
         var validator = new ArgumentValidator();
         Assert.Equal(ArgumentValidityStatus.InvalidData, validator.CheckArgument(new InvalidModList(), out _, out _));
-        Assert.Equal(ArgumentValidityStatus.Valid, validator.CheckArgument(new ModArgumentList(Array.Empty<IGameArgument<string>>()), out _, out _));
+        Assert.Equal(ArgumentValidityStatus.Valid, validator.CheckArgument(new ModArgumentList(Array.Empty<ModArgument>()), out _, out _));
     }
 
 
@@ -121,6 +123,18 @@ public class ArgumentValidatorTest
         public override string ValueToCommandLine()
         {
             return Value;
+        }
+    }
+
+    private class DoubleArg : NamedArgument<double>
+    {
+        public DoubleArg(double value) : base("NUMBER", value, false)
+        {
+        }
+
+        public override string ValueToCommandLine()
+        {
+            return new ArgumentValueSerializer().Serialize(Value);
         }
     }
 

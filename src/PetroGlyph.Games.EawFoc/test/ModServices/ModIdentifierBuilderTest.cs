@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.TestingUtilities;
 using Semver;
 using Testably.Abstractions.Testing;
@@ -27,6 +28,7 @@ public class ModIdentifierBuilderTest
         _fileSystem = new MockFileSystem();
         var sc = new ServiceCollection();
         sc.AddSingleton<IFileSystem>(_fileSystem);
+        sc.AddSingleton<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
         _service = new ModIdentifierBuilder(sc.BuildServiceProvider());
     }
 

@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.IO.Abstractions;
-using PG.StarWarsGame.Infrastructure.Services.FileService;
 
 namespace PG.StarWarsGame.Infrastructure;
 
@@ -18,9 +17,4 @@ public interface IPhysicalPlayableObject : IPlayableObject
     /// The filesystem used by this instance.
     /// </summary>
     IFileSystem FileSystem { get; }
-
-    /// <summary>
-    /// <see cref="IPhysicalFileService"/> service assigned to this instance.
-    /// </summary>
-    IPhysicalFileService FileService { get; }
 }
