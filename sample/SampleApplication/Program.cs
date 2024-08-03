@@ -17,7 +17,6 @@ using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Name;
-using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 
 var services = SetupApplication();

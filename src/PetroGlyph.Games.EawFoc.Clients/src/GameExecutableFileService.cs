@@ -16,7 +16,7 @@ internal class GameExecutableFileService(IServiceProvider serviceProvider) : IGa
         if (string.IsNullOrEmpty(exeFileName))
             return null;
 
-#if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET
         return game.Directory
             .EnumerateFiles(exeFileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })
             .FirstOrDefault();

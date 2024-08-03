@@ -3,9 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Games;
-#if NET
-using System.Diagnostics.CodeAnalysis;
-#endif
 
 namespace AET.SteamAbstraction;
 
