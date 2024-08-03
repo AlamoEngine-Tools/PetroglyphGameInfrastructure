@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
+using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;

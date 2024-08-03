@@ -2,6 +2,7 @@
 using System.IO.Abstractions;
 using System.Linq;
 using AET.SteamAbstraction.Library;
+using AET.SteamAbstraction.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Testably.Abstractions.Testing;

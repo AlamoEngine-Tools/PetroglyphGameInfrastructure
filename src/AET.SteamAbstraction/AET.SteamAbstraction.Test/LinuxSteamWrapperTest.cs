@@ -1,6 +1,7 @@
 using System;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
+using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;

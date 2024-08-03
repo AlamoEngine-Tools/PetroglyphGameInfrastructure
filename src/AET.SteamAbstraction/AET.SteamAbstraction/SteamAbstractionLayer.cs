@@ -1,5 +1,6 @@
 ﻿using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
+using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,7 +9,7 @@ namespace AET.SteamAbstraction;
 /// <summary>
 /// Provides initialization routines for this library.
 /// </summary>
-public class SteamAbstractionLayer
+public static class SteamAbstractionLayer
 {
     /// <summary>
     /// Adds services provided by this library to the given <paramref name="serviceCollection"/>

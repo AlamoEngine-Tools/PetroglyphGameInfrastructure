@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using AnakinRaW.CommonUtilities;
+using AET.SteamAbstraction.Registry;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction.Library;
 
-internal class SteamLibraryFinder(IServiceProvider serviceProvider) : DisposableObject, ISteamLibraryFinder
+internal class SteamLibraryFinder(IServiceProvider serviceProvider) : ISteamLibraryFinder
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-    private readonly ISteamRegistry _registry = serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
+    private readonly ISteamRegistryFactory _registryFactory = serviceProvider.GetRequiredService<ISteamRegistryFactory>();
     private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
     private readonly ISteamVdfReader _configReader = serviceProvider.GetRequiredService<ISteamVdfReader>();
 
@@ -41,7 +41,8 @@ internal class SteamLibraryFinder(IServiceProvider serviceProvider) : Disposable
 
     private IFileInfo? GetLibraryLocationsFile()
     {
-        var steamInstallLocation = _registry.InstallationDirectory;
+        using var registry = _registryFactory.CreateRegistry();
+        var steamInstallLocation = registry.InstallationDirectory;
         if (steamInstallLocation is null)
             throw new SteamException("Unable to find an installation of Steam.");
 
@@ -55,11 +56,5 @@ internal class SteamLibraryFinder(IServiceProvider serviceProvider) : Disposable
             _fileSystem.Path.Combine(steamInstallLocation.FullName, "config/libraryfolders.vdf"));
 
         return libraryLocationsFile.Exists ? libraryLocationsFile : null;
-    }
-
-    protected override void DisposeManagedResources()
-    {
-        base.DisposeManagedResources();
-        _registry.Dispose();
     }
 }

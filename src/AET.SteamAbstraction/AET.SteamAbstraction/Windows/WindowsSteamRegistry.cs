@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using System;
 using System.Linq;
+using AET.SteamAbstraction.Registry;
 using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
 

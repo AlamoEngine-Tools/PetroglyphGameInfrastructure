@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.NativeMethods;
+using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities.Registry.Windows;
 using Microsoft.Extensions.DependencyInjection;

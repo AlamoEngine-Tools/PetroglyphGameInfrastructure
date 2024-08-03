@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace AET.SteamAbstraction;
+namespace AET.SteamAbstraction.Registry;
 
 internal class SteamRegistryFactory(IServiceProvider serviceProvider) : ISteamRegistryFactory
 {

@@ -1,4 +1,4 @@
-﻿namespace AET.SteamAbstraction;
+﻿namespace AET.SteamAbstraction.Registry;
 
 internal interface ISteamRegistryFactory
 {
