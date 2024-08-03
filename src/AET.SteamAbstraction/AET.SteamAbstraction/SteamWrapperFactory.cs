@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using AET.SteamAbstraction.Registry;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;

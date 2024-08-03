@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Games;
+using AET.SteamAbstraction.Registry;
 using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -63,7 +64,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
     public virtual bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest? game)
     {
         ThrowIfSteamNotInstalled();
-        using var gameFinder = ServiceProvider.GetRequiredService<ISteamGameFinder>();
+        var gameFinder = ServiceProvider.GetRequiredService<ISteamGameFinder>();
         game = gameFinder.FindGame(gameId);
         return game is not null;
     }
