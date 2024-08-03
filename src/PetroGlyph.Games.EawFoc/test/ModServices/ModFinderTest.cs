@@ -26,7 +26,7 @@ public class ModFinderTest
         _fileSystem = new MockFileSystem();
         _idBuilder = new Mock<IModIdentifierBuilder>();
         _gameTypeResolver = new Mock<IModGameTypeResolver>();
-        sc.AddTransient(_ => _steamHelper.Object);
+        sc.AddSingleton(_ => _steamHelper.Object);
         sc.AddSingleton<IFileSystem>(_ => _fileSystem);
         sc.AddSingleton(_ => _idBuilder.Object);
         sc.AddSingleton(_ => _gameTypeResolver.Object);
@@ -93,6 +93,54 @@ public class ModFinderTest
 
         _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), false))
             .Returns("somePath");
+
+        var mods = _service.FindMods(game.Object);
+        var mod = Assert.Single(mods);
+        Assert.Equal("somePath", mod.Identifier);
+        Assert.Equal(ModType.Default, mod.Type);
+    }
+
+    [Fact]
+    public void TestNoModOfPlatform_Normal()
+    {
+        _fileSystem.Initialize().WithSubdirectory("Game/Mods/ModA");
+        var game = new Mock<IGame>();
+        game.Setup(g => g.Exists()).Returns(true);
+        game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+        game.Setup(g => g.Type).Returns(GameType.Eaw);
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
+
+        _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), false))
+            .Returns("somePath");
+
+        var resolverResult = GameType.Foc;
+        _gameTypeResolver
+            .Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, true, out resolverResult))
+            .Returns(true);
+
+        var mods = _service.FindMods(game.Object);
+        Assert.Empty(mods);
+    }
+
+    [Fact]
+    public void TestModOfCorrectPlatform_Normal()
+    {
+        _fileSystem.Initialize().WithSubdirectory("Game/Mods/ModA");
+        var game = new Mock<IGame>();
+        game.Setup(g => g.Exists()).Returns(true);
+        game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
+        game.Setup(g => g.Type).Returns(GameType.Eaw);
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
+
+        _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), false))
+            .Returns("somePath");
+
+        var resolverResult = GameType.Eaw;
+        _gameTypeResolver
+            .Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, true, out resolverResult))
+            .Returns(true);
 
         var mods = _service.FindMods(game.Object);
         var mod = Assert.Single(mods);
@@ -191,6 +239,62 @@ public class ModFinderTest
 
         _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), true))
             .Returns("workshopPath");
+
+        var mods = _service.FindMods(game.Object);
+        var mod = Assert.Single(mods);
+        Assert.Equal("workshopPath", mod.Identifier);
+        Assert.Equal(ModType.Workshops, mod.Type);
+    }
+
+    [Fact]
+    public void TestNoWsModMatchingType_Steam()
+    {
+        _fileSystem.Initialize()
+            .WithSubdirectory("Lib/workshop/content/32470/12345678");
+
+        var game = new Mock<IGame>();
+        game.Setup(g => g.Exists()).Returns(true);
+        game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
+        game.Setup(g => g.Type).Returns(GameType.Foc);
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
+        _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
+            .Returns(_fileSystem.DirectoryInfo.New("Lib/workshop/content/32470/"));
+
+        _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), true))
+            .Returns("workshopPath");
+
+        var resolverResult = GameType.Eaw;
+        _gameTypeResolver
+            .Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Workshops, true, out resolverResult))
+            .Returns(true);
+
+        var mods = _service.FindMods(game.Object);
+        Assert.Empty(mods);
+    }
+
+    [Fact]
+    public void TestNoWsMatchesType_Steam()
+    {
+        _fileSystem.Initialize()
+            .WithSubdirectory("Lib/workshop/content/32470/12345678");
+
+        var game = new Mock<IGame>();
+        game.Setup(g => g.Exists()).Returns(true);
+        game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
+        game.Setup(g => g.Type).Returns(GameType.Foc);
+        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
+        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
+        _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
+            .Returns(_fileSystem.DirectoryInfo.New("Lib/workshop/content/32470/"));
+
+        _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), true))
+            .Returns("workshopPath");
+
+        var resolverResult = GameType.Foc;
+        _gameTypeResolver
+            .Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Workshops, true, out resolverResult))
+            .Returns(true);
 
         var mods = _service.FindMods(game.Object);
         var mod = Assert.Single(mods);

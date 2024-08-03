@@ -62,9 +62,9 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
                 return false;
 
             if (!result.HasVariantModinfoFiles)
-                return TryGetGameType(modType, result.MainModinfo!.GetModinfo(), out gameType);
+                return TryGetGameType(result.MainModinfo!.GetModinfo(), out gameType);
 
-            var manySteamData = result.Variants.Select(x => x.TryGetModinfo()?.SteamData);
+            var manySteamData = result.Variants.Select(x => x.TryGetModinfo()?.SteamData).OfType<ISteamData>();
 
             var asSet = new HashSet<GameType>();
 
@@ -74,14 +74,12 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
                     asSet.Add(type);
             }
 
-            if (asSet.Count != 1)
-                return false;
-
-            gameType = asSet.First();
-            return true;
-
+            if (asSet.Count == 1)
+            {
+                gameType = asSet.First();
+                return true;
+            }
         }
-
         return false;
     }
 
@@ -96,16 +94,13 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
         if (HandleWorkshop(modLocation, modType, out gameType))
             return true;
 
-        if (modinfo is not null)
-            return TryGetGameType(modType, modinfo, out gameType);
-
-        return false;
+        return TryGetGameType(modinfo, out gameType);
     }
 
     /// <inheritdoc />
-    public bool TryGetGameType(ModType modType, IModinfo modinfo, out GameType gameType)
+    public bool TryGetGameType(IModinfo? modinfo, out GameType gameType)
     {
-        if (GetGameType(modinfo.SteamData, out gameType))
+        if (GetGameType(modinfo?.SteamData, out gameType))
             return true;
         return false;
     }

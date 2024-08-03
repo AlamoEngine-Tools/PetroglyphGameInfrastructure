@@ -47,26 +47,26 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
     }
 
     /// <inheritdoc />
-    public bool TryGetGameType(ModType modType, IModinfo modinfo, out GameType gameType)
+    public bool TryGetGameType(IModinfo? modinfo, out GameType gameType)
     {
-        if (_offlineResolver.TryGetGameType(modType, modinfo, out gameType))
+        if (_offlineResolver.TryGetGameType(modinfo, out gameType))
             return true;
-        if (modinfo.SteamData is null)
+        if (modinfo?.SteamData is null)
             return false;
         return GetGameTypeFromSteamPage(modinfo.SteamData.Id, out gameType);
     }
 
-
     private bool GetGameTypeFromSteamPage(string steamIdValue, out GameType gameType)
     {
-        gameType = default;
         if (!_steamGameHelpers.ToSteamWorkshopsId(steamIdValue, out var steamId))
             throw new InvalidOperationException($"Unable to convert '{steamIdValue}' to valid Steam Workshop ID.");
 
+        gameType = default;
 
         var nullableGameType = _gameTypeCache.GetOrAdd(steamId, id =>
         {
-            var webPage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(steamId, CultureInfo.InvariantCulture).GetAwaiter().GetResult();
+            var webPage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(steamId, CultureInfo.InvariantCulture)
+                .GetAwaiter().GetResult();
             if (webPage is null)
                 return null;
             var tagNodes = webPage.DocumentNode.SelectNodes("//div[@class='workshopTags']/a/text()");
@@ -77,7 +77,6 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
                 return GameType.Eaw;
             return null;
         });
-
 
         if (nullableGameType.HasValue)
         {
