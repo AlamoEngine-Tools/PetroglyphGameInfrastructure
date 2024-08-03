@@ -110,7 +110,7 @@ public class ModArgumentListFactoryTest
         var modList = _service.BuildArgumentList(new List<IMod> { modA.Object }, false);
 
         var arg = Assert.Single(modList.Value);
-        Assert.Equal(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "../d:/a" : "D:\\A", arg.Value);
+        Assert.Equal(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/d:/a" : "D:\\A", arg.Value);
         Assert.Equal(ArgumentNameCatalog.ModPathArg, arg.Name);
     }
 

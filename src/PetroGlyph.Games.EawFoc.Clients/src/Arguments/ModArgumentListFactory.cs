@@ -12,13 +12,13 @@ using PG.StarWarsGame.Infrastructure.Services.Steam;
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-///  Create a <see cref="ModArgumentList"/> from a given mod instance
+/// Create a <see cref="ModArgumentList"/> from a given mod instance
 /// by using a registered service instance of <see cref="IModDependencyTraverser"/>
 /// </summary>
-public class ModArgumentListFactory : IModArgumentListFactory
+internal class ModArgumentListFactory : IModArgumentListFactory
 {
     private readonly IServiceProvider _serviceProvider;
-    private IArgumentValidator? _validator;
+    private readonly IArgumentValidator _validator;
 
     /// <summary>
     /// Initializes a new builder instance.
@@ -27,6 +27,7 @@ public class ModArgumentListFactory : IModArgumentListFactory
     public ModArgumentListFactory(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _validator = serviceProvider.GetRequiredService<IArgumentValidator>();
     }
 
     /// <inheritdoc/>
@@ -35,7 +36,7 @@ public class ModArgumentListFactory : IModArgumentListFactory
         var dependencyArgs = new List<ModArgument>();
         foreach (var dependency in traversedModChain)
         {
-            // Virtual and non physical mods are just "placeholders" we cannot add them to the argument list.
+            // Virtual and non-physical mods are just "placeholders" we cannot add them to the argument list.
             if (dependency.Type == ModType.Virtual || dependency is not IPhysicalMod physicalMod)
                 continue;
             dependencyArgs.Add(BuildSingleModArgument(physicalMod, validateArgumentOnCreation));
@@ -55,7 +56,7 @@ public class ModArgumentListFactory : IModArgumentListFactory
         }
 
         // Virtual mods must have dependencies and are resolved at the time they are created.
-        // Also Mnoods with no dependencies must be physical. 
+        // Also, Mods with no dependencies must be physical. 
         // This simply results in an empty list.
         if (modInstance.Type == ModType.Virtual || modInstance is not IPhysicalMod physicalMod)
             return ModArgumentList.Empty;
@@ -86,10 +87,9 @@ public class ModArgumentListFactory : IModArgumentListFactory
         var argument = new ModArgument(argumentValue, isWorkshop);
         if (validate)
         {
-            _validator ??= _serviceProvider.GetRequiredService<IArgumentValidator>();
             var validity = _validator.CheckArgument(argument, out _, out _);
             if (validity != ArgumentValidityStatus.Valid)
-                throw new ModException(mod, $"Create mod argument for {mod} is not valid: {validity}");
+                throw new ModException(mod, $"Created mod argument for {mod} is not valid: {validity}");
         }
 
         return argument;

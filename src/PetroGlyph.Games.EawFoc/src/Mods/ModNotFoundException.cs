@@ -3,7 +3,7 @@
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// Exception indicating a queried mod, <see cref="IMod"/> or <see cref="IModReference"/> was not found in some <see cref="IModContainer"/> instance.
+/// Exception indicating a queried mod, <see cref="IMod"/> or <see cref="IModReference"/>, was not found in some <see cref="IModContainer"/> instance.
 /// </summary>
 public class ModNotFoundException : PetroglyphException
 {

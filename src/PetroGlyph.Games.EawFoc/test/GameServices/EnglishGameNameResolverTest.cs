@@ -11,7 +11,7 @@ public class EnglishGameNameResolverTest
     public void IgnoreCulture()
     {
         var resolver = new EnglishGameNameResolver();
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         resolver.ResolveName(id, CultureInfo.GetCultureInfo("de"));
         var name = resolver.ResolveName(id);
         Assert.Contains("Steam", name);
@@ -22,7 +22,7 @@ public class EnglishGameNameResolverTest
     public void EawSteamName()
     {
         var resolver = new EnglishGameNameResolver();
-        var id = new GameIdentity(GameType.EaW, GamePlatform.SteamGold);
+        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         var name = resolver.ResolveName(id);
         Assert.Contains("Steam", name);
         Assert.Contains("Empire at War", name);

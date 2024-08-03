@@ -30,7 +30,7 @@ public class RegistryGameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         var detector = new RegistryGameDetector(registry.Object, registry.Object, false, sp.Object);
-        var options = new GameDetectorOptions(GameType.EaW);
+        var options = new GameDetectorOptions(GameType.Eaw);
         var result = detector.FindGameLocation(options);
         Assert.Null(result.Location);
     }
@@ -44,7 +44,7 @@ public class RegistryGameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         var detector = new RegistryGameDetector(registry.Object, registry.Object, false, sp.Object);
-        var options = new GameDetectorOptions(GameType.EaW);
+        var options = new GameDetectorOptions(GameType.Eaw);
         var result = detector.FindGameLocation(options);
         Assert.True(result.InitializationRequired);
     }
@@ -60,7 +60,7 @@ public class RegistryGameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         var detector = new RegistryGameDetector(registry.Object, registry.Object, false, sp.Object);
-        var options = new GameDetectorOptions(GameType.EaW);
+        var options = new GameDetectorOptions(GameType.Eaw);
         var result = detector.FindGameLocation(options);
         Assert.NotNull(result.Location);
     }

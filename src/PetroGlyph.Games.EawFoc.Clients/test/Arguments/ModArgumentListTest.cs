@@ -11,7 +11,7 @@ public class ModArgumentListTest
     [Fact]
     public void TestProps()
     {
-        var arg = new ModArgumentList(new List<IGameArgument<string>> { new ModArgument("path", false) });
+        var arg = new ModArgumentList(new List<ModArgument> { new ModArgument("path", false) });
         Assert.Equal(ArgumentNameCatalog.ModListArg, arg.Name);
         Assert.Equal(ArgumentKind.ModList, arg.Kind);
         Assert.Empty(arg.ValueToCommandLine());
@@ -27,24 +27,17 @@ public class ModArgumentListTest
     }
 
     [Fact]
-    public void TestNotValid()
-    {
-        var arg = new ModArgumentList(new List<IGameArgument<string>> { new InvalidModArg() });
-        Assert.False(arg.IsValid(out _));
-    }
-
-    [Fact]
     public void TestEquals()
     {
         var a = ModArgumentList.Empty;
-        var b = new ModArgumentList(new List<IGameArgument<string>>());
+        var b = new ModArgumentList(new List<ModArgument>());
         Assert.True(a.Equals(b));
 
-        var c = new ModArgumentList(new List<IGameArgument<string>> { new ModArgument("path", false) });
+        var c = new ModArgumentList(new List<ModArgument> { new ModArgument("path", false) });
         Assert.False(a.Equals(c));
-        var d = new ModArgumentList(new List<IGameArgument<string>> { new ModArgument("path", true) });
+        var d = new ModArgumentList(new List<ModArgument> { new ModArgument("path", true) });
         Assert.False(c.Equals(d));
-        var e = new ModArgumentList(new List<IGameArgument<string>> { new ModArgument("path", true) });
+        var e = new ModArgumentList(new List<ModArgument> { new ModArgument("path", true) });
         Assert.True(d.Equals(e));
     }
 

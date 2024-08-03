@@ -32,7 +32,7 @@ internal sealed class LowRamArgument() : FlagArgument(ArgumentNameCatalog.LowRam
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class MCEArgument() : FlagArgument(ArgumentNameCatalog.LowRamArg, true, true);
+internal sealed class MCEArgument() : FlagArgument(ArgumentNameCatalog.MCEArg, true, true);
 
 #endregion
 

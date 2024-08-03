@@ -28,12 +28,12 @@ public class GameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         sp.Setup(p => p.GetService(typeof(IGamePlatformIdentifier))).Returns(identifier.Object);
-        var detector = new Mock<GameDetector>(sp.Object, false);
+        var detector = new Mock<GameDetectorBase>(sp.Object, false);
 
         var options = new GameDetectorOptions(GameType.Foc);
 
         detector.Setup(d => d.FindGameLocation(options))
-            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
+            .Returns(new GameDetectorBase.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
 
 
         var result = detector.Object.Detect(options);
@@ -57,12 +57,12 @@ public class GameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         sp.Setup(p => p.GetService(typeof(IGamePlatformIdentifier))).Returns(identifier.Object);
-        var detector = new Mock<GameDetector>(sp.Object, false);
+        var detector = new Mock<GameDetectorBase>(sp.Object, false);
 
         var options = new GameDetectorOptions(GameType.Foc);
 
         detector.Setup(d => d.FindGameLocation(options))
-            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
+            .Returns(new GameDetectorBase.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
 
 
         var result = detector.Object.Detect(options);
@@ -86,7 +86,7 @@ public class GameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         sp.Setup(p => p.GetService(typeof(IGamePlatformIdentifier))).Returns(identifier.Object);
-        var detector = new Mock<GameDetector>(sp.Object, false);
+        var detector = new Mock<GameDetectorBase>(sp.Object, false);
 
         var options = new GameDetectorOptions(GameType.Foc);
 
@@ -115,12 +115,12 @@ public class GameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         sp.Setup(p => p.GetService(typeof(IGamePlatformIdentifier))).Returns(identifier.Object);
-        var detector = new Mock<GameDetector>(sp.Object, false);
+        var detector = new Mock<GameDetectorBase>(sp.Object, false);
 
         var options = new GameDetectorOptions(GameType.Foc);
 
         detector.Setup(d => d.FindGameLocation(options))
-            .Returns(new GameDetector.GameLocationData { InitializationRequired = true });
+            .Returns(new GameDetectorBase.GameLocationData { InitializationRequired = true });
 
         var eventRaised = false;
         detector.Object.InitializationRequested += (_, _) => eventRaised = true;
@@ -148,13 +148,13 @@ public class GameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         sp.Setup(p => p.GetService(typeof(IGamePlatformIdentifier))).Returns(identifier.Object);
-        var detector = new Mock<GameDetector>(sp.Object, true);
+        var detector = new Mock<GameDetectorBase>(sp.Object, true);
 
         var options = new GameDetectorOptions(GameType.Foc);
 
         detector.SetupSequence(d => d.FindGameLocation(options))
-            .Returns(new GameDetector.GameLocationData { InitializationRequired = true })
-            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
+            .Returns(new GameDetectorBase.GameLocationData { InitializationRequired = true })
+            .Returns(new GameDetectorBase.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
 
         var eventRaised = false;
         detector.Object.InitializationRequested += (_, args) =>
@@ -186,12 +186,12 @@ public class GameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         sp.Setup(p => p.GetService(typeof(IGamePlatformIdentifier))).Returns(identifier.Object);
-        var detector = new Mock<GameDetector>(sp.Object, true);
+        var detector = new Mock<GameDetectorBase>(sp.Object, true);
 
         var options = new GameDetectorOptions(GameType.Foc);
 
         detector.Setup(d => d.FindGameLocation(options))
-            .Returns(new GameDetector.GameLocationData { InitializationRequired = true });
+            .Returns(new GameDetectorBase.GameLocationData { InitializationRequired = true });
 
         var eventRaised = false;
         detector.Object.InitializationRequested += (_, _) => { eventRaised = true; };
@@ -220,7 +220,7 @@ public class GameDetectorTest
         var sp = new Mock<IServiceProvider>();
         sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
         sp.Setup(p => p.GetService(typeof(IGamePlatformIdentifier))).Returns(identifier.Object);
-        var detector = new Mock<GameDetector>(sp.Object, false);
+        var detector = new Mock<GameDetectorBase>(sp.Object, false);
 
         var options = new GameDetectorOptions(GameType.Foc)
         {
@@ -231,7 +231,7 @@ public class GameDetectorTest
         };
 
         detector.Setup(d => d.FindGameLocation(options))
-            .Returns(new GameDetector.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
+            .Returns(new GameDetectorBase.GameLocationData { Location = fs.DirectoryInfo.New("Game") });
 
 
         var result = detector.Object.Detect(options);

@@ -7,12 +7,12 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 /// <summary>
 /// Special argument which holds an ordered list of arguments to represent a mod chain.
 /// </summary>
-public sealed class ModArgumentList : GameArgument<IReadOnlyList<IGameArgument<string>>>
+public sealed class ModArgumentList : GameArgument<IReadOnlyList<ModArgument>>
 {
     /// <summary>
     /// Empty <see cref="ModArgumentList"/>.
     /// </summary>
-    public static ModArgumentList Empty = new(new List<NamedArgument<string>>(0));
+    public static ModArgumentList Empty = new(new List<ModArgument>(0));
 
     /// <summary>
     /// This is always <see cref="ArgumentKind.ModList"/>.
@@ -26,7 +26,7 @@ public sealed class ModArgumentList : GameArgument<IReadOnlyList<IGameArgument<s
     /// Creates a new argument from a given list of 
     /// </summary>
     /// <param name="mods">The mod arguments of this list.</param>
-    public ModArgumentList(IReadOnlyList<IGameArgument<string>> mods) : base(mods)
+    public ModArgumentList(IReadOnlyList<ModArgument> mods) : base(mods)
     {
     }
 
@@ -52,7 +52,7 @@ public sealed class ModArgumentList : GameArgument<IReadOnlyList<IGameArgument<s
             return false;
         if (ReferenceEquals(this, other))
             return true;
-        if (other is not IGameArgument<IReadOnlyList<IGameArgument<string>>> otherModList)
+        if (other is not IGameArgument<IReadOnlyList<ModArgument>> otherModList)
             return false;
         return Kind == other.Kind && Value.SequenceEqual(otherModList.Value);
     }

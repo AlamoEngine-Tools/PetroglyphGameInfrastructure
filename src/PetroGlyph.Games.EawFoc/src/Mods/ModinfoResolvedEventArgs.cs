@@ -6,7 +6,7 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 /// <summary>
 /// Event arguments used for <see cref="IMod.ModinfoResolved"/>.
 /// </summary>
-public class ModinfoResolvedEventArgs : EventArgs
+public sealed class ModinfoResolvedEventArgs : EventArgs
 {
     /// <summary>
     /// The <see cref="IMod"/> which raised the event.

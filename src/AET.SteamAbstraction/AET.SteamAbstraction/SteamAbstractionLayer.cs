@@ -23,7 +23,7 @@ public class SteamAbstractionLayer
 
         serviceCollection.AddSingleton<ISteamVdfReader>(sp => new SteamVdfReader(sp));
 
-        serviceCollection.AddTransient<ISteamLibraryFinder>(sp => new SteamLibraryFinder(sp));
-        serviceCollection.AddTransient<ISteamGameFinder>(sp => new SteamGameFinder(sp));
+        serviceCollection.AddSingleton<ISteamLibraryFinder>(sp => new SteamLibraryFinder(sp));
+        serviceCollection.AddSingleton<ISteamGameFinder>(sp => new SteamGameFinder(sp));
     }
 }

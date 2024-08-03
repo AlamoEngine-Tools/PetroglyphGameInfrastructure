@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
@@ -55,9 +56,9 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
             case ArgumentKind.KeyValue:
                 return BuildKeyValueArgument(name, value);
             case ArgumentKind.ModList:
-                if (argument is not IGameArgument<IReadOnlyList<IGameArgument<string>>> modList)
+                if (argument is not IGameArgument<IReadOnlyList<ModArgument>> modList)
                     throw new GameArgumentException(argument,
-                        "Mod List argument is expected to be of type 'IGameArgument<IReadOnlyList<IGameArgument<string>>>'");
+                        "Mod List argument is expected to be of type 'IGameArgument<IReadOnlyList<ModArgument>>'");
                 return BuildModListString(modList);
             default:
                 throw new ArgumentOutOfRangeException();
@@ -78,7 +79,7 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
         return $"{key}={value}";
     }
 
-    private string BuildModListString(IGameArgument<IReadOnlyList<IGameArgument<string>>> modList)
+    private string BuildModListString(IGameArgument<IReadOnlyList<ModArgument>> modList)
     {
         var sb = new StringBuilder();
         foreach (var modArg in modList.Value)

@@ -5,7 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients;
 /// <summary>
 /// The exception that is thrown when a game was not started successfully.
 /// </summary>
-public class GameStartException : ClientException
+public sealed class GameStartException : ClientException
 {
     /// <summary>
     /// The instance that was requested to start.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services;
@@ -13,93 +14,74 @@ namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
 public class GameFactoryTest
 {
+    private readonly GameFactory _factory;
+    private readonly Mock<IGameNameResolver> _nameResolver;
+    private readonly MockFileSystem _fileSystem = new();
+
+    public GameFactoryTest()
+    {
+        var sc = new ServiceCollection();
+        _nameResolver = new Mock<IGameNameResolver>();
+        sc.AddSingleton(_nameResolver.Object);
+        sc.AddSingleton<IFileSystem>(_fileSystem);
+        _factory = new GameFactory(sc.BuildServiceProvider());
+    }
+
     [Fact]
     public void NullCtor_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new GameFactory(null));
-        Assert.Throws<ArgumentNullException>(() => new GameFactory(null, null, null));
-        var nameResolver = new Mock<IGameNameResolver>();
-        Assert.Throws<ArgumentNullException>(() => new GameFactory(nameResolver.Object, null, null));
     }
 
     [Fact]
     public void FaultedDetection_Throws()
     {
-        var sp = new Mock<IServiceProvider>();
-        var factory = new GameFactory(sp.Object);
-        Assert.Throws<GameException>(() =>
-            factory.CreateGame(new GameDetectionResult(GameType.EaW, new Exception())));
+        Assert.Throws<GameException>(() => _factory.CreateGame(new GameDetectionResult(GameType.Eaw, new Exception()), CultureInfo.CurrentCulture));
     }
 
     [Fact]
     public void NotInstalled_Throws()
     {
-        var sp = new Mock<IServiceProvider>();
-        var nameResolver = new Mock<IGameNameResolver>();
-        nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
-        var culture = CultureInfo.GetCultureInfo("de");
-        var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
-        var detectionResult = GameDetectionResult.NotInstalled(GameType.EaW);
-        Assert.Throws<GameException>(() =>
-            factory.CreateGame(detectionResult));
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
+        var detectionResult = GameDetectionResult.NotInstalled(GameType.Eaw);
+        Assert.Throws<GameException>(() => _factory.CreateGame(detectionResult, CultureInfo.CurrentCulture));
     }
 
     [Fact]
     public void NoLocation_Throws()
-    {
-        var sp = new Mock<IServiceProvider>();
-        var nameResolver = new Mock<IGameNameResolver>();
-        nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
-        var culture = CultureInfo.GetCultureInfo("de");
-        var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
-        var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
-        Assert.Throws<ArgumentNullException>(() => factory.CreateGame(identity, null));
+    { 
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
+        var identity = new GameIdentity(GameType.Eaw, GamePlatform.Disk);
+        Assert.Throws<ArgumentNullException>(() => _factory.CreateGame(identity, null, true, CultureInfo.CurrentCulture));
     }
 
     [Fact]
     public void GameNotExists_Throws()
     {
-#if NET
-        return;
-#endif
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(new MockFileSystem());
-        var nameResolver = new Mock<IGameNameResolver>();
-        nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
-        var culture = CultureInfo.GetCultureInfo("de");
-        var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
-        var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
-        Assert.Throws<GameException>(() => factory.CreateGame(identity, new MockFileSystem().DirectoryInfo.New("Game")));
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
+        var identity = new GameIdentity(GameType.Eaw, GamePlatform.Disk);
+        Assert.Throws<GameException>(() => _factory.CreateGame(identity, _fileSystem.DirectoryInfo.New("Game"), true, CultureInfo.CurrentCulture));
     }
 
     [Fact]
     public void IgnoreGameNotExists()
-    {
-        var sp = new Mock<IServiceProvider>();
-        var nameResolver = new Mock<IGameNameResolver>();
-        nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
-        var culture = CultureInfo.GetCultureInfo("de");
-        var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
-        var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
-        var game = factory.CreateGame(identity, new MockFileSystem().DirectoryInfo.New("Game"), false);
+    { 
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
+        var identity = new GameIdentity(GameType.Eaw, GamePlatform.Disk);
+        var game = _factory.CreateGame(identity, new MockFileSystem().DirectoryInfo.New("Game"), false, CultureInfo.CurrentCulture);
         Assert.Equal(identity.Platform, game.Platform);
         Assert.Equal(identity.Type, game.Type);
     }
 
     [Fact]
     public void GameFromIdentity()
-    {
-        var sp = new Mock<IServiceProvider>();
-        var nameResolver = new Mock<IGameNameResolver>();
-        nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
-        var culture = CultureInfo.GetCultureInfo("de");
-        var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
-        var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
-        var fs = new MockFileSystem();
-        fs.Initialize()
+    { 
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
+        var identity = new GameIdentity(GameType.Eaw, GamePlatform.Disk);
+        _fileSystem.Initialize()
             .WithSubdirectory("GameData")
             .WithFile("GameData/sweaw.exe");
-        var game = factory.CreateGame(identity, fs.DirectoryInfo.New("GameData"), false);
+        var game = _factory.CreateGame(identity, _fileSystem.DirectoryInfo.New("GameData"), false, CultureInfo.CurrentCulture);
         Assert.Equal(identity.Platform, game.Platform);
         Assert.Equal(identity.Type, game.Type);
     }
@@ -107,18 +89,13 @@ public class GameFactoryTest
     [Fact]
     public void GameFromDetectionResult()
     {
-        var sp = new Mock<IServiceProvider>();
-        var nameResolver = new Mock<IGameNameResolver>();
-        nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
-        var culture = CultureInfo.GetCultureInfo("de");
-        var factory = new GameFactory(nameResolver.Object, culture, sp.Object);
-        var identity = new GameIdentity(GameType.EaW, GamePlatform.Disk);
-        var fs = new MockFileSystem();
-        var detectionResult = new GameDetectionResult(identity, fs.DirectoryInfo.New("GameData"));
-        fs.Initialize()
+        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
+        var identity = new GameIdentity(GameType.Eaw, GamePlatform.Disk);
+        var detectionResult = new GameDetectionResult(identity, _fileSystem.DirectoryInfo.New("GameData"));
+        _fileSystem.Initialize()
             .WithSubdirectory("GameData")
             .WithFile("GameData/sweaw.exe");
-        var game = factory.CreateGame(detectionResult);
+        var game = _factory.CreateGame(detectionResult, CultureInfo.CurrentCulture);
         Assert.Equal(identity.Platform, game.Platform);
         Assert.Equal(identity.Type, game.Type);
     }

@@ -68,7 +68,7 @@ public class GamePlatformIdentifierTest
 
         var locRef = Disk_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.Disk };
-        const GameType type = GameType.EaW;
+        const GameType type = GameType.Eaw;
 
         var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.Disk, actual);
@@ -96,7 +96,7 @@ public class GamePlatformIdentifierTest
 
         var locRef = Steam_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.SteamGold };
-        const GameType type = GameType.EaW;
+        const GameType type = GameType.Eaw;
 
         var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.SteamGold, actual);
@@ -124,7 +124,7 @@ public class GamePlatformIdentifierTest
 
         var locRef = Gog_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.GoG };
-        const GameType type = GameType.EaW;
+        const GameType type = GameType.Eaw;
 
         var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.GoG, actual);
@@ -152,7 +152,7 @@ public class GamePlatformIdentifierTest
 
         var locRef = DiskGold_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.DiskGold };
-        const GameType type = GameType.EaW;
+        const GameType type = GameType.Eaw;
 
         var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.DiskGold, actual);
@@ -180,7 +180,7 @@ public class GamePlatformIdentifierTest
 
         var locRef = Origin_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.Origin };
-        const GameType type = GameType.EaW;
+        const GameType type = GameType.Eaw;
 
         var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.Origin, actual);

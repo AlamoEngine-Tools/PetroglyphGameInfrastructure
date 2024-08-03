@@ -4,7 +4,6 @@ using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.StarWarsGame.Infrastructure.Services.FileService;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
@@ -12,8 +11,7 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 /// An ordinary, physical mod.
 /// </summary>
 public class Mod : ModBase, IPhysicalMod
-{
-    private IPhysicalFileService? _fileService;
+{ 
     private string? _identifier;
 
     internal string InternalPath { get; }
@@ -23,18 +21,6 @@ public class Mod : ModBase, IPhysicalMod
 
     /// <inheritdoc/>
     public IFileSystem FileSystem => Directory.FileSystem;
-
-    /// <inheritdoc/>
-    public virtual IPhysicalFileService FileService
-    {
-        get
-        {
-            if (_fileService is not null)
-                return _fileService;
-            _fileService = new DefaultFileService(this);
-            return _fileService;
-        }
-    }
 
     /// <summary>
     /// The <see cref="IModinfoFile"/> which was set by an constructor, null <see langword="null"/> otherwise;
@@ -110,6 +96,12 @@ public class Mod : ModBase, IPhysicalMod
             throw new ArgumentNullException(nameof(serviceProvider));
         Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
         InternalPath = CreateInternalPath(modDirectory);
+    }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"{Name}:{Type} @{Directory.FullName}";
     }
 
     internal string CreateInternalPath(IDirectoryInfo directory)

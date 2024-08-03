@@ -16,7 +16,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 /// this instance will raise an <see cref="IGameDetector.InitializationRequested"/> event.
 /// </para>
 /// </summary>
-public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
+public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
 {
     private const uint EaWGameId = 32470;
     private const uint FocDepotId = 32472;
@@ -34,8 +34,8 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
         _steamWrapperFactory = ServiceProvider.GetRequiredService<ISteamWrapperFactory>();
     }
 
-    /// <inheritdoc/>
-    protected override GameLocationData FindGameLocation(GameDetectorOptions options)
+    /// <inheritdoc />
+    protected internal override GameLocationData FindGameLocation(GameDetectorOptions options)
     {
         using var steam = _steamWrapperFactory.CreateWrapper();
 
@@ -57,7 +57,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
         fullGamePath = options.Type switch
         {
             GameType.Foc => FileSystem.Path.Combine(fullGamePath, "corruption"),
-            GameType.EaW => FileSystem.Path.Combine(fullGamePath, "GameData"),
+            GameType.Eaw => FileSystem.Path.Combine(fullGamePath, "GameData"),
             _ => fullGamePath
         };
 
@@ -65,7 +65,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetector
 
         try
         {
-            using var registry = _registryFactory.CreateRegistry(options.Type, ServiceProvider);
+            using var registry = _registryFactory.CreateRegistry(options.Type);
             if (registry.Type != options.Type)
                 throw new InvalidOperationException("Incompatible registry");
             if (registry.Version is null)
