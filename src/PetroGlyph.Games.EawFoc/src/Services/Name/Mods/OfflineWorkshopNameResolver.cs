@@ -26,7 +26,8 @@ public sealed class OfflineWorkshopNameResolver : ModNameResolverBase
     protected internal override string? ResolveCore(IModReference modReference, CultureInfo culture)
     {
         if (modReference.Type != ModType.Workshops)
-            throw new NotSupportedException("Can only resolve for Steam Workshop mods!");
+            return null;
+
         if (!_steamHelper.ToSteamWorkshopsId(modReference.Identifier, out var modId))
             throw new ModException(modReference, $"Cannot get SteamID from workshops object {modReference.Identifier}");
 
