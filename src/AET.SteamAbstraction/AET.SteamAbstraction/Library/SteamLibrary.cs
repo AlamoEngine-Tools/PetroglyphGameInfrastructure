@@ -16,9 +16,9 @@ internal class SteamLibrary : ISteamLibrary
 
     private readonly Dictionary<KnownLibraryLocations, string[]> _locationsNames = new()
     {
-        { KnownLibraryLocations.SteamApps, new[] { "steamapps" } },
-        { KnownLibraryLocations.Common, new[] { "steamapps", "common" } },
-        { KnownLibraryLocations.Workshops, new[] { "steamapps", "workshop" } }
+        { KnownLibraryLocations.SteamApps, ["steamapps"] },
+        { KnownLibraryLocations.Common, ["steamapps", "common"] },
+        { KnownLibraryLocations.Workshops, ["steamapps", "workshop"] }
     };
 
     private readonly string _normalizedLocation;

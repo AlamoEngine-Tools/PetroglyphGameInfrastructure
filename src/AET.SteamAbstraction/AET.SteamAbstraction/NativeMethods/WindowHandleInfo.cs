@@ -8,7 +8,7 @@ internal class WindowHandleInfo(IntPtr handle)
 {
     public List<IntPtr> GetAllChildHandles()
     {
-        List<IntPtr> childHandles = new();
+        List<IntPtr> childHandles = [];
 
         var gcChildHandlesList = GCHandle.Alloc(childHandles);
         var pointerChildHandlesList = GCHandle.ToIntPtr(gcChildHandlesList);
