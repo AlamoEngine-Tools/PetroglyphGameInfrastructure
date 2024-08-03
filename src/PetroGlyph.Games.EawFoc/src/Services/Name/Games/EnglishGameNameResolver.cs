@@ -10,11 +10,19 @@ namespace PG.StarWarsGame.Infrastructure.Services.Name;
 public sealed class EnglishGameNameResolver : IGameNameResolver
 {
     /// <summary>
+    /// Returns the english name of the game, regardless of the given <paramref name="culture"/>
+    /// </summary>
+    public string ResolveName(IGameIdentity game, CultureInfo culture)
+    {
+        return ResolveName(game);
+    }
+
+    /// <summary>
     /// Returns the english name of the game.
     /// </summary>
-    public string ResolveName(IGameIdentity game)
+    private string ResolveName(IGameIdentity game)
     {
-        if (game == null) 
+        if (game == null)
             throw new ArgumentNullException(nameof(game));
         var gameName = game.Type == GameType.Eaw
             ? PetroglyphStarWarsGameConstants.EmpireAtWarEnglishNameShort
@@ -23,11 +31,4 @@ public sealed class EnglishGameNameResolver : IGameNameResolver
         return $"{gameName} ({platform})";
     }
 
-    /// <summary>
-    /// Returns the english name of the game, regardless of the given <paramref name="culture"/>
-    /// </summary>
-    public string ResolveName(IGameIdentity game, CultureInfo culture)
-    {
-        return ResolveName(game);
-    }
 }

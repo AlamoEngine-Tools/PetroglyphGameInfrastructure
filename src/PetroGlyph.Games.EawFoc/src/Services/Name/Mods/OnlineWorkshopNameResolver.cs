@@ -4,6 +4,7 @@ using System.Globalization;
 using EawModinfo.Spec;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 
@@ -26,7 +27,7 @@ public sealed class OnlineWorkshopNameResolver : ModNameResolverBase
     }
 
     /// <inheritdoc/>
-    protected internal override string ResolveCore(IModReference modReference, CultureInfo culture)
+    protected internal override string? ResolveCore(IModReference modReference, CultureInfo culture)
     {
         if (modReference.Type != ModType.Workshops)
             throw new NotSupportedException("Can only resolve for Steam Workshop mods!");
@@ -42,21 +43,25 @@ public sealed class OnlineWorkshopNameResolver : ModNameResolverBase
             var downloader = ServiceProvider.GetService<ISteamWorkshopWebpageDownloader>() ??
                              new SteamWorkshopWebpageDownloader();
             var modsWorkshopWebpage = downloader.GetSteamWorkshopsPageHtmlAsync(modId, culture).GetAwaiter().GetResult();
-            if (modsWorkshopWebpage is null)
-                throw new InvalidOperationException("Unable to get the mod's workshop web page.");
 
-            return GetName(modsWorkshopWebpage);
+            if (modsWorkshopWebpage == null)
+            {
+                Logger?.LogTrace($"Unable to download website for Steam ID '{modId}'.");
+                return null;
+            }
+
+            return GetName(modsWorkshopWebpage, modId);
         })!;
     }
 
-    private static string GetName(HtmlDocument htmlDocument)
+    private string? GetName(HtmlDocument htmlDocument, ulong modId)
     {
-        if (htmlDocument == null)
-            throw new ArgumentNullException(nameof(htmlDocument));
-
         var node = htmlDocument.DocumentNode.SelectSingleNode("//div[contains(@class, 'workshopItemTitle')]");
         if (node is null)
-            throw new InvalidOperationException("Unable to get name form Workshop's web page. Missing 'workshopItemTitle' node.");
+        {
+            Logger?.LogTrace($"Unable to find the item title on website for Steam ID '{modId}',");
+            return null;
+        }
         return node.InnerHtml;
     }
 }

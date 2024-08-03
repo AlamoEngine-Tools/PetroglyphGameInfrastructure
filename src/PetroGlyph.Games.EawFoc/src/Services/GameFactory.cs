@@ -8,22 +8,11 @@ using PG.StarWarsGame.Infrastructure.Services.Name;
 
 namespace PG.StarWarsGame.Infrastructure.Services;
 
-/// <inheritdoc/>
-internal sealed class GameFactory : IGameFactory
+internal sealed class GameFactory(IServiceProvider serviceProvider) : IGameFactory
 {
-    private readonly IGameNameResolver _nameResolver;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IGameNameResolver _nameResolver = serviceProvider.GetRequiredService<IGameNameResolver>();
+    private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
-    /// <summary>
-    /// Creates a new factory instances. Uses <see cref="EnglishGameNameResolver"/> for the game's name resolution.
-    /// </summary>
-    /// <param name="serviceProvider">The service provider which gets passed to the game instances.</param>
-    public GameFactory(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _nameResolver = serviceProvider.GetRequiredService<IGameNameResolver>();
-    }
-    
     /// <inheritdoc/>
     public IGame CreateGame(GameDetectionResult gameDetection, CultureInfo culture)
     {
@@ -45,7 +34,10 @@ internal sealed class GameFactory : IGameFactory
             throw new ArgumentException("Cannot create a game with undefined platform");
 
         var name = _nameResolver.ResolveName(identity, culture);
-        var game = new PetroglyphStarWarsGame(identity, location, name, _serviceProvider);
+        if (string.IsNullOrEmpty(name))
+            throw new GameException("Cannot create game with null or empty name.");
+
+        var game = new PetroglyphStarWarsGame(identity, location, name!, _serviceProvider);
         if (checkGameExists && !game.Exists())
             throw new GameException($"Game does not exists at location: {location}");
 

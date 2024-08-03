@@ -1,7 +1,7 @@
 ﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-/// Indicates the validity of a <see cref="IGameArgument"/>
+/// Indicates the validity of a <see cref="IGameArgument"/>.
 /// </summary>
 public enum ArgumentValidityStatus
 {

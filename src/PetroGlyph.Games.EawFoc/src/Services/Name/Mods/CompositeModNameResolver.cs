@@ -4,12 +4,11 @@ using System.Globalization;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
-/// <see cref="IModNameResolver"/> which takes a sorted list of <see cref="IModNameResolver"/> and returns the first valid result.
+/// <see cref="IModNameResolver"/> which takes a sorted list of <see cref="IModNameResolver"/> and returns the first non-null or non-empty result.
 /// </summary>
 public sealed class CompositeModNameResolver : IModNameResolver
 {
@@ -17,7 +16,7 @@ public sealed class CompositeModNameResolver : IModNameResolver
     private readonly ILogger? _logger;
 
     /// <summary>
-    /// Create a new instance.
+    /// Initializes a new instance of the <see cref="CompositeModNameResolver"/> class with a factory method for subsequent resolvers.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="resolverFactory">Factory method to create a list of <see cref="IModNameResolver"/>.</param>
@@ -25,7 +24,8 @@ public sealed class CompositeModNameResolver : IModNameResolver
     {
         if (serviceProvider == null)
             throw new ArgumentNullException(nameof(serviceProvider));
-        if (resolverFactory == null) throw new ArgumentNullException(nameof(resolverFactory));
+        if (resolverFactory == null)
+            throw new ArgumentNullException(nameof(resolverFactory));
         var resolvers = resolverFactory(serviceProvider);
         ThrowHelper.ThrowIfCollectionNullOrEmpty(resolvers);
         _resolvers = resolvers;
@@ -33,7 +33,7 @@ public sealed class CompositeModNameResolver : IModNameResolver
     }
 
     /// <inheritdoc/>
-    public string ResolveName(IModReference modReference, CultureInfo culture)
+    public string? ResolveName(IModReference modReference, CultureInfo culture)
     {
         if (modReference == null)
             throw new ArgumentNullException(nameof(modReference));
@@ -44,24 +44,19 @@ public sealed class CompositeModNameResolver : IModNameResolver
         {
             try
             {
-                try
-                {
-                    _logger?.LogDebug($"Resolving mod name with {nameResolver}");
-                    var name = nameResolver.ResolveName(modReference, culture);
-                    if (!string.IsNullOrEmpty(name))
-                        return name;
-                }
-                catch (Exception e)
-                {
-                    throw new ModException(modReference, "Error while resolving a mod's name", e);
-                }
+                _logger?.LogDebug($"Resolving mod name with {nameResolver}");
+                var name = nameResolver.ResolveName(modReference, culture);
+                if (!string.IsNullOrEmpty(name))
+                    return name;
             }
-            catch (ModException e)
+            catch (Exception e)
             {
-                _logger?.LogDebug(e, e.Message);
+                _logger?.LogDebug(e, $"Error while resolving mod name for '{modReference}' with resolver {nameResolver.GetType()}: {e.Message}");
+                throw;
             }
         }
 
-        throw new ModException(modReference, "Unable to resolve the mod's name.");
+        _logger?.LogTrace($"Unable to resolve name for '{modReference}'");
+        return null;
     }
 }
