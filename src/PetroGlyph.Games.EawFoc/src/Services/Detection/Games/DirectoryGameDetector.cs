@@ -66,7 +66,7 @@ public sealed class DirectoryGameDetector : GameDetectorBase
     private IDirectoryInfo? FindSuitableSubDirectory(GameType type)
     {
         var subDirectories = type switch
-#if NET
+#if NET || NETSTANDARD2_1_OR_GREATER
         {
             GameType.Eaw => _directory.EnumerateDirectories(KnownEawSubDirName,
                 new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = true }),

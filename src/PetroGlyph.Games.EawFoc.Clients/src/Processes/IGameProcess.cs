@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-#if NETSTANDARD2_0_OR_GREATER
-#endif
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 

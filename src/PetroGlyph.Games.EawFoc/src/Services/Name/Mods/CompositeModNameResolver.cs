@@ -44,14 +44,14 @@ public sealed class CompositeModNameResolver : IModNameResolver
         {
             try
             {
-                _logger?.LogDebug($"Resolving mod name with {nameResolver}");
+                _logger?.LogTrace($"Resolving mod name with {nameResolver}");
                 var name = nameResolver.ResolveName(modReference, culture);
                 if (!string.IsNullOrEmpty(name))
                     return name;
             }
             catch (Exception e)
             {
-                _logger?.LogDebug(e, $"Error while resolving mod name for '{modReference}' with resolver {nameResolver.GetType()}: {e.Message}");
+                _logger?.LogError(e, $"Error while resolving mod name for '{modReference}' with resolver {nameResolver.GetType()}: {e.Message}");
                 throw;
             }
         }
