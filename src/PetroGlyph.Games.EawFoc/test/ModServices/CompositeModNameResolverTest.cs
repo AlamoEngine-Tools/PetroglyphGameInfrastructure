@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
-using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Name;
 using Xunit;
 
@@ -44,19 +42,19 @@ public class CompositeModNameResolverTest
     }
 
     [Fact]
-    public void RequiresInvariant_Throws()
+    public void ReturnsNull()
     {
         var sp = new Mock<IServiceProvider>();
 
         var internalResolver = new Mock<IModNameResolver>();
         internalResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), It.IsAny<CultureInfo>()))
-            .Returns((string)null!);
+            .Returns((string?)null);
 
         var modRef = new ModReference("Id", ModType.Default);
 
         var resolver = new CompositeModNameResolver(sp.Object, _ => [internalResolver.Object]);
 
-        Assert.Throws<ModException>(() => resolver.ResolveName(modRef, CultureInfo.InvariantCulture));
+        Assert.Null(resolver.ResolveName(modRef, CultureInfo.InvariantCulture));
     }
 
 
@@ -89,12 +87,12 @@ public class CompositeModNameResolverTest
 
         var internalResolver = new Mock<IModNameResolver>();
         internalResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), It.IsAny<CultureInfo>()))
-            .Throws<Exception>();
+            .Throws<InvalidOperationException>();
 
         var modRef = new ModReference("Id", ModType.Default);
 
         var resolver = new CompositeModNameResolver(sp.Object, _ => [internalResolver.Object]);
 
-        Assert.Throws<ModException>(() => resolver.ResolveName(modRef, CultureInfo.InvariantCulture));
+        Assert.Throws<InvalidOperationException>(() => resolver.ResolveName(modRef, CultureInfo.InvariantCulture));
     }
 }

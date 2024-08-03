@@ -23,13 +23,13 @@ public sealed class OfflineWorkshopNameResolver : ModNameResolverBase
     }
 
     /// <inheritdoc/>
-    protected internal override string ResolveCore(IModReference modReference, CultureInfo culture)
+    protected internal override string? ResolveCore(IModReference modReference, CultureInfo culture)
     {
         if (modReference.Type != ModType.Workshops)
             throw new NotSupportedException("Can only resolve for Steam Workshop mods!");
         if (!_steamHelper.ToSteamWorkshopsId(modReference.Identifier, out var modId))
             throw new ModException(modReference, $"Cannot get SteamID from workshops object {modReference.Identifier}");
 
-        return _workshopCache.ContainsMod(modId) ? _workshopCache.GetName(modId) : null!;
+        return _workshopCache.ContainsMod(modId) ? _workshopCache.GetName(modId) : null;
     }
 }

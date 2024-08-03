@@ -32,7 +32,7 @@ public abstract class ModNameResolverBase : IModNameResolver
     }
 
     /// <inheritdoc/>
-    public string ResolveName(IModReference modReference, CultureInfo culture)
+    public string? ResolveName(IModReference modReference, CultureInfo culture)
     {
         if (modReference == null)
             throw new ArgumentNullException(nameof(modReference));
@@ -43,19 +43,13 @@ public abstract class ModNameResolverBase : IModNameResolver
         {
             var name = ResolveCore(modReference, culture);
             if (string.IsNullOrEmpty(name))
-                throw new PetroglyphException($"Unable to resolve the mod's name {modReference}");
+                Logger?.LogTrace($"Resolver '{this}' resolved null or empty name for '{modReference}'.");
             return name;
-        }
-        catch (PetroglyphException ex)
-        {
-            Logger?.LogError(ex, ex.Message);
-            throw;
         }
         catch (Exception ex)
         {
-            var e = new PetroglyphException($"Unable to resolve the mod's name {modReference}: {this}", ex);
-            Logger?.LogError(e, e.Message);
-            throw e;
+            Logger?.LogError(ex, $"Resolver '{this}' had an error while resolving the name for {modReference}: {ex.Message}");
+            throw;
         }
     }
 
@@ -71,5 +65,5 @@ public abstract class ModNameResolverBase : IModNameResolver
     /// <param name="modReference">The target <see cref="IModReference"/>.</param>
     /// <param name="culture">The target <see cref="CultureInfo"/>.</param>
     /// <returns>The resolved name or <see langword="null"/>.</returns>
-    protected internal abstract string ResolveCore(IModReference modReference, CultureInfo culture);
+    protected internal abstract string? ResolveCore(IModReference modReference, CultureInfo culture);
 }

@@ -13,7 +13,7 @@ public class EnglishGameNameResolverTest
         var resolver = new EnglishGameNameResolver();
         var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
         resolver.ResolveName(id, CultureInfo.GetCultureInfo("de"));
-        var name = resolver.ResolveName(id);
+        var name = resolver.ResolveName(id, CultureInfo.CurrentCulture);
         Assert.Contains("Steam", name);
         Assert.Contains("Empire at War", name);
     }
@@ -23,7 +23,7 @@ public class EnglishGameNameResolverTest
     {
         var resolver = new EnglishGameNameResolver();
         var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
-        var name = resolver.ResolveName(id);
+        var name = resolver.ResolveName(id, CultureInfo.InvariantCulture);
         Assert.Contains("Steam", name);
         Assert.Contains("Empire at War", name);
     }
@@ -33,7 +33,7 @@ public class EnglishGameNameResolverTest
     {
         var resolver = new EnglishGameNameResolver();
         var id = new GameIdentity(GameType.Foc, GamePlatform.SteamGold);
-        var name = resolver.ResolveName(id);
+        var name = resolver.ResolveName(id, CultureInfo.CurrentCulture);
         Assert.Contains("Steam", name);
         Assert.Contains("Corruption", name);
     }
@@ -43,7 +43,7 @@ public class EnglishGameNameResolverTest
     {
         var resolver = new EnglishGameNameResolver();
         var id = new GameIdentity(GameType.Foc, GamePlatform.Disk);
-        var name = resolver.ResolveName(id);
+        var name = resolver.ResolveName(id, CultureInfo.InvariantCulture);
         Assert.DoesNotContain("Steam", name);
         Assert.Contains("Corruption", name);
     }

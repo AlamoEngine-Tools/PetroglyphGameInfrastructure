@@ -14,5 +14,5 @@ public interface IGameNameResolver
     /// <param name="game">The game which name shall get resolved.</param>
     /// <param name="culture">The culture context.</param>
     /// <returns>The resolved name.</returns>
-    string ResolveName(IGameIdentity game, CultureInfo culture);
+    string? ResolveName(IGameIdentity game, CultureInfo culture);
 }
