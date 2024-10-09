@@ -18,6 +18,7 @@ internal class ModFinder : IModReferenceFinder
     private readonly ISteamGameHelpers _steamHelper;
     private readonly IModIdentifierBuilder _idBuilder;
     private readonly IModGameTypeResolver _gameTypeResolver;
+    private readonly IModinfoFileFinder _modinfoFileFinder;
 
     /// <summary>
     /// Creates a new instance.
@@ -30,6 +31,7 @@ internal class ModFinder : IModReferenceFinder
         _idBuilder = serviceProvider.GetRequiredService<IModIdentifierBuilder>();
         _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
         _gameTypeResolver = serviceProvider.GetRequiredService<IModGameTypeResolver>();
+        _modinfoFileFinder = serviceProvider.GetRequiredService<IModinfoFileFinder>();
     }
 
     /// <summary>
@@ -39,7 +41,7 @@ internal class ModFinder : IModReferenceFinder
     /// <returns>A set of <see cref="IModReference"/>s.
     /// The <see cref="IModReference.Identifier"/> either holds the absolute path or Steam Workshops ID.</returns>
     /// <exception cref="GameException">If the <paramref name="game"/> is not installed.</exception>
-    public ISet<IModReference> FindMods(IGame game)
+    public ISet<DetectedModReference> FindMods(IGame game)
     {
         if (game == null)
             throw new ArgumentNullException(nameof(game));
@@ -47,25 +49,25 @@ internal class ModFinder : IModReferenceFinder
         if (!game.Exists())
             throw new GameException("The game does not exist");
 
-        var mods = new HashSet<IModReference>();
+        var mods = new HashSet<DetectedModReference>();
         foreach (var modReference in GetNormalMods(game).Union(GetWorkshopsMods(game)))
             mods.Add(modReference);
         return mods;
     }
 
-    private IEnumerable<ModReference> GetNormalMods(IGame game)
+    private IEnumerable<DetectedModReference> GetNormalMods(IGame game)
     {
         return GetAllModsFromPath(game.ModsLocation, false, game.Type);
     }
 
-    private IEnumerable<ModReference> GetWorkshopsMods(IGame game)
+    private IEnumerable<DetectedModReference> GetWorkshopsMods(IGame game)
     {
         return game.Platform != GamePlatform.SteamGold
             ? []
             : GetAllModsFromPath(_steamHelper.GetWorkshopsLocation(game), true, game.Type);
     }
 
-    private IEnumerable<ModReference> GetAllModsFromPath(IDirectoryInfo lookupDirectory, bool isWorkshopsPath, GameType requestedGameType)
+    private IEnumerable<DetectedModReference> GetAllModsFromPath(IDirectoryInfo lookupDirectory, bool isWorkshopsPath, GameType requestedGameType)
     {
         if (!lookupDirectory.Exists)
             yield break;
@@ -74,13 +76,37 @@ internal class ModFinder : IModReferenceFinder
 
         foreach (var modDirectory in lookupDirectory.EnumerateDirectories())
         {
-            // If the type resolver was unable to find the type, we have to assume that the current mod matches to the game.
-            // Otherwise, we'd produce false negatives. Only if the resolver was able to determine a result, we use that finding.
-            if (_gameTypeResolver.TryGetGameType(modDirectory, type, true, out var actualGameType) && requestedGameType != actualGameType)
+            var modinfoFiles = _modinfoFileFinder.Find(FindOptions.FindAny);
+            
+            var mainModinfo = modinfoFiles.MainModinfo?.TryGetModinfo();
+
+            if (IsDefinitelyNotGameType(requestedGameType, modDirectory, type, mainModinfo))
                 continue;
 
             var id = _idBuilder.Build(modDirectory, isWorkshopsPath);
-            yield return new ModReference(id, type);
+            yield return new DetectedModReference(new ModReference(id, type), mainModinfo);
+
+            foreach (var variantModinfoFile in modinfoFiles.Variants)
+            {
+                var variantModinfo = variantModinfoFile.TryGetModinfo();
+                if (variantModinfo is null)
+                    continue;
+
+
+                if (IsDefinitelyNotGameType(requestedGameType, modDirectory, type, variantModinfo))
+                    continue;
+
+                id = _idBuilder.Build(modDirectory, isWorkshopsPath);
+                yield return new DetectedModReference(new ModReference(id, type), variantModinfo);
+            }
         }
+    }
+
+    private bool IsDefinitelyNotGameType(GameType expected, IDirectoryInfo modDirectory, ModType modType, IModinfo? modinfo)
+    {
+        // If the type resolver was unable to find the type, we have to assume that the current mod matches to the game.
+        // Otherwise, we'd produce false negatives. Only if the resolver was able to determine a result, we use that finding.
+        return _gameTypeResolver.TryGetGameType(modDirectory, modType, modinfo, out var variantGameType) &&
+               expected != variantGameType;
     }
 }

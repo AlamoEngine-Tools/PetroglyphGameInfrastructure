@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
-using EawModinfo.File;
 using EawModinfo.Spec;
 using EawModinfo.Spec.Steam;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +22,30 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
     private readonly ISteamWorkshopCache _cache = serviceProvider.GetRequiredService<ISteamWorkshopCache>();
     private readonly ISteamGameHelpers _steamGameHelpers = serviceProvider.GetRequiredService<ISteamGameHelpers>();
 
+    /// <inheritdoc />
+    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out GameType gameType)
+    {
+        gameType = default;
+
+        if (modType == ModType.Virtual)
+            return false;
+
+        if (HandleWorkshop(modLocation, modType, out gameType))
+            return true;
+
+        if (TryGetGameType(modinfo, out gameType))
+            return true;
+
+        // TODO: If mod is in game\mods\modDir return gametype of the game.
+        return false;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetGameType(IModinfo? modinfo, out GameType gameType)
+    {
+        return GetGameType(modinfo?.SteamData, out gameType);
+    }
+
     private bool HandleWorkshop(IDirectoryInfo directory, ModType modType, out GameType gameType)
     {
         gameType = default;
@@ -40,71 +63,7 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
 
         return false;
     }
-
-
-    /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, bool searchModInfo, out GameType gameType)
-    {
-        gameType = default;
-        
-        if (modType == ModType.Virtual)
-            throw new NotSupportedException("Virtual mods do not support the file system.");
-
-        if (HandleWorkshop(modLocation, modType, out gameType))
-            return true;
-
-        if (searchModInfo)
-        {
-            var modinfoFinder = new ModinfoFileFinder(modLocation);
-            var result = modinfoFinder.Find(FindOptions.FindAny);
-
-            if (result is { HasMainModinfoFile: false, HasVariantModinfoFiles: false })
-                return false;
-
-            if (!result.HasVariantModinfoFiles)
-                return TryGetGameType(result.MainModinfo!.GetModinfo(), out gameType);
-
-            var manySteamData = result.Variants.Select(x => x.TryGetModinfo()?.SteamData).OfType<ISteamData>();
-
-            var asSet = new HashSet<GameType>();
-
-            foreach (var steamData in manySteamData)
-            {
-                if (GetGameType(steamData, out var type))
-                    asSet.Add(type);
-            }
-
-            if (asSet.Count == 1)
-            {
-                gameType = asSet.First();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out GameType gameType)
-    {
-        gameType = default;
-
-        if (modType == ModType.Virtual)
-            throw new NotSupportedException("Virtual mods do not support the file system.");
-
-        if (HandleWorkshop(modLocation, modType, out gameType))
-            return true;
-
-        return TryGetGameType(modinfo, out gameType);
-    }
-
-    /// <inheritdoc />
-    public bool TryGetGameType(IModinfo? modinfo, out GameType gameType)
-    {
-        if (GetGameType(modinfo?.SteamData, out gameType))
-            return true;
-        return false;
-    }
-
+    
     private static bool GetGameType(ISteamData? steamData, out GameType gameType)
     {
         gameType = GameType.Eaw;

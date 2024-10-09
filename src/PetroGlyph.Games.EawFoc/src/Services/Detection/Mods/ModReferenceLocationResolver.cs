@@ -17,7 +17,6 @@ internal class ModReferenceLocationResolver : IModReferenceLocationResolver
 {
     private readonly IFileSystem _fileSystem;
     private readonly ISteamGameHelpers _steamHelper;
-    private readonly IModGameTypeResolver _modGameTypeResolver;
 
     /// <summary>
     /// Creates a new instance.
@@ -27,11 +26,10 @@ internal class ModReferenceLocationResolver : IModReferenceLocationResolver
     {
         _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
-        _modGameTypeResolver = serviceProvider.GetRequiredService<IModGameTypeResolver>();
     }
 
     /// <inheritdoc/>
-    public IDirectoryInfo ResolveLocation(IModReference mod, IGame game, bool checkModGameType)
+    public IDirectoryInfo ResolveLocation(IModReference mod, IGame game)
     {
         if (mod == null)
             throw new ArgumentNullException(nameof(mod));
@@ -44,15 +42,15 @@ internal class ModReferenceLocationResolver : IModReferenceLocationResolver
                 "Resolving physical location for a virtual mod is not allowed."),
             ModType.Workshops when game.Platform != GamePlatform.SteamGold => throw new ModException(mod,
                 "Trying to find a workshop mods for a non-Steam game instance"),
-            _ => mod.Type == ModType.Workshops ? ResolveWorkshopsMod(mod, game, checkModGameType) : ResolveNormalMod(mod, game, checkModGameType)
+            _ => mod.Type == ModType.Workshops ? ResolveWorkshopsMod(mod, game) : ResolveNormalMod(mod, game)
         };
     }
 
-    private IDirectoryInfo ResolveWorkshopsMod(IModReference mod, IGame game, bool checkGameType)
+    private IDirectoryInfo ResolveWorkshopsMod(IModReference mod, IGame game)
     {
         if (mod is IPhysicalMod physicalMod)
         {
-            if (checkGameType && game.Type != physicalMod.Game.Type)
+            if (game.Type != physicalMod.Game.Type)
                 throw new ModException(mod, $"The mod '{mod}' does not belong to the game '{game}'.");
             return physicalMod.Directory;
         }
@@ -68,17 +66,14 @@ internal class ModReferenceLocationResolver : IModReferenceLocationResolver
         if (modLocation is null || !modLocation.Exists)
             throw new ModNotFoundException(mod, game);
 
-        if (checkGameType) 
-            CheckModGameType(mod, modLocation, ModType.Workshops, game);
-
         return modLocation;
     }
 
-    private IDirectoryInfo ResolveNormalMod(IModReference mod, IGame game, bool checkGameType)
+    private IDirectoryInfo ResolveNormalMod(IModReference mod, IGame game)
     {
         if (mod is IPhysicalMod physicalMod)
         {
-            if (checkGameType && game.Type != physicalMod.Game.Type)
+            if (game.Type != physicalMod.Game.Type)
                 throw new ModException(mod, $"The mod '{mod}' does not belong to the game '{game}'.");
             return physicalMod.Directory;
         }
@@ -99,16 +94,7 @@ internal class ModReferenceLocationResolver : IModReferenceLocationResolver
         
         if (modLocation is null || !modLocation.Exists)
             throw new ModNotFoundException(mod, game);
-
-        if (checkGameType) 
-            CheckModGameType(mod, modLocation, ModType.Default, game);
-
+        
         return modLocation;
-    }
-
-    private void CheckModGameType(IModReference mod, IDirectoryInfo modLocation, ModType modType, IGame game)
-    {
-        if (_modGameTypeResolver.TryGetGameType(modLocation, modType, true, out var gameType) && gameType != game.Type)
-            throw new ModException(mod, $"The mod '{mod}' does not belong to the game '{game}'.");
     }
 }

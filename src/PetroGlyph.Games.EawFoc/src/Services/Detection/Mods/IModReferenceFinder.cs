@@ -14,5 +14,5 @@ public interface IModReferenceFinder
     /// </summary>
     /// <param name="game">The target game.</param>
     /// <returns>A set of found <see cref="IModReference"/>s.</returns>
-    ISet<IModReference> FindMods(IGame game);
+    ISet<DetectedModReference> FindMods(IGame game);
 }

@@ -56,7 +56,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
             .Returns(modLoc);
 
         _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
@@ -79,7 +79,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
             .Returns(modLoc);
         var modinfo = new Mock<IModinfo>();
         modinfo.Setup(m => m.Name).Returns("MyName");
@@ -88,7 +88,7 @@ public class ModFactoryTest
         modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
         var mainFile = new Mock<IModinfoFile>();
         mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
-        mainFile.Setup(m => m.GetModinfo()).Returns(modinfo.Object);
+        mainFile.Setup(m => m.TryGetModinfo()).Returns(modinfo.Object);
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
 
@@ -105,7 +105,7 @@ public class ModFactoryTest
         var game = new Mock<IGame>();
         game.SetupGet(g => g.Type).Returns(GameType.Eaw);
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
             .Returns(modLoc);
         var modinfo = new Mock<IModinfo>();
         modinfo.Setup(m => m.Name).Returns("MyName");
@@ -114,7 +114,7 @@ public class ModFactoryTest
         modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
         var mainFile = new Mock<IModinfoFile>();
         mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
-        mainFile.Setup(m => m.GetModinfo()).Returns(modinfo.Object);
+        mainFile.Setup(m => m.TryGetModinfo()).Returns(modinfo.Object);
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
 
@@ -133,7 +133,7 @@ public class ModFactoryTest
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
             .Returns(modLoc);
 
         var variantA = new Mock<IModinfo>();
@@ -143,7 +143,7 @@ public class ModFactoryTest
         variantA.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
         var variantFileA = new Mock<IModinfoFile>();
         variantFileA.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-        variantFileA.Setup(m => m.GetModinfo()).Returns(variantA.Object);
+        variantFileA.Setup(m => m.TryGetModinfo()).Returns(variantA.Object);
 
         var variantB = new Mock<IModinfo>();
         variantB.Setup(m => m.Name).Returns("MyNameB");
@@ -152,7 +152,7 @@ public class ModFactoryTest
         variantB.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
         var variantFileB = new Mock<IModinfoFile>();
         variantFileB.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-        variantFileB.Setup(m => m.GetModinfo()).Returns(variantB.Object);
+        variantFileB.Setup(m => m.TryGetModinfo()).Returns(variantB.Object);
 
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object }));
@@ -171,7 +171,7 @@ public class ModFactoryTest
         var game = new Mock<IGame>();
         game.SetupGet(g => g.Type).Returns(GameType.Foc);
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
             .Returns(modLoc);
 
         var variantA = new Mock<IModinfo>();
@@ -181,7 +181,7 @@ public class ModFactoryTest
         variantA.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
         var variantFileA = new Mock<IModinfoFile>();
         variantFileA.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-        variantFileA.Setup(m => m.GetModinfo()).Returns(variantA.Object);
+        variantFileA.Setup(m => m.TryGetModinfo()).Returns(variantA.Object);
 
         var variantB = new Mock<IModinfo>();
         variantB.Setup(m => m.Name).Returns("MyNameB");
@@ -190,7 +190,7 @@ public class ModFactoryTest
         variantB.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
         var variantFileB = new Mock<IModinfoFile>();
         variantFileB.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-        variantFileB.Setup(m => m.GetModinfo()).Returns(variantB.Object);
+        variantFileB.Setup(m => m.TryGetModinfo()).Returns(variantB.Object);
 
         _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
             .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object }));
@@ -208,38 +208,13 @@ public class ModFactoryTest
     }
 
     [Fact]
-    public void TestModCreation_NoModinfoFiles()
-    {
-        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-        var game = new Mock<IGame>();
-        var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
-            .Returns(modLoc);
-
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
-
-        _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-            .Returns(new ModinfoFinderCollection(modLoc));
-
-        var modRef = new ModReference("Mods/Name", ModType.Default);
-
-        var mod = _service.FromReference(game.Object, modRef, true, CultureInfo.CurrentCulture);
-        Assert.NotNull(mod);
-        Assert.Equal("Name", mod.Name);
-
-
-        GameType result;
-        _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, null, out result), Times.Once);
-    }
-
-    [Fact]
     public void TestModCreation_WithModinfo()
     {
         _fileSystem.Initialize().WithSubdirectory("Mods/Name");
         var game = new Mock<IGame>();
         var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
 
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
+        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
             .Returns(modLoc);
         _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
 
@@ -260,162 +235,5 @@ public class ModFactoryTest
 
         GameType result;
         _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, modinfo.Object, out result), Times.Once);
-    }
-
-    [Fact]
-    public void TestModCreation_SearchMainModinfo()
-    {
-        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-        var game = new Mock<IGame>();
-        var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
-            .Returns(modLoc);
-
-        var modinfo = new Mock<IModinfo>();
-        modinfo.Setup(m => m.Name).Returns("MyName");
-        modinfo.Setup(m => m.Dependencies)
-            .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-        modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
-
-        var mainFile = new Mock<IModinfoFile>();
-        mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
-        mainFile.Setup(m => m.GetModinfo()).Returns(modinfo.Object);
-        _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-            .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
-
-
-        var modRef = new ModReference("Mods/Name", ModType.Default);
-
-        var mod = _service.FromReference(game.Object, modRef, true, CultureInfo.CurrentCulture);
-        Assert.NotNull(mod);
-        Assert.Equal("MyName", mod.Name);
-
-        GameType result;
-        _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, modinfo.Object, out result), Times.Once);
-    }
-
-    [Fact]
-    public void TestModCreation_NoSearchMainModinfo()
-    {
-        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-        var game = new Mock<IGame>();
-        var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
-            .Returns(modLoc);
-
-        var modinfo = new Mock<IModinfo>();
-        modinfo.Setup(m => m.Name).Returns("MyName");
-        modinfo.Setup(m => m.Dependencies)
-            .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-        modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
-
-        var mainFile = new Mock<IModinfoFile>();
-        mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
-        mainFile.Setup(m => m.GetModinfo()).Returns(modinfo.Object);
-        _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-            .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
-
-
-        var modRef = new ModReference("Mods/Name", ModType.Default);
-
-        var mod = _service.FromReference(game.Object, modRef, false, CultureInfo.CurrentCulture);
-        Assert.NotNull(mod);
-        Assert.Equal("Name", mod.Name);
-
-        GameType result;
-        _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, null, out result), Times.Once);
-    }
-
-    [Fact]
-    public void TestVariantModCreation_NoVariants()
-    {
-        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-        var game = new Mock<IGame>();
-        var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
-            .Returns(modLoc);
-
-        var modinfo = new Mock<IModinfo>();
-        modinfo.Setup(m => m.Name).Returns("MyName");
-        modinfo.Setup(m => m.Dependencies)
-            .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-        modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-
-        _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
-
-        _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-            .Returns(new ModinfoFinderCollection(modLoc));
-
-        var modRef = new ModReference("Mods/Name", ModType.Default);
-
-        var mods = _service.VariantsFromReference(game.Object, modRef, CultureInfo.CurrentCulture);
-        Assert.Empty(mods);
-
-
-        GameType result;
-        _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, modinfo.Object, out result), Times.Never);
-    }
-
-    [Fact]
-    public void TestVariantModCreation_TwoVariants()
-    {
-        _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-        var game = new Mock<IGame>();
-        game.SetupGet(g => g.Type).Returns(GameType.Foc);
-        var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-        _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>(), false))
-            .Returns(modLoc);
-
-        var variantA = new Mock<IModinfo>();
-        variantA.Setup(m => m.Name).Returns("MyNameA");
-        variantA.Setup(m => m.Dependencies)
-            .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-        variantA.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-        var variantFileA = new Mock<IModinfoFile>();
-        variantFileA.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-        variantFileA.Setup(m => m.GetModinfo()).Returns(variantA.Object);
-
-        var variantB = new Mock<IModinfo>();
-        variantB.Setup(m => m.Name).Returns("MyNameB");
-        variantB.Setup(m => m.Dependencies)
-            .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-        variantB.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-        var variantFileB = new Mock<IModinfoFile>();
-        variantFileB.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-        variantFileB.Setup(m => m.GetModinfo()).Returns(variantB.Object);
-
-        var variantC = new Mock<IModinfo>();
-        variantC.Setup(m => m.Name).Returns("MyNameC");
-        variantC.Setup(m => m.Dependencies)
-            .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-        variantC.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-        var variantFileC = new Mock<IModinfoFile>();
-        variantFileC.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-        variantFileC.Setup(m => m.GetModinfo()).Returns(variantC.Object);
-
-        _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-            .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object, variantFileC.Object }));
-
-        
-        var variantBType = GameType.Foc;
-        _gameTypeResolver.Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, variantB.Object, out variantBType))
-            .Returns(true);
-
-        var variantCType = GameType.Eaw;
-        _gameTypeResolver.Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, variantC.Object, out variantCType))
-            .Returns(true);
-
-
-        var modRef = new ModReference("Mods/Name", ModType.Default);
-
-        var mods = _service.VariantsFromReference(game.Object, modRef, CultureInfo.CurrentCulture);
-        Assert.Equal(2, mods.Count());
-
-        GameType anyResolve;
-        _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, It.IsAny<IModinfo>(), out anyResolve), Times.Exactly(3));
     }
 }
