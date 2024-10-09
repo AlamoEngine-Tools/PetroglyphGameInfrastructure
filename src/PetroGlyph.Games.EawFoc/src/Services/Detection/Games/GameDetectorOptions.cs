@@ -13,7 +13,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <param name="Type">The game type which shall be searched.</param>
 public sealed record GameDetectorOptions(GameType Type)
 {
-    private static readonly GamePlatform[] AnyPlatform = { GamePlatform.Undefined };
+    private static readonly GamePlatform[] AnyPlatform = [GamePlatform.Undefined];
 
     private IList<GamePlatform> _targetPlatforms = AnyPlatform;
 

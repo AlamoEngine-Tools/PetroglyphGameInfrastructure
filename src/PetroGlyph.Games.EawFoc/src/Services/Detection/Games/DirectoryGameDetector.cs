@@ -4,19 +4,10 @@ using System.IO.Abstractions;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;
-/* Nicht gemergte Änderung aus Projekt "PG.StarWarsGame.Infrastructure (net8.0)"
-Vor:
-using PG.StarWarsGame.Infrastructure.Games;
-Nach:
-using PG;
-using PG.StarWarsGame;
-using PG.StarWarsGame.Infrastructure;
-using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Services;
-using PG.StarWarsGame.Infrastructure.Services.StarWarsGame.Infrastructure.Services.Detection.Games;
-*/
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
+
+// TODO: Input directory should be directory where the .EXE is in, not the parent dir.
 
 /// <summary>
 /// Detects whether a given directory contains a Petroglyph Star Wars Game
