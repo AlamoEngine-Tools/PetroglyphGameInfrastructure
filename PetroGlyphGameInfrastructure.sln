@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AET.SteamAbstraction", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AET.SteamAbstraction.Test", "src\AET.SteamAbstraction\AET.SteamAbstraction.Test\AET.SteamAbstraction.Test.csproj", "{38FE318C-F775-4318-859C-DCAB3C6FCD71}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PG.StarWarsGame.Infrastructure.Testing", "src\Testing\PG.StarWarsGame.Infrastructure.Testing\PG.StarWarsGame.Infrastructure.Testing.csproj", "{AE6040AE-F3E7-4B8F-8C85-CB9D4D44746A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{38FE318C-F775-4318-859C-DCAB3C6FCD71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38FE318C-F775-4318-859C-DCAB3C6FCD71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38FE318C-F775-4318-859C-DCAB3C6FCD71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE6040AE-F3E7-4B8F-8C85-CB9D4D44746A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE6040AE-F3E7-4B8F-8C85-CB9D4D44746A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE6040AE-F3E7-4B8F-8C85-CB9D4D44746A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE6040AE-F3E7-4B8F-8C85-CB9D4D44746A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{C8F51821-F25D-4C4E-8050-5C559ADD39DB} = {91EC3980-0C87-484F-91E5-0FE684C1D2E0}
 		{24CA9F24-E6DC-4908-B586-E7C14515628C} = {DDF4836A-1257-4323-A288-B5F277242010}
 		{38FE318C-F775-4318-859C-DCAB3C6FCD71} = {91EC3980-0C87-484F-91E5-0FE684C1D2E0}
+		{AE6040AE-F3E7-4B8F-8C85-CB9D4D44746A} = {91EC3980-0C87-484F-91E5-0FE684C1D2E0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {76D00646-2467-4997-A19B-8299D8724D38}

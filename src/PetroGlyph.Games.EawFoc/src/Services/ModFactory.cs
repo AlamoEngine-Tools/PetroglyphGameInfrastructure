@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
 using EawModinfo.File;
-using EawModinfo.Model;
 using EawModinfo.Spec;
 using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
