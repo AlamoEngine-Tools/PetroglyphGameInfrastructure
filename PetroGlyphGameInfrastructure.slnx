@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src\AET.SteamAbstraction\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
+    <Project Path="src\PetroGlyph.Games.EawFoc.Clients\src\PG.StarWarsGame.Infrastructure.Clients.csproj" />
+    <Project Path="src\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="src\AET.SteamAbstraction\AET.SteamAbstraction.Test\AET.SteamAbstraction.Test.csproj" />
+    <Project Path="src\PetroGlyph.Games.EawFoc.Clients\test\PG.StarWarsGame.Infrastructure.Clients.Test.csproj" />
+    <Project Path="src\PetroGlyph.Games.EawFoc\test\PG.StarWarsGame.Infrastructure.Test.csproj" />
+    <Project Path="src\Testing\PG.StarWarsGame.Infrastructure.Testing\PG.StarWarsGame.Infrastructure.Testing.csproj" />
+    <Project Path="src\Testing\PG.TestingUtilities\PG.TestingUtilities.csproj" />
+  </Folder>
+  <Project Path="sample\SampleApplication\SampleApplication.csproj" />
+  <Properties Name="Visual Studio">
+    <Property Name="OpenWith" Value="17" />
+  </Properties>
+</Solution>
