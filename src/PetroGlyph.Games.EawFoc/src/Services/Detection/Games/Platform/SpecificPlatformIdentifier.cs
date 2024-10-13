@@ -23,6 +23,7 @@ internal abstract class SpecificPlatformIdentifier : ISpecificPlatformIdentifier
     }
 
     public abstract bool IsPlatformFoc(ref IDirectoryInfo location);
+
     public abstract bool IsPlatformEaw(ref IDirectoryInfo location);
 
 

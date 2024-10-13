@@ -25,7 +25,7 @@ internal class OriginIdentifier(IServiceProvider serviceProvider) : SpecificPlat
             }
         }
 
-        if (!DirectoryContainsFiles(location, new[] { "EALaunchHelper.exe" }))
+        if (!DirectoryContainsFiles(location, ["EALaunchHelper.exe"]))
             return false;
 
         return ParentContainsOriginDirectories(location);

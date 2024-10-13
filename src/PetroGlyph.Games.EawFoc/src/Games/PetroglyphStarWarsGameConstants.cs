@@ -22,4 +22,9 @@ public static class PetroglyphStarWarsGameConstants
     /// Forces of Corruption default .exe file name.
     /// </summary>
     public const string ForcesOfCorruptionExeFileName = "swfoc.exe";
+
+    /// <summary>
+    /// The game independent name of the MegaFiles.XML file.
+    /// </summary>
+    public const string MegaFilesXmlFileName = "megafiles.xml";
 }

@@ -50,7 +50,7 @@ public class ModFinderTest
     [Fact]
     public void TestNoMods_Normal()
     {
-        var game = _fileSystem.InstallGame("Game/Mods", new GameIdentity(GameType.Eaw, GamePlatform.Disk), _serviceProvider);
+        var game = _fileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.Disk), _serviceProvider);
         var mods = _service.FindMods(game);
         Assert.Empty(mods);
     }

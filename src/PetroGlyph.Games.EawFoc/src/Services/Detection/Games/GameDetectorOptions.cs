@@ -28,9 +28,7 @@ public sealed record GameDetectorOptions(GameType Type)
 
     internal GameDetectorOptions Normalize()
     {
-        if (!TargetPlatforms.Any())
-            return this with { TargetPlatforms = new List<GamePlatform> { GamePlatform.Undefined } };
-        if (TargetPlatforms.Contains(GamePlatform.Undefined))
+        if (TargetPlatforms.Count == 0 || TargetPlatforms.Contains(GamePlatform.Undefined))
             return this with { TargetPlatforms = AnyPlatform };
         return this with { TargetPlatforms = TargetPlatforms.Distinct().ToList() };
     }

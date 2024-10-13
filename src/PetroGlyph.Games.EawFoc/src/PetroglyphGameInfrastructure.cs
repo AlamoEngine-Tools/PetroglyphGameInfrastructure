@@ -3,6 +3,7 @@ using PG.StarWarsGame.Infrastructure.Games.Registry;
 using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Services.Name;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
@@ -23,6 +24,7 @@ public static class PetroglyphGameInfrastructure
     public static void InitializeServices(IServiceCollection serviceCollection)
     {
         serviceCollection.AddSingleton<IGameRegistryFactory>(sp => new GameRegistryFactory(sp));
+        serviceCollection.AddSingleton<IGamePlatformIdentifier>(sp => new GamePlatformIdentifier(sp));
         serviceCollection.AddSingleton<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
         serviceCollection.AddSingleton<IGameFactory>(sp => new GameFactory(sp));
         serviceCollection.AddSingleton<IModFactory>(sp => new ModFactory(sp));
