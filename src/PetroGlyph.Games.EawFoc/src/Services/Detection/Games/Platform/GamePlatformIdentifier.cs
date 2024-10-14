@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -19,17 +18,18 @@ internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
     /// <summary>
     /// Default ordering of <see cref="GamePlatform"/>s for identification.
     /// </summary>
-    public static readonly GamePlatform[] DefaultGamePlatformOrdering = {
+    public static readonly IList<GamePlatform> DefaultGamePlatformOrdering =
+    [
         // Sorted by (guessed) number of user installations
         GamePlatform.SteamGold,
         GamePlatform.GoG,
         GamePlatform.Origin,
 
-        // Disk Platforms are lowest priority, because their heuristics are less precise/specific than the above platforms. 
+        // Disk Platforms have the lowest priority, because their heuristics are less precise/specific than the above platforms. 
         // This could lead to false positives. (E.g.: Game is "Steam", but detection was "DiskGold")
         GamePlatform.DiskGold,
         GamePlatform.Disk
-    };
+    ];
 
     /// <summary>
     /// Creates a new instance.
@@ -39,13 +39,6 @@ internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(GamePlatformIdentifier));
-    }
-
-    /// <inheritdoc/>
-    public GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location)
-    {
-        if (location == null) throw new ArgumentNullException(nameof(location));
-        return GetGamePlatformCore(type, ref location, DefaultGamePlatformOrdering);
     }
 
     /// <inheritdoc/>
@@ -78,11 +71,6 @@ internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
 
     private IList<GamePlatform> NormalizeLookupPlatforms(IList<GamePlatform> lookupPlatforms)
     {
-        return !lookupPlatforms.Contains(GamePlatform.Undefined)
-            ? lookupPlatforms
-            : lookupPlatforms
-                .Where(p => p != GamePlatform.Undefined)
-                .Union(DefaultGamePlatformOrdering)
-                .ToList();
+        return lookupPlatforms.Contains(GamePlatform.Undefined) ? DefaultGamePlatformOrdering : lookupPlatforms;
     }
 }

@@ -48,7 +48,7 @@ IList<IMod> FindMods()
 
     foreach (var modReference in modRefs)
     {
-        var mod = factory.FromReference(game, modReference, true, CultureInfo.CurrentCulture);
+        var mod = factory.FromReference(game, modReference, CultureInfo.CurrentCulture);
         modList.Add(mod);
     }
 

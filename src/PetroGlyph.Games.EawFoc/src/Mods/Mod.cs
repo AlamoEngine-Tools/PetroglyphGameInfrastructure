@@ -23,11 +23,6 @@ public class Mod : ModBase, IPhysicalMod
     public IFileSystem FileSystem => Directory.FileSystem;
 
     /// <summary>
-    /// The <see cref="IModinfoFile"/> which was set by an constructor, null <see langword="null"/> otherwise;
-    /// </summary>
-    public IModinfoFile? ModinfoFile { get; }
-
-    /// <summary>
     /// Is this mod is a workshops mod, it holds the workshop ID, otherwise a normalized, absolute path
     /// </summary>
     public override string Identifier
@@ -41,24 +36,6 @@ public class Mod : ModBase, IPhysicalMod
             }
             return _identifier!;
         }
-    }
-
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    /// <param name="game">The game of the mod.</param>
-    /// <param name="modDirectory">The mod's directory.</param>
-    /// <param name="workshop">When set to <see langword="true"/> this instance is a Steam Workshop mod.</param>
-    /// <param name="modinfoFile">The <see cref="IModinfoFile"/> which holds the mod's <see cref="IModinfo"/> data.</param>
-    /// <param name="serviceProvider">The service provider.</param>
-    public Mod(IGame game, IDirectoryInfo modDirectory, bool workshop, IModinfoFile modinfoFile, IServiceProvider serviceProvider)
-        : base(game, workshop ? ModType.Workshops : ModType.Default, modinfoFile?.GetModinfo()!, serviceProvider)
-    {
-        if (serviceProvider == null) 
-            throw new ArgumentNullException(nameof(serviceProvider));
-        ModinfoFile = modinfoFile;
-        Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
-        InternalPath = CreateInternalPath(modDirectory);
     }
 
     /// <summary>

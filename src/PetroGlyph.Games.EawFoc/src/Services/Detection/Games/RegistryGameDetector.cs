@@ -50,7 +50,7 @@ public sealed class RegistryGameDetector : GameDetectorBase, IDisposable
         if (exeDirectory is not null)
             return new GameLocationData { Location = exeDirectory };
 
-        Logger?.LogDebug("Could not get instal location from registry path.");
+        Logger?.LogDebug("Could not get install location from registry path.");
         return default;
     }
 

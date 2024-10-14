@@ -53,19 +53,28 @@ public sealed class CompositeGameDetector : IGameDetector
         {
             _logger?.LogDebug($"Searching for game {options.Type} with detector: {sortedDetector}");
             sortedDetector.InitializationRequested += PassThroughInitializationRequest;
-            var result = sortedDetector.Detect(options);
-            sortedDetector.InitializationRequested -= PassThroughInitializationRequest;
-            if (_disposeDetectors && sortedDetector is IDisposable disposable)
-                disposable.Dispose();
+
+            GameDetectionResult result;
+            try
+            {
+                sortedDetector.TryDetect(options, out result);
+            }
+            finally
+            {
+                sortedDetector.InitializationRequested -= PassThroughInitializationRequest;
+                if (_disposeDetectors && sortedDetector is IDisposable disposable)
+                    disposable.Dispose();
+            }
+
             if (result.GameLocation is not null)
                 return result;
             if (result.Error is not null)
                 errors.Add(result.Error);
         }
 
-        return errors.Any()
-            ? new GameDetectionResult(options.Type, new AggregateException(errors))
-            : GameDetectionResult.NotInstalled(options.Type);
+        if (errors.Any())
+            throw new AggregateException(errors);
+        return GameDetectionResult.NotInstalled(options.Type);
     }
 
     /// <summary>
@@ -77,8 +86,17 @@ public sealed class CompositeGameDetector : IGameDetector
     /// <returns><see langword="true"/> when a game was found; <see langword="false"/> otherwise.</returns>
     public bool TryDetect(GameDetectorOptions options, out GameDetectionResult result)
     {
-        result = Detect(options);
-        return result.Installed;
+        try
+        {
+            result = Detect(options);
+            return result.Installed;
+        }
+        catch (Exception e)
+        {
+            _logger?.LogWarning(e, "Unable to find any games, due to error in detection.");
+            result = new GameDetectionResult(options.Type, e);
+            return false;
+        }
     }
 
     private void PassThroughInitializationRequest(object? sender, GameInitializeRequestEventArgs e)

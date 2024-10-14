@@ -22,18 +22,7 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
     private readonly ISteamGameHelpers _steamGameHelpers = serviceProvider.GetRequiredService<ISteamGameHelpers>();
     private readonly ISteamWorkshopWebpageDownloader _steamWebpageDownloader = serviceProvider.GetRequiredService<ISteamWorkshopWebpageDownloader>();
 
-    private readonly ConcurrentDictionary<ulong, GameType?> _gameTypeCache = new ConcurrentDictionary<ulong, GameType?>();
-
-    /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, bool searchModInfo, out GameType gameType)
-    {
-        if (_offlineResolver.TryGetGameType(modLocation, modType, searchModInfo, out gameType))
-            return true;
-
-        if (modType != ModType.Workshops)
-            return false;
-        return GetGameTypeFromSteamPage(modLocation.Name, out gameType);
-    }
+    private readonly ConcurrentDictionary<ulong, GameType?> _gameTypeCache = new();
 
     /// <inheritdoc />
     public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out GameType gameType)

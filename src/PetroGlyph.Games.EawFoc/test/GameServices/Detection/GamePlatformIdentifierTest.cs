@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using Moq;
+using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
+using PG.StarWarsGame.Infrastructure.Testing;
 using Testably.Abstractions.Testing;
 using Xunit;
 
@@ -11,207 +12,192 @@ namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
 public class GamePlatformIdentifierTest
 {
+    private readonly MockFileSystem _fileSystem = new();
+    private readonly GamePlatformIdentifier _platformIdentifier;
+    private readonly IServiceProvider _serviceProvider;
+
+    public GamePlatformIdentifierTest()
+    {
+        var sc = new ServiceCollection();
+        sc.AddSingleton<IFileSystem>(_fileSystem);
+        PetroglyphGameInfrastructure.InitializeServices(sc);
+        _serviceProvider = sc.BuildServiceProvider();
+        _platformIdentifier = new GamePlatformIdentifier(_serviceProvider);
+    }
+
     [Fact]
-    public void TestNullArg_Throws()
+    public void NullArgs_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => new GamePlatformIdentifier(null!));
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
+
         IDirectoryInfo? nullRef = null;
-        Assert.Throws<ArgumentNullException>(() => identifier.GetGamePlatform(default, ref nullRef!));
-        Assert.Throws<ArgumentNullException>(() => identifier.GetGamePlatform(default, ref nullRef!, new List<GamePlatform>()));
-        var fs = new MockFileSystem();
-        var locRef = fs.DirectoryInfo.New("Game");
-        Assert.Throws<ArgumentNullException>(() => identifier.GetGamePlatform(default, ref locRef, null!));
+        Assert.Throws<ArgumentNullException>(() => _platformIdentifier.GetGamePlatform(default, ref nullRef!, new List<GamePlatform>()));
+        var locRef = _fileSystem.DirectoryInfo.New("Game");
+        Assert.Throws<ArgumentNullException>(() => _platformIdentifier.GetGamePlatform(default, ref locRef, null!));
     }
 
-    [Fact]
-    public void TestNoInput()
+    [Theory]
+    [InlineData]
+    [InlineData(GamePlatform.Undefined)]
+    [InlineData(GamePlatform.SteamGold, GamePlatform.Undefined)]
+    public void GetGamePlatform_LookupNormalizesToDefaultSearchOrder(params GamePlatform[] lookup)
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-        var fs = new MockFileSystem();
-        var locRef = fs.DirectoryInfo.New("Game");
-        var actual = identifier.GetGamePlatform(default, ref locRef, new List<GamePlatform>());
-        Assert.Equal(GamePlatform.Undefined, actual);
+        // Using GOG here as it's more special than Disk, but also does not change loc ref. Steam is a param of this test, that should be overwritten.
+        var game = _fileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.GoG), _serviceProvider);
+        var gameLocation = game.Directory;
+
+        var actual = _platformIdentifier.GetGamePlatform(GameType.Foc, ref gameLocation, lookup);
+        Assert.Equal(GamePlatform.GoG, actual);
+        Assert.Equal(game.Directory.FullName, gameLocation.FullName);
     }
 
-    [Fact]
-    public void TestUndefinedWhenNoKnownGameInput()
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void GetGamePlatform_WrongGameInstalledReturnsUndefined(GameType queryGameType)
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-        var fs = new MockFileSystem();
-        var locRef = fs.DirectoryInfo.New("Game");
-        var actual = identifier.GetGamePlatform(default, ref locRef);
-        Assert.Equal(GamePlatform.Undefined, actual);
+        foreach (GamePlatform platform in Enum.GetValues(typeof(GamePlatform)))
+        {
+            var installType = queryGameType == GameType.Foc ? GameType.Eaw : GameType.Foc;
+            var game = _fileSystem.InstallGame(new GameIdentity(installType, platform), _serviceProvider);
+            var gameLocation = game.Directory;
+
+            var actual = _platformIdentifier.GetGamePlatform(GameType.Foc, ref gameLocation, []);
+            Assert.Equal(GamePlatform.Undefined, actual);
+            Assert.Equal(game.Directory.FullName, gameLocation.FullName);
+        }
     }
 
+
     [Fact]
-    public void TestUndefinedWhenNoRequestedGameInput()
+    public void GetGamePlatform_NoGameInstalledReturnsUndefined()
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
-        var locRef = Disk_Eaw();
-        var lookup = new List<GamePlatform> { GamePlatform.SteamGold };
-
-        var actual = identifier.GetGamePlatform(default, ref locRef, lookup);
+        var gameLocation = _fileSystem.DirectoryInfo.New("noGameDir");
+        var locRef = gameLocation;
+        var actual = _platformIdentifier.GetGamePlatform(default, ref locRef, []);
         Assert.Equal(GamePlatform.Undefined, actual);
+        Assert.Equal(gameLocation.FullName, locRef.FullName);
     }
 
     [Fact]
     public void TestEawDisk()
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
         var locRef = Disk_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.Disk };
         const GameType type = GameType.Eaw;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.Disk, actual);
     }
 
     [Fact]
     public void TestFocDisk()
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
         var locRef = Disk_Foc();
         var lookup = new List<GamePlatform> { GamePlatform.Disk };
         const GameType type = GameType.Foc;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.Disk, actual);
     }
 
     [Fact]
     public void TestEawSteam()
-    {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
+    { 
         var locRef = Steam_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.SteamGold };
         const GameType type = GameType.Eaw;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.SteamGold, actual);
     }
 
     [Fact]
     public void TestFocSteam()
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
         var locRef = Steam_Foc();
         var lookup = new List<GamePlatform> { GamePlatform.SteamGold };
         const GameType type = GameType.Foc;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.SteamGold, actual);
     }
 
     [Fact]
     public void TestEawGog()
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
         var locRef = Gog_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.GoG };
         const GameType type = GameType.Eaw;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.GoG, actual);
     }
 
     [Fact]
     public void TestFocGog()
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
         var locRef = Gog_Foc();
         var lookup = new List<GamePlatform> { GamePlatform.GoG };
         const GameType type = GameType.Foc;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.GoG, actual);
     }
 
     [Fact]
     public void TestEawGold()
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
         var locRef = DiskGold_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.DiskGold };
         const GameType type = GameType.Eaw;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.DiskGold, actual);
     }
 
     [Fact]
     public void TestFocGold()
-    {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
+    { 
         var locRef = DiskGold_Foc();
         var lookup = new List<GamePlatform> { GamePlatform.DiskGold };
         var type = GameType.Foc;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.DiskGold, actual);
     }
 
     [Fact]
     public void TestEawOrigin()
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
         var locRef = Origin_Eaw();
         var lookup = new List<GamePlatform> { GamePlatform.Origin };
         const GameType type = GameType.Eaw;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.Origin, actual);
     }
 
     [Fact]
     public void TestFocOrigin()
     {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
         var locRef = Origin_Foc_Corrected();
         var lookup = new List<GamePlatform> { GamePlatform.Origin };
         var type = GameType.Foc;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.Origin, actual);
     }
 
     [Fact]
     public void TestFocOriginWithSanitization()
-    {
-        var sp = new Mock<IServiceProvider>();
-        var identifier = new GamePlatformIdentifier(sp.Object);
-
+    { 
         var locRef = Origin_Foc_Registry();
         var locStore = locRef;
         var lookup = new List<GamePlatform> { GamePlatform.Origin };
         var type = GameType.Foc;
 
-        var actual = identifier.GetGamePlatform(type, ref locRef, lookup);
+        var actual = _platformIdentifier.GetGamePlatform(type, ref locRef, lookup);
         Assert.Equal(GamePlatform.Origin, actual);
         Assert.NotEqual(locStore, locRef);
     }

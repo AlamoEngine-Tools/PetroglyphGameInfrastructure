@@ -13,7 +13,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <param name="Type">The game type which shall be searched.</param>
 public sealed record GameDetectorOptions(GameType Type)
 {
-    private static readonly GamePlatform[] AnyPlatform = { GamePlatform.Undefined };
+    private static readonly GamePlatform[] AnyPlatform = [GamePlatform.Undefined];
 
     private IList<GamePlatform> _targetPlatforms = AnyPlatform;
 
@@ -28,9 +28,7 @@ public sealed record GameDetectorOptions(GameType Type)
 
     internal GameDetectorOptions Normalize()
     {
-        if (!TargetPlatforms.Any())
-            return this with { TargetPlatforms = new List<GamePlatform> { GamePlatform.Undefined } };
-        if (TargetPlatforms.Contains(GamePlatform.Undefined))
+        if (TargetPlatforms.Count == 0 || TargetPlatforms.Contains(GamePlatform.Undefined))
             return this with { TargetPlatforms = AnyPlatform };
         return this with { TargetPlatforms = TargetPlatforms.Distinct().ToList() };
     }

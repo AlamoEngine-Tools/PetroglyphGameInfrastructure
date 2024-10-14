@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
+using PG.StarWarsGame.Infrastructure.Testing;
 using Testably.Abstractions.Testing;
 using Xunit;
 
@@ -12,161 +12,152 @@ namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
 public class DirectoryGameDetectorTest
 {
-    [Fact]
-    public void TestInvalidArgs_Throws()
+    private readonly MockFileSystem _fileSystem = new();
+    private readonly IServiceProvider _serviceProvider;
+
+    public DirectoryGameDetectorTest()
     {
-        var fs = new MockFileSystem();
-        var sp = new Mock<IServiceProvider>();
-        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null, null));
-        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), null));
-        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null, sp.Object));
+        var sc = new ServiceCollection();
+        sc.AddSingleton<IFileSystem>(_fileSystem);
+        PetroglyphGameInfrastructure.InitializeServices(sc);
+        _serviceProvider = sc.BuildServiceProvider();
+    }
+
+    private DirectoryGameDetector CreateDetector(string path)
+    { 
+        var directory = _fileSystem.DirectoryInfo.New(path);
+        return new DirectoryGameDetector(directory, _serviceProvider);
     }
 
     [Fact]
-    public void TestNoGame()
+    public void InvalidArgs_Throws()
     {
-        var fs = new MockFileSystem();
         var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Eaw);
+        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null!, null!));
+        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(_fileSystem.DirectoryInfo.New("Game"), null!));
+        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null!, sp.Object));
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindGameLocation_GamesNotInstalled_DirectoryNotFound(GameType gameType)
+    {
+        var options = new GameDetectorOptions(gameType);
+        var detector = CreateDetector("Game");
+       
+        var result = detector.FindGameLocation(options);
+        Assert.Null(result.Location);
+        Assert.False(result.IsInstalled);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindGameLocation_GamesNotInstalled_GameExeNotFound(GameType gameType)
+    {
+        var options = new GameDetectorOptions(gameType);
+
+        _fileSystem.Initialize().WithSubdirectory("Game");
+        var detector = CreateDetector("Game");
+
+        var result = detector.FindGameLocation(options);
+        Assert.Null(result.Location);
+        Assert.False(result.IsInstalled);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw, PetroglyphStarWarsGameConstants.EmpireAtWarExeFileName)]
+    [InlineData(GameType.Foc, PetroglyphStarWarsGameConstants.ForcesOfCorruptionExeFileName)]
+    public void FindGameLocation_GamesNotInstalled_GameDataWithMegaFilesNotFound(GameType gameType, string exeName)
+    {
+        var options = new GameDetectorOptions(gameType);
+        _fileSystem.Initialize().WithSubdirectory("Game").WithFile($"Game/{exeName}");
+        var detector = CreateDetector("Game");
+        
+        var result = detector.FindGameLocation(options);
+        Assert.Null(result.Location);
+        Assert.False(result.IsInstalled);
+
+        _fileSystem.Initialize().WithSubdirectory("Game/Data");
+
+        result = detector.FindGameLocation(options);
+        Assert.Null(result.Location);
+        Assert.False(result.IsInstalled);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindGameLocation_GamesInstalled(GameType gameType)
+    {
+        var options = new GameDetectorOptions(gameType);
+        var game  = _fileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.Disk), _serviceProvider);
+        var detector = CreateDetector(game.Directory.FullName);
+
+        var result = detector.FindGameLocation(options);
+        Assert.Equal(game.Directory.FullName, result.Location!.FullName);
+        Assert.True(result.IsInstalled);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindGameLocation_GamesInstalled_WrongPathGiven(GameType gameType)
+    {
+        var options = new GameDetectorOptions(gameType);
+        _fileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.Disk), _serviceProvider);
+        var detector = CreateDetector("this_path_does_not_contain_a_game");
+
+        var result = detector.FindGameLocation(options);
+        Assert.Null(result.Location);
+        Assert.False(result.IsInstalled);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw, GameType.Foc)]
+    [InlineData(GameType.Foc, GameType.Eaw)]
+    public void FindGameLocation_GamesInstalled_WrongTypeGiven(GameType gameType, GameType searchType)
+    {
+        var options = new GameDetectorOptions(searchType);
+        _fileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.Disk), _serviceProvider);
+        var detector = CreateDetector("this_path_does_not_contain_a_game");
+
+        var result = detector.FindGameLocation(options);
+        Assert.Null(result.Location);
+        Assert.False(result.IsInstalled);
+    }
+
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void Detect_Integration_GameInstalled(GameType gameType)
+    {
+        var options = new GameDetectorOptions(gameType);
+        var game = _fileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.Disk), _serviceProvider);
+        var detector = CreateDetector(game.Directory.FullName);
+
+        var result = detector.Detect(options);
+        Assert.Equal(game.Directory.FullName, result.GameLocation!.FullName);
+
+        Assert.True(detector.TryDetect(options, out result));
+        Assert.Equal(game.Directory.FullName, result.GameLocation!.FullName);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void Detect_Integration_GameNotInstalled(GameType gameType)
+    {
+        var options = new GameDetectorOptions(gameType);
+        _fileSystem.Initialize().WithSubdirectory("game/bin");
+        var detector = CreateDetector("game/bin");
+
         var result = detector.Detect(options);
         Assert.Null(result.GameLocation);
-    }
 
-    [Fact]
-    public void TestNoEawGame()
-    {
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Game/swfoc.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Eaw);
-        var result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-    }
-
-    [Fact]
-    public void TestNoFocGame()
-    {
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Game/sweaw.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-    }
-
-    [Fact]
-    public void TestAnyEawGame()
-    {
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Game/sweaw.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Eaw);
-        var result = detector.FindGameLocation(options);
-        Assert.NotNull(result.Location);
-    }
-
-    [Fact]
-    public void TestAnyFocGame()
-    { 
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Game/swfoc.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = detector.FindGameLocation(options);
-        Assert.NotNull(result.Location);
-    }
-
-    [Fact]
-    public void TestInKnownSubFocGame()
-    {
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Dir/EAWX/swfoc.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = detector.FindGameLocation(options);
-        Assert.NotNull(result.Location);
-    }
-
-    [Fact]
-    public void TestNotInKnownSubFocGame()
-    {
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Dir/EAWX/sweaw.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-    }
-
-    [Fact]
-    public void TestInUnknownSubFocGame()
-    {
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Dir/SomeDir/sweaw.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-    }
-
-    [Fact]
-    public void TestInKnownSubEawGame()
-    {
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Dir/GameData/sweaw.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Eaw);
-        var result = detector.FindGameLocation(options);
-        Assert.NotNull(result.Location);
-    }
-
-    [Fact]
-    public void TestInKnownSubSubEawGame()
-    {
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Dir/Sub/GameData/sweaw.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Dir"), sp.Object);
-        var options = new GameDetectorOptions(GameType.Eaw);
-        var result = detector.FindGameLocation(options);
-        Assert.NotNull(result.Location);
-    }
-
-
-    [Fact]
-    public void TestAnyFocGame_Integration()
-    {
-        var fs = new MockFileSystem();
-        fs.Initialize().WithFile("Game/sweaw.exe");
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IFileSystem))).Returns(fs);
-        var pi = new Mock<IGamePlatformIdentifier>();
-        var options = new GameDetectorOptions(GameType.Eaw);
-        pi.Setup(i => i.GetGamePlatform(It.IsAny<GameType>(), ref It.Ref<IDirectoryInfo>.IsAny, It.IsAny<IList<GamePlatform>>()))
-            .Returns(GamePlatform.GoG);
-        sp.Setup(p => p.GetService(typeof(IGamePlatformIdentifier))).Returns(pi.Object);
-        var detector = new DirectoryGameDetector(fs.DirectoryInfo.New("Game"), sp.Object);
-        var result = detector.Detect(options);
-        Assert.NotNull(result.GameLocation);
-        Assert.Equal(GamePlatform.GoG, result.GameIdentity.Platform);
+        Assert.False(detector.TryDetect(options, out result));
+        Assert.Null(result.GameLocation);
     }
 }
