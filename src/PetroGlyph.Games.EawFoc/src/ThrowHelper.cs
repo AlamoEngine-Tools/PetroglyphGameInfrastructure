@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace PG.StarWarsGame.Infrastructure;
@@ -17,20 +18,30 @@ internal static class ThrowHelper
     /// <exception cref="ArgumentNullException"><paramref name="argument"/> is null.</exception>
     /// <exception cref="ArgumentException"><paramref name="argument"/> is empty.</exception>
 #pragma warning disable CS8777 // Parameter must have a non-null value when exiting.
-    public static void ThrowIfCollectionNullOrEmpty([NotNull] ICollection? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+    public static void ThrowIfCollectionNullOrEmptyOrContainsNull([NotNull] ICollection? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
     {
         if (argument is null)
             throw new ArgumentNullException(paramName);
         if (argument.Count == 0)
             throw new ArgumentException("The value cannot be an empty collection.", nameof(paramName));
+        foreach (var value in argument)
+        {
+            if (value is null)
+                throw new ArgumentException("The collection cannot contain null references.", nameof(paramName));
+        }
     }
 
-    public static void ThrowIfCollectionNullOrEmpty<T>([NotNull] ICollection<T>? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+    public static void ThrowIfCollectionNullOrEmptyOrContainsNull<T>([NotNull] ICollection<T>? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
     {
         if (argument is null)
             throw new ArgumentNullException(paramName);
         if (argument.Count == 0)
             throw new ArgumentException("The value cannot be an empty collection.", nameof(paramName));
+        foreach (var value in argument)
+        {
+            if (value is null)
+                throw new ArgumentException("The collection cannot contain null references.", nameof(paramName));
+        }
     }
 #pragma warning restore CS8777 // Parameter must have a non-null value when exiting.
 }

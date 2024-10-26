@@ -16,6 +16,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 public sealed class FileBasedLanguageFinder(IServiceProvider serviceProvider) : ILanguageFinder
 {
     private readonly IPlayableObjectFileService _fileService = serviceProvider.GetRequiredService<IPlayableObjectFileService>();
+    private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
 
     /// <inheritdoc/>
     public ISet<ILanguageInfo> GetTextLocalizations(IPhysicalPlayableObject playableObject)
@@ -37,7 +38,7 @@ public sealed class FileBasedLanguageFinder(IServiceProvider serviceProvider) : 
     {
         return TryGetLanguageFromFiles(
             () => _fileService.DataFiles(playableObject, "sfx2d_*.meg", "Audio/SFX", false, false),
-            fileName => GetSfxLangName(fileName, playableObject.FileSystem), LanguageSupportLevel.SFX);
+            fileName => GetSfxLangName(fileName, _fileSystem), LanguageSupportLevel.SFX);
 
         static string? GetSfxLangName(string fileName, IFileSystem fs)
         {

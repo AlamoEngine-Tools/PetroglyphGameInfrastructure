@@ -1,32 +1,28 @@
 ﻿using System;
 using System.IO.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
-public class DirectoryGameDetectorTest
+public class DirectoryGameDetectorTest : GameDetectorTestBase<EmptyStruct>
 {
-    private readonly MockFileSystem _fileSystem = new();
-    private readonly IServiceProvider _serviceProvider;
+    protected override bool SupportInitialization => false;
 
-    public DirectoryGameDetectorTest()
+    protected override IGameDetector CreateDetector(GameDetectorTestInfo<EmptyStruct> gameInfo, bool shallHandleInitialization)
     {
-        var sc = new ServiceCollection();
-        sc.AddSingleton<IFileSystem>(_fileSystem);
-        PetroglyphGameInfrastructure.InitializeServices(sc);
-        _serviceProvider = sc.BuildServiceProvider();
+        return new DirectoryGameDetector(gameInfo.GameDirectory ?? FileSystem.DirectoryInfo.New("doesNotExist"), ServiceProvider);
     }
 
-    private DirectoryGameDetector CreateDetector(string path)
-    { 
-        var directory = _fileSystem.DirectoryInfo.New(path);
-        return new DirectoryGameDetector(directory, _serviceProvider);
+    protected override GameDetectorTestInfo<EmptyStruct> SetupGame(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        return new(gameIdentity.Type, game.Directory, default);
     }
 
     [Fact]
@@ -34,130 +30,66 @@ public class DirectoryGameDetectorTest
     {
         var sp = new Mock<IServiceProvider>();
         Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null!, null!));
-        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(_fileSystem.DirectoryInfo.New("Game"), null!));
+        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(FileSystem.DirectoryInfo.New("Game"), null!));
         Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null!, sp.Object));
     }
 
     [Theory]
-    [InlineData(GameType.Eaw)]
-    [InlineData(GameType.Foc)]
-    public void FindGameLocation_GamesNotInstalled_DirectoryNotFound(GameType gameType)
+    [MemberData(nameof(RealGameIdentities))]
+    public void Detect_TryDetect_GamesNotInstalled_DirectoryNotFound(GameIdentity identity)
     {
-        var options = new GameDetectorOptions(gameType);
-        var detector = CreateDetector("Game");
-       
-        var result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-        Assert.False(result.IsInstalled);
+        TestNotInstalledWithCustomSetup(identity, _ => FileSystem.DirectoryInfo.New("doesNotExist"));
     }
 
     [Theory]
-    [InlineData(GameType.Eaw)]
-    [InlineData(GameType.Foc)]
-    public void FindGameLocation_GamesNotInstalled_GameExeNotFound(GameType gameType)
+    [MemberData(nameof(RealGameIdentities))]
+    public void Detect_TryDetect_GamesNotInstalled_GameExeNotFound(GameIdentity identity)
     {
-        var options = new GameDetectorOptions(gameType);
-
-        _fileSystem.Initialize().WithSubdirectory("Game");
-        var detector = CreateDetector("Game");
-
-        var result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-        Assert.False(result.IsInstalled);
+        FileSystem.Initialize().WithFile("Game/Data/megafiles.xml");
+        TestNotInstalledWithCustomSetup(identity, _ => FileSystem.DirectoryInfo.New("Game"));
     }
 
     [Theory]
-    [InlineData(GameType.Eaw, PetroglyphStarWarsGameConstants.EmpireAtWarExeFileName)]
-    [InlineData(GameType.Foc, PetroglyphStarWarsGameConstants.ForcesOfCorruptionExeFileName)]
-    public void FindGameLocation_GamesNotInstalled_GameDataWithMegaFilesNotFound(GameType gameType, string exeName)
+    [MemberData(nameof(RealGameIdentities))]
+    public void Detect_TryDetect_GamesNotInstalled_GameDataWithMegaFilesNotFound(GameIdentity identity)
     {
-        var options = new GameDetectorOptions(gameType);
-        _fileSystem.Initialize().WithSubdirectory("Game").WithFile($"Game/{exeName}");
-        var detector = CreateDetector("Game");
-        
-        var result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-        Assert.False(result.IsInstalled);
+        var exeName = identity.Type == GameType.Eaw
+            ? PetroglyphStarWarsGameConstants.EmpireAtWarExeFileName
+            : PetroglyphStarWarsGameConstants.ForcesOfCorruptionExeFileName;
 
-        _fileSystem.Initialize().WithSubdirectory("Game/Data");
+        FileSystem.Initialize().WithSubdirectory("Game").WithFile($"Game/{exeName}");
+        TestNotInstalledWithCustomSetup(identity, _ => FileSystem.DirectoryInfo.New("doesNotExist"));
 
-        result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-        Assert.False(result.IsInstalled);
+        FileSystem.Directory.CreateDirectory("Game/Data");
+        TestNotInstalledWithCustomSetup(identity, _ => FileSystem.DirectoryInfo.New("doesNotExist"));
     }
 
     [Theory]
-    [InlineData(GameType.Eaw)]
-    [InlineData(GameType.Foc)]
-    public void FindGameLocation_GamesInstalled(GameType gameType)
+    [MemberData(nameof(RealGameIdentities))]
+    public void Detect_TryDetect_GamesInstalled_WrongPathGiven(GameIdentity identity)
     {
-        var options = new GameDetectorOptions(gameType);
-        var game  = _fileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.Disk), _serviceProvider);
-        var detector = CreateDetector(game.Directory.FullName);
-
-        var result = detector.FindGameLocation(options);
-        Assert.Equal(game.Directory.FullName, result.Location!.FullName);
-        Assert.True(result.IsInstalled);
+        TestNotInstalledWithCustomSetup(identity, i =>
+        {
+            FileSystem.InstallGame(i, ServiceProvider);
+            return FileSystem.DirectoryInfo.New("other");
+        });
     }
 
-    [Theory]
-    [InlineData(GameType.Eaw)]
-    [InlineData(GameType.Foc)]
-    public void FindGameLocation_GamesInstalled_WrongPathGiven(GameType gameType)
+    private void TestNotInstalledWithCustomSetup(GameIdentity identity, Func<GameIdentity, IDirectoryInfo> customSetup)
     {
-        var options = new GameDetectorOptions(gameType);
-        _fileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.Disk), _serviceProvider);
-        var detector = CreateDetector("this_path_does_not_contain_a_game");
-
-        var result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-        Assert.False(result.IsInstalled);
+        var expected = GameDetectionResult.NotInstalled(identity.Type);
+        TestDetectorCore(
+            identity,
+            false,
+            _ => new GameDetectorTestInfo<EmptyStruct>(identity.Type, customSetup(identity), default),
+            _ => expected,
+            null,
+            queryPlatforms: []);
     }
 
-    [Theory]
-    [InlineData(GameType.Eaw, GameType.Foc)]
-    [InlineData(GameType.Foc, GameType.Eaw)]
-    public void FindGameLocation_GamesInstalled_WrongTypeGiven(GameType gameType, GameType searchType)
-    {
-        var options = new GameDetectorOptions(searchType);
-        _fileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.Disk), _serviceProvider);
-        var detector = CreateDetector("this_path_does_not_contain_a_game");
+    protected override GameDetectorTestInfo<EmptyStruct> SetupForRequiredInitialization(GameIdentity identity)
+        => throw new NotSupportedException();
 
-        var result = detector.FindGameLocation(options);
-        Assert.Null(result.Location);
-        Assert.False(result.IsInstalled);
-    }
-
-
-    [Theory]
-    [InlineData(GameType.Eaw)]
-    [InlineData(GameType.Foc)]
-    public void Detect_Integration_GameInstalled(GameType gameType)
-    {
-        var options = new GameDetectorOptions(gameType);
-        var game = _fileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.Disk), _serviceProvider);
-        var detector = CreateDetector(game.Directory.FullName);
-
-        var result = detector.Detect(options);
-        Assert.Equal(game.Directory.FullName, result.GameLocation!.FullName);
-
-        Assert.True(detector.TryDetect(options, out result));
-        Assert.Equal(game.Directory.FullName, result.GameLocation!.FullName);
-    }
-
-    [Theory]
-    [InlineData(GameType.Eaw)]
-    [InlineData(GameType.Foc)]
-    public void Detect_Integration_GameNotInstalled(GameType gameType)
-    {
-        var options = new GameDetectorOptions(gameType);
-        _fileSystem.Initialize().WithSubdirectory("game/bin");
-        var detector = CreateDetector("game/bin");
-
-        var result = detector.Detect(options);
-        Assert.Null(result.GameLocation);
-
-        Assert.False(detector.TryDetect(options, out result));
-        Assert.Null(result.GameLocation);
-    }
+    protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<EmptyStruct> info)
+        => throw new NotSupportedException();
 }

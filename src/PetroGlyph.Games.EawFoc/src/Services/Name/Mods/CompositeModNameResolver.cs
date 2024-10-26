@@ -27,7 +27,7 @@ public sealed class CompositeModNameResolver : IModNameResolver
         if (resolverFactory == null)
             throw new ArgumentNullException(nameof(resolverFactory));
         var resolvers = resolverFactory(serviceProvider);
-        ThrowHelper.ThrowIfCollectionNullOrEmpty(resolvers);
+        ThrowHelper.ThrowIfCollectionNullOrEmptyOrContainsNull(resolvers);
         _resolvers = resolvers;
         _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
     }

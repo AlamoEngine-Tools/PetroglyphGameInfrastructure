@@ -12,10 +12,9 @@ public class CompositeModIconFinderTest
     [Fact]
     public void TestInvalidArgs_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new CompositeModIconFinder(null));
+        Assert.Throws<ArgumentNullException>(() => new CompositeModIconFinder(null!));
         Assert.Throws<ArgumentException>(() => new CompositeModIconFinder(new List<IModIconFinder>()));
-        Assert.Throws<ArgumentNullException>(() =>
-            new CompositeModIconFinder(new List<IModIconFinder> { null }).FindIcon(null));
+        Assert.Throws<ArgumentException>(() => new CompositeModIconFinder(new List<IModIconFinder> { null! }));
     }
 
     [Fact]

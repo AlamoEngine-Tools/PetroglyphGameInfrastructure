@@ -1,7 +1,7 @@
 ﻿namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
-/// The type of the game can be either "Empire at War" of "Forces of Corruption"
+/// Represents the type of the game which is either "Empire at War" of "Forces of Corruption"
 /// </summary>
 public enum GameType
 {

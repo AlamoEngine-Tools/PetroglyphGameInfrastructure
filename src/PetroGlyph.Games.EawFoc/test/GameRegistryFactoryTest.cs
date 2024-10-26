@@ -23,32 +23,26 @@ public class GameRegistryFactoryTest
         _service = new GameRegistryFactory(sc.BuildServiceProvider());
     }
 
-    [Fact]
-    public void TestNotFound()
+    [Theory]
+    [InlineData(GameType.Eaw, null, false)]
+    [InlineData(GameType.Foc, null, false)]
+    [InlineData(GameType.Eaw, GameRegistryFactory.EawRegistryPath, true)]
+    [InlineData(GameType.Foc, GameRegistryFactory.FocRegistryPath, true)]
+    [InlineData(GameType.Eaw, "someRandomPathEaw", false)]
+    [InlineData(GameType.Foc, "someRandomPathFoc", false)]
+    // Swapped subPaths
+    [InlineData(GameType.Eaw, GameRegistryFactory.FocRegistryPath, false)]
+    [InlineData(GameType.Foc, GameRegistryFactory.EawRegistryPath, false)]
+    public void CreateRegistry_RegistryCreated(GameType gameType, string? subPath, bool isSubPathValid)
     {
-        Assert.Throws<GameRegistryNotFoundException>(() =>
-            _service.CreateRegistry(GameType.Eaw));
-    }
-
-    [Fact]
-    public void TestEaWRegistryFound()
-    { 
-        var lm = _registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-        lm.CreateSubKey(GameRegistryFactory.EawRegistryPath);
-
-        var gameRegistry = _service.CreateRegistry(GameType.Eaw);
+        if (subPath is not null)
+        {
+            using var lm = _registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+            using var k = lm.CreateSubKey(subPath);
+        }
+        var gameRegistry = _service.CreateRegistry(gameType);
         Assert.NotNull(gameRegistry);
-        Assert.Equal(GameType.Eaw, gameRegistry.Type);
-    }
-
-    [Fact]
-    public void TestFocRegistryFound()
-    {
-        var lm = _registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-        lm.CreateSubKey(GameRegistryFactory.FocRegistryPath);
-
-        var gameRegistry = _service.CreateRegistry(GameType.Foc);
-        Assert.NotNull(gameRegistry);
-        Assert.Equal(GameType.Foc, gameRegistry.Type);
+        Assert.Equal(gameType, gameRegistry.Type);
+        Assert.Equal(isSubPathValid, gameRegistry.Exits);
     }
 }

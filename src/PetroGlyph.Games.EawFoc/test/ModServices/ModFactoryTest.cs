@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Abstractions;
-using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Name;

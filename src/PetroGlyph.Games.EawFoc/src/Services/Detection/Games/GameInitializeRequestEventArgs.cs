@@ -1,4 +1,5 @@
 ﻿using System;
+using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
@@ -8,9 +9,9 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 public sealed class GameInitializeRequestEventArgs : EventArgs
 {
     /// <summary>
-    /// The original options how the game was searched.
+    /// Gets the game type that requests initialization.
     /// </summary>
-    public GameDetectorOptions Options { get; }
+    public GameType GameType { get; }
 
     /// <summary>
     /// Indicates whether the initialization request was processed. Default is <see langword="false"/>.
@@ -18,11 +19,11 @@ public sealed class GameInitializeRequestEventArgs : EventArgs
     public bool Handled { get; set; }
 
     /// <summary>
-    /// Creates a new instances with a given <see cref="GameDetectorOptions"/>
+    /// Creates a new instances of the <see cref="GameInitializeRequestEventArgs"/> of the specified <see cref="Games.GameType"/>.
     /// </summary>
-    /// <param name="options">The option of this instance.</param>
-    public GameInitializeRequestEventArgs(GameDetectorOptions options)
+    /// <param name="gameType">The uninitialized game type.</param>
+    public GameInitializeRequestEventArgs(GameType gameType)
     {
-        Options = options;
+        GameType = gameType;
     }
 }

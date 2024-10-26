@@ -18,8 +18,8 @@ public class CompositeModNameResolverTest
         Assert.Throws<ArgumentException>(() => new CompositeModNameResolver(new Mock<IServiceProvider>().Object, _ => []));
         Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(null, _ => [null]));
         var sp = new Mock<IServiceProvider>();
-        Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(sp.Object, _ => [null]).ResolveName(null, CultureInfo.CurrentCulture));
-        Assert.Throws<ArgumentNullException>(() => new CompositeModNameResolver(sp.Object, _ => [null]).ResolveName(new ModReference(), null));
+        Assert.Throws<ArgumentException>(() => new CompositeModNameResolver(sp.Object, _ => [null]).ResolveName(null, CultureInfo.CurrentCulture));
+        Assert.Throws<ArgumentException>(() => new CompositeModNameResolver(sp.Object, _ => [null]).ResolveName(new ModReference(), null));
     }
 
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 
@@ -10,71 +11,62 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 public sealed class GameDetectionResult
 {
     /// <summary>
-    /// Gets a value indicating whether this detection result points to an installed game.
+    /// Gets a value indicating whether the <see cref="GameDetectionResult"/> points to an installed game.
     /// </summary>
-    public bool Installed => GameLocation is not null && Error is null;
+    [MemberNotNullWhen(true, nameof(GameLocation))]
+    public bool Installed => GameLocation is not null;
 
     /// <summary>
-    /// The actual identity of the found game. This might differ from the actual detection request.
+    /// Gets the actual identity of the found game. This might differ from the actual detection request.
     /// </summary>
     public IGameIdentity GameIdentity { get; }
 
     /// <summary>
-    /// Directory information of the game; <see langword="null"/> if an <see cref="Error"/> is present or <see cref="InitializationRequired"/> is <see langword="true"/>
+    /// Gets the directory information of the game.
     /// </summary>
     public IDirectoryInfo? GameLocation { get; }
 
     /// <summary>
-    /// Indicates whether the detection hit a state where a game might be installed but requires initialization (like running the game once).
+    /// Gets a value indicating whether the detected game state requires an initialization (like running the game once).
     /// </summary>
     public bool InitializationRequired { get; }
 
-    /// <summary>
-    /// Contains an <see cref="Exception"/> if there was any during the detection process; <see langword="null"/> otherwise.
-    /// </summary>
-    public Exception? Error { get; }
-
-    private GameDetectionResult(GameType type)
-    {
-        GameIdentity = new GameIdentity(type, GamePlatform.Undefined);
-    }
-
-    /// <summary>
-    /// Creates a new instance with given <see cref="IGameIdentity"/> and a non-null location.
-    /// </summary>
-    /// <param name="gameIdentity">The identity of the game.</param>
-    /// <param name="location">The actual location of the game. Must not be <see langword="null"/></param>
-    public GameDetectionResult(IGameIdentity gameIdentity, IDirectoryInfo location)
+    private GameDetectionResult(IGameIdentity gameIdentity, IDirectoryInfo? location, bool requiresInitialization)
     {
         GameIdentity = gameIdentity;
-        GameLocation = location ?? throw new ArgumentNullException(nameof(location));
-    }
-
-    internal GameDetectionResult(GameType type, Exception error) : this(type)
-    {
-        Error = error;
-    }
-
-    private GameDetectionResult(GameType type, bool initializationRequired) : this(type)
-    {
-        InitializationRequired = initializationRequired;
+        GameLocation = location;
+        InitializationRequired = requiresInitialization;
     }
 
     /// <summary>
-    /// Creates a new instance where <see cref="GameLocation"/> is <see langword="null"/>
+    /// Creates a new instance of <see cref="GameDetectionResult"/> of a detected game.
+    /// </summary>
+    /// <param name="gameIdentity">The identity of the detected game.</param>
+    /// <param name="location">The location of the detected game.</param>
+    public static GameDetectionResult FromInstalled(GameIdentity gameIdentity, IDirectoryInfo location)
+    {
+        if (gameIdentity == null) 
+            throw new ArgumentNullException(nameof(gameIdentity));
+        if (location == null) 
+            throw new ArgumentNullException(nameof(location));
+        return new(gameIdentity, location, false);
+    }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="GameDetectionResult"/> of an undetected game.
     /// </summary>
     /// <param name="type">The requested <see cref="GameType"/></param>
     public static GameDetectionResult NotInstalled(GameType type)
     {
-        return new(type);
+        return new(new GameIdentity(type, GamePlatform.Undefined), null, false);
     }
 
     /// <summary>
-    /// Creates a new instance where <see cref="InitializationRequired"/> is <see langword="true"/>
+    /// Creates a new instance of <see cref="GameDetectionResult"/> of an uninitialized game.
     /// </summary>
-    /// <param name="type">The requested <see cref="GameType"/></param>
+    /// <param name="type">The requested <see cref="GameType"/>.</param>
     public static GameDetectionResult RequiresInitialization(GameType type)
     {
-        return new(type, true);
+        return new(new GameIdentity(type, GamePlatform.Undefined), null, true);
     }
 }

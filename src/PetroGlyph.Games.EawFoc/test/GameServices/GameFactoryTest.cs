@@ -34,12 +34,6 @@ public class GameFactoryTest
     }
 
     [Fact]
-    public void FaultedDetection_Throws()
-    {
-        Assert.Throws<GameException>(() => _factory.CreateGame(new GameDetectionResult(GameType.Eaw, new Exception()), CultureInfo.CurrentCulture));
-    }
-
-    [Fact]
     public void NotInstalled_Throws()
     {
         _nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
@@ -91,7 +85,7 @@ public class GameFactoryTest
     {
         _nameResolver.Setup(r => r.ResolveName(It.IsAny<IGameIdentity>(), It.IsAny<CultureInfo>())).Returns("GameName");
         var identity = new GameIdentity(GameType.Eaw, GamePlatform.Disk);
-        var detectionResult = new GameDetectionResult(identity, _fileSystem.DirectoryInfo.New("GameData"));
+        var detectionResult = GameDetectionResult.FromInstalled(identity, _fileSystem.DirectoryInfo.New("GameData"));
         _fileSystem.Initialize()
             .WithSubdirectory("GameData")
             .WithFile("GameData/sweaw.exe");

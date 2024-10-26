@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -34,12 +36,14 @@ public abstract class GameDetectorBase : IGameDetector
     protected IFileSystem FileSystem;
 
     /// <summary>
-    /// Creates a new instance
+    /// Creates a new instance of the <see cref="GameDetectorBase"/> class.
     /// </summary>
     /// <param name="serviceProvider">The service provider</param>
     /// <param name="tryHandleInitialization">
-    /// Indicates whether this instance shall raise the <see cref="InitializationRequested"/>event.
-    /// When set to <see langword="false"/> the event will not be raised and initialization cannot be handled.</param>
+    /// Indicates whether this instance shall raise the <see cref="InitializationRequested"/> event.
+    /// When set to <see langword="false"/> the event will not be raised and initialization cannot be handled.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="serviceProvider"/> is <see langword="null"/>.</exception>
     protected GameDetectorBase(IServiceProvider serviceProvider, bool tryHandleInitialization)
     {
         ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -47,14 +51,78 @@ public abstract class GameDetectorBase : IGameDetector
         Logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
         FileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
     }
+    
+    /// <inheritdoc/>
+    public bool TryDetect(GameType gameType, ICollection<GamePlatform> platforms, out GameDetectionResult result)
+    {
+        try
+        {
+            result = Detect(gameType, platforms);
+            return result.Installed;
+        }
+        catch (Exception e)
+        {
+            Logger?.LogWarning(e, "Unable to find any games, due to error in detection.");
+            result = GameDetectionResult.NotInstalled(gameType);
+            return false;
+        }
+    }
 
-    /// <summary>
-    /// Checks whether a specified directory contains the matching executable file.
-    /// </summary>
-    /// <param name="directory">The directory to check.</param>
-    /// <param name="gameType">The <see cref="GameType"/> of the game.</param>
-    /// <returns><see langword="true"/>if the directory contains the correct executable file; <see langword="false"/> otherwise.</returns>
-    public static bool GameExeExists(IDirectoryInfo directory, GameType gameType)
+    /// <inheritdoc/>
+    public GameDetectionResult Detect(GameType gameType, ICollection<GamePlatform> platforms)
+    {
+        platforms = NormalizePlatforms(platforms);
+
+        var locationData = FindGameLocation(gameType);
+
+        if (!locationData.IsInstalled)
+        {
+            Logger?.LogInformation($"Unable to find an installed game of type {gameType}.");
+            return GameDetectionResult.NotInstalled(gameType);
+        }
+
+        if (!HandleInitialization(gameType, ref locationData))
+            return GameDetectionResult.RequiresInitialization(gameType);
+
+        var location = locationData.Location!;
+        var identifier = ServiceProvider.GetRequiredService<IGamePlatformIdentifier>();
+        var actualPlatform = identifier.GetGamePlatform(gameType, ref location);
+
+        // This is the bare minimum for a game to exist on the disk. If we don't have these files,
+        // the detector returned a false result.
+        if (!GameExeExists(location, gameType) || !DataAndMegaFilesXmlExists(location))
+        {
+            Logger?.LogDebug($"Unable to find the game's executable or megafiles.xml at the given location: {location.FullName}");
+            return GameDetectionResult.NotInstalled(gameType);
+        }
+
+        if (!MatchesOptionsPlatform(platforms, actualPlatform))
+        {
+            var wrongGameFound = GameDetectionResult.NotInstalled(gameType);
+            Logger?.LogInformation($"Game detected at location: {wrongGameFound.GameLocation?.FullName} " +
+                                   $"but Platform {actualPlatform} was not requested.");
+            return wrongGameFound;
+        }
+
+        var detectedResult = GameDetectionResult.FromInstalled(new GameIdentity(gameType, actualPlatform), location);
+        Logger?.LogInformation($"Game detected: {detectedResult.GameIdentity} at location: {location.FullName}");
+        return detectedResult;
+    }
+
+    /// <inheritdoc/>
+    [ExcludeFromCodeCoverage]
+    public override string ToString()
+    {
+        return GetType().Name;
+    }
+
+    internal static bool MinimumGameFilesExist(GameType type, IDirectoryInfo directory)
+    {
+        return GameExeExists(directory, type) && DataAndMegaFilesXmlExists(directory);
+    }
+
+
+    internal static bool GameExeExists(IDirectoryInfo directory, GameType gameType)
     {
         if (!directory.Exists)
             return false;
@@ -67,16 +135,8 @@ public abstract class GameDetectorBase : IGameDetector
         return directory.FileSystem.File.Exists(exePath);
     }
 
-    /// <summary>
-    /// Checks whether a specified directory contains the DATA directory together with the MegaFiles.XML file.
-    /// </summary>
-    /// <param name="directory">The directory to check.</param>
-    /// <returns><see langword="true"/>if the directory contains the correct executable file; <see langword="false"/> otherwise.</returns>
-    public static bool DataAndMegaFilesXmlExists(IDirectoryInfo directory)
+    internal static bool DataAndMegaFilesXmlExists(IDirectoryInfo directory)
     {
-        if (!directory.Exists)
-            return false;
-
         var fs = directory.FileSystem;
 
         var dataPath = fs.Path.Combine(directory.FullName, "Data");
@@ -88,105 +148,38 @@ public abstract class GameDetectorBase : IGameDetector
         return fs.File.Exists(megaFilesPath);
     }
 
-    /// <inheritdoc/>
-    public bool TryDetect(GameDetectorOptions options, out GameDetectionResult result)
-    {
-        try
-        {
-            result = Detect(options);
-            if (result.Error is not null)
-                return false;
-            return result.GameLocation is not null;
-
-        }
-        catch (Exception e)
-        {
-            Logger?.LogWarning(e, "Unable to find any games, due to error in detection.");
-            result = new GameDetectionResult(options.Type, e);
-            return false;
-        }
-    }
-
-    /// <inheritdoc/>
-    public GameDetectionResult Detect(GameDetectorOptions options)
-    {
-        options = options.Normalize();
-        var result = GameDetectionResult.NotInstalled(options.Type);
-
-        var locationData = FindGameLocation(options);
-        locationData.ThrowIfInvalid();
-
-        if (!locationData.IsInstalled)
-        {
-            Logger?.LogInformation($"Unable to find an installed game of type {options.Type}.");
-            return result;
-        }
-
-        if (!HandleInitialization(options, ref locationData))
-            return GameDetectionResult.RequiresInitialization(options.Type);
-
-        Debug.Assert(locationData.Location is not null, "Illegal operation state: Expected location to be not null!");
-
-        var location = locationData.Location!;
-        var identifier = ServiceProvider.GetRequiredService<IGamePlatformIdentifier>();
-        var platform = identifier.GetGamePlatform(options.Type, ref location, options.TargetPlatforms);
-
-        if (!GameExeExists(location, options.Type) || !DataAndMegaFilesXmlExists(location))
-        {
-            Logger?.LogDebug($"Unable to find the game's executable or megafile.xml at the given location: {location.FullName}");
-            return GameDetectionResult.NotInstalled(options.Type);
-        }
-
-        if (MatchesOptionsPlatform(options, platform))
-        {
-            result = new GameDetectionResult(new GameIdentity(options.Type, platform), location);
-            Logger?.LogInformation($"Game detected: {result.GameIdentity} at location: {location.FullName}");
-            return result;
-        }
-
-        Logger?.LogInformation($"Game detected at location: {result.GameLocation?.FullName} " +
-                               $"but Platform {platform} was not requested.");
-        return result;
-    }
-
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return GetType().Name;
-    }
-
     /// <summary>
     /// Instance specific implementation which tries to find a game installation. 
     /// </summary>
-    /// <param name="options">The search options</param>
+    /// <param name="gameType">The game type to detect.</param>
     /// <returns>Information about a found game installation.</returns>
     /// <remarks>This method may throw arbitrary exceptions.</remarks>
-    protected internal abstract GameLocationData FindGameLocation(GameDetectorOptions options);
+    protected abstract GameLocationData FindGameLocation(GameType gameType);
 
-    private static bool MatchesOptionsPlatform(GameDetectorOptions options, GamePlatform identifiedPlatform)
+    private static bool MatchesOptionsPlatform(ICollection<GamePlatform> platforms, GamePlatform identifiedPlatform)
     {
-        return options.TargetPlatforms.Contains(GamePlatform.Undefined) ||
-               options.TargetPlatforms.Contains(identifiedPlatform);
+        return platforms.Contains(GamePlatform.Undefined) ||
+               platforms.Contains(identifiedPlatform);
     }
 
-    private bool HandleInitialization(GameDetectorOptions options, ref GameLocationData locationData)
+    private bool HandleInitialization(GameType gameType, ref GameLocationData locationData)
     {
         if (!locationData.InitializationRequired)
             return true;
 
-        Logger?.LogDebug($"It appears that the game '{locationData.ToString()}' exists but it is not initialized. Game options: {options}.");
+        Logger?.LogDebug($"It appears that the game '{locationData.ToString()}' exists but it is not initialized. Game type '{gameType}'.");
         if (!_tryHandleInitialization)
             return false;
 
-        if (RequestInitialization(options))
-            locationData = FindGameLocation(options);
+        if (RequestInitialization(gameType))
+            locationData = FindGameLocation(gameType);
 
         return locationData.Location is not null;
     }
 
-    private bool RequestInitialization(GameDetectorOptions options)
+    private bool RequestInitialization(GameType gameType)
     {
-        var request = new GameInitializeRequestEventArgs(options);
+        var request = new GameInitializeRequestEventArgs(gameType);
         var callbacks = InitializationRequested;
         if (callbacks is not null)
         {
@@ -196,34 +189,54 @@ public abstract class GameDetectorBase : IGameDetector
         return request.Handled;
     }
 
+    private static IList<GamePlatform> NormalizePlatforms(ICollection<GamePlatform> platforms)
+    {
+        if (platforms.Count == 0 || platforms.Contains(GamePlatform.Undefined))
+            return [GamePlatform.Undefined];
+        return platforms.Distinct().ToList();
+    }
+
     /// <summary>
     /// Represents location and initialization state of a game.
     /// </summary>
-    protected internal readonly struct GameLocationData
+    public readonly struct GameLocationData
     {
+        /// <summary>
+        /// Gets a <see cref="GameLocationData"/> representing a not installed location.
+        /// </summary>
+        public static readonly GameLocationData NotInstalled = default;
+
+        /// <summary>
+        /// Gets a <see cref="GameLocationData"/> representing an uninitialized game state.
+        /// </summary>
+        public static readonly GameLocationData RequiresInitialization = new() { InitializationRequired = true };
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GameLocationData"/> struct of the specified game location.
+        /// </summary>
+        /// <param name="location">The detected game location or <see langword="null"/> if no game was detected.</param>
+        public GameLocationData(IDirectoryInfo? location)
+        {
+            Location = location;
+        }
+
         /// <summary>
         /// Nullable location entry.
         /// </summary>
-        public IDirectoryInfo? Location { get; init; }
+        public IDirectoryInfo? Location { get; }
 
         /// <summary>
         /// Indicates whether an initialization is required.
         /// </summary>
-        public bool InitializationRequired { get; init; }
+        public bool InitializationRequired { get; private init; }
 
         /// <summary>
         /// Indicates whether this instance represents an installed game.
         /// </summary>
         public bool IsInstalled => Location != null || InitializationRequired;
 
-        internal void ThrowIfInvalid()
-        {
-            if (Location is not null && InitializationRequired)
-                throw new NotSupportedException("The LocationData cannot have a location set " +
-                                                $"but also {nameof(InitializationRequired)} set to true.");
-        }
-
         /// <inheritdoc />
+        [ExcludeFromCodeCoverage]
         public override string ToString()
         {
             if (InitializationRequired)

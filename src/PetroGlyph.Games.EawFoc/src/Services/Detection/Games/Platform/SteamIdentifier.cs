@@ -4,25 +4,21 @@ using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 
-internal class SteamIdentifier : SpecificPlatformIdentifier
+internal class SteamIdentifier(IServiceProvider serviceProvider) : SpecificPlatformIdentifier(serviceProvider)
 {
-
-    private static readonly string[] KnownSteamFiles = {
+    private static readonly string[] KnownSteamFiles =
+    [
         "32470_install.vdf",
         "32472_install.vdf",
         "runm2.dat",
         "runme.dat",
         "runme.exe",
         "runme2.exe"
-    };
-
-    public SteamIdentifier(IServiceProvider serviceProvider) : base(serviceProvider)
-    {
-    }
+    ];
 
     public override bool IsPlatformFoc(ref IDirectoryInfo location)
     {
-        if (!GameDetectorBase.GameExeExists(location, GameType.Foc))
+        if (!GameDetectorBase.MinimumGameFilesExist(GameType.Foc, location))
             return false;
 
         if (!ContainsSteamExe(location))
@@ -34,7 +30,7 @@ internal class SteamIdentifier : SpecificPlatformIdentifier
 
     public override bool IsPlatformEaw(ref IDirectoryInfo location)
     {
-        if (!GameDetectorBase.GameExeExists(location, GameType.Eaw))
+        if (!GameDetectorBase.MinimumGameFilesExist(GameType.Eaw, location))
             return false;
 
         if (!ContainsSteamExe(location))

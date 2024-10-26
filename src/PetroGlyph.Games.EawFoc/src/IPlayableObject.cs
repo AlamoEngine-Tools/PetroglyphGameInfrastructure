@@ -6,29 +6,27 @@ using PG.StarWarsGame.Infrastructure.Mods;
 namespace PG.StarWarsGame.Infrastructure;
 
 /// <summary>
-/// Flag interface to identify an object which can be played in some sort.
-/// Known types are <see cref="IGame"/> and <see cref="IMod"/>
+/// Represents a playable PG entity. Known types are <see cref="IGame"/> and <see cref="IMod"/>
 /// </summary>
 public interface IPlayableObject
 {
     /// <summary>
-    /// The name of this playable object.
+    /// Gets the name of this playable object.
     /// </summary>
     string Name { get; }
 
     /// <summary>
-    /// Set of available languages for this instance.
+    /// Gets a set of available languages for this object.
     /// </summary>
     ISet<ILanguageInfo> InstalledLanguages { get; }
 
     /// <summary>
-    /// Absolute or relative path to an icon of this instance.
+    /// Gets the absolute or relative path to an icon of this object.
     /// </summary>
     string? IconFile { get; }
 
     /// <summary>
-    /// The game associated to this instance.
-    /// If this instance is an <see cref="IGame"/> this returns itself.
+    /// Gets the game that is associated to this object. If this object is itself an <see cref="IGame"/> this instance is returned.
     /// </summary>
     IGame Game { get; }
 }

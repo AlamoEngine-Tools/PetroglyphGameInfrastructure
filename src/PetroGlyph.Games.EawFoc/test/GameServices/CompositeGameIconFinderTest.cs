@@ -12,10 +12,10 @@ public class CompositeGameIconFinderTest
     [Fact]
     public void TestInvalidArgs_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new CompositeGameIconFinder(null));
+        Assert.Throws<ArgumentNullException>(() => new CompositeGameIconFinder(null!));
         Assert.Throws<ArgumentException>(() => new CompositeGameIconFinder(new List<IGameIconFinder>()));
-        Assert.Throws<ArgumentNullException>(() =>
-            new CompositeGameIconFinder(new List<IGameIconFinder> { null }).FindIcon(null));
+        Assert.Throws<ArgumentException>(() =>
+            new CompositeGameIconFinder(new List<IGameIconFinder> { null! }).FindIcon(null!));
     }
 
     [Fact]

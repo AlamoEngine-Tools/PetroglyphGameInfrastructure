@@ -1,6 +1,5 @@
 ﻿using System;
 using EawModinfo;
-using EawModinfo.Model;
 using EawModinfo.Spec;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Games;

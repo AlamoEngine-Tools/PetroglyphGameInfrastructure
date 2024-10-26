@@ -42,35 +42,22 @@ internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
     }
 
     /// <inheritdoc/>
-    public GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location, IList<GamePlatform> lookupPlatforms)
+    public GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location)
     {
         if (location == null)
             throw new ArgumentNullException(nameof(location));
-        if (lookupPlatforms == null)
-            throw new ArgumentNullException(nameof(lookupPlatforms));
-        return GetGamePlatformCore(type, ref location, NormalizeLookupPlatforms(lookupPlatforms));
-    }
-
-    private GamePlatform GetGamePlatformCore(GameType type, ref IDirectoryInfo location, IEnumerable<GamePlatform> lookupPlatforms)
-    {
-        _logger?.LogDebug("Validating game platform:");
-        foreach (var platform in lookupPlatforms)
+        foreach (var platform in DefaultGamePlatformOrdering)
         {
             var validator = GamePlatformIdentifierFactory.Create(platform, _serviceProvider);
             _logger?.LogDebug($"Validating location for {platform}...");
             if (!validator.IsPlatform(type, ref location))
                 continue;
 
-            _logger?.LogDebug($"Game location was identified as {platform}");
+            _logger?.LogDebug($"Game location was identified as {platform}.");
             return platform;
         }
 
         _logger?.LogDebug("Unable to determine which which platform the game has.");
         return GamePlatform.Undefined;
-    }
-
-    private IList<GamePlatform> NormalizeLookupPlatforms(IList<GamePlatform> lookupPlatforms)
-    {
-        return lookupPlatforms.Contains(GamePlatform.Undefined) ? DefaultGamePlatformOrdering : lookupPlatforms;
     }
 }

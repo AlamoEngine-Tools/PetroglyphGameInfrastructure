@@ -18,8 +18,6 @@ internal sealed class GameFactory(IServiceProvider serviceProvider) : IGameFacto
     {
         if (gameDetection == null)
             throw new ArgumentNullException(nameof(gameDetection));
-        if (gameDetection.Error is not null)
-            throw new GameException("Unable to create a game from faulted detection result.");
         if (gameDetection.GameLocation is null)
             throw new GameException($"Unable to create game {gameDetection.GameIdentity.Type}, because it's not installed on this machine");
         return CreateGame(gameDetection.GameIdentity, gameDetection.GameLocation, false, culture);
@@ -38,6 +36,8 @@ internal sealed class GameFactory(IServiceProvider serviceProvider) : IGameFacto
             throw new GameException("Cannot create game with null or empty name.");
 
         var game = new PetroglyphStarWarsGame(identity, location, name!, _serviceProvider);
+        
+        // TODO: Should also ensure correct platform.
         if (checkGameExists && !game.Exists())
             throw new GameException($"Game does not exists at location: {location}");
 

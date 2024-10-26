@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
@@ -26,9 +25,14 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     private IDirectoryInfo? _modLocation;
     
     /// <summary>
-    /// Shared Service provider instance.
+    /// Gets the service provider.
     /// </summary>
     protected IServiceProvider ServiceProvider;
+
+    /// <summary>
+    /// Gets the file system of this game.
+    /// </summary>
+    protected readonly IFileSystem FileSystem;
 
     /// <summary>
     /// Shared internal (modifiable) set of mods.
@@ -51,9 +55,6 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     public IDirectoryInfo Directory { get; }
 
     /// <inheritdoc/>
-    public IFileSystem FileSystem => Directory.FileSystem;
-
-    /// <inheritdoc/>
     public IDirectoryInfo ModsLocation
     {
         get
@@ -72,10 +73,10 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     public IReadOnlyCollection<IMod> Mods => ModsInternal.ToList();
 
     /// <summary>
-    /// Creates a new game instance.
+    /// Initializes a new game instance of the <see cref="PetroglyphStarWarsGame"/> class with the specified identity, name and location.
     /// </summary>
-    /// <param name="gameIdentity">The game identity.</param>
-    /// <param name="gameDirectory">The game directory</param>
+    /// <param name="gameIdentity">The game's identity.</param>
+    /// <param name="gameDirectory">The game's install directory</param>
     /// <param name="name">The name of the game.</param>
     /// <param name="serviceProvider">The service provider.</param>
     public PetroglyphStarWarsGame(
@@ -92,6 +93,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
             throw new ArgumentNullException(nameof(gameIdentity));
         AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
 
+        FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         Name = name;
         Type = gameIdentity.Type;
         Platform = gameIdentity.Platform;
@@ -107,16 +109,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     /// <inheritdoc/>
     public virtual bool Exists()
     {
-        try
-        {
-            var d = new DirectoryGameDetector(Directory, ServiceProvider);
-            var r = d.FindGameLocation(new GameDetectorOptions(Type) { TargetPlatforms = new[] { Platform } });
-            return r.IsInstalled && r.Location == Directory;
-        }
-        catch (IOException)
-        {
-            return false;
-        }
+        return GameDetectorBase.MinimumGameFilesExist(Type, Directory);
     }
 
     /// <inheritdoc/>
@@ -198,6 +191,11 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
         return _normalizedPath.Equals(normalizedDirectory, StringComparison.Ordinal);
     }
 
+    bool IEquatable<IGameIdentity>.Equals(IGameIdentity other)
+    {
+        return Type == other.Type && Platform == other.Platform;
+    }
+
     /// <inheritdoc/>
     public override bool Equals(object? obj)
     {
@@ -211,13 +209,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     /// <inheritdoc/>
     public override int GetHashCode()
     {
-        unchecked
-        {
-            var hashCode = _normalizedPath.GetHashCode();
-            hashCode = (hashCode * 397) ^ (int)Type;
-            hashCode = (hashCode * 397) ^ (int)Platform;
-            return hashCode;
-        }
+        return HashCode.Combine(_normalizedPath, Type, Platform);
     }
 
     /// <inheritdoc/>

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
@@ -10,11 +9,10 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 internal interface IGamePlatformIdentifier
 {
     /// <summary>
-    /// Identifies the <see cref="GamePlatform"/> using a custom lookup strategy taken from <paramref name="lookupPlatforms"/>.
+    /// Identifies the <see cref="GamePlatform"/> from a specified game location.
     /// </summary>
     /// <param name="type">The <see cref="GameType"/> of the installation.</param>
-    /// <param name="location">The installation location. Note that during this method the reference might get changed!</param>
-    /// <param name="lookupPlatforms">Ordered list of platforms to query. If the list contains <see cref="GamePlatform.Undefined"/>, all possible platforms will be queried in their default order.</param>
-    /// <returns></returns>
-    GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location, IList<GamePlatform> lookupPlatforms);
+    /// <param name="location">The variable containing a reference to the installation location. During this operation the reference might get changed.</param>
+    /// <returns>The identified game platform. <see cref="GamePlatform.Undefined"/> if no platform could be identified.</returns>
+    GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location);
 }

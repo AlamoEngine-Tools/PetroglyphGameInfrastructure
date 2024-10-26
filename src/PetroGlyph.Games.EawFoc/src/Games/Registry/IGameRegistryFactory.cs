@@ -1,15 +1,14 @@
 ﻿namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 /// <summary>
-/// Factory service to create an <see cref="IGameRegistry"/>
+/// A factory to create new instances of an <see cref="IGameRegistry"/>.
 /// </summary>
 public interface IGameRegistryFactory
 {
     /// <summary>
-    /// Returns a <see cref="IGameRegistry"/> for a requested <see cref="GameType"/>.
+    /// Create a new instance of an <see cref="IGameRegistry"/> for a specified <see cref="GameType"/>.
     /// </summary>
     /// <param name="type">The <see cref="GameType"/> of the registry.</param>
-    /// <returns>An instance of the registry for the given <paramref name="type"/>.</returns>
-    /// <exception cref="GameRegistryNotFoundException">The game's registry does not exist.</exception>
+    /// <returns>A new instance of the registry for the specified <paramref name="type"/>.</returns>
     IGameRegistry CreateRegistry(GameType type);
 }

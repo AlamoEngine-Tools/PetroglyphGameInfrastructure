@@ -10,12 +10,11 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
-/// Searches an installation of a Petroglyph Star Wars game on the Steam client.
-/// <para>
-/// When an installation was found, but was not initialized,
-/// this instance will raise an <see cref="IGameDetector.InitializationRequested"/> event.
-/// </para>
+/// A <see cref="IGameDetector"/> that is able to find game installations from Steam.
 /// </summary>
+/// <remarks>
+/// This detector supports game initialization requests.
+/// </remarks>
 public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
 {
     private const uint EaWGameId = 32470;
@@ -35,26 +34,26 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
     }
 
     /// <inheritdoc />
-    protected internal override GameLocationData FindGameLocation(GameDetectorOptions options)
+    protected override GameLocationData FindGameLocation(GameType gameType)
     {
         using var steam = _steamWrapperFactory.CreateWrapper();
 
         if (!steam.Installed)
-            return default;
+            return GameLocationData.NotInstalled;
 
         if (!steam.IsGameInstalled(EaWGameId, out var game))
-            return default;
+            return GameLocationData.NotInstalled;
 
         if (!game!.State.HasFlag(SteamAppState.StateFullyInstalled))
-            return default;
+            return GameLocationData.NotInstalled;
 
-        if (options.Type == GameType.Foc && !game.Depots.Contains(FocDepotId))
-            return default;
+        if (gameType == GameType.Foc && !game.Depots.Contains(FocDepotId))
+            return GameLocationData.NotInstalled;
 
         // This only contains the root directory
         var gameLocation = game.InstallDir;
         var fullGamePath = gameLocation.FullName;
-        fullGamePath = options.Type switch
+        fullGamePath = gameType switch
         {
             GameType.Foc => FileSystem.Path.Combine(fullGamePath, "corruption"),
             GameType.Eaw => FileSystem.Path.Combine(fullGamePath, "GameData"),
@@ -63,25 +62,17 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
 
         var installLocation = FileSystem.DirectoryInfo.New(fullGamePath);
 
-        try
-        {
-            using var registry = _registryFactory.CreateRegistry(options.Type);
-            if (registry.Type != options.Type)
-                throw new InvalidOperationException("Incompatible registry");
-            if (registry.Version is null)
-            {
-                Logger?.LogDebug("Registry-Key found, but games are not initialized.");
-                return new GameLocationData { InitializationRequired = true };
-            }
-        }
-        catch (GameRegistryNotFoundException)
+        using var registry = _registryFactory.CreateRegistry(gameType);
+        if (registry.Type != gameType)
+            throw new InvalidOperationException("Incompatible registry");
+        if (registry.Version is null)
         {
             Logger?.LogDebug("Registry-Key found, but games are not initialized.");
-            return new GameLocationData { InitializationRequired = true };
+            return GameLocationData.RequiresInitialization;
         }
 
-        return !GameExeExists(installLocation, options.Type)
-            ? default
-            : new GameLocationData { Location = installLocation };
+        return !GameExeExists(installLocation, gameType)
+            ? GameLocationData.NotInstalled
+            : new GameLocationData(installLocation);
     }
 }

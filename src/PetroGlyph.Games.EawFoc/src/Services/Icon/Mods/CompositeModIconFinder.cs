@@ -17,7 +17,7 @@ public class CompositeModIconFinder : IModIconFinder
     /// <param name="orderedFinders">Ordered list of <see cref="IGameIconFinder"/>s.</param>
     public CompositeModIconFinder(IList<IModIconFinder> orderedFinders)
     {
-        ThrowHelper.ThrowIfCollectionNullOrEmpty(orderedFinders);
+        ThrowHelper.ThrowIfCollectionNullOrEmptyOrContainsNull(orderedFinders);
         _orderedFinders = orderedFinders;
     }
 

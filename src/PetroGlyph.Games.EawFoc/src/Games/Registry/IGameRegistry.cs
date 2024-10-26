@@ -4,32 +4,27 @@ using System.IO.Abstractions;
 namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 /// <summary>
-/// A Registry wrapper for an <see cref="IGame"/>.
+/// Represents a wrapper for Registry values a Petroglyph Star Wars game uses.
 /// </summary>
 public interface IGameRegistry : IDisposable
 {
     /// <summary>
-    /// The <see cref="GameType"/> this registry is dedicated to.
+    /// Gets the <see cref="GameType"/> this registry is dedicated to.
     /// </summary>
     GameType Type { get; }
 
     /// <summary>
-    /// Key indication the game exists.
+    /// Gets a values indicating whether the underlying registry key exists.
     /// </summary>
     bool Exits { get; }
 
     /// <summary>
-    /// The game this instance is associated too.
-    /// </summary>
-    IGame? Game { get; }
-
-    /// <summary>
-    /// The version registry node.
+    /// Gets the version registry node.
     /// </summary>
     Version? Version { get; }
 
     /// <summary>
-    /// The installed license key.
+    /// Gets the installed license key.
     /// </summary>
     string? CdKey { get; }
 
@@ -39,14 +34,16 @@ public interface IGameRegistry : IDisposable
     int? EaWGold { get; }
 
     /// <summary>
-    /// The game's exe file.
+    /// Gets the game's exe file.
     /// </summary>
     IFileInfo? ExePath { get; }
 
     /// <summary>
-    /// Useless indication whether the game is installed,
-    /// because there exists no native mechanism which sets this property to the correct value.
+    /// Gets the registry value, whether the game is installed.
     /// </summary>
+    /// <remarks>
+    /// This value should not be trusted as it is not ensured this value is set correctly by any client platform.
+    /// </remarks>
     bool? Installed { get; }
 
     /// <summary>
@@ -56,18 +53,12 @@ public interface IGameRegistry : IDisposable
     IDirectoryInfo? InstallPath { get; }
 
     /// <summary>
-    /// The Petroglyph's native game launcher.
+    /// Gets the file info of Petroglyph's native game launcher.
     /// </summary>
     IFileInfo? Launcher { get; }
 
     /// <summary>
-    /// The revision version of the game.
+    /// Gets the revision version of the game.
     /// </summary>
     int? Revision { get; }
-
-    /// <summary>
-    /// Sets the <see cref="Game"/> property.
-    /// </summary>
-    /// <param name="game">The game instance or <see langword="null"/> to unassign the game from this instance.</param>
-    void AssignGame(IGame? game);
 }

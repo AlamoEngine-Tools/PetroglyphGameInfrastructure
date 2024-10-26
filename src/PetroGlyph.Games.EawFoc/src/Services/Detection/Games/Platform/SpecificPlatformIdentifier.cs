@@ -29,12 +29,15 @@ internal abstract class SpecificPlatformIdentifier : ISpecificPlatformIdentifier
 
     protected static bool DirectoryContainsFiles(IDirectoryInfo directory, ICollection<string> expectedFiles)
     {
-        var files = directory.GetFiles();
-        if (files.Length < expectedFiles.Count)
-            return false;
+        var files = directory.GetFiles().Select(x => x.Name).ToList();
 
-        return expectedFiles.All(steamFile =>
-            files.Any(x => x.Name.Equals(steamFile, StringComparison.InvariantCultureIgnoreCase)));
+        foreach (var expectedFile in expectedFiles)
+        {
+            if (!files.Contains(expectedFile, StringComparer.OrdinalIgnoreCase))
+                return false;
+        }
+
+        return true;
     }
 
     protected static bool DirectoryContainsFolders(IDirectoryInfo directory, ICollection<string> expectedFolders)

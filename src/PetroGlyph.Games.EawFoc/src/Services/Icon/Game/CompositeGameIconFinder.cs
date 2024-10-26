@@ -17,7 +17,7 @@ public sealed class CompositeGameIconFinder : IGameIconFinder
     /// <param name="orderedFinders">Ordered list of <see cref="IGameIconFinder"/>s.</param>
     public CompositeGameIconFinder(IList<IGameIconFinder> orderedFinders)
     {
-        ThrowHelper.ThrowIfCollectionNullOrEmpty(orderedFinders);
+        ThrowHelper.ThrowIfCollectionNullOrEmptyOrContainsNull(orderedFinders);
         _orderedFinders = orderedFinders;
     }
 

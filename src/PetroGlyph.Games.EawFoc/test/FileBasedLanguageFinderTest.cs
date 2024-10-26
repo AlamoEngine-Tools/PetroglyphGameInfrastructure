@@ -92,7 +92,6 @@ public class FileBasedLanguageFinderTest
     public void TestFindSFX_EnglishGerman()
     {
         var game = new Mock<IGame>();
-        game.Setup(g => g.FileSystem).Returns(_fileSystem);
         game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
 
         _fileSystem.Initialize()
@@ -121,7 +120,6 @@ public class FileBasedLanguageFinderTest
     public void TestFindSpeechMeg_EnglishGerman()
     {
         var game = new Mock<IGame>();
-        game.Setup(g => g.FileSystem).Returns(_fileSystem);
         game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
 
         var fs = new MockFileSystem();
@@ -151,7 +149,6 @@ public class FileBasedLanguageFinderTest
     public void TestFindSpeechFolder_EnglishGerman()
     {
         var game = new Mock<IGame>();
-        game.Setup(g => g.FileSystem).Returns(_fileSystem);
         game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
 
         _fileSystem.Initialize()
@@ -175,7 +172,6 @@ public class FileBasedLanguageFinderTest
     public void TestFindSpeechFolder_NotExists()
     {
         var game = new Mock<IGame>();
-        game.Setup(g => g.FileSystem).Returns(_fileSystem);
         game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
 
         _fileService.Setup(s => s.DataDirectory(game.Object, "Audio/Speech", false))

@@ -35,3 +35,6 @@ public enum TestPlatformIdentifier
     Windows = 1,
     Linux = 2,
 }
+
+[StructLayout(LayoutKind.Explicit)]
+public struct EmptyStruct;

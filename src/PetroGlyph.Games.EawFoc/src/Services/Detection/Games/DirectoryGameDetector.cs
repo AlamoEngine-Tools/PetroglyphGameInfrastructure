@@ -1,18 +1,22 @@
 ﻿using System;
 using System.IO.Abstractions;
 using Microsoft.Extensions.Logging;
+using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
-/// Detects whether a given directory contains a Petroglyph Star Wars Game
+/// A <see cref="IGameDetector"/> that that is able to detect game installations from a specified directory.
 /// </summary>
+/// <remarks>
+/// This detector does not support game initialization requests.
+/// </remarks>
 public sealed class DirectoryGameDetector : GameDetectorBase
 {
     private readonly IDirectoryInfo _directory;
 
     /// <summary>
-    /// Creates a new instance.
+    /// Creates a new instance of the <see cref="DirectoryGameDetector"/> class.
     /// </summary>
     /// <param name="directory">The directory to search for an installation.</param>
     /// <param name="serviceProvider">The service provider.</param>
@@ -22,12 +26,9 @@ public sealed class DirectoryGameDetector : GameDetectorBase
     }
 
     /// <inheritdoc/>
-    protected internal override GameLocationData FindGameLocation(GameDetectorOptions options)
+    protected override GameLocationData FindGameLocation(GameType gameType)
     {
-        Logger?.LogDebug($"Searching for game {options.Type} at directory: {_directory}");
-
-        if (GameExeExists(_directory, options.Type) && DataAndMegaFilesXmlExists(_directory))
-            return new GameLocationData { Location = _directory };
-        return default;
+        Logger?.LogDebug($"Searching for game {gameType} at directory: {_directory}");
+        return !MinimumGameFilesExist(gameType, _directory) ? GameLocationData.NotInstalled : new GameLocationData(_directory);
     }
 }

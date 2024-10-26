@@ -1,17 +1,19 @@
-﻿namespace PG.StarWarsGame.Infrastructure.Games;
+﻿using System;
+
+namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
-/// Minimal information to identify and distinguish Petroglyph Star Wars games from each other.
+/// Represents the minimal information to identify and distinguish different Petroglyph Star Wars games from each other.
 /// </summary>
-public interface IGameIdentity
+public interface IGameIdentity : IEquatable<IGameIdentity>
 {
     /// <summary>
-    /// The type of the game.
+    /// Gets the type of the game.
     /// </summary>
     public GameType Type { get; }
 
     /// <summary>
-    /// The platform of the game.
+    /// Gets the platform of the game.
     /// </summary>
     public GamePlatform Platform { get; }
 }
