@@ -97,4 +97,17 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
         Assert.Throws<ArgumentException>(() => new RegistryGameDetector(focRegistry, focRegistry, false, ServiceProvider));
         Assert.Throws<ArgumentException>(() => new RegistryGameDetector(eawRegistry, eawRegistry, false, ServiceProvider));
     }
+
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void Dispose_ShallDisposeRegistries(GameIdentity identity)
+    {
+        var info = SetupGame(identity);
+        var detector = new RegistryGameDetector(info.DetectorSetupInfo!.EawRegistry!, info.DetectorSetupInfo!.FocRegistry!,
+            false, ServiceProvider);
+        detector.Dispose();
+
+        Assert.Throws<ObjectDisposedException>(() => info.DetectorSetupInfo.EawRegistry.CdKey);
+        Assert.Throws<ObjectDisposedException>(() => info.DetectorSetupInfo.FocRegistry.CdKey);
+    }
 }

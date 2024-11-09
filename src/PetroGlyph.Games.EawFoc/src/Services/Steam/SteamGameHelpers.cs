@@ -35,7 +35,7 @@ internal class SteamGameHelpers : ISteamGameHelpers
         if (commonParent is null)
             throw new GameException("Unable to get workshops location.");
 
-        var workshopDirPath = _fileSystem.Path.Combine(commonParent.FullName, "workshop/content/32470");
+        var workshopDirPath = _fileSystem.Path.Combine(commonParent.FullName, "workshop", "content", "32470");
         return _fileSystem.DirectoryInfo.New(workshopDirPath);
     }
 

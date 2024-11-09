@@ -43,19 +43,18 @@ public interface IModContainer : IEnumerable<IMod>
     bool RemoveMod(IMod mod);
 
     /// <summary>
-    /// Searches this instance for a <see cref="IMod"/> which matches a given <see cref="IModReference"/>.
+    /// Searches <see cref="Mods"/> whether it contains the specified mod reference.
     /// </summary>
-    /// <param name="modReference">The <see cref="IModReference"/> to match.</param>
+    /// <param name="modReference">The <see cref="IModReference"/> to find.</param>
     /// <returns>The found mod.</returns>
-    /// <exception cref="ModNotFoundException">Throws when unable to find a matching mod instance.</exception>
+    /// <exception cref="ModNotFoundException"><paramref name="modReference"/> was not found in <see cref="Mods"/>.</exception>
     IMod FindMod(IModReference modReference);
 
     /// <summary>
-    /// Searches this instance for a <see cref="IMod"/> which matches a given <see cref="IModReference"/>.
+    /// Searches <see cref="Mods"/> whether it contains the specified mod reference.
     /// </summary>
-    /// <param name="modReference">The <see cref="IModReference"/> to match.</param>
-    /// <param name="mod">The mod instance which was found. <see langword="null"/>if no instance in this container matched.</param>
-    /// <returns><see langword="true"/>if a matching mod could be found; <see langword="false"/> otherwise.</returns>
-    /// <exception cref="ModNotFoundException">Throws when unable to find a matching mod instance.</exception>
+    /// <param name="modReference">The <see cref="IModReference"/> to find.</param>
+    /// <param name="mod">When this method returns the variable contains the mod found or <see langword="null"/> if no <paramref name="modReference"/> was not found.</param>
+    /// <returns><see langword="true"/>if a matching mod could be found; otherwise, <see langword="false"/>.</returns>
     bool TryFindMod(IModReference modReference, out IMod? mod);
 }

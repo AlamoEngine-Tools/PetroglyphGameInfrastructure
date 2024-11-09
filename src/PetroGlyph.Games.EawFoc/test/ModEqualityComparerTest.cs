@@ -3,31 +3,69 @@ using EawModinfo.Spec;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Semver;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
-public class ModEqualityComparerTest
+public class ModEqualityComparerTest : CommonTestBase
 {
-    [Fact]
-    public void Test_Minimal()
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public void Test_ModsShouldNeverBeEquals(bool includeDeps, bool includeGame)
     {
-        var gameA = new Mock<IGame>();
-        gameA.Setup(g => g.Equals(It.IsAny<IGame>())).Returns(true);
-        var comparer = new ModEqualityComparer(false, false);
-        Assert.False(comparer.Equals(null, null));
-        var modA = new Mock<IMod>();
-        modA.Setup(m => m.Game).Returns(gameA.Object);
-        Assert.False(comparer.Equals(modA.Object, null));
-        Assert.False(comparer.Equals(null, modA.Object));
-        Assert.True(comparer.Equals(modA.Object, modA.Object));
-        var modB = new Mock<IMod>();
-        Assert.True(comparer.Equals(modA.Object, modB.Object));
-        modB.Setup(m => m.Identifier).Returns("B");
-        Assert.False(comparer.Equals(modA.Object, modB.Object));
-        modA.Setup(m => m.Identifier).Returns("B");
-        Assert.True(comparer.Equals(modA.Object, modB.Object));
+        var game = FileSystem.InstallGame(new GameIdentity(GameType.Eaw, GamePlatform.Disk), ServiceProvider);
+
+        var modA = game.InstallMod("A", false, ServiceProvider);
+        var modB = game.InstallMod("B", false, ServiceProvider);
+
+        var comparer = new ModEqualityComparer(includeDeps, includeGame);
+        Assert.False(comparer.Equals(modA, modB));
+        Assert.NotEqual(comparer.GetHashCode(modA), comparer.GetHashCode(modB));
+
+        Assert.False(comparer.Equals((IModIdentity)modA, modB));
+        Assert.NotEqual(comparer.GetHashCode((IModIdentity)modA), comparer.GetHashCode((IModIdentity)modB));
+
+        Assert.False(comparer.Equals((IModReference)modA, modB));
+        Assert.NotEqual(comparer.GetHashCode((IModReference)modA), comparer.GetHashCode((IModReference)modB));
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public void Test_ShouldAlwaysBeEquals(bool includeDeps, bool includeGame)
+    {
+        var game = FileSystem.InstallGame(new GameIdentity(GameType.Eaw, GamePlatform.Disk), ServiceProvider);
+
+        var modA = game.InstallMod("A", false, ServiceProvider);
+
+        var comparer = new ModEqualityComparer(includeDeps, includeGame);
+        Assert.True(comparer.Equals(modA, modA)); 
+        Assert.Equal(comparer.GetHashCode(modA), comparer.GetHashCode(modA));
+
+        Assert.True(comparer.Equals((IModIdentity)modA, modA));
+        Assert.Equal(comparer.GetHashCode((IModIdentity)modA), comparer.GetHashCode((IModIdentity)modA));
+
+        Assert.True(comparer.Equals(modA, modA));
+        Assert.Equal(comparer.GetHashCode((IModReference)modA), comparer.GetHashCode((IModReference)modA));
+
+        var modB = game.InstallMod("A", false, ServiceProvider);
+        Assert.True(comparer.Equals(modA, modB));
+        Assert.Equal(comparer.GetHashCode(modA), comparer.GetHashCode(modB));
+
+        Assert.True(comparer.Equals((IModIdentity)modA, modB));
+        Assert.Equal(comparer.GetHashCode((IModIdentity)modA), comparer.GetHashCode((IModIdentity)modB));
+
+        Assert.True(comparer.Equals((IModReference)modA, modB));
+        Assert.Equal(comparer.GetHashCode((IModReference)modA), comparer.GetHashCode((IModReference)modB));
     }
 
     [Fact]

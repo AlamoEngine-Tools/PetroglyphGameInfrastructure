@@ -80,14 +80,18 @@ public sealed class ModEqualityComparer : IEqualityComparer<IMod>, IEqualityComp
     /// <inheritdoc/>
     public int GetHashCode(IMod obj)
     {
-        var num = 0;
-        var id = obj.Identifier;
-        num ^= _ignoreCaseComparer.GetHashCode(id);
+        var code = new HashCode();
+        code.Add(obj.Identifier);
         if (_includeGameReference)
-            num ^= obj.Game.GetHashCode();
+            code.Add(obj.Game);
         if (_includeDependencies)
-            num ^= obj.Dependencies.GetHashCode();
-        return num;
+        {
+            var depHash = new HashCode();
+            foreach (var dep in obj.Dependencies) 
+                depHash.Add(dep);
+            code.Add(depHash.ToHashCode());
+        }
+        return code.ToHashCode();
     }
 
     /// <summary>

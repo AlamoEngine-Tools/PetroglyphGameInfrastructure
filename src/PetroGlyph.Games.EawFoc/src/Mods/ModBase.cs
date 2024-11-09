@@ -176,8 +176,8 @@ public abstract class ModBase : PlayableObject, IMod
     /// <inheritdoc/>
     public virtual bool AddMod(IMod mod)
     {
-        if (Game != mod.Game)
-            throw new ModException(mod, "Game instances of the two mods must be equal");
+        if (!ReferenceEquals(Game, mod.Game))
+            throw new GameException("Game instances of the two mods must be the same.");
         var result = ModsInternal.Add(mod);
         if (result)
             OnModsCollectionModified(new ModCollectionChangedEventArgs(mod, ModCollectionChangedAction.Add));

@@ -9,7 +9,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
-public class CompositeDetectorTest : GameDetectorTestBase
+public class CompositeDetectorTest : CommonTestBase
 {
     [Fact]
     public void Ctor_InvalidThrows()

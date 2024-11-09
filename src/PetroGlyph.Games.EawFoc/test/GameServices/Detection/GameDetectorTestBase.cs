@@ -1,47 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
-using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
-public abstract class GameDetectorTestBase
-{ 
-    protected readonly IServiceProvider ServiceProvider;
-
-    protected readonly MockFileSystem FileSystem = new();
-
-    [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
-    protected GameDetectorTestBase()
-    {
-        var sc = new ServiceCollection();
-        SetupServiceProvider(sc);
-        ServiceProvider = sc.BuildServiceProvider();
-    }
-
-    protected virtual void SetupServiceProvider(IServiceCollection sc)
-    {
-        sc.AddSingleton<IFileSystem>(FileSystem);
-        PetroglyphGameInfrastructure.InitializeServices(sc);
-    }
-
-    public static IEnumerable<object[]> RealGameIdentities()
-    {
-        foreach (var platform in GITestUtilities.EnumerateRealPlatforms())
-        {
-            yield return [new GameIdentity(GameType.Eaw, platform)];
-            yield return [new GameIdentity(GameType.Foc, platform)];
-        }
-    }
-}
-
-public abstract partial class GameDetectorTestBase<T> : GameDetectorTestBase
+public abstract partial class GameDetectorTestBase<T> : CommonTestBase
 {
     protected abstract bool SupportInitialization { get; }
 

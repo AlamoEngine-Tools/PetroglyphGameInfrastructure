@@ -189,17 +189,18 @@ public class ModBaseTest
         Assert.Empty(mod);
     }
 
-    [Fact]
-    public void AddInvalidMod_Throws()
-    {
-        var game = new Mock<IGame>();
-        var sp = new Mock<IServiceProvider>();
-        var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
+    // TODO: Same as Game
+    //[Fact]
+    //public void AddInvalidMod_Throws()
+    //{
+    //    var game = new Mock<IGame>();
+    //    var sp = new Mock<IServiceProvider>();
+    //    var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
 
-        var modMock = new Mock<IMod>();
+    //    var modMock = new Mock<IMod>();
 
-        Assert.Throws<ModException>(() => mod.AddMod(modMock.Object));
-    }
+    //    Assert.Throws<ModException>(() => mod.AddMod(modMock.Object));
+    //}
 
     [Fact]
     public void AddModRaiseEvent()

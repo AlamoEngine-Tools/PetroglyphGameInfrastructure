@@ -57,17 +57,17 @@ public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContai
     DependencyResolveLayout DependencyResolveLayout { get; }
 
     /// <summary>
-    /// Searches for direct <see cref="IMod"/> dependencies.
-    /// Updates <see cref="IModIdentity.Dependencies"/> property.
+    /// Searches for direct <see cref="IMod"/> dependencies and updates the <see cref="Dependencies"/> list.
     /// This operation ignores whether dependencies have already been resolved or not.
     /// This operation sets the <see cref="DependencyResolveStatus"/> accordingly to the current state of the operation.
     /// </summary>
-    /// <param name="resolver">Resolver service to use</param>
-    /// <param name="options"></param>
-    /// <remarks>This operation does NOT update the <see cref="IModContainer.Mods"/>collection of dependencies.</remarks>
-    /// <exception cref="ModDependencyCycleException">If a dependency cycle was found.</exception>
-    /// <exception cref="ModDependencyCycleException">if the method get's called again while already resolving this instance.</exception>
-    /// <exception cref="ModNotFoundException">if a dependency could not be found.</exception>
+    /// <param name="resolver">Resolver service to use.</param>
+    /// <param name="options">The resolve options.</param>
+    /// <remarks>This operation does <b>not</b> update the <see cref="Mods"/> collection of dependencies.</remarks>
+    /// <exception cref="ModDependencyCycleException">A dependency cycle was found.</exception>
+    /// <exception cref="ModDependencyCycleException">This method gets called while already resolving this instance.</exception>
+    /// <exception cref="ModNotFoundException">A dependency could not be found.</exception>
     /// <exception cref="PetroglyphException">if some internal constrained failed.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="resolver"/> or <paramref name="options"/> is <see langword="null"/>.</exception>
     void ResolveDependencies(IDependencyResolver resolver, DependencyResolverOptions options);
 }

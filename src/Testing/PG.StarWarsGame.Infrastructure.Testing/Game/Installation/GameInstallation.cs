@@ -8,7 +8,7 @@ namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
 public static partial class GameInstallation
 {
-    private const string SteamBasePath = "steam/apps/32470";
+    private const string SteamBasePath = "steam/apps/common/SteamSW";
     private const string GogBasePath = "games/gog";
     private const string OriginBasePath = "games/origin";
 
@@ -44,6 +44,9 @@ public static partial class GameInstallation
             .WithFile(fs.Path.Combine(SteamBasePath, "runm2.dat"))
             .WithFile(fs.Path.Combine(SteamBasePath, "runme.exe"))
             .WithFile(fs.Path.Combine(SteamBasePath, "runme2.exe"));
+
+        fs.Directory.CreateDirectory(fs.Path.Combine(SteamBasePath, "..", "..", "workshop", "content", "32470"));
+
         initAction(initializer);
     }
 

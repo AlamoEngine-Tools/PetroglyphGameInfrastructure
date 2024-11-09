@@ -37,7 +37,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     /// <summary>
     /// Shared internal (modifiable) set of mods.
     /// </summary>
-    protected internal readonly HashSet<IMod> ModsInternal = new();
+    protected internal readonly HashSet<IMod> ModsInternal = new(new ModEqualityComparer(false, false));
 
     /// <inheritdoc/>
     public override string Name { get; }
