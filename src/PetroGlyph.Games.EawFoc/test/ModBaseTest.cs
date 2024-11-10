@@ -44,7 +44,7 @@ public class ModBaseTest
         Assert.Equal("Name", mod.Name);
         Assert.Equal(ModType.Default, mod.Type);
         Assert.Empty(mod.Dependencies);
-        Assert.Equal(DependencyResolveLayout.ResolveRecursive, mod.DependencyResolveLayout);
+        Assert.Equal(DependencyResolveLayout.FullResolved, mod.DependencyResolveLayout);
         Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);
         Assert.Empty(mod.Mods);
         Assert.Null(mod.Version);
@@ -55,13 +55,13 @@ public class ModBaseTest
             Icon = "IconPath",
             Version = new SemVersion(1, 0, 0),
             Languages = new List<ILanguageInfo>(),
-            Dependencies = new DependencyList(new List<IModReference>(), DependencyResolveLayout.ResolveLastItem)
+            Dependencies = new DependencyList(new List<IModReference>{mod}, DependencyResolveLayout.ResolveLastItem)
         };
         var modA = new ModMock(game.Object, ModType.Default, modinfo, sp.Object);
         Assert.Equal("Name", modA.Name);
         Assert.Equal(ModType.Default, modA.Type);
         Assert.Equal(modinfo, modA.ModInfo);
-        Assert.Empty(modA.Dependencies);
+        Assert.Empty(modA.Dependencies); // Dependencies list is empty until resolved
         Assert.Equal(DependencyResolveLayout.ResolveLastItem, modA.DependencyResolveLayout);
         Assert.Equal(DependencyResolveStatus.None, modA.DependencyResolveStatus);
         Assert.Empty(modA.Mods);

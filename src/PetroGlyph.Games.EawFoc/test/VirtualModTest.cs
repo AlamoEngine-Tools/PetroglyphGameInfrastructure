@@ -29,10 +29,12 @@ public class VirtualModTest
         var sp = new Mock<IServiceProvider>();
         Assert.Throws<ModinfoException>(() => new VirtualMod(game.Object, new Mock<IModinfo>().Object, sp.Object));
         Assert.Throws<PetroglyphException>(() => new VirtualMod("name", game.Object, new List<ModDependencyEntry>(), DependencyResolveLayout.FullResolved, sp.Object));
-        var modinfo = new Mock<IModinfo>();
-        modinfo.Setup(i => i.Name).Returns("Name");
-        modinfo.Setup(i => i.Dependencies).Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-        Assert.Throws<PetroglyphException>(() => new VirtualMod(game.Object, modinfo.Object, sp.Object));
+
+        var modInfo = new ModinfoData("Name")
+        {
+            Dependencies = new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved)
+        };
+        Assert.Throws<PetroglyphException>(() => new VirtualMod(game.Object, modInfo, sp.Object));
     }
 
     [Fact]

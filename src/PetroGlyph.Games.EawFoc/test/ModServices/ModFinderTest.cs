@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Abstractions;
-using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -20,7 +19,6 @@ public class ModFinderTest
     private readonly MockFileSystem _fileSystem;
     private readonly Mock<IModIdentifierBuilder> _idBuilder;
     private readonly Mock<IModGameTypeResolver> _gameTypeResolver;
-    private readonly Mock<IModinfoFileFinder> _modInfoFileFinder;
 
     public ModFinderTest()
     {
@@ -28,13 +26,11 @@ public class ModFinderTest
         _steamHelper = new Mock<ISteamGameHelpers>();
         _fileSystem = new MockFileSystem();
         _idBuilder = new Mock<IModIdentifierBuilder>();
-        _modInfoFileFinder = new Mock<IModinfoFileFinder>();
         _gameTypeResolver = new Mock<IModGameTypeResolver>();
         sc.AddSingleton(_ => _steamHelper.Object);
         sc.AddSingleton<IFileSystem>(_ => _fileSystem);
         sc.AddSingleton(_ => _idBuilder.Object);
         sc.AddSingleton(_ => _gameTypeResolver.Object);
-        sc.AddSingleton(_ => _modInfoFileFinder.Object);
 
         _serviceProvider = sc.BuildServiceProvider();
         _service = new ModFinder(_serviceProvider);

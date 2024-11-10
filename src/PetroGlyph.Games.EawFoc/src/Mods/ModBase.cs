@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using EawModinfo;
 using EawModinfo.Model;
 using EawModinfo.Spec;
+using EawModinfo.Spec.Equality;
 using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -317,7 +319,7 @@ public abstract class ModBase : PlayableObject, IMod
         if (modinfo is null)
             return modinfo;
         OnModinfoResolved(new ModinfoResolvedEventArgs(this, modinfo));
-        if (!new ModIdentityEqualityComparer(false, false, StringComparison.Ordinal).Equals(this, modinfo))
+        if (!new ModIdentityEqualityComparer(false, false, StringComparer.Ordinal).Equals(this, modinfo))
             throw new ModinfoException("Resolved modinfo does not match the current mod");
         return modinfo;
     }
@@ -356,5 +358,15 @@ public abstract class ModBase : PlayableObject, IMod
     protected virtual void OnDependenciesChanged(ModDependenciesChangedEventArgs e)
     {
         DependenciesChanged?.Invoke(this, e);
+    }
+
+    string IConvertibleToJson.ToJson()
+    {
+        return new ModReference(this).ToJson();
+    }
+
+    void IConvertibleToJson.ToJson(Stream stream)
+    {
+        new ModReference(this).ToJson(stream);
     }
 }

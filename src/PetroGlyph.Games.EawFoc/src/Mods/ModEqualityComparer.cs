@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
-using EawModinfo.Utilities;
+using EawModinfo.Spec.Equality;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
@@ -104,7 +104,7 @@ public sealed class ModEqualityComparer : IEqualityComparer<IMod>, IEqualityComp
     public bool Equals(IModIdentity? x, IModIdentity? y)
     {
         return !_includeDependencies
-            ? new ModIdentityEqualityComparer(true, false, StringComparison.Ordinal).Equals(x, y)
+            ? new ModIdentityEqualityComparer(true, false, StringComparer.Ordinal).Equals(x, y)
             : ModIdentityEqualityComparer.Default.Equals(x, y);
     }
 

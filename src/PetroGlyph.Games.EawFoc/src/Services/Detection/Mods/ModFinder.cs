@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
+using EawModinfo.File;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +19,6 @@ internal class ModFinder : IModReferenceFinder
     private readonly ISteamGameHelpers _steamHelper;
     private readonly IModIdentifierBuilder _idBuilder;
     private readonly IModGameTypeResolver _gameTypeResolver;
-    private readonly IModinfoFileFinder _modinfoFileFinder;
 
     /// <summary>
     /// Creates a new instance.
@@ -31,7 +31,6 @@ internal class ModFinder : IModReferenceFinder
         _idBuilder = serviceProvider.GetRequiredService<IModIdentifierBuilder>();
         _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
         _gameTypeResolver = serviceProvider.GetRequiredService<IModGameTypeResolver>();
-        _modinfoFileFinder = serviceProvider.GetRequiredService<IModinfoFileFinder>();
     }
 
     /// <summary>
@@ -76,9 +75,10 @@ internal class ModFinder : IModReferenceFinder
 
         foreach (var modDirectory in lookupDirectory.EnumerateDirectories())
         {
-            var modinfoFiles = _modinfoFileFinder.Find(FindOptions.FindAny);
-            
-            var mainModinfo = modinfoFiles.MainModinfo?.TryGetModinfo();
+            var modinfoFiles = ModinfoFileFinder.FindModinfoFiles(modDirectory);
+
+            IModinfo? mainModinfo = null;
+            modinfoFiles.MainModinfo?.TryGetModinfo(out mainModinfo);
 
             if (IsDefinitelyNotGameType(requestedGameType, modDirectory, type, mainModinfo))
                 continue;
@@ -88,10 +88,8 @@ internal class ModFinder : IModReferenceFinder
 
             foreach (var variantModinfoFile in modinfoFiles.Variants)
             {
-                var variantModinfo = variantModinfoFile.TryGetModinfo();
-                if (variantModinfo is null)
+                if (!variantModinfoFile.TryGetModinfo(out var variantModinfo))
                     continue;
-
 
                 if (IsDefinitelyNotGameType(requestedGameType, modDirectory, type, variantModinfo))
                     continue;
