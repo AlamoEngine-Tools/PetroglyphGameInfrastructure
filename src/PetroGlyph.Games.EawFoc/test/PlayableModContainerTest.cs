@@ -1,8 +1,8 @@
-﻿using EawModinfo.Spec;
-using Moq;
+﻿using System;
+using EawModinfo.Model;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Xunit;
 
@@ -25,8 +25,8 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
         var container = CreateModContainer();
         var game = container.Game;
 
-        var mod = game.InstallMod("mod", false, ServiceProvider);
-        var modSame = game.InstallMod("mod", false, ServiceProvider);
+        var mod = game.InstallMod("myMod", false, ServiceProvider);
+        var modSame = game.InstallMod("myMod", false, ServiceProvider);
 
         Assert.Empty(container.Mods);
 
@@ -44,78 +44,103 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
         Assert.Empty(container.Mods);
         Assert.Empty(container);
     }
-    
-    //[Fact]
-    //public void AddInvalidMod_Throws()
-    //{
-    //    var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
-    //    var otherGame = new PetroglyphStarWarsGame(gameIdentity, game.Directory, game.Name, ServiceProvider);
 
-    //    var mod = otherGame.InstallMod("mod", false, ServiceProvider);
+    [Fact]
+    public void AddMod_DifferentGameRef_Throws()
+    {
+        var container = CreateModContainer();
+        var game = container.Game;
 
-    //    Assert.Throws<ModException>(() => game.AddMod(mod));
+        var otherGame = new PetroglyphStarWarsGame(game, game.Directory, game.Name, ServiceProvider);
+        var mod = otherGame.InstallMod("mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        Assert.Throws<ModException>(() => container.AddMod(mod));
+    }
 
-    //    if (gameIdentity.Platform == GamePlatform.SteamGold)
-    //    {
-    //        var wsMod = otherGame.InstallMod("steamMod", true, ServiceProvider);
-    //        Assert.Throws<ModException>(() => game.AddMod(mod));
-    //    }
-    //}
+    [Fact]
+    public void AddMod_ShouldNotAddSelf()
+    {
+        var game = CreateModContainer().Game;
 
-    //[Fact]
-    //public void AddModRaiseEvent()
-    //{
-    //    var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var isWs = GITestUtilities.GetRandomWorkshopFlag(game);
+        var mod = game.InstallMod("mod", isWs, ServiceProvider);
+        var sameMod = new Mod(game, mod.Directory, isWs, mod.Name, ServiceProvider);
 
-    //    var raised = false;
-    //    game.ModsCollectionModified += (_, args) =>
-    //    {
-    //        raised = true;
-    //        Assert.Equal(ModCollectionChangedAction.Add, args.Action);
-    //    };
+        Assert.False(mod.AddMod(mod));
+        Assert.False(mod.AddMod(sameMod));
+    }
 
-    //    var modMock = new Mock<IMod>();
-    //    modMock.Setup(m => m.Game).Returns(game);
-    //    game.AddMod(modMock.Object);
+    [Fact]
+    public void AddMod_RemoveMod_RaiseEvent()
+    {
+        var container = CreateModContainer();
+        var game = container.Game;
 
-    //    Assert.True(raised);
-    //}
+        var mod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+
+        var evtAdd = Assert.Raises<ModCollectionChangedEventArgs>(
+            a => container.ModsCollectionModified += a,
+            a => container.ModsCollectionModified -= a,
+            () => { container.AddMod(mod); }
+        );
+
+        Assert.NotNull(evtAdd);
+        Assert.Equal(container, evtAdd.Sender);
+        Assert.Equal(mod, evtAdd.Arguments.Mod);
+        Assert.Equal(ModCollectionChangedAction.Add, evtAdd.Arguments.Action);
+
+        var evtRemove = Assert.Raises<ModCollectionChangedEventArgs>(
+            a => container.ModsCollectionModified += a,
+            a => container.ModsCollectionModified -= a,
+            () => { container.RemoveMod(mod); }
+        );
+
+        Assert.NotNull(evtRemove);
+        Assert.Equal(container, evtRemove.Sender);
+        Assert.Equal(mod, evtRemove.Arguments.Mod);
+        Assert.Equal(ModCollectionChangedAction.Remove, evtRemove.Arguments.Action);
+    }
 
 
-    //[Fact]
-    //public void RemoveModRaiseEvent()
-    //{
-    //    var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+    [Fact]
+    public void RemoveModRaiseEvent()
+    {
+        var container = CreateModContainer();
+        var game = container.Game;
 
-    //    var modMock = new Mock<IMod>();
-    //    var modA = modMock.Object;
-    //    modMock.Setup(m => m.Equals(It.IsAny<IMod>())).Returns(true);
-    //    modMock.Setup(m => m.Game).Returns(game);
-    //    game.AddMod(modA);
+        var mod = game.InstallMod("mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
 
-    //    var raised = false;
-    //    game.ModsCollectionModified += (_, args) =>
-    //    {
-    //        raised = true;
-    //        Assert.Equal(ModCollectionChangedAction.Remove, args.Action);
-    //    };
+        var raised = false;
+        container.ModsCollectionModified += (_, _) =>
+        {
+            raised = true;
+        };
 
-    //    game.RemoveMod(modA);
-    //    Assert.True(raised);
-    //}
+        game.RemoveMod(mod);
+        Assert.False(raised);
+    }
 
-    //[Fact]
-    //public void FindMod()
-    //{
-    //    var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+    [Fact]
+    public void FindMod()
+    {
+        var container = CreateModContainer();
+        var game = container.Game;
 
-    //    var modMock = new Mock<IMod>();
-    //    var modA = modMock.Object;
-    //    modMock.Setup(m => m.Equals(It.IsAny<IModReference>())).Returns(true);
-    //    modMock.Setup(m => m.Game).Returns(game);
-    //    game.AddMod(modA);
+        var mod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        
+        Assert.True(container.AddMod(mod));
 
-    //    var mod = game.FindMod(modA);
-    //    Assert.NotNull(mod);
-    //}
+        Assert.Same(mod, container.FindMod(mod));
+        Assert.Same(mod, container.FindMod(new ModReference(mod.Identifier, mod.Type)));
+
+        Assert.Null(container.FindMod(new ModReference("other", mod.Type)));
+    }
+
+    [Fact]
+    public void ModContainerMethod_NullArgs_Throws()
+    {
+        var container = CreateModContainer();
+        Assert.Throws<ArgumentNullException>(() => container.AddMod(null!));
+        Assert.Throws<ArgumentNullException>(() => container.RemoveMod(null!));
+        Assert.Throws<ArgumentNullException>(() => container.FindMod(null!));
+    }
 }

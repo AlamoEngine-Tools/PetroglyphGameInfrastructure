@@ -37,10 +37,10 @@ public abstract class PlayableModContainer(IServiceProvider serviceProvider) : P
     {
         if (mod == null) 
             throw new ArgumentNullException(nameof(mod));
-        if (this is IMod thisMod && ReferenceEquals(this, mod))
-            throw new ModDependencyCycleException(thisMod, "Cannot add self as a ");
         if (!ReferenceEquals(Game, mod.Game))
             throw new ModException(mod, "Game instances of the two mods must be the same.");
+        if (ReferenceEquals(this, mod) || (this is IModReference thisModRef && thisModRef.Equals(mod)))
+            return false;
         var result = ModsInternal.Add(mod);
         if (result)
             OnModsCollectionModified(new ModCollectionChangedEventArgs(mod, ModCollectionChangedAction.Add));
@@ -50,6 +50,8 @@ public abstract class PlayableModContainer(IServiceProvider serviceProvider) : P
     /// <inheritdoc />
     public bool RemoveMod(IMod mod)
     {
+        if (mod == null) 
+            throw new ArgumentNullException(nameof(mod));
         var result = ModsInternal.Remove(mod);
         if (result)
             OnModsCollectionModified(new ModCollectionChangedEventArgs(mod, ModCollectionChangedAction.Remove));
@@ -59,6 +61,8 @@ public abstract class PlayableModContainer(IServiceProvider serviceProvider) : P
     /// <inheritdoc />
     public IMod? FindMod(IModReference modReference)
     {
+        if (modReference is null) 
+            throw new ArgumentNullException(nameof(modReference));
         var identifierBuilder = ServiceProvider.GetRequiredService<IModIdentifierBuilder>();
         var normalized = identifierBuilder.Normalize(modReference);
         return Mods.FirstOrDefault(normalized.Equals);

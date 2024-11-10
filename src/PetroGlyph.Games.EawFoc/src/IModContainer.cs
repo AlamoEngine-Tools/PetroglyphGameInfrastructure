@@ -22,8 +22,10 @@ public interface IModContainer : IEnumerable<IMod>
     IReadOnlyCollection<IMod> Mods { get; }
 
     /// <summary>
-    /// Associates an <see cref="IMod"/> to the this <see cref="IModContainer"/>
+    /// Associates an <see cref="IMod"/> to the this <see cref="IModContainer"/>.
     /// <remarks>
+    /// You cannot add a mod to the collection when this instance and <paramref name="mod"/> have the same mod references.
+    /// <br></br>
     /// This operation is "in-memory" only, meaning the <paramref name="mod"/>'s <see cref="IModIdentity.Dependencies"/>
     /// will NOT be updated.
     /// </remarks>
@@ -32,7 +34,6 @@ public interface IModContainer : IEnumerable<IMod>
     /// <returns><see langword="true"/> if the mod was added; otherwise <see langword="false"/> if the mod already existed.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="mod"/> is <see langword="null"/>.</exception>
     /// <exception cref="ModException"> <paramref name="mod"/> does not point to the same game reference as the container.</exception>
-    /// <exception cref="ModDependencyCycleException">An attempt is made to add this instance to the container.</exception>
     bool AddMod(IMod mod);
 
     /// <summary>
