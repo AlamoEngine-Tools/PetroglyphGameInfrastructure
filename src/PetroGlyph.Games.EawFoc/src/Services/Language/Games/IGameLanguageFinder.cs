@@ -14,5 +14,5 @@ internal interface IGameLanguageFinder
     /// </summary>
     /// <param name="game">The target game.</param>
     /// <returns>Set of installed languages.</returns>
-    ISet<ILanguageInfo> FindInstalledLanguages(IGame game);
+    IReadOnlyCollection<ILanguageInfo> FindInstalledLanguages(IGame game);
 }

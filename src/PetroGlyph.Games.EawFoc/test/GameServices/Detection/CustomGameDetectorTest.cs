@@ -29,7 +29,7 @@ public class CustomGameDetectorTest
     public void Detect_TryDetect_FindGameLocationThrowsException(GameType gameType)
     {
         var expected = GameDetectionResult.NotInstalled(gameType);
-        foreach (var platform in GITestUtilities.EnumerateRealPlatforms())
+        foreach (var platform in GITestUtilities.RealPlatforms)
         {
             var gameInfo = _fileSystem.InstallGame(new GameIdentity(gameType, platform), _serviceProvider);
             Assert.NotNull(gameInfo);
@@ -66,7 +66,7 @@ public class CustomGameDetectorTest
     public void Detect_TryDetect_InitializationRequestedIsTriggeredWhenSupported_DoNotHandle(GameType gameType, bool supportInitialization)
     {
         var requiredInit = GameDetectionResult.RequiresInitialization(gameType);
-        foreach (var platform in GITestUtilities.EnumerateRealPlatforms())
+        foreach (var platform in GITestUtilities.RealPlatforms)
         {
             var gameInfo = _fileSystem.InstallGame(new GameIdentity(gameType, platform), _serviceProvider);
             Assert.NotNull(gameInfo);
@@ -103,7 +103,7 @@ public class CustomGameDetectorTest
     [InlineData(GameType.Foc)]
     public void Detect_TryDetect_InitializationRequestedIsTriggeredAndHandled(GameType gameType)
     {
-        foreach (var platform in GITestUtilities.EnumerateRealPlatforms())
+        foreach (var platform in GITestUtilities.RealPlatforms)
         { 
             var gameInfo = _fileSystem.InstallGame(new GameIdentity(gameType, platform), _serviceProvider);
             Assert.NotNull(gameInfo);

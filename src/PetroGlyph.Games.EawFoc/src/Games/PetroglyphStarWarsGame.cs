@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
-using System.Linq;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
-using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Icon;
 using PG.StarWarsGame.Infrastructure.Services.Language;
@@ -16,28 +14,15 @@ namespace PG.StarWarsGame.Infrastructure.Games;
 /// <summary>
 /// Represents a Petroglyph Star War Game, which is either Empire at War or Forces of Corruption.
 /// </summary>
-public class PetroglyphStarWarsGame : PlayableObject, IGame
+public class PetroglyphStarWarsGame : PlayableModContainer, IGame
 {
-    /// <inheritdoc/>
-    public event EventHandler<ModCollectionChangedEventArgs>? ModsCollectionModified;
-
     private readonly string _normalizedPath;
     private IDirectoryInfo? _modLocation;
     
     /// <summary>
-    /// Gets the service provider.
-    /// </summary>
-    protected IServiceProvider ServiceProvider;
-
-    /// <summary>
     /// Gets the file system of this game.
     /// </summary>
     protected readonly IFileSystem FileSystem;
-
-    /// <summary>
-    /// Shared internal (modifiable) set of mods.
-    /// </summary>
-    protected internal readonly HashSet<IMod> ModsInternal = new(new ModEqualityComparer(false, false));
 
     /// <inheritdoc/>
     public override string Name { get; }
@@ -69,9 +54,6 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
         }
     }
 
-    /// <inheritdoc/>
-    public IReadOnlyCollection<IMod> Mods => ModsInternal.ToList();
-
     /// <summary>
     /// Initializes a new game instance of the <see cref="PetroglyphStarWarsGame"/> class with the specified identity, name and location.
     /// </summary>
@@ -79,16 +61,18 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     /// <param name="gameDirectory">The game's install directory</param>
     /// <param name="name">The name of the game.</param>
     /// <param name="serviceProvider">The service provider.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="gameIdentity"/> or <paramref name="gameDirectory"/> or <paramref name="name"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
     public PetroglyphStarWarsGame(
         IGameIdentity gameIdentity,
         IDirectoryInfo gameDirectory,
         string name,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider) : base(serviceProvider)
     {
         if (gameDirectory == null) 
             throw new ArgumentNullException(nameof(gameDirectory));
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
         if (gameIdentity is null)
             throw new ArgumentNullException(nameof(gameIdentity));
         AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
@@ -110,66 +94,6 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     public virtual bool Exists()
     {
         return GameDetectorBase.MinimumGameFilesExist(Type, Directory);
-    }
-
-    /// <inheritdoc/>
-    public virtual bool AddMod(IMod mod)
-    {
-        // To avoid programming errors due to copies of the same game instance, we only check for reference equality.
-        if (!ReferenceEquals(this, mod.Game))
-            throw new ModException(mod, "Mod does not match to this game instance.");
-
-        var result = ModsInternal.Add(mod);
-        if (result)
-            OnModsCollectionModified(new ModCollectionChangedEventArgs(mod, ModCollectionChangedAction.Add));
-        return result;
-    }
-
-    /// <inheritdoc/>
-    public virtual bool RemoveMod(IMod mod)
-    {
-        var result = ModsInternal.Remove(mod);
-        if (result)
-            OnModsCollectionModified(new ModCollectionChangedEventArgs(mod, ModCollectionChangedAction.Remove));
-        return result;
-    }
-
-    /// <inheritdoc/>
-    public IMod FindMod(IModReference modReference)
-    {
-        var identifierBuilder = ServiceProvider.GetRequiredService<IModIdentifierBuilder>();
-        var normalized = identifierBuilder.Normalize(modReference);
-        var foundMod = Mods.FirstOrDefault(normalized.Equals);
-        if (foundMod is null)
-            throw new ModNotFoundException(modReference, this);
-        return foundMod;
-    }
-
-    /// <inheritdoc/>
-    public bool TryFindMod(IModReference modReference, out IMod? mod)
-    {
-        mod = null;
-        try
-        {
-            mod = FindMod(modReference);
-            return true;
-        }
-        catch (ModNotFoundException)
-        {
-            return false;
-        }
-    }
-
-    /// <inheritdoc/>
-    public IEnumerator<IMod> GetEnumerator()
-    {
-        return Mods.GetEnumerator();
-    }
-
-    /// <inheritdoc/>
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
     }
 
     /// <inheritdoc/>
@@ -203,7 +127,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
             return true;
         if (obj is null)
             return false;
-        return obj is IGame otherGame && Equals(otherGame);
+        return obj is PetroglyphStarWarsGame otherGame && Equals(otherGame);
     }
 
     /// <inheritdoc/>
@@ -213,6 +137,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     }
 
     /// <inheritdoc/>
+    [ExcludeFromCodeCoverage]
     public override string ToString()
     {
         return $"{Type}:{Platform} @{Directory}";
@@ -222,7 +147,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     /// Resolves the game's installed languages.
     /// </summary>
     /// <returns>Set of resolved languages.</returns>
-    protected override ISet<ILanguageInfo> ResolveInstalledLanguages()
+    protected override IReadOnlyCollection<ILanguageInfo> ResolveInstalledLanguages()
     {
         return ServiceProvider.GetRequiredService<IGameLanguageFinder>().FindInstalledLanguages(this);
     }
@@ -233,16 +158,7 @@ public class PetroglyphStarWarsGame : PlayableObject, IGame
     /// <returns>Resolve icon path or <see langword="null"/>.</returns>
     protected override string? ResolveIconFile()
     {
-        var finder = ServiceProvider.GetService<IGameIconFinder>() ?? new FallbackGameIconFinder(ServiceProvider);
+        var finder = ServiceProvider.GetRequiredService<IGameIconFinder>();
         return finder.FindIcon(this);
-    }
-
-    /// <summary>
-    /// Raises the <see cref="ModsCollectionModified"/> event for this instance.
-    /// </summary>
-    /// <param name="e">The event args to pass.</param>
-    protected virtual void OnModsCollectionModified(ModCollectionChangedEventArgs e)
-    {
-        ModsCollectionModified?.Invoke(this, e);
     }
 }

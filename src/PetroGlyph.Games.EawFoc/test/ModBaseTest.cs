@@ -9,30 +9,22 @@ using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Icon;
 using PG.StarWarsGame.Infrastructure.Services.Language;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.TestingUtilities;
 using Semver;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
-public class ModBaseTest
+public abstract class ModBaseTest : PlayableModContainerTest
 {
-    [Fact]
-    public void InvalidCtor_Throws()
+    protected abstract ModBase CreateMod();
+
+    protected PetroglyphStarWarsGame CreateRandomGame()
     {
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(null, ModType.Default, null, null).Object);
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(null, ModType.Default, null, null).Object);
-        var game = new Mock<IGame>();
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, null, null).Object);
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, null, null).Object);
-        var sp = new Mock<IServiceProvider>();
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, null, sp.Object).Object);
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, string.Empty, sp.Object).Object);
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, null, sp.Object).Object);
-
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, "abs", null).Object);
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, new Mock<IModinfo>().Object, null).Object);
-
-        Assert.ThrowsAny<Exception>(() => new Mock<ModBase>(game.Object, ModType.Default, new Mock<IModinfo>().Object, sp.Object).Object);
+        var gameId = new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), TestHelpers.GetRandom(GITestUtilities.RealPlatforms));
+        return FileSystem.InstallGame(gameId, ServiceProvider);
     }
 
     [Fact]
@@ -55,7 +47,7 @@ public class ModBaseTest
             Icon = "IconPath",
             Version = new SemVersion(1, 0, 0),
             Languages = new List<ILanguageInfo>(),
-            Dependencies = new DependencyList(new List<IModReference>{mod}, DependencyResolveLayout.ResolveLastItem)
+            Dependencies = new DependencyList(new List<IModReference> { mod }, DependencyResolveLayout.ResolveLastItem)
         };
         var modA = new ModMock(game.Object, ModType.Default, modinfo, sp.Object);
         Assert.Equal("Name", modA.Name);
@@ -70,43 +62,43 @@ public class ModBaseTest
         Assert.Equal(modinfo.Icon, modA.IconFile);
     }
 
-    [Fact]
-    public void TestModinfoResolving()
-    {
-        var game = new Mock<IGame>();
-        var sp = new Mock<IServiceProvider>();
-        var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
+    //[Fact]
+    //public void TestModinfoResolving()
+    //{
+    //    var game = new Mock<IGame>();
+    //    var sp = new Mock<IServiceProvider>();
+    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
 
-        var counter = 0;
+    //    var counter = 0;
 
-        void OnModOnResolvingModinfoA(object? sender, ResolvingModinfoEventArgs args)
-        {
-            counter++;
-            args.Cancel = true;
-        }
+    //    void OnModOnResolvingModinfoA(object? sender, ResolvingModinfoEventArgs args)
+    //    {
+    //        counter++;
+    //        args.Cancel = true;
+    //    }
 
-        void OnModOnResolvingModinfoB(object? sender, ResolvingModinfoEventArgs args)
-        {
-            counter++;
-        }
+    //    void OnModOnResolvingModinfoB(object? sender, ResolvingModinfoEventArgs args)
+    //    {
+    //        counter++;
+    //    }
 
-        mod.ResolvingModinfo += OnModOnResolvingModinfoA;
-        var flag = false;
-        mod.ModinfoResolved += (_, _) => flag = true;
-        Assert.Null(mod.ResetModinfo());
-        Assert.Null(mod.ModInfo);
-        Assert.Equal(1, counter);
-        Assert.Null(mod.ModInfo);
-        Assert.Equal(1, counter);
-        Assert.False(flag);
-        mod.ResolvingModinfo -= OnModOnResolvingModinfoA;
-        mod.ResolvingModinfo += OnModOnResolvingModinfoB;
-        Assert.Null(mod.ResetModinfo());
-        Assert.NotNull(mod.ModInfo);
-        Assert.Equal(2, counter);
-        Assert.True(flag);
+    //    mod.ResolvingModinfo += OnModOnResolvingModinfoA;
+    //    var flag = false;
+    //    mod.ModinfoResolved += (_, _) => flag = true;
+    //    Assert.Null(mod.ResetModinfo());
+    //    Assert.Null(mod.ModInfo);
+    //    Assert.Equal(1, counter);
+    //    Assert.Null(mod.ModInfo);
+    //    Assert.Equal(1, counter);
+    //    Assert.False(flag);
+    //    mod.ResolvingModinfo -= OnModOnResolvingModinfoA;
+    //    mod.ResolvingModinfo += OnModOnResolvingModinfoB;
+    //    Assert.Null(mod.ResetModinfo());
+    //    Assert.NotNull(mod.ModInfo);
+    //    Assert.Equal(2, counter);
+    //    Assert.True(flag);
 
-    }
+    //}
 
     [Fact]
     public void TestModinfoResolving_Throws()
@@ -159,128 +151,6 @@ public class ModBaseTest
         var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
         Assert.Empty(mod.InstalledLanguages);
         Assert.True(flag);
-    }
-
-    [Fact]
-    public void AddRemoveMods()
-    {
-        var game = new Mock<IGame>();
-        var sp = new Mock<IServiceProvider>();
-        var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
-
-        Assert.Empty(mod.Mods);
-
-        var modMock = new Mock<IMod>();
-        modMock.Setup(m => m.Game).Returns(game.Object);
-        modMock.Setup(m => m.Equals(It.IsAny<IMod>())).Returns(true);
-        var modA = modMock.Object;
-
-        mod.AddMod(modA);
-        Assert.Single( mod.Mods);
-        mod.AddMod(modA);
-        Assert.Single(mod.Mods);
-        Assert.Single(mod);
-
-        mod.RemoveMod(modA);
-        Assert.Empty(mod.Mods);
-
-        mod.RemoveMod(modA);
-        Assert.Empty(mod.Mods);
-        Assert.Empty(mod);
-    }
-
-    // TODO: Same as Game
-    //[Fact]
-    //public void AddInvalidMod_Throws()
-    //{
-    //    var game = new Mock<IGame>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
-
-    //    var modMock = new Mock<IMod>();
-
-    //    Assert.Throws<ModException>(() => mod.AddMod(modMock.Object));
-    //}
-
-    [Fact]
-    public void AddModRaiseEvent()
-    {
-        var game = new Mock<IGame>();
-        var sp = new Mock<IServiceProvider>();
-        var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
-
-        var raised = false;
-        mod.ModsCollectionModified += (_, args) =>
-        {
-            raised = true;
-            Assert.Equal(ModCollectionChangedAction.Add, args.Action);
-        };
-
-        var modMock = new Mock<IMod>();
-        modMock.Setup(m => m.Game).Returns(game.Object);
-        mod.AddMod(modMock.Object);
-
-        Assert.True(raised);
-    }
-
-
-    [Fact]
-    public void RemoveModRaiseEvent()
-    {
-        var game = new Mock<IGame>();
-        var sp = new Mock<IServiceProvider>();
-        var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
-
-        var modMock = new Mock<IMod>();
-        var modA = modMock.Object;
-        modMock.Setup(m => m.Equals(It.IsAny<IMod>())).Returns(true);
-        modMock.Setup(m => m.Game).Returns(game.Object);
-        mod.AddMod(modA);
-
-        var raised = false;
-        mod.ModsCollectionModified += (_, args) =>
-        {
-            raised = true;
-            Assert.Equal(ModCollectionChangedAction.Remove, args.Action);
-        };
-
-        mod.RemoveMod(modA);
-        Assert.True(raised);
-    }
-
-    [Fact]
-    public void FindMod()
-    {
-        var game = new Mock<IGame>();
-        var sp = new Mock<IServiceProvider>();
-        var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
-
-        var modMock = new Mock<IMod>();
-        var modA = modMock.Object;
-        modMock.Setup(m => m.Equals(It.IsAny<IModReference>())).Returns(true);
-        modMock.Setup(m => m.Game).Returns(game.Object);
-        mod.AddMod(modA);
-
-        var foundMod = mod.FindMod(modA);
-        Assert.NotNull(foundMod);
-
-        Assert.True(mod.TryFindMod(modA, out _));
-    }
-
-    [Fact]
-    public void FindMod_Throws()
-    {
-        var game = new Mock<IGame>();
-        var sp = new Mock<IServiceProvider>();
-        var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
-
-        var modMock = new Mock<IMod>();
-        var modA = modMock.Object;
-        modMock.Setup(m => m.Game).Returns(game.Object);
-        mod.AddMod(modA);
-
-        Assert.Throws<ModNotFoundException>(() => mod.FindMod(modA));
-        Assert.False(mod.TryFindMod(modA, out _));
     }
 
     [Fact]

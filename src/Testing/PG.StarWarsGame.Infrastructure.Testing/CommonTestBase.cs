@@ -29,7 +29,7 @@ public abstract class CommonTestBase
 
     public static IEnumerable<object[]> RealGameIdentities()
     {
-        foreach (var platform in GITestUtilities.EnumerateRealPlatforms())
+        foreach (var platform in GITestUtilities.RealPlatforms)
         {
             yield return [new GameIdentity(GameType.Eaw, platform)];
             yield return [new GameIdentity(GameType.Foc, platform)];

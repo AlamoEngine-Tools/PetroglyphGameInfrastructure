@@ -1,19 +1,20 @@
-﻿using System.IO.Abstractions;
+﻿using System;
+using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 
 /// <summary>
-/// Common helpers for Steam-based Games
+/// Provides common helpers for Steam-based Games
 /// </summary>
-internal interface ISteamGameHelpers
+public interface ISteamGameHelpers
 {
     /// <summary>
     /// Gets the game's workshop directory.
     /// </summary>
     /// <param name="game">The target game</param>
-    /// <exception cref="GameException">If the game is not a Steam game</exception>
-    /// <exception cref="GameException">If it was impossible to compute the workshop location.</exception>
+    /// <exception cref="ArgumentException"><paramref name="game"/> is not a Steam game.</exception>
+    /// <exception cref="GameException">It was impossible to compute the workshop location for <paramref name="game"/>.</exception>
     IDirectoryInfo GetWorkshopsLocation(IGame game);
 
     /// <summary>
@@ -21,14 +22,14 @@ internal interface ISteamGameHelpers
     /// </summary>
     /// <param name="game">The target game.</param>
     /// <param name="workshopsLocation">The found location; <see langword="null"/> of no workshop location could be computed.</param>
-    /// <returns><see langword="true"/>if the workshop location was found; <see langword="false"/> otherwise.</returns>
+    /// <returns><see langword="true"/>if the workshop location was found; otherwise, <see langword="false"/>.</returns>
     bool TryGetWorkshopsLocation(IGame game, out IDirectoryInfo? workshopsLocation);
 
     /// <summary>
-    /// Tries to convert a string to a <see cref="ulong"/> value which acts as a SteamWorkshop ID. 
+    /// Tries to convert a string to a <see cref="ulong"/> value which represents a Steam Workshop ID. 
     /// </summary>
     /// <param name="input">The input string</param>
     /// <param name="steamId">The resulting id.</param>
-    /// <returns><see langword="true"/>if the <paramref name="input"/> could be converted; <see langword="false"/> otherwise.</returns>
+    /// <returns><see langword="true"/>if the <paramref name="input"/> could be converted; otherwise, <see langword="false"/>.</returns>
     bool ToSteamWorkshopsId(string input, out ulong steamId);
 }

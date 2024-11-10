@@ -9,7 +9,7 @@ namespace PG.StarWarsGame.Infrastructure.Testing.Mods;
 
 public static class ModInstallations
 {
-    public static IMod InstallAndAddMod(this IGame game, string name, bool workshop, IServiceProvider serviceProvider)
+    public static Mod InstallAndAddMod(this IGame game, string name, bool workshop, IServiceProvider serviceProvider)
     {
         var mod = game.InstallMod(name, workshop, serviceProvider);
         game.AddMod(mod);
@@ -17,7 +17,7 @@ public static class ModInstallations
     }
 
 
-    public static IMod InstallMod(this IGame game, string name, bool workshop, IServiceProvider serviceProvider)
+    public static Mod InstallMod(this IGame game, string name, bool workshop, IServiceProvider serviceProvider)
     {
         Assert.True(game.ModsLocation.Exists);
 

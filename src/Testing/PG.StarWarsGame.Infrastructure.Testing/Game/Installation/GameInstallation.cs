@@ -12,7 +12,7 @@ public static partial class GameInstallation
     private const string GogBasePath = "games/gog";
     private const string OriginBasePath = "games/origin";
 
-    public static IGame InstallGame(this MockFileSystem fs, GameIdentity gameIdentity, IServiceProvider sp)
+    public static PetroglyphStarWarsGame InstallGame(this MockFileSystem fs, GameIdentity gameIdentity, IServiceProvider sp)
     { 
         Func<MockFileSystem, GamePlatform, IDirectoryInfo> installFunc;
 

@@ -28,8 +28,7 @@ internal abstract class ModLanguageFinderBase : IModLanguageFinder
     /// <summary>
     /// Default return result containing only  ENGLISH - FullLocalized.
     /// </summary>
-    protected static ISet<ILanguageInfo> DefaultLanguageCollection =
-        new HashSet<ILanguageInfo> { LanguageInfo.Default };
+    protected static HashSet<ILanguageInfo> DefaultLanguageCollection = [LanguageInfo.Default];
 
     private readonly bool _lookupInheritedLanguages;
 
@@ -50,25 +49,21 @@ internal abstract class ModLanguageFinderBase : IModLanguageFinder
     }
 
     /// <inheritdoc/>
-    public virtual ISet<ILanguageInfo> FindInstalledLanguages(IMod mod)
+    public IReadOnlyCollection<ILanguageInfo> FindInstalledLanguages(IMod mod)
     {
         // We don't "trust" the modinfo here as the default language (EN) also gets
         // applied when nothing was specified by the mod developer.
         // Only if we have more than the default language, we trust the modinfo.
         var modinfo = mod.ModInfo;
         if (modinfo is not null && !IsEmptyOrDefault(modinfo.Languages))
-            return new HashSet<ILanguageInfo>(modinfo.Languages);
+            return modinfo.Languages;
 
 
         var foundLanguages = FindInstalledLanguagesCore(mod);
-        if (!IsEmptyOrDefault(foundLanguages))
+        if (!IsEmptyOrDefault(foundLanguages) && !_lookupInheritedLanguages && mod.DependencyResolveStatus != DependencyResolveStatus.Resolved)
             return foundLanguages;
 
-        if (!_lookupInheritedLanguages)
-            return DefaultLanguageCollection;
-
-        var inheritedLanguages = GetInheritedLanguages(mod);
-        return !inheritedLanguages.Any() ? DefaultLanguageCollection : inheritedLanguages;
+        return GetInheritedLanguages(mod, foundLanguages);
     }
 
     /// <summary>
@@ -76,30 +71,24 @@ internal abstract class ModLanguageFinderBase : IModLanguageFinder
     /// Returns <see langword="true"/> in this case; <see langword="false"/> otherwise.
     /// </summary>
     /// <param name="languages">The enumeration to lookup.</param>
-    protected static bool IsEmptyOrDefault(IEnumerable<ILanguageInfo> languages)
+    protected static bool IsEmptyOrDefault(IReadOnlyCollection<ILanguageInfo> languages)
     {
-        var languageInfos = languages.ToList();
-        return !languageInfos.Any() || languageInfos.All(x => x.Equals(LanguageInfo.Default));
+        if (languages.Count == 0)
+            return true;
+        if (languages.Count == 1 && languages.First().Equals(LanguageInfo.Default))
+            return true;
+        return false;
     }
 
-    /// <summary>
-    /// Gets installed languages of (already resolved) dependencies.
-    /// </summary>
-    /// <param name="mod">The target <see cref="IMod"/>.</param>
-    /// <returns>Set of installed languages of a dependency.</returns>
-    /// <remarks>This implementation is not greedy, meaning it returns the first non-<see cref="IsEmptyOrDefault"/> result.</remarks>
-    protected virtual ISet<ILanguageInfo> GetInheritedLanguages(IMod mod)
+    private static IReadOnlyCollection<ILanguageInfo> GetInheritedLanguages(IMod mod, IReadOnlyCollection<ILanguageInfo> defaultLanguages)
     {
-        if (mod.DependencyResolveStatus != DependencyResolveStatus.Resolved)
-            return DefaultLanguageCollection;
-
         foreach (var dependency in mod.Dependencies)
         {
             var dependencyLanguages = dependency.Mod.InstalledLanguages;
             if (!IsEmptyOrDefault(dependencyLanguages))
                 return dependencyLanguages;
         }
-        return new HashSet<ILanguageInfo>();
+        return defaultLanguages;
     }
 
     /// <summary>
@@ -107,5 +96,5 @@ internal abstract class ModLanguageFinderBase : IModLanguageFinder
     /// </summary>
     /// <param name="mod">The target <see cref="IMod"/>.</param>
     /// <returns>A set of fetched <see cref="ILanguageInfo"/>s.</returns>
-    protected internal abstract ISet<ILanguageInfo> FindInstalledLanguagesCore(IMod mod);
+    protected internal abstract IReadOnlyCollection<ILanguageInfo> FindInstalledLanguagesCore(IMod mod);
 }

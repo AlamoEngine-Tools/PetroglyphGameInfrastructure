@@ -13,14 +13,14 @@ public interface ILanguageFinder
     /// </summary>
     /// <param name="playableObject">the playable object to search localization for.</param>
     /// <returns>A set of found text localization.</returns>
-    ISet<ILanguageInfo> GetTextLocalizations(IPhysicalPlayableObject playableObject);
+    IReadOnlyCollection<ILanguageInfo> GetTextLocalizations(IPhysicalPlayableObject playableObject);
 
     /// <summary>
     /// Searches a given <see cref="IPhysicalPlayableObject"/> for installed SFX localizations.
     /// </summary>
     /// <param name="playableObject">the playable object to search localization for.</param>
     /// <returns>A set of found SFX localization.</returns>
-    ISet<ILanguageInfo> GetSfxMegLocalizations(IPhysicalPlayableObject playableObject);
+    IReadOnlyCollection<ILanguageInfo> GetSfxMegLocalizations(IPhysicalPlayableObject playableObject);
 
     /// <summary>
     /// Searches a given <see cref="IPhysicalPlayableObject"/> for installed speech localizations
@@ -28,14 +28,14 @@ public interface ILanguageFinder
     /// </summary>
     /// <param name="playableObject">the playable object to search localization for.</param>
     /// <returns>A set of found speech localization.</returns>
-    ISet<ILanguageInfo> GetSpeechLocalizationsFromFolder(IPhysicalPlayableObject playableObject);
+    IReadOnlyCollection<ILanguageInfo> GetSpeechLocalizationsFromFolder(IPhysicalPlayableObject playableObject);
 
     /// <summary>
     /// Searches a given <see cref="IPhysicalPlayableObject"/> for installed speech localizations from .meg files.
     /// </summary>
     /// <param name="playableObject">the playable object to search localization for.</param>
     /// <returns>A set of found speech localization.</returns>
-    ISet<ILanguageInfo> GetSpeechLocalizationsFromMegs(IPhysicalPlayableObject playableObject);
+    IReadOnlyCollection<ILanguageInfo> GetSpeechLocalizationsFromMegs(IPhysicalPlayableObject playableObject);
 
     /// <summary>
     /// Merges multiple enumerations of <see cref="ILanguageInfo"/> into a single set.
@@ -47,5 +47,5 @@ public interface ILanguageFinder
     /// gets merged to {German:FullLocalized}</example>
     /// <param name="setsToMerge">The enumerations to merge</param>
     /// <returns>The merged set.</returns>
-    ISet<ILanguageInfo> Merge(params IEnumerable<ILanguageInfo>[] setsToMerge);
+    IReadOnlyCollection<ILanguageInfo> Merge(params IEnumerable<ILanguageInfo>[] setsToMerge);
 }

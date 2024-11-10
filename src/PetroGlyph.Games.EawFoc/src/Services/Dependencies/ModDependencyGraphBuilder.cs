@@ -77,7 +77,7 @@ internal class ModDependencyGraphBuilder : IModDependencyGraphBuilder
         return ResolveFreeDependenciesFactory(targetMod).Item1;
     }
 
-    private void AddToGraph(ModDependencyGraph graph, IMod root, Func<IMod, (IList<IMod>, DependencyResolveLayout)> dependencyFactory)
+    private static void AddToGraph(ModDependencyGraph graph, IMod root, Func<IMod, (IList<IMod>, DependencyResolveLayout)> dependencyFactory)
     {
         var pendingQueue = new Queue<IMod>();
         pendingQueue.Enqueue(root);
@@ -117,7 +117,7 @@ internal class ModDependencyGraphBuilder : IModDependencyGraphBuilder
         return (source.Dependencies.Select(d => d.Mod).ToList(), source.DependencyResolveLayout);
     }
 
-    private (IList<ModDependencyEntry> dependencies, DependencyResolveLayout resolveLayout) ResolveFreeDependenciesFactory(IMod source)
+    private static (IList<ModDependencyEntry> dependencies, DependencyResolveLayout resolveLayout) ResolveFreeDependenciesFactory(IMod source)
     {
         var layout = source.DependencyResolveLayout;
         if (source.DependencyResolveStatus == DependencyResolveStatus.Resolved)
@@ -128,7 +128,13 @@ internal class ModDependencyGraphBuilder : IModDependencyGraphBuilder
 
         layout = source.ModInfo.Dependencies.ResolveLayout;
         var dependencies = source.ModInfo.Dependencies
-            .Select(modReference => new ModDependencyEntry(source.Game.FindMod(modReference), modReference.VersionRange))
+            .Select(modReference =>
+            {
+                var dep = source.Game.FindMod(modReference);
+                if (dep is null)
+                    throw new ModNotFoundException(modReference, source.Game);
+                return new ModDependencyEntry(dep, modReference.VersionRange);
+            })
             .ToList();
         return (dependencies, layout);
     }

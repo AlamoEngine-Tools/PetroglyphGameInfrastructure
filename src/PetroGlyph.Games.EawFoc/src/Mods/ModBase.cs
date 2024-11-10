@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,10 +19,8 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 /// <summary>
 /// Base implementation for Mods
 /// </summary>
-public abstract class ModBase : PlayableObject, IMod
+public abstract class ModBase : PlayableModContainer, IMod
 {
-    /// <inheritdoc/>
-    public event EventHandler<ModCollectionChangedEventArgs>? ModsCollectionModified;
     /// <inheritdoc/>
     public event EventHandler<ResolvingModinfoEventArgs>? ResolvingModinfo;
     /// <inheritdoc/>
@@ -36,19 +33,9 @@ public abstract class ModBase : PlayableObject, IMod
     private bool _modinfoSearched;
 
     /// <summary>
-    /// Shared service provider instance.
-    /// </summary>
-    protected readonly IServiceProvider ServiceProvider;
-
-    /// <summary>
     /// Shared, internal, mutable, dependency list which gets used for <see cref="Dependencies"/>.
     /// </summary>
     protected readonly List<ModDependencyEntry> DependenciesInternal = new();
-
-    /// <summary>
-    /// Shared, internal, mutable, set of mods which gets used for <see cref="Mods"/>.
-    /// </summary>
-    protected readonly HashSet<IMod> ModsInternal = new();
 
     /// <inheritdoc/>
     public abstract string Identifier { get; }
@@ -71,7 +58,7 @@ public abstract class ModBase : PlayableObject, IMod
     string IModIdentity.Name => Name;
 
     /// <inheritdoc/>
-    public IModinfo? ModInfo
+    public virtual IModinfo? ModInfo
     {
         get
         {
@@ -95,9 +82,6 @@ public abstract class ModBase : PlayableObject, IMod
     public IReadOnlyList<ModDependencyEntry> Dependencies => DependenciesInternal.ToList();
 
     /// <inheritdoc/>
-    public IReadOnlyCollection<IMod> Mods => ModsInternal.ToList();
-
-    /// <inheritdoc/>
     public DependencyResolveStatus DependencyResolveStatus { get; protected set; }
 
     /// <inheritdoc/>
@@ -111,12 +95,14 @@ public abstract class ModBase : PlayableObject, IMod
     /// <param name="type">The mod's platform</param>
     /// <param name="name">The name of the mod.</param>
     /// <param name="serviceProvider">The service provider.</param>
-    protected ModBase(IGame game, ModType type, string name, IServiceProvider serviceProvider)
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="game"/> or <paramref name="name"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
+    protected ModBase(IGame game, ModType type, string name, IServiceProvider serviceProvider) : base(serviceProvider)
     {
         if (game == null) 
             throw new ArgumentNullException(nameof(game));
-        if (serviceProvider == null) 
-            throw new ArgumentNullException(nameof(serviceProvider));
         AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
         ServiceProvider = serviceProvider;
         Name = name;
@@ -131,15 +117,16 @@ public abstract class ModBase : PlayableObject, IMod
     /// <param name="type">The mod's platform</param>
     /// <param name="modinfo">The modinfo data.</param>
     /// <param name="serviceProvider">The service provider.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="game"/> or <paramref name="modinfo"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
+    /// </exception>
     /// <exception cref="ModinfoException">when <paramref name="modinfo"/> is not valid.</exception>
-    protected ModBase(IGame game, ModType type, IModinfo modinfo, IServiceProvider serviceProvider)
+    protected ModBase(IGame game, ModType type, IModinfo modinfo, IServiceProvider serviceProvider) : base(serviceProvider)
     {
         if (game == null) 
             throw new ArgumentNullException(nameof(game));
         if (modinfo == null)
             throw new ArgumentNullException(nameof(modinfo));
-        if (serviceProvider == null) 
-            throw new ArgumentNullException(nameof(serviceProvider));
         modinfo.Validate();
         _modInfo = modinfo;
         ServiceProvider = serviceProvider;
@@ -176,50 +163,6 @@ public abstract class ModBase : PlayableObject, IMod
     }
 
     /// <inheritdoc/>
-    public virtual bool AddMod(IMod mod)
-    {
-        if (!ReferenceEquals(Game, mod.Game))
-            throw new GameException("Game instances of the two mods must be the same.");
-        var result = ModsInternal.Add(mod);
-        if (result)
-            OnModsCollectionModified(new ModCollectionChangedEventArgs(mod, ModCollectionChangedAction.Add));
-        return result;
-    }
-
-    /// <inheritdoc/>
-    public virtual bool RemoveMod(IMod mod)
-    {
-        var result = ModsInternal.Remove(mod);
-        if (result)
-            OnModsCollectionModified(new ModCollectionChangedEventArgs(mod, ModCollectionChangedAction.Remove));
-        return result;
-    }
-
-    /// <inheritdoc/>
-    public IMod FindMod(IModReference modReference)
-    {
-        var foundMod = Mods.FirstOrDefault(modReference.Equals);
-        if (foundMod is null)
-            throw new ModNotFoundException(modReference, this);
-        return foundMod;
-    }
-
-    /// <inheritdoc/>
-    public bool TryFindMod(IModReference modReference, out IMod? mod)
-    {
-        mod = null;
-        try
-        {
-            mod = FindMod(modReference);
-            return true;
-        }
-        catch (ModNotFoundException)
-        {
-            return false;
-        }
-    }
-
-    /// <inheritdoc/>
     public virtual bool Equals(IMod? other)
     {
         return ModEqualityComparer.Default.Equals(this, other);
@@ -236,30 +179,7 @@ public abstract class ModBase : PlayableObject, IMod
     {
         return ModEqualityComparer.Default.Equals(this, other);
     }
-
-    /// <inheritdoc/>
-    public IEnumerator<IMod> GetEnumerator()
-    {
-        return Mods.GetEnumerator();
-    }
-
-    /// <summary>
-    /// Resets a <see cref="ModInfo"/> so it can be resolved again.
-    /// </summary>
-    /// <returns>The old <see cref="IModinfo"/> or <see langword="null"/>.</returns>
-    public IModinfo? ResetModinfo()
-    {
-        var old = _modInfo;
-        _modinfoSearched = false;
-        _modInfo = null;
-        return old;
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
+    
     /// <summary>
     /// Implementation to resolve the <see cref="ModInfo"/> property.
     /// </summary>
@@ -292,17 +212,16 @@ public abstract class ModBase : PlayableObject, IMod
         var iconFile = ModInfo?.Icon;
         if (iconFile is not null)
             return iconFile;
-        var finder = ServiceProvider.GetService<IModIconFinder>() ?? new SimpleModIconFinder(ServiceProvider);
+        var finder = ServiceProvider.GetRequiredService<IModIconFinder>();
         return finder.FindIcon(this);
     }
-
 
     /// <summary>
     /// Resolves the installed languages of this mod.
     /// </summary>
     /// <remarks>The implementation returns the value an <see cref="IModLanguageFinderFactory"/> service.</remarks>
     /// <returns>The resolved languages.</returns>
-    protected override ISet<ILanguageInfo> ResolveInstalledLanguages()
+    protected override IReadOnlyCollection<ILanguageInfo> ResolveInstalledLanguages()
     {
         var factory = ServiceProvider.GetRequiredService<IModLanguageFinderFactory>();
         var finder = factory.CreateLanguageFinder(this);
@@ -340,15 +259,6 @@ public abstract class ModBase : PlayableObject, IMod
     protected virtual void OnModinfoResolved(ModinfoResolvedEventArgs e)
     {
         ModinfoResolved?.Invoke(this, e);
-    }
-
-    /// <summary>
-    /// Raised the <see cref="ModsCollectionModified"/> event.
-    /// </summary>
-    /// <param name="e">The event arguments</param>
-    protected virtual void OnModsCollectionModified(ModCollectionChangedEventArgs e)
-    {
-        ModsCollectionModified?.Invoke(this, e);
     }
 
     /// <summary>

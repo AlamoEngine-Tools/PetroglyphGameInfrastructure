@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 
@@ -9,13 +10,18 @@ namespace PG.StarWarsGame.Infrastructure;
 /// for <see cref="IPlayableObject.IconFile"/> and <see cref="IPlayableObject.InstalledLanguages"/>
 /// including a reset option, to re-initialize.
 /// </summary>
-public abstract class PlayableObject : IPlayableObject
+public abstract class PlayableObject(IServiceProvider serviceProvider) : IPlayableObject
 {
-    private ISet<ILanguageInfo>? _installedLanguages;
+    private IReadOnlyCollection<ILanguageInfo>? _installedLanguages;
     private string? _iconFile;
 
     private bool _languageSearched;
     private bool _iconSearched;
+
+    /// <summary>
+    /// The service provider.
+    /// </summary>
+    protected IServiceProvider ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
     /// <inheritdoc/>
     public abstract string Name { get; }
@@ -24,7 +30,7 @@ public abstract class PlayableObject : IPlayableObject
     public abstract IGame Game { get; }
 
     /// <inheritdoc/>
-    public ISet<ILanguageInfo> InstalledLanguages
+    public IReadOnlyCollection<ILanguageInfo> InstalledLanguages
     {
         get
         {
@@ -68,33 +74,8 @@ public abstract class PlayableObject : IPlayableObject
     /// Initialization function to resolve installed languages. Default implements returns an empty set.
     /// </summary>
     /// <returns></returns>
-    protected virtual ISet<ILanguageInfo> ResolveInstalledLanguages()
+    protected virtual IReadOnlyCollection<ILanguageInfo> ResolveInstalledLanguages()
     {
         return new HashSet<ILanguageInfo>();
-    }
-
-    /// <summary>
-    /// Resets the state of <see cref="IconFile"/> so it can be resolved again.
-    /// </summary>
-    /// <returns>Returns the old value.</returns>
-    public virtual string? ResetIcon()
-    {
-        var oldIcon = _iconFile;
-        _iconFile = null;
-        _iconSearched = false;
-        return oldIcon;
-    }
-
-    /// <summary>
-    /// Resets the state of <see cref="InstalledLanguages"/> so it can be resolved again.
-    /// </summary>
-    /// <remarks>Return value can be <see langword="null"/>, if <see cref="InstalledLanguages"/> was not called at least once before resetting.</remarks>
-    /// <returns>Returns the old value.</returns>
-    public virtual ISet<ILanguageInfo>? ResetLanguages()
-    {
-        var oldLanguages = _installedLanguages;
-        _installedLanguages = null;
-        _languageSearched = false;
-        return oldLanguages;
     }
 }

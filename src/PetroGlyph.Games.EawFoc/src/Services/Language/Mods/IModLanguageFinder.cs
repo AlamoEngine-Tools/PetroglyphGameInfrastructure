@@ -15,5 +15,5 @@ internal interface IModLanguageFinder
     /// </summary>
     /// <param name="mod">The target mod</param>
     /// <returns>A set of installed language information.</returns>
-    ISet<ILanguageInfo> FindInstalledLanguages(IMod mod);
+    IReadOnlyCollection<ILanguageInfo> FindInstalledLanguages(IMod mod);
 }

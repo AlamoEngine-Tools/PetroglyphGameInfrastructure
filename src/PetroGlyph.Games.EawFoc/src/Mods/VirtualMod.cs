@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -10,10 +11,13 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// An in-memory mod
+/// Represents a virtual, in-memory mod.
 /// </summary>
 public sealed class VirtualMod : ModBase, IVirtualMod
 {
+    /// <inheritdoc />
+    public override IModinfo? ModInfo { get; }
+
     /// <summary>
     /// The identifier is a unique representation of the mod's name and its dependencies.
     /// </summary>
@@ -22,30 +26,46 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     /// <inheritdoc/>
     public override DependencyResolveLayout DependencyResolveLayout { get; }
 
-
     /// <summary>
-    /// Creates a new instance.
+    /// Initializes a new instance of the <see cref="VirtualMod"/> class of the specified game and modinfo.
     /// </summary>
     /// <param name="game">The game of the mod.</param>
     /// <param name="modInfoData">The mod's <see cref="IModinfo"/> data.</param>
     /// <param name="serviceProvider">The service provider.</param>
-    /// <exception cref="ModException">If the <paramref name="modInfoData"/> has no dependencies.</exception>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="game"/> or <paramref name="modInfoData"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="PetroglyphException">If the <paramref name="modInfoData"/> has no dependencies.</exception>
+    /// <exception cref="ModNotFoundException">A dependency was not found.</exception>
+    /// <exception cref="ModException">No physical dependency was not found.</exception>
     public VirtualMod(IGame game, IModinfo modInfoData, IServiceProvider serviceProvider)
         : base(game, ModType.Virtual, modInfoData, serviceProvider)
     {
-        if (modInfoData.Dependencies is null || !modInfoData.Dependencies.Any())
+        if (modInfoData.Dependencies is null)
+            throw new ArgumentException("dependencies cannot be null.", nameof(modInfoData));
+        if (modInfoData.Dependencies.Count == 0)
             throw new PetroglyphException("Virtual mods must be initialized with pre-defined dependencies");
+
+        ModInfo = modInfoData;
 
         // Since we are in a ctor we cannot use the common services.
         // We have to use a lightweight implementation for resolving and checking dependencies.
         // This means we cannot ensure at this point this instance has
         // a) A cycle free dependency graph,
-        // b) at least one physical mod as a base.
+        var hasPhysicalMod = false;
         foreach (var dependency in modInfoData.Dependencies)
         {
             var mod = game.FindMod(dependency);
+            if (mod is null)
+                throw new ModNotFoundException(dependency, this);
             DependenciesInternal.Add(new ModDependencyEntry(mod, dependency.VersionRange));
+            if (mod.Type is ModType.Default or ModType.Workshops)
+                hasPhysicalMod = true;
         }
+
+        if (!hasPhysicalMod)
+            throw new ModException(this, "No physical dependency was found.");
+
         DependencyResolveLayout = modInfoData.Dependencies.ResolveLayout;
         DependencyResolveStatus = DependencyResolveStatus.Resolved;
 
@@ -61,19 +81,21 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="dependencies">list of dependencies.</param>
     /// <exception cref="ModException">If the <paramref name="dependencies"/> is empty.</exception>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="name"/> or <paramref name="game"/> or <paramref name="dependencies"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
     public VirtualMod(string name, IGame game, IList<ModDependencyEntry> dependencies, DependencyResolveLayout layout, IServiceProvider serviceProvider)
         : base(game, ModType.Virtual, name, serviceProvider)
     {
         if (dependencies == null) 
             throw new ArgumentNullException(nameof(dependencies));
-        if (!dependencies.Any())
-            throw new PetroglyphException("Virtual mods must be initialized with pre-defined dependencies");
+        if (dependencies.Count == 0)
+            throw new PetroglyphException("Virtual mods must have at least one physical dependency.");
 
         // Since we are in a ctor we cannot use the common services.
         // We have to use a lightweight implementation for resolving and checking dependencies.
-        // This means we cannot ensure at this point this instance has
-        // a) A cycle free dependency graph,
-        // b) at least one physical mod as a base.
+        // This means we cannot ensure at this point this instance has a cycle free dependency graph.
         foreach (var dependency in dependencies)
         {
             if (!dependency.Mod.Game.Equals(game))
@@ -82,6 +104,11 @@ public sealed class VirtualMod : ModBase, IVirtualMod
         }
         DependencyResolveLayout = layout;
         DependencyResolveStatus = DependencyResolveStatus.Resolved;
+
+        ModInfo = new ModinfoData(name)
+        {
+            Dependencies = new DependencyList(new List<IModReference>(Dependencies.Select(x => x.Mod)), layout)
+        };
 
         Identifier = CalculateIdentifier();
     }
@@ -93,7 +120,7 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     }
 
     /// <summary>
-    /// This method is not supported.
+    /// This method is not supported, as virtual mods have pre-defined dependencies.
     /// </summary>
     /// <exception cref="NotSupportedException"></exception>
     public override void ResolveDependencies(IDependencyResolver resolver, DependencyResolverOptions options)
@@ -102,7 +129,7 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     }
 
     /// <summary>
-    /// This method is not supported.
+    /// This method is not supported, as virtual mods have pre-defined dependencies.
     /// </summary>
     /// <exception cref="NotSupportedException"></exception>
     protected override void OnResolvingModinfo(ResolvingModinfoEventArgs e)
@@ -111,7 +138,7 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     }
 
     /// <summary>
-    /// This method is not supported.
+    /// This method is not supported, as virtual mods have pre-defined dependencies.
     /// </summary>
     /// <exception cref="NotSupportedException"></exception>
     protected override void OnDependenciesChanged(ModDependenciesChangedEventArgs e)

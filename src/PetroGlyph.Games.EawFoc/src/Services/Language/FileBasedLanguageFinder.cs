@@ -19,7 +19,7 @@ public sealed class FileBasedLanguageFinder(IServiceProvider serviceProvider) : 
     private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
 
     /// <inheritdoc/>
-    public ISet<ILanguageInfo> GetTextLocalizations(IPhysicalPlayableObject playableObject)
+    public IReadOnlyCollection<ILanguageInfo> GetTextLocalizations(IPhysicalPlayableObject playableObject)
     {
         return TryGetLanguageFromFiles(
             () => _fileService.DataFiles(playableObject, "MasterTextFile_*.dat", "Text", false, false),
@@ -34,7 +34,7 @@ public sealed class FileBasedLanguageFinder(IServiceProvider serviceProvider) : 
     }
 
     /// <inheritdoc/>
-    public ISet<ILanguageInfo> GetSfxMegLocalizations(IPhysicalPlayableObject playableObject)
+    public IReadOnlyCollection<ILanguageInfo> GetSfxMegLocalizations(IPhysicalPlayableObject playableObject)
     {
         return TryGetLanguageFromFiles(
             () => _fileService.DataFiles(playableObject, "sfx2d_*.meg", "Audio/SFX", false, false),
@@ -53,7 +53,7 @@ public sealed class FileBasedLanguageFinder(IServiceProvider serviceProvider) : 
     }
 
     /// <inheritdoc/>
-    public ISet<ILanguageInfo> GetSpeechLocalizationsFromMegs(IPhysicalPlayableObject playableObject)
+    public IReadOnlyCollection<ILanguageInfo> GetSpeechLocalizationsFromMegs(IPhysicalPlayableObject playableObject)
     {
         // TODO: When merged into PG repo, try to get real path from megafiles.xml
         return TryGetLanguageFromFiles(
@@ -70,7 +70,7 @@ public sealed class FileBasedLanguageFinder(IServiceProvider serviceProvider) : 
     }
 
     /// <inheritdoc/>
-    public ISet<ILanguageInfo> GetSpeechLocalizationsFromFolder(IPhysicalPlayableObject playableObject)
+    public IReadOnlyCollection<ILanguageInfo> GetSpeechLocalizationsFromFolder(IPhysicalPlayableObject playableObject)
     {
         var speechDir = _fileService.DataDirectory(playableObject, "Audio/Speech");
         if (!speechDir.Exists)
@@ -93,7 +93,7 @@ public sealed class FileBasedLanguageFinder(IServiceProvider serviceProvider) : 
     }
 
     /// <inheritdoc/>
-    public ISet<ILanguageInfo> Merge(params IEnumerable<ILanguageInfo>[] setsToMerge)
+    public IReadOnlyCollection<ILanguageInfo> Merge(params IEnumerable<ILanguageInfo>[] setsToMerge)
     {
         if (!setsToMerge.Any())
             return new HashSet<ILanguageInfo>();
@@ -113,7 +113,7 @@ public sealed class FileBasedLanguageFinder(IServiceProvider serviceProvider) : 
 
     }
 
-    private static ISet<ILanguageInfo> TryGetLanguageFromFiles(
+    private static IReadOnlyCollection<ILanguageInfo> TryGetLanguageFromFiles(
         Func<IEnumerable<IFileInfo>> fileEnumerator,
         Func<string, string?> languageNameFactory, LanguageSupportLevel supportLevel)
     {

@@ -19,8 +19,10 @@ public class Mod : ModBase, IPhysicalMod
     /// <inheritdoc/>
     public IDirectoryInfo Directory { get; }
 
-    /// <inheritdoc/>
-    public IFileSystem FileSystem => Directory.FileSystem;
+    /// <summary>
+    /// Gets the file system.
+    /// </summary>
+    protected readonly IFileSystem FileSystem;
 
     /// <summary>
     /// Is this mod is a workshops mod, it holds the workshop ID, otherwise a normalized, absolute path
@@ -46,15 +48,15 @@ public class Mod : ModBase, IPhysicalMod
     /// <param name="workshop">When set to <see langword="true"/> this instance is a Steam Workshop mod.</param>
     /// <param name="name">The name of the mod.</param>
     /// <param name="serviceProvider">The service provider.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="game"/> or <paramref name="modDirectory"/> or <paramref name="name"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
     public Mod(IGame game, IDirectoryInfo modDirectory, bool workshop, string name, IServiceProvider serviceProvider)
         : base(game, workshop ? ModType.Workshops : ModType.Default, name, serviceProvider)
     {
-        if (modDirectory == null) 
-            throw new ArgumentNullException(nameof(modDirectory));
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
-        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
-        Directory = modDirectory;
+        Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
+        FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         InternalPath = CreateInternalPath(modDirectory);
     }
 
@@ -66,12 +68,14 @@ public class Mod : ModBase, IPhysicalMod
     /// <param name="workshop">When set to <see langword="true"/> this instance is a Steam Workshop mod.</param>
     /// <param name="modInfoData">The <see cref="IModinfo"/>.</param>
     /// <param name="serviceProvider">The service provider.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="game"/> or <paramref name="modDirectory"/> or <paramref name="modInfoData"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
+    /// </exception>
     public Mod(IGame game, IDirectoryInfo modDirectory, bool workshop, IModinfo modInfoData, IServiceProvider serviceProvider) :
         base(game, workshop ? ModType.Workshops : ModType.Default, modInfoData, serviceProvider)
     {
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
         Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
+        FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         InternalPath = CreateInternalPath(modDirectory);
     }
 

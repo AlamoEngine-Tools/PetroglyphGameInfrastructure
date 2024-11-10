@@ -25,7 +25,7 @@ internal class GameLanguageFinder : IGameLanguageFinder
     }
 
     /// <inheritdoc/>
-    public ISet<ILanguageInfo> FindInstalledLanguages(IGame game)
+    public IReadOnlyCollection<ILanguageInfo> FindInstalledLanguages(IGame game)
     {
         var text = _helper.GetTextLocalizations(game);
         var speech = _helper.GetSpeechLocalizationsFromMegs(game);

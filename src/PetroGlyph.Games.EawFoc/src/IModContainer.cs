@@ -17,8 +17,7 @@ public interface IModContainer : IEnumerable<IMod>
     event EventHandler<ModCollectionChangedEventArgs> ModsCollectionModified;
 
     /// <summary>
-    /// Set of all mods this instance is associated with.
-    /// For an <see cref="IGame"/> this is a flattened set of all Mods and their respective submods.
+    /// Gets a set of all mods this mod container are associated to.
     /// </summary>
     IReadOnlyCollection<IMod> Mods { get; }
 
@@ -31,30 +30,27 @@ public interface IModContainer : IEnumerable<IMod>
     /// </summary>
     /// <param name="mod">The mod instance</param>
     /// <returns><see langword="true"/> if the mod was added; otherwise <see langword="false"/> if the mod already existed.</returns>
-    /// <exception cref="ModException"> if mods have different base games.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="mod"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ModException"> <paramref name="mod"/> does not point to the same game reference as the container.</exception>
+    /// <exception cref="ModDependencyCycleException">An attempt is made to add this instance to the container.</exception>
     bool AddMod(IMod mod);
 
     /// <summary>
-    /// Removed an <see cref="IMod"/> from the this <see cref="IModContainer"/> 
+    /// Removes a mod from the mod container.
     /// </summary>
-    /// <param name="mod">The mod instance</param>
-    /// <returns><see langword="true"/> if the mod was removed; otherwise <see langword="false"/> if the mod did not exists.</returns>
-    /// <exception cref="ArgumentNullException"> when <paramref name="mod"/> is null</exception>
+    /// <param name="mod">The mod to remove</param>
+    /// <returns><see langword="true"/> if <paramref name="mod"/> is successfully removed; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="mod"/> is <see langword="null"/>.</exception>
     bool RemoveMod(IMod mod);
 
     /// <summary>
-    /// Searches <see cref="Mods"/> whether it contains the specified mod reference.
+    /// Searches <see cref="Mods"/> for a mod that matches the specified mod reference.
     /// </summary>
-    /// <param name="modReference">The <see cref="IModReference"/> to find.</param>
-    /// <returns>The found mod.</returns>
-    /// <exception cref="ModNotFoundException"><paramref name="modReference"/> was not found in <see cref="Mods"/>.</exception>
-    IMod FindMod(IModReference modReference);
-
-    /// <summary>
-    /// Searches <see cref="Mods"/> whether it contains the specified mod reference.
-    /// </summary>
-    /// <param name="modReference">The <see cref="IModReference"/> to find.</param>
-    /// <param name="mod">When this method returns the variable contains the mod found or <see langword="null"/> if no <paramref name="modReference"/> was not found.</param>
-    /// <returns><see langword="true"/>if a matching mod could be found; otherwise, <see langword="false"/>.</returns>
-    bool TryFindMod(IModReference modReference, out IMod? mod);
+    /// <remarks>
+    /// The mod identifier of <paramref name="modReference"/> gets normalized before searching the mod reference.
+    /// </remarks>
+    /// <param name="modReference">The <see cref="IModReference"/> to search for.</param>
+    /// <returns>The first mod that matched the normalized mod reference, if found; otherwise, <see langword="null"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="modReference"/> is <see langword="null"/>.</exception>
+    IMod? FindMod(IModReference modReference);
 }

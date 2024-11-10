@@ -4,6 +4,7 @@ using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
+using PG.StarWarsGame.Infrastructure.Services.Icon;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Services.Name;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
@@ -46,6 +47,9 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IModGameTypeResolver>(sp => new OfflineModGameTypeResolver(sp));
 
         serviceCollection.AddSingleton<ISteamWorkshopWebpageDownloader>(_ => new SteamWorkshopWebpageDownloader());
+
+        serviceCollection.AddSingleton<IModIconFinder>(sp => new SimpleModIconFinder(sp));
+        serviceCollection.AddSingleton<IGameIconFinder>(sp => new FallbackGameIconFinder(sp));
 
         // Must be transient
         serviceCollection.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));

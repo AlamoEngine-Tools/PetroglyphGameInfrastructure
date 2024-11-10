@@ -7,14 +7,8 @@ namespace PG.StarWarsGame.Infrastructure.Testing;
 
 public static class GITestUtilities
 {
-    public static IEnumerable<GamePlatform> EnumerateRealPlatforms()
-    {
-        foreach (GamePlatform platform in Enum.GetValues(typeof(GamePlatform)))
-        {
-            if (platform is not GamePlatform.Undefined) 
-                yield return platform;
-        }
-    }
+    public static ICollection<GamePlatform> RealPlatforms { get; } =
+        [GamePlatform.Disk, GamePlatform.DiskGold, GamePlatform.DiskGold, GamePlatform.GoG, GamePlatform.Origin];
 
     public static void AssertEqual(this GameDetectionResult expected, GameDetectionResult actual)
     {
@@ -22,5 +16,12 @@ public static class GITestUtilities
         Assert.Equal(expected.GameLocation?.FullName, actual.GameLocation?.FullName);
         Assert.Equal(expected.InitializationRequired, actual.InitializationRequired);
         Assert.Equal(expected.Installed, actual.Installed);
+    }
+
+    public static bool GetRandomWorkshopFlag(IGame game)
+    {
+        if (game.Platform is not GamePlatform.SteamGold)
+            return false;
+        return new Random().NextDouble() >= 0.5;
     }
 }

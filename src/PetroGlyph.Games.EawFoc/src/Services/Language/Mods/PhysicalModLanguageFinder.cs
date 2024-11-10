@@ -24,7 +24,7 @@ internal class PhysicalModLanguageFinder : ModLanguageFinderBase
     }
 
     /// <inheritdoc/>
-    protected internal override ISet<ILanguageInfo> FindInstalledLanguagesCore(IMod mod)
+    protected internal override IReadOnlyCollection<ILanguageInfo> FindInstalledLanguagesCore(IMod mod)
     {
         if (mod is not IPhysicalMod physicalMod)
             throw new NotSupportedException("Non physical mod is not supported by this instance.");

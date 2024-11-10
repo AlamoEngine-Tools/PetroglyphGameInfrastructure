@@ -40,7 +40,7 @@ public class GamePlatformIdentifierTest
     [InlineData(GameType.Foc)]
     public void GetGamePlatform_WrongGameInstalledReturnsUndefined(GameType queryGameType)
     {
-        foreach (var platform in GITestUtilities.EnumerateRealPlatforms())
+        foreach (var platform in GITestUtilities.RealPlatforms)
         {
             var installType = queryGameType == GameType.Foc ? GameType.Eaw : GameType.Foc;
             var game = _fileSystem.InstallGame(new GameIdentity(installType, platform), _serviceProvider);

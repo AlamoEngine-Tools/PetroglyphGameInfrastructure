@@ -18,7 +18,7 @@ public interface IPlayableObject
     /// <summary>
     /// Gets a set of available languages for this object.
     /// </summary>
-    ISet<ILanguageInfo> InstalledLanguages { get; }
+    IReadOnlyCollection<ILanguageInfo> InstalledLanguages { get; }
 
     /// <summary>
     /// Gets the absolute or relative path to an icon of this object.
