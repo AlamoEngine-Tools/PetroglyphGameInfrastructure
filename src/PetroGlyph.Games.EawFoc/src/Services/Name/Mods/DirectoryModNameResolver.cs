@@ -8,7 +8,7 @@ using PG.StarWarsGame.Infrastructure.Mods;
 namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
 /// <summary>
-/// Resolves a mod's name by its directory name. The name will be beautified by removing separator characters like '_'.
+/// Resolves a mod's name by its directory name. The name will be beautified by replacing the characters like '_' and '-' with spaces ' '.
 /// This instance is always culture invariant.
 /// This instance does not work with virtual mods. 
 /// </summary>
@@ -35,6 +35,7 @@ public sealed class DirectoryModNameResolver : ModNameResolverBase
     private static string BeautifyDirectoryName(string directoryName)
     {
         var removedUnderscore = directoryName.Replace('_', ' ');
-        return removedUnderscore;
+        var removedDash = removedUnderscore.Replace('-', ' ');
+        return removedDash;
     }
 }
