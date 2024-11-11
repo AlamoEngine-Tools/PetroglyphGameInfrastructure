@@ -35,11 +35,7 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IModDependencyGraphBuilder>(_ => new ModDependencyGraphBuilder());
         serviceCollection.AddSingleton<IModDependencyTraverser>(sp => new ModDependencyTraverser(sp));
 
-        serviceCollection.AddSingleton<ILanguageFinder>(sp => new FileBasedLanguageFinder(sp));
-        serviceCollection.AddSingleton<IPlayableObjectFileService>(sp => new PlayableObjectFileService(sp));
-        serviceCollection.AddSingleton<IModLanguageFinderFactory>(sp => new ModLanguageFinderFactory(sp));
-
-        serviceCollection.AddSingleton<IGameLanguageFinder>(sp => new GameLanguageFinder(sp));
+        serviceCollection.AddSingleton<ILanguageFinder>(sp => new InstalledLanguageFinder(sp));
         serviceCollection.AddSingleton<ISteamWorkshopCache>(_ => new KnownSteamWorkshopCache());
 
         serviceCollection.AddSingleton<IModNameResolver>(sp => new DirectoryModNameResolver(sp));
@@ -48,7 +44,7 @@ public static class PetroglyphGameInfrastructure
 
         serviceCollection.AddSingleton<ISteamWorkshopWebpageDownloader>(_ => new SteamWorkshopWebpageDownloader());
 
-        serviceCollection.AddSingleton<IIconFinder>(sp => new IconFinder(sp));
+        serviceCollection.AddSingleton<IIconFinder>(_ => new IconFinder());
 
         // Must be transient
         serviceCollection.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));

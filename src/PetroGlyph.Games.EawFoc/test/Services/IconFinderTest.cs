@@ -5,12 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Test.Services;
 
 public class IconFinderTest : CommonTestBase
 {
-    private readonly IconFinder _iconFinder;
-
-    public IconFinderTest()
-    {
-        _iconFinder = new IconFinder(ServiceProvider);
-    }
+    private readonly IconFinder _iconFinder = new();
 
     //[Fact]
     //public void TestMissing()

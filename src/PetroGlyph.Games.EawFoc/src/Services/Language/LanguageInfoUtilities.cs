@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
-using System.Threading;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 
@@ -11,76 +11,66 @@ namespace PG.StarWarsGame.Infrastructure.Services.Language;
 /// </summary>
 public static class LanguageInfoUtilities
 {
-    private static IDictionary<string, CultureInfo>? _culturesByName;
+    private static readonly IDictionary<string, CultureInfo> CulturesByCode;
+    private static readonly IDictionary<string, CultureInfo> CulturesByEnglishName;
 
-    private static IDictionary<string, CultureInfo> CulturesByName
+    static LanguageInfoUtilities()
     {
-        get
-        {
-            var cultures = LazyInitializer.EnsureInitialized(ref _culturesByName,
-                () =>
-                {
-                    var dictionary = new Dictionary<string, CultureInfo>();
-                    foreach (var culture in CultureInfo.GetCultures(CultureTypes.NeutralCultures))
-                    {
-                        var englishName = culture.EnglishName.ToLowerInvariant();
-                        if (!dictionary.ContainsKey(englishName))
-                            dictionary.Add(englishName, culture);
-                    }
-                    return dictionary;
-                });
-            return cultures!;
-        }
-    }
+        var neutralCultures = CultureInfo.GetCultures(CultureTypes.NeutralCultures);
 
-    private static IDictionary<string, CultureInfo>? _culturesByCode;
+        var twoLetterCodeDict = new Dictionary<string, CultureInfo>(neutralCultures.Length, StringComparer.OrdinalIgnoreCase);
+        var englishNameDict = new Dictionary<string, CultureInfo>(neutralCultures.Length, StringComparer.OrdinalIgnoreCase);
 
-    private static IDictionary<string, CultureInfo> CulturesByCode
-    {
-        get
+        foreach (var culture in neutralCultures)
         {
-            var cultures = LazyInitializer.EnsureInitialized(ref _culturesByCode,
-                () =>
-                {
-                    var dictionary = new Dictionary<string, CultureInfo>();
-                    foreach (var culture in CultureInfo.GetCultures(CultureTypes.NeutralCultures))
-                    {
-                        var tln = culture.TwoLetterISOLanguageName.ToLowerInvariant();
-                        if (!dictionary.ContainsKey(tln))
-                            dictionary.Add(tln, culture);
-                    }
-                    return dictionary;
-                });
-            return cultures!;
+            var tln = culture.TwoLetterISOLanguageName;
+            if (!twoLetterCodeDict.ContainsKey(tln))
+                twoLetterCodeDict.Add(tln, culture);
+            var englishName = culture.EnglishName;
+            if (!englishNameDict.ContainsKey(englishName))
+                englishNameDict.Add(englishName, culture);
         }
+
+        CulturesByCode = twoLetterCodeDict;
+        CulturesByEnglishName = englishNameDict;
     }
 
     /// <summary>
-    /// Gets the english language name of a given <see cref="ILanguageInfo"/>.
+    /// Gets the english language name of a given <see cref="ILanguageInfo"/>,
+    /// or <see langword="null"/> if the language info does not have an english name or has an invalid name.
     /// </summary>
     /// <param name="languageInfo">The info to get the english name from.</param>
     /// <returns>The english language name.</returns>
-    /// <exception cref="CultureNotFoundException">If the language could not be determined.</exception>
-    public static string GetEnglishName(ILanguageInfo languageInfo)
+    /// <exception cref="ArgumentNullException"><paramref name="languageInfo"/> is <see langinfo="null"/>.</exception>
+    public static string? GetEnglishName(ILanguageInfo languageInfo)
     {
-        var code = languageInfo.Code.ToLowerInvariant();
-        if (!CulturesByCode.TryGetValue(code, out var culture))
-            throw new CultureNotFoundException($"Unable to get culture for language {code}");
-        return culture.EnglishName;
+        if (languageInfo == null)
+            throw new ArgumentNullException(nameof(languageInfo));
+
+        return !CulturesByCode.TryGetValue(languageInfo.Code, out var culture)
+            ? null
+            : culture.EnglishName;
     }
 
 
     /// <summary>
-    /// Converts a given language name and <see cref="LanguageSupportLevel"/> to an <see cref="ILanguageInfo"/>
+    /// Returns a language info from the specified english language name and <see cref="LanguageSupportLevel"/>,
+    /// or <see langword="null"/> if no language info could be created from the specified language name.
     /// </summary>
     /// <param name="englishLanguageName">The english name of the language.</param>
-    /// <param name="supportLevel">The desired support level.</param>
-    /// <returns>A new instance of a <see cref="ILanguageInfo"/></returns>
-    public static ILanguageInfo FromEnglishName(string englishLanguageName, LanguageSupportLevel supportLevel)
+    /// <param name="supportLevel">The support level to use for the returned language info.</param>
+    /// <returns>
+    /// The <see cref="ILanguageInfo"/> from <paramref name="englishLanguageName"/> and <paramref name="supportLevel"/>,
+    /// or <see langword="null"/> if no language info could be created from <paramref name="englishLanguageName"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="englishLanguageName"/> is <see langinfo="null"/>.</exception>
+    public static ILanguageInfo? FromEnglishName(string englishLanguageName, LanguageSupportLevel supportLevel)
     {
-        englishLanguageName = englishLanguageName.ToLowerInvariant();
-        if (!CulturesByName.TryGetValue(englishLanguageName, out var culture))
-            throw new CultureNotFoundException($"Unable to get culture for language {englishLanguageName}");
-        return new LanguageInfo(culture.TwoLetterISOLanguageName, supportLevel);
+        if (englishLanguageName == null) 
+            throw new ArgumentNullException(nameof(englishLanguageName));
+
+        return !CulturesByEnglishName.TryGetValue(englishLanguageName, out var culture)
+            ? null
+            : new LanguageInfo(culture.TwoLetterISOLanguageName, supportLevel);
     }
 }

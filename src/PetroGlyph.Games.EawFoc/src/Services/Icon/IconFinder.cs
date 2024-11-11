@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using EawModinfo.Spec;
-using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Utilities;
@@ -12,12 +11,11 @@ namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 /// Provides a very simple implementation which searches returns the first .ico file in a mod's directory.
 /// For virtual mods it returns the icon of the first physical dependency which has a icon.
 /// </summary>
-public class IconFinder(IServiceProvider serviceProvider) : IIconFinder
+public class IconFinder : IIconFinder
 {
     private const string EawIconName = "eaw.ico";
     private const string FocIconName = "foc.ico";
 
-    private readonly IPlayableObjectFileService _fileService = serviceProvider.GetRequiredService<IPlayableObjectFileService>();
     /// <inheritdoc />
     /// <remarks>
     /// Virtual mods are currently not supported and always return <see langword="null"/>.
@@ -43,7 +41,7 @@ public class IconFinder(IServiceProvider serviceProvider) : IIconFinder
     protected virtual string? FindIconForMod(IMod mod)
     {
         if (mod is IPhysicalMod physicalMod)
-            return _fileService.DataFiles(physicalMod, "*.ico", "..", false, false)
+            return physicalMod.DataFiles("*.ico", "..", false)
                 .FirstOrDefault()?.FullName;
         if (mod.Type == ModType.Virtual)
         {
@@ -66,7 +64,7 @@ public class IconFinder(IServiceProvider serviceProvider) : IIconFinder
             GameType.Foc => FocIconName,
             _ => throw new ArgumentOutOfRangeException()
         };
-        return _fileService.DataFiles(game, expectedFileName, "..", false, false)
+        return game.DataFiles(expectedFileName, "..", false)
             .FirstOrDefault()?.FullName;
     }
 }

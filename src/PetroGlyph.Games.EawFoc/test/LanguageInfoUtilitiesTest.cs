@@ -16,6 +16,7 @@ public class LanguageInfoUtilitiesTest
             LanguageInfoUtilities.FromEnglishName("english", LanguageSupportLevel.FullLocalized));
         Assert.Equal(new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
             LanguageInfoUtilities.FromEnglishName("ENGLISH", LanguageSupportLevel.FullLocalized));
+        Assert.Null(LanguageInfoUtilities.FromEnglishName("BLAH", LanguageSupportLevel.Default));
     }
 
     [Fact]
@@ -23,8 +24,10 @@ public class LanguageInfoUtilitiesTest
     {
         var de = new LanguageInfo("de", LanguageSupportLevel.FullLocalized);
         var en = new LanguageInfo("en", LanguageSupportLevel.FullLocalized);
+        var unknown = new LanguageInfo("zz", LanguageSupportLevel.FullLocalized);
 
         Assert.Equal("German", LanguageInfoUtilities.GetEnglishName(de));
         Assert.Equal("English", LanguageInfoUtilities.GetEnglishName(en));
+        Assert.Null(LanguageInfoUtilities.GetEnglishName(unknown));
     }
 }

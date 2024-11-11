@@ -149,7 +149,7 @@ public class PetroglyphStarWarsGame : PlayableModContainer, IGame
     /// <returns>Set of resolved languages.</returns>
     protected override IReadOnlyCollection<ILanguageInfo> ResolveInstalledLanguages()
     {
-        return ServiceProvider.GetRequiredService<IGameLanguageFinder>().FindInstalledLanguages(this);
+        return ServiceProvider.GetRequiredService<ILanguageFinder>().FindLanguages(this);
     }
 
     /// <summary>

@@ -123,35 +123,35 @@ public abstract class ModBaseTest : PlayableModContainerTest
     //    Assert.True(flag);
     //}
 
-    [Fact]
-    public void TestLanguageResolving_Throws()
-    {
-        var flag = false;
-        var sp = new Mock<IServiceProvider>();
-        var resolver = new Mock<IModLanguageFinderFactory>();
-        resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>())).Callback(() => flag = true).Returns(new Mock<IModLanguageFinder>().Object);
-        var game = new Mock<IGame>();
-        sp.Setup(p => p.GetService(typeof(IModLanguageFinderFactory))).Returns(resolver.Object);
-        var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
-        Assert.Throws<PetroglyphException>(() => mod.InstalledLanguages);
-        Assert.True(flag);
-    }
+    //[Fact]
+    //public void TestLanguageResolving_Throws()
+    //{
+    //    var flag = false;
+    //    var sp = new Mock<IServiceProvider>();
+    //    var resolver = new Mock<IModLanguageFinderFactory>();
+    //    resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>())).Callback(() => flag = true).Returns(new Mock<IModLanguageFinder>().Object);
+    //    var game = new Mock<IGame>();
+    //    sp.Setup(p => p.GetService(typeof(IModLanguageFinderFactory))).Returns(resolver.Object);
+    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
+    //    Assert.Throws<PetroglyphException>(() => mod.InstalledLanguages);
+    //    Assert.True(flag);
+    //}
 
-    [Fact]
-    public void TestLanguageResolving()
-    {
-        var flag = false;
-        var sp = new Mock<IServiceProvider>();
-        var finder = new Mock<IModLanguageFinder>();
-        finder.Setup(f => f.FindInstalledLanguages(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo>());
-        var resolver = new Mock<IModLanguageFinderFactory>();
-        resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>())).Callback(() => flag = true).Returns(finder.Object);
-        var game = new Mock<IGame>();
-        sp.Setup(p => p.GetService(typeof(IModLanguageFinderFactory))).Returns(resolver.Object);
-        var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
-        Assert.Empty(mod.InstalledLanguages);
-        Assert.True(flag);
-    }
+    //[Fact]
+    //public void TestLanguageResolving()
+    //{
+    //    var flag = false;
+    //    var sp = new Mock<IServiceProvider>();
+    //    var finder = new Mock<IModLanguageFinder>();
+    //    finder.Setup(f => f.FindInstalledLanguages(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo>());
+    //    var resolver = new Mock<IModLanguageFinderFactory>();
+    //    resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>())).Callback(() => flag = true).Returns(finder.Object);
+    //    var game = new Mock<IGame>();
+    //    sp.Setup(p => p.GetService(typeof(IModLanguageFinderFactory))).Returns(resolver.Object);
+    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
+    //    Assert.Empty(mod.InstalledLanguages);
+    //    Assert.True(flag);
+    //}
 
     [Fact]
     public void Resolve_NullArgs()

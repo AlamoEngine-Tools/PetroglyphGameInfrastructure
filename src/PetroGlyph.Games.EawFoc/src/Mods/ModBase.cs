@@ -222,13 +222,11 @@ public abstract class ModBase : PlayableModContainer, IMod
     /// <summary>
     /// Resolves the installed languages of this mod.
     /// </summary>
-    /// <remarks>The implementation returns the value an <see cref="IModLanguageFinderFactory"/> service.</remarks>
     /// <returns>The resolved languages.</returns>
     protected override IReadOnlyCollection<ILanguageInfo> ResolveInstalledLanguages()
     {
-        var factory = ServiceProvider.GetRequiredService<IModLanguageFinderFactory>();
-        var finder = factory.CreateLanguageFinder(this);
-        return finder.FindInstalledLanguages(this);
+        var finder = ServiceProvider.GetRequiredService<ILanguageFinder>();
+        return finder.FindLanguages(this);
     }
 
     private IModinfo? ResolveModInfo()
