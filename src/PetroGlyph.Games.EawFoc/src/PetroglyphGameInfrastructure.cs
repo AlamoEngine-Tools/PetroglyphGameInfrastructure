@@ -48,8 +48,7 @@ public static class PetroglyphGameInfrastructure
 
         serviceCollection.AddSingleton<ISteamWorkshopWebpageDownloader>(_ => new SteamWorkshopWebpageDownloader());
 
-        serviceCollection.AddSingleton<IModIconFinder>(sp => new SimpleModIconFinder(sp));
-        serviceCollection.AddSingleton<IGameIconFinder>(sp => new FallbackGameIconFinder(sp));
+        serviceCollection.AddSingleton<IIconFinder>(sp => new IconFinder(sp));
 
         // Must be transient
         serviceCollection.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));

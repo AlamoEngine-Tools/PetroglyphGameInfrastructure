@@ -203,16 +203,19 @@ public abstract class ModBase : PlayableModContainer, IMod
     }
 
     /// <summary>
-    /// Resolves the version of this mod.
+    /// Resolves the icon of this mod.
     /// </summary>
-    /// <remarks>The implementation returns the value from <see cref="IModinfo.Icon"/>, uses an <see cref="IModIconFinder"/> service. As fallback returns the value from <see cref="SimpleModIconFinder"/>.</remarks>
-    /// <returns>The resolved icon or <see langword="null"/>.</returns>
+    /// <remarks
+    /// >The implementation returns the value from <see cref="IModinfo.Icon"/> if present.
+    /// If no modinfo is available or modinfo does not define an icon path, <see cref="IIconFinder"/> is used.
+    /// </remarks>
+    /// <returns>The resolved icon, or <see langword="null"/> if no icon is resolved.</returns>
     protected override string? ResolveIconFile()
     {
         var iconFile = ModInfo?.Icon;
         if (iconFile is not null)
             return iconFile;
-        var finder = ServiceProvider.GetRequiredService<IModIconFinder>();
+        var finder = ServiceProvider.GetRequiredService<IIconFinder>();
         return finder.FindIcon(this);
     }
 

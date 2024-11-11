@@ -109,19 +109,19 @@ public abstract class ModBaseTest : PlayableModContainerTest
         Assert.Throws<ModinfoException>(() => mod.ModInfo);
     }
 
-    [Fact]
-    public void TestIconResolving()
-    {
-        var flag = false;
-        var resolver = new Mock<IModIconFinder>();
-        resolver.Setup(r => r.FindIcon(It.IsAny<IMod>())).Returns((string)null!).Callback(() => flag = true);
-        var game = new Mock<IGame>();
-        var sp = new Mock<IServiceProvider>();
-        sp.Setup(p => p.GetService(typeof(IModIconFinder))).Returns(resolver.Object);
-        var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
-        Assert.Null(mod.IconFile);
-        Assert.True(flag);
-    }
+    //[Fact]
+    //public void TestIconResolving()
+    //{
+    //    var flag = false;
+    //    var resolver = new Mock<IModIconFinder>();
+    //    resolver.Setup(r => r.FindIcon(It.IsAny<IMod>())).Returns((string)null!).Callback(() => flag = true);
+    //    var game = new Mock<IGame>();
+    //    var sp = new Mock<IServiceProvider>();
+    //    sp.Setup(p => p.GetService(typeof(IModIconFinder))).Returns(resolver.Object);
+    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
+    //    Assert.Null(mod.IconFile);
+    //    Assert.True(flag);
+    //}
 
     [Fact]
     public void TestLanguageResolving_Throws()

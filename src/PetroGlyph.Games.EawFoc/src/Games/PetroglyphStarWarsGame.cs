@@ -155,10 +155,10 @@ public class PetroglyphStarWarsGame : PlayableModContainer, IGame
     /// <summary>
     /// Resolves the icon of this instance.
     /// </summary>
-    /// <returns>Resolve icon path or <see langword="null"/>.</returns>
+    /// <returns>The resolved icon path, or <see langword="null"/> if no icon is resolved.</returns>
     protected override string? ResolveIconFile()
     {
-        var finder = ServiceProvider.GetRequiredService<IGameIconFinder>();
+        var finder = ServiceProvider.GetRequiredService<IIconFinder>();
         return finder.FindIcon(this);
     }
 }

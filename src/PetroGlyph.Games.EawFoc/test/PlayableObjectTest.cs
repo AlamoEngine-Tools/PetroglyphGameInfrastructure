@@ -15,6 +15,13 @@ public abstract class PlayableObjectTest : CommonTestBase
     }
 
     [Fact]
+    public void IconFile_IconInstalled()
+    {
+        var obj = CreatePlayableObject();
+        Assert.Null(obj.IconFile);
+    }
+
+    [Fact]
     public void InstalledLanguages_NoLanguagesFound()
     {
         var obj = CreatePlayableObject();
