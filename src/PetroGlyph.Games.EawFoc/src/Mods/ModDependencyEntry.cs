@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using EawModinfo.Spec;
 using Semver;
 
@@ -64,5 +65,12 @@ public sealed class ModDependencyEntry : IEquatable<ModDependencyEntry>
     public override int GetHashCode()
     {
         return Mod.GetHashCode();
+    }
+
+    /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
+    public override string ToString()
+    {
+        return $"{Mod.Identifier}:{VersionRange}";
     }
 }

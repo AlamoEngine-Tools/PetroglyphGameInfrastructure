@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using EawModinfo.Model;
 using EawModinfo.Spec;
+using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Testing;
 using Xunit;
@@ -10,6 +11,16 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class GameLocalizationUtilitiesTest : CommonTestBase
 {
+    [Fact]
+    public void ArgumentNull_Throws()
+    {
+        IGame game = null!;
+        Assert.Throws<ArgumentNullException>(() => GameLocalizationUtilities.GetTextLocalizations(game));
+        Assert.Throws<ArgumentNullException>(() => GameLocalizationUtilities.GetSfxMegLocalizations(game));
+        Assert.Throws<ArgumentNullException>(() => GameLocalizationUtilities.GetSpeechLocalizationsFromMegs(game));
+        Assert.Throws<ArgumentNullException>(() => GameLocalizationUtilities.GetSpeechLocalizationsFromFolder(game));
+    }
+
     [Fact]
     public void Merge()
     {
@@ -40,132 +51,124 @@ public class GameLocalizationUtilitiesTest : CommonTestBase
             new LanguageInfo("fr", LanguageSupportLevel.Text | LanguageSupportLevel.Speech),
         }, GameLocalizationUtilities.Merge(enumA, enumB), true);
     }
-        
-    //[Fact]
-    //public void TestFindText_None()
-    //{
-    //    var game = new Mock<IGame>();
-    //    var actual = _languageFinder.GetTextLocalizations(game.Object);
-    //    Assert.Empty(actual);
-    //}
 
-    //[Fact]
-    //public void TestFindText_EnglishGerman()
-    //{
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+    [Fact]
+    public void GetTextLocalizations_None()
+    {
+        var game = CreateRandomGame();
+        var actual = GameLocalizationUtilities.GetTextLocalizations(game);
+        Assert.Empty(actual);
+    }
 
-    //    _fileSystem.Initialize()
-    //        .WithFile("Game/Text/MasterTextFile_English.da")
-    //        .WithFile("Game/Text/MASTERTEXTFILE_GERMAN.DAT");
+    [Fact]
+    public void GetSfxMegLocalizations_None()
+    {
+        var game = CreateRandomGame();
+        var actual = GameLocalizationUtilities.GetSfxMegLocalizations(game);
+        Assert.Empty(actual);
+    }
 
-    //    _fileService.Setup(s => s.DataFiles(game.Object, "MasterTextFile_*.dat", "Text", false, false))
-    //        .Returns(new List<IFileInfo>
-    //        {
-    //            _fileSystem.FileInfo.New("Game/Text/MasterTextFile_English.dat"),
-    //            _fileSystem.FileInfo.New("Game/Text/MASTERTEXTFILE_GERMAN.DAT")
-    //        });
+    [Fact]
+    public void GetSpeechLocalizationsFromFolder_None()
+    {
+        var game = CreateRandomGame();
+        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromFolder(game);
+        Assert.Empty(actual);
+    }
 
-    //    var actual = _languageFinder.GetTextLocalizations(game.Object);
+    [Fact]
+    public void GetSpeechLocalizationsFromMegs_None()
+    {
+        var game = CreateRandomGame();
+        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromMegs(game);
+        Assert.Empty(actual);
+    }
 
-    //    Assert.Equal(new HashSet<ILanguageInfo>
-    //    {
-    //        new LanguageInfo("en", LanguageSupportLevel.Text),
-    //        new LanguageInfo("de", LanguageSupportLevel.Text)
-    //    }, actual);
-    //}
+    [Fact]
+    public void GetTextLocalizations()
+    {
+        var game = CreateRandomGame();
+        var dir = FileSystem.Path.Combine(game.Directory.FullName, "Data", "Text");
+        FileSystem.Directory.CreateDirectory(dir);
 
-    //[Fact]
-    //public void TestFindSFX_EnglishGerman()
-    //{
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "MasterTextFile_English.txt"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "MASTERTEXTFILE_GERMAN.DAT"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "mastertextfile_spanish.DAT"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "mastertextfile_en.dat"));
+        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "Data", "mastertextfile_eng.dat"));
 
-    //    _fileSystem.Initialize()
-    //        .WithFile("Game/Audio/SFX/sfx2d_english.meg")
-    //        .WithFile("Game/Audio/SFX/SFX2D_GERMAN.MEG")
-    //        .WithFile("Game/Audio/SFX/sfx2d_non_localized.meg");
+        var actual = GameLocalizationUtilities.GetTextLocalizations(game);
 
-    //    _fileService.Setup(s => s.DataFiles(game.Object, "sfx2d_*.meg", "Audio/SFX", false, false))
-    //        .Returns(new List<IFileInfo>
-    //        {
-    //            _fileSystem.FileInfo.New("Game/Audio/SFX/sfx2d_english.meg"),
-    //            _fileSystem.FileInfo.New("Game/Audio/SFX/SFX2D_GERMAN.MEG"),
-    //            _fileSystem.FileInfo.New("Game/Audio/SFX/sfx2d_non_localized.meg")
-    //        });
+        Assert.Equivalent(new HashSet<ILanguageInfo>
+        {
+            new LanguageInfo("es", LanguageSupportLevel.Text),
+            new LanguageInfo("de", LanguageSupportLevel.Text)
+        }, actual, true);
+    }
 
-    //   var actual = _languageFinder.GetSfxMegLocalizations(game.Object);
+    [Fact]
+    public void GetSfxMegLocalizations()
+    {
+        var game = CreateRandomGame();
+        var dir = FileSystem.Path.Combine(game.Directory.FullName, "Data", "Audio", "SFX");
+        FileSystem.Directory.CreateDirectory(dir);
 
-    //    Assert.Equal(new HashSet<ILanguageInfo>
-    //    {
-    //        new LanguageInfo("en", LanguageSupportLevel.SFX),
-    //        new LanguageInfo("de", LanguageSupportLevel.SFX)
-    //    }, actual);
-    //}
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "sfx2d_english.txt"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "sfx2d_german.meg"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "SFX2D_SPANISH.meg"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "SFX2Denglish.meg"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "SFX2D_en.meg"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "SFX2D_.meg"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "sfx2d_non_localized.meg"));
 
-    //[Fact]
-    //public void TestFindSpeechMeg_EnglishGerman()
-    //{
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+        var actual = GameLocalizationUtilities.GetSfxMegLocalizations(game);
 
-    //    var fs = new MockFileSystem();
-    //    fs.Initialize()
-    //        .WithFile("Game/EnglishSpeech.meg")
-    //        .WithFile("Game/GERMANSPEECH.MEG")
-    //        .WithFile("Game/SomeSpeech.meg");
+        Assert.Equivalent(new HashSet<ILanguageInfo>
+        {
+            new LanguageInfo("es", LanguageSupportLevel.SFX),
+            new LanguageInfo("de", LanguageSupportLevel.SFX)
+        }, actual, true);
+    }
 
-    //    _fileService.Setup(s => s.DataFiles(game.Object, "*speech.meg", null, false, false))
-    //        .Returns(new List<IFileInfo>
-    //        {
-    //            fs.FileInfo.New("Game/EnglishSpeech.meg"),
-    //            fs.FileInfo.New("Game/GERMANSPEECH.MEG"),
-    //            fs.FileInfo.New("Game/SomeSpeech.meg")
-    //        });
+    [Fact]
+    public void GetSpeechLocalizationsFromMegs()
+    {
+        var game = CreateRandomGame();
+        var dir = FileSystem.Path.Combine(game.Directory.FullName, "Data");
+        FileSystem.Directory.CreateDirectory(dir);
 
-    //  var actual = _languageFinder.GetSpeechLocalizationsFromMegs(game.Object);
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "EnglishSpeech.txt"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "English.meg"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "Speech.meg"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "GermanSpeech.meg"));
+        FileSystem.File.Create(FileSystem.Path.Combine(dir, "SPANISHSPEECH.MEG"));
 
-    //    Assert.Equal(new HashSet<ILanguageInfo>
-    //    {
-    //        new LanguageInfo("en", LanguageSupportLevel.Speech),
-    //        new LanguageInfo("de", LanguageSupportLevel.Speech)
-    //    }, actual);
-    //}
+        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromMegs(game);
 
-    //[Fact]
-    //public void TestFindSpeechFolder_EnglishGerman()
-    //{
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
+        Assert.Equivalent(new HashSet<ILanguageInfo>
+        {
+            new LanguageInfo("es", LanguageSupportLevel.Speech),
+            new LanguageInfo("de", LanguageSupportLevel.Speech)
+        }, actual, true);
+    }
 
-    //    _fileSystem.Initialize()
-    //        .WithSubdirectory("Game/Audio/Speech/English")
-    //        .WithSubdirectory("Game/Audio/Speech/GERMAN")
-    //        .WithSubdirectory("Game/Audio/Speech/Some");
+    [Fact]
+    public void GetSpeechLocalizationsFromFolder()
+    {
+        var game = CreateRandomGame();
+        var dir = FileSystem.Path.Combine(game.Directory.FullName, "Data", "Audio", "Speech");
+        FileSystem.Directory.CreateDirectory(dir);
 
-    //    _fileService.Setup(s => s.DataDirectory(game.Object, "Audio/Speech", false))
-    //        .Returns(_fileSystem.DirectoryInfo.New("Game/Audio/Speech"));
+        FileSystem.Directory.CreateDirectory(FileSystem.Path.Combine(dir, "Eng"));
+        FileSystem.Directory.CreateDirectory(FileSystem.Path.Combine(dir, "German"));
+        FileSystem.Directory.CreateDirectory(FileSystem.Path.Combine(dir, "Spanish"));
 
-    //    var actual = _languageFinder.GetSpeechLocalizationsFromFolder(game.Object);
+        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromFolder(game);
 
-    //    Assert.Equal(new HashSet<ILanguageInfo>
-    //    {
-    //        new LanguageInfo("en", LanguageSupportLevel.Speech),
-    //        new LanguageInfo("de", LanguageSupportLevel.Speech)
-    //    }, actual);
-    //}
-
-    //[Fact]
-    //public void TestFindSpeechFolder_NotExists()
-    //{
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
-
-    //    _fileService.Setup(s => s.DataDirectory(game.Object, "Audio/Speech", false))
-    //        .Returns(_fileSystem.DirectoryInfo.New("Game/Audio/Speech"));
-
-    //    var actual = _languageFinder.GetSpeechLocalizationsFromFolder(game.Object);
-
-    //    Assert.Empty(actual);
-    //}
+        Assert.Equivalent(new HashSet<ILanguageInfo>
+        {
+            new LanguageInfo("es", LanguageSupportLevel.Speech),
+            new LanguageInfo("de", LanguageSupportLevel.Speech)
+        }, actual, true);
+    }
 }

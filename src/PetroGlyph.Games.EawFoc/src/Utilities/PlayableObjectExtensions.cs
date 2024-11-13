@@ -34,8 +34,7 @@ public static class PlayableObjectExtensions
     {
         if (playableObject == null)
             throw new ArgumentNullException(nameof(playableObject));
-
-        var objectPath = playableObject.Directory;
+        
         subPath ??= string.Empty;
 
         var fs = playableObject.Directory.FileSystem;
@@ -44,7 +43,7 @@ public static class PlayableObjectExtensions
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             var searchPattern = fs.Path.Combine("Data", subPath);
-            var candidateDir = objectPath.EnumerateDirectories(searchPattern,
+            var candidateDir = playableObject.Directory.EnumerateDirectories(searchPattern,
                 new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive }).FirstOrDefault();
             if (candidateDir is not null)
                 return candidateDir;

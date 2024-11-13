@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -56,8 +57,7 @@ public static class GameLocalizationUtilities
             if (fileName.Equals("sfx2d_non_localized.meg", StringComparison.OrdinalIgnoreCase))
                 return null;
             var cutOffIndex = fileName.LastIndexOf('_');
-            if (cutOffIndex == -1 || cutOffIndex == fileName.Length)
-                return null;
+            Debug.Assert(cutOffIndex >= 0);
             var langNameWithExtension = fileName.Substring(cutOffIndex + 1);
             return fs.Path.GetFileNameWithoutExtension(langNameWithExtension);
         }
@@ -80,8 +80,7 @@ public static class GameLocalizationUtilities
         static string GetSpeechLangName(string megFileName)
         {
             var cutOffIndex = megFileName.IndexOf("speech.meg", StringComparison.OrdinalIgnoreCase);
-            if (cutOffIndex < 0)
-                throw new InvalidOperationException($"unable to get language name from {megFileName}");
+            Debug.Assert(cutOffIndex >= 0);
             return megFileName.Substring(0, cutOffIndex);
         }
     }

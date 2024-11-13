@@ -19,8 +19,8 @@
 		<InheritDocEnabled>true</InheritDocEnabled>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.70" />
-		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
+		<PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\AET.SteamAbstraction\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />

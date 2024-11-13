@@ -1,251 +1,337 @@
-﻿using EawModinfo.Spec;
-using Moq;
+﻿using System;
 using System.Collections.Generic;
-using System;
-using Testably.Abstractions.Testing;
+using EawModinfo.Model;
+using EawModinfo.Spec;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Language;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Services;
 
-public class LanguageFinderTest
+public class LanguageFinderTest : CommonTestBase
 {
-    //[Fact]
-    //public void NullArgTest_Throws()
-    //{
-    //    Assert.ThrowsAny<Exception>(() => new Mock<ModLanguageFinderBase>(null, false).Object);
-    //}
+    private readonly InstalledLanguageFinder _languageFinder;
 
-    //[Fact]
-    //public void TestModinfo()
-    //{
-    //    var helper = new Mock<ILanguageFinder>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(helper.Object);
+    public LanguageFinderTest()
+    {
+        _languageFinder = new InstalledLanguageFinder(ServiceProvider);
+    }
 
-    //    var finder = new Mock<ModLanguageFinderBase>(sp.Object, false) { CallBase = true };
+    [Fact]
+    public void NullArgTest_Throws()
+    {
+        Assert.ThrowsAny<Exception>(() => _languageFinder.FindLanguages(null!));
+    }
 
-    //    var expected = new LanguageInfo("de", LanguageSupportLevel.Default);
+    [Fact]
+    public void FindLanguages_Game_WithNoLanguages()
+    {
+        var game = CreateRandomGame();
+        var langs = _languageFinder.FindLanguages(game);
+        Assert.Equivalent(new List<ILanguageInfo>(), langs, true);
+    }
 
-    //    var modinfo = new Mock<IModinfo>();
-    //    modinfo.Setup(m => m.Languages)
-    //        .Returns(new List<ILanguageInfo> { expected });
-    //    var mod = new Mock<IMod>();
-    //    mod.Setup(m => m.ModInfo).Returns(modinfo.Object);
+    [Fact]
+    public void FindLanguages_Game_WithLanguages_En_De()
+    {
+        var game = CreateRandomGame();
+        game.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        game.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
+        var langs = _languageFinder.FindLanguages(game);
 
-    //    finder.Setup(f => f.FindInstalledLanguagesCore(It.IsAny<IMod>())).Throws<Exception>();
+        Assert.Equivalent(new List<ILanguageInfo>
+        {
+            new LanguageInfo("de", LanguageSupportLevel.SFX),
+            new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
+        }, langs, true);
+    }
 
-    //    var langs = finder.Object.FindInstalledLanguages(mod.Object);
-    //    Assert.Single(langs);
-    //    Assert.Equal(expected, langs.FirstOrDefault());
-    //}
+    [Fact]
+    public void FindLanguages_Mod_WithNoLanguages_UsesGame()
+    {
+        var game = CreateRandomGame();
+        game.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        var mod = game.InstallMod("myMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //[Fact]
-    //public void TestModinfoDefault_Throws()
-    //{
-    //    var helper = new Mock<ILanguageFinder>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(helper.Object);
+        Assert.Equivalent(new List<ILanguageInfo>{ new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
+    }
 
-    //    var finder = new Mock<ModLanguageFinderBase>(sp.Object, false) { CallBase = true };
+    [Fact]
+    public void FindLanguages_Mod_WithLanguages_En_De()
+    {
+        var game = FileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
+        var mod = game.InstallMod("myMod", true, ServiceProvider);
+        mod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        mod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
-    //    var modinfo = new Mock<IModinfo>();
-    //    modinfo.Setup(m => m.Languages)
-    //        .Returns(new List<ILanguageInfo> { LanguageInfo.Default });
-    //    var mod = new Mock<IMod>();
-    //    mod.Setup(m => m.ModInfo).Returns(modinfo.Object);
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //    finder.Setup(f => f.FindInstalledLanguagesCore(It.IsAny<IMod>())).Throws<Exception>();
+        Assert.Equivalent(new List<ILanguageInfo>
+        {
+            new LanguageInfo("de", LanguageSupportLevel.SFX),
+            new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
+        }, langs, true);
+    }
 
-    //    Assert.Throws<Exception>(() => finder.Object.FindInstalledLanguages(mod.Object));
-    //}
+    public static IEnumerable<object[]> GetModInheritanceTestExpectedResults()
+    {
+        yield return [false, new List<ILanguageInfo>()];
+        yield return [true, new List<ILanguageInfo>
+        {
+            new LanguageInfo("de", LanguageSupportLevel.SFX),
+            new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
+        }];
+    }
 
-    //[Fact]
-    //public void TestModinfoDefault()
-    //{
-    //    var helper = new Mock<ILanguageFinder>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(helper.Object);
+    [Fact]
+    public void FindLanguages_Mod_InheritLanguage_TargetModDoesNotHaveLanguages()
+    {
+        var game = CreateRandomGame();
+        var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        baseMod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
-    //    var expected = new LanguageInfo("de", LanguageSupportLevel.Default);
+        var modInfo = new ModinfoData("myMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(baseMod)
+            }, DependencyResolveLayout.FullResolved)
+        };
+        var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
+        mod.ResolveDependencies(new ModDependencyResolver(ServiceProvider), new DependencyResolverOptions{ResolveCompleteChain = true});
 
-    //    var finder = new Mock<ModLanguageFinderBase>(sp.Object, false) { CallBase = true };
-    //    finder.Setup(f => f.FindInstalledLanguagesCore(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo> { expected });
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //    var mod = new Mock<IMod>();
+        Assert.Equivalent(new List<ILanguageInfo>
+        {
+            new LanguageInfo("de", LanguageSupportLevel.SFX),
+            new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
+        }, langs, true);
+    }
 
-    //    var langs = finder.Object.FindInstalledLanguages(mod.Object);
+    [Fact]
+    public void FindLanguages_Mod_InheritLanguage_TargetAndDependencyModDoNotHaveLanguages()
+    {
+        var game = CreateRandomGame();
+        var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        
+        var modInfo = new ModinfoData("myMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(baseMod)
+            }, DependencyResolveLayout.FullResolved)
+        };
+        var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
+        mod.ResolveDependencies(new ModDependencyResolver(ServiceProvider), new DependencyResolverOptions { ResolveCompleteChain = true });
 
-    //    Assert.Single(langs);
-    //    Assert.Equal(expected, langs.FirstOrDefault());
-    //}
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //[Fact]
-    //public void TestModinfoDefault_NoDeps()
-    //{
-    //    var helper = new Mock<ILanguageFinder>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(helper.Object);
+        Assert.Equivalent(new List<ILanguageInfo>(), langs, true);
+    }
 
-    //    var expected = LanguageInfo.Default;
+    [Fact]
+    public void FindLanguages_Mod_InheritLanguage_TargetModDoesNotHaveLanguagesAndDependencyIsNotResolved()
+    {
+        var game = CreateRandomGame();
+        var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
 
-    //    var finder = new Mock<ModLanguageFinderBase>(sp.Object, false) { CallBase = true };
-    //    finder.Setup(f => f.FindInstalledLanguagesCore(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo> { expected });
+        var modInfo = new ModinfoData("myMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(baseMod)
+            }, DependencyResolveLayout.FullResolved)
+        };
+        var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
+        // Do not resolve dependencies here!
 
-    //    var mod = new Mock<IMod>();
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //    var langs = finder.Object.FindInstalledLanguages(mod.Object);
+        Assert.Equivalent(new List<ILanguageInfo>(), langs, true);
+    }
 
-    //    Assert.Single(langs);
-    //    Assert.Equal(expected, langs.FirstOrDefault());
-    //}
+    [Fact]
+    public void FindLanguages_Mod_TargetModDoesHaveDefaultLanguageInstalled()
+    {
+        var game = CreateRandomGame();
+        var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        baseMod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
-    //[Fact]
-    //public void TestModinfoDefault_DepNotResolved()
-    //{
-    //    var helper = new Mock<ILanguageFinder>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(helper.Object);
+        var modInfo = new ModinfoData("myMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(baseMod)
+            }, DependencyResolveLayout.FullResolved)
+        };
+        var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
+        mod.ResolveDependencies(new ModDependencyResolver(ServiceProvider), new DependencyResolverOptions { ResolveCompleteChain = true });
 
-    //    var expected = LanguageInfo.Default;
+        // Only english is installed
+        mod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
-    //    var finder = new Mock<ModLanguageFinderBase>(sp.Object, true) { CallBase = true };
-    //    finder.Setup(f => f.FindInstalledLanguagesCore(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo> { expected });
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //    var mod = new Mock<IMod>();
-    //    mod.Setup(m => m.DependencyResolveStatus).Returns(DependencyResolveStatus.None);
+        // We should not have the languages from base, because only english was detected as physically installed.
+        Assert.Equivalent(new List<ILanguageInfo>{new LanguageInfo("en", LanguageSupportLevel.FullLocalized)}, langs, true);
+    }
 
-    //    var langs = finder.Object.FindInstalledLanguages(mod.Object);
+    [Fact]
+    public void FindLanguages_Mod_TargetModDoesHaveModinfoLanguages()
+    {
+        var game = CreateRandomGame();
+        var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        baseMod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
-    //    Assert.Single(langs);
-    //    Assert.Equal(expected, langs.FirstOrDefault());
-    //}
+        var modInfo = new ModinfoData("myMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(baseMod)
+            }, DependencyResolveLayout.FullResolved),
+            Languages = new List<ILanguageInfo>
+            {
+                new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
+                new LanguageInfo("de", LanguageSupportLevel.SFX)
+            }
+        };
+        var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
+        mod.ResolveDependencies(new ModDependencyResolver(ServiceProvider), new DependencyResolverOptions { ResolveCompleteChain = true });
 
-    //[Fact]
-    //public void TestModinfoDefault_FirstDep()
-    //{
-    //    var helper = new Mock<ILanguageFinder>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(helper.Object);
+        // Should not be considered
+        mod.InstallLanguage(new LanguageInfo("it", LanguageSupportLevel.FullLocalized));
 
-    //    var expected = new LanguageInfo("de", LanguageSupportLevel.Default);
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //    var finder = new Mock<ModLanguageFinderBase>(sp.Object, true) { CallBase = true };
-    //    finder.Setup(f => f.FindInstalledLanguagesCore(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo> { LanguageInfo.Default });
+        // We should not have the languages from base, because only english was detected as physically installed.
+        Assert.Equivalent(new List<ILanguageInfo>
+        {
+            new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
+            new LanguageInfo("de", LanguageSupportLevel.SFX)
 
-    //    var mod = new Mock<IMod>();
-    //    mod.Setup(m => m.DependencyResolveStatus).Returns(DependencyResolveStatus.Resolved);
+        }, langs, true);
+    }
 
-    //    var dep = new Mock<IMod>();
-    //    dep.Setup(m => m.InstalledLanguages).Returns(new HashSet<ILanguageInfo> { expected });
-    //    mod.Setup(m => m.Dependencies).Returns(new List<ModDependencyEntry> { new(dep.Object) });
+    [Fact]
+    public void FindLanguages_Mod_TargetModDoesHaveModinfoWithDefaultLanguagesExplicitlySet()
+    {
+        var game = CreateRandomGame();
+        var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        baseMod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
-    //    var langs = finder.Object.FindInstalledLanguages(mod.Object);
+        var modInfo = new ModinfoData("myMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(baseMod)
+            }, DependencyResolveLayout.FullResolved),
+            // Set language
+            Languages = new List<ILanguageInfo> { LanguageInfo.Default }
+        };
+        var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
+        mod.ResolveDependencies(new ModDependencyResolver(ServiceProvider), new DependencyResolverOptions());
 
-    //    Assert.Single(langs);
-    //    Assert.Equal(expected, langs.FirstOrDefault());
-    //}
+        // Should not be considered
+        mod.InstallLanguage(new LanguageInfo("it", LanguageSupportLevel.FullLocalized));
 
-    //[Fact]
-    //public void TestModinfoDefault_SecondDep()
-    //{
-    //    var helper = new Mock<ILanguageFinder>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(helper.Object);
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //    var expected = new LanguageInfo("de", LanguageSupportLevel.Default);
+        // We should not have the languages from base, because only english was detected as physically installed.
+        Assert.Equivalent(new List<ILanguageInfo>
+        {
+            new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
+        }, langs, true);
+    }
 
-    //    var finder = new Mock<ModLanguageFinderBase>(sp.Object, true) { CallBase = true };
-    //    finder.Setup(f => f.FindInstalledLanguagesCore(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo> { LanguageInfo.Default });
+    [Fact]
+    public void FindLanguages_Mod_TargetModDoesNotHaveLanguagesAndDependencyAlsoDoesNotHaveLanguages_UsesGameFallback()
+    {
+        var game = CreateRandomGame();
+        game.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var modInfo = new ModinfoData("myMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(baseMod)
+            }, DependencyResolveLayout.FullResolved)
+        };
+        var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
+        mod.ResolveDependencies(new ModDependencyResolver(ServiceProvider), new DependencyResolverOptions());
 
-    //    var mod = new Mock<IMod>();
-    //    mod.Setup(m => m.DependencyResolveStatus).Returns(DependencyResolveStatus.Resolved);
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //    var depA = new Mock<IMod>();
-    //    var depB = new Mock<IMod>();
-    //    depA.Setup(m => m.InstalledLanguages).Returns(new HashSet<ILanguageInfo> { LanguageInfo.Default });
-    //    depB.Setup(m => m.InstalledLanguages).Returns(new HashSet<ILanguageInfo> { expected });
-    //    mod.Setup(m => m.Dependencies).Returns(new List<ModDependencyEntry> { new(depA.Object), new(depB.Object) });
+        Assert.Equivalent(new List<ILanguageInfo>{ new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
+    }
 
-    //    var langs = finder.Object.FindInstalledLanguages(mod.Object);
+    [Fact]
+    public void FindLanguages_Mod_TargetModDoesNotHaveLanguagesAndSecondDependencyHasLanguages()
+    {
+        var game = CreateRandomGame();
+        var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        var middleModInfo = new ModinfoData("middleMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(baseMod)
+            }, DependencyResolveLayout.FullResolved)
+        };
+        var middleMod = game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(game), middleModInfo, ServiceProvider);
+        var modInfo = new ModinfoData("myMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(middleMod)
+            }, DependencyResolveLayout.ResolveRecursive)
+        };
+        var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
+        mod.ResolveDependencies(new ModDependencyResolver(ServiceProvider), new DependencyResolverOptions{ResolveCompleteChain = true});
 
-    //    Assert.Single(langs);
-    //    Assert.Equal(expected, langs.FirstOrDefault());
-    //}
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //[Fact]
-    //public void TestModinfoDefault_DepDefault()
-    //{
-    //    var helper = new Mock<ILanguageFinder>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(helper.Object);
+        Assert.Equivalent(new List<ILanguageInfo>{ new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
+    }
 
-    //    var expected = LanguageInfo.Default;
+    [Fact]
+    public void FindLanguages_VirtualMod_TargetModDoesNotHaveLanguagesAndSecondDependencyHasLanguages()
+    {
+        var game = CreateRandomGame();
+        var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        var middleMod = game.InstallAndAddMod("middleMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var modInfo = new ModinfoData("myMod")
+        {
+            Dependencies = new DependencyList(new List<IModReference>
+            {
+                new ModReference(middleMod), new ModReference(baseMod)
+            }, DependencyResolveLayout.ResolveRecursive)
+        };
+        var mod = new VirtualMod(game, modInfo, ServiceProvider);
 
-    //    var finder = new Mock<ModLanguageFinderBase>(sp.Object, true) { CallBase = true };
-    //    finder.Setup(f => f.FindInstalledLanguagesCore(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo> { LanguageInfo.Default });
+        var langs = _languageFinder.FindLanguages(mod);
 
-    //    var mod = new Mock<IMod>();
-    //    mod.Setup(m => m.DependencyResolveStatus).Returns(DependencyResolveStatus.Resolved);
+        Assert.Equivalent(new List<ILanguageInfo> { new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
+    }
 
-    //    var dep = new Mock<IMod>();
-    //    dep.Setup(m => m.InstalledLanguages).Returns(new HashSet<ILanguageInfo> { expected });
-    //    mod.Setup(m => m.Dependencies).Returns(new List<ModDependencyEntry> { new(dep.Object) });
 
-    //    var langs = finder.Object.FindInstalledLanguages(mod.Object);
-
-    //    Assert.Single(langs);
-    //    Assert.Equal(expected, langs.FirstOrDefault());
-    //}
-
-    //[Fact]
-    //public void NullSp_Throws()
-    //{
-    //    Assert.Throws<ArgumentNullException>(() => new GameLanguageFinder(null));
-    //}
-
-    //[Fact]
-    //public void TestEmptyResult()
-    //{
-    //    var fs = new MockFileSystem();
-    //    fs.Initialize().WithSubdirectory("Game");
-
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
-
-    //    var languageHelper = new Mock<ILanguageFinder>();
-    //    languageHelper
-    //        .Setup(h => h.Merge(It.IsAny<IEnumerable<ILanguageInfo>[]>()))
-    //        .Returns(new HashSet<ILanguageInfo>());
-
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(languageHelper.Object);
-
-    //    var finder = new GameLanguageFinder(sp.Object);
-    //    var langs = finder.FindInstalledLanguages(game.Object);
-    //    Assert.Empty(langs);
-    //}
-
-    //[Fact]
-    //public void TestSomeResult()
-    //{
-    //    var fs = new MockFileSystem();
-    //    fs.Initialize().WithSubdirectory("Game");
-
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Directory).Returns(fs.DirectoryInfo.New("Game"));
-
-    //    var langInfo = new Mock<ILanguageInfo>();
-
-    //    var languageHelper = new Mock<ILanguageFinder>();
-    //    languageHelper
-    //        .Setup(h => h.Merge(It.IsAny<IEnumerable<ILanguageInfo>[]>()))
-    //        .Returns(new HashSet<ILanguageInfo> { langInfo.Object });
-
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(ILanguageFinder))).Returns(languageHelper.Object);
-
-    //    var finder = new GameLanguageFinder(sp.Object);
-    //    var langs = finder.FindInstalledLanguages(game.Object);
-    //    Assert.Equal(1, langs.Count);
-    //}
+    [Fact]
+    public void FindLanguages_Mod_FromModinfo_WithNoLanguages()
+    {
+        var game = CreateRandomGame();
+        var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), new ModinfoData("myMod"), ServiceProvider);
+        var langs = _languageFinder.FindLanguages(mod);
+        Assert.Equivalent(new List<ILanguageInfo>(), langs, true);
+    }
 }

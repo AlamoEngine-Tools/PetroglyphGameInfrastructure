@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing;
@@ -34,5 +36,15 @@ public abstract class CommonTestBase
             yield return [new GameIdentity(GameType.Eaw, platform)];
             yield return [new GameIdentity(GameType.Foc, platform)];
         }
+    }
+
+    protected static GameIdentity CreateRandomGameIdentity()
+    {
+        return new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), TestHelpers.GetRandom(GITestUtilities.RealPlatforms));
+    }
+
+    protected PetroglyphStarWarsGame CreateRandomGame()
+    {
+        return FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
     }
 }

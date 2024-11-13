@@ -20,7 +20,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.70" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
 		<PackageReference Include="Required" Version="1.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -33,9 +33,9 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-		<PackageReference Include="Testably.Abstractions.Testing" Version="3.2.3" />
+		<PackageReference Include="Testably.Abstractions.Testing" Version="3.2.4" />
 		<PackageReference Include="xunit" Version="2.9.2" />
 	</ItemGroup>
 

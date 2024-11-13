@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using EawModinfo.Model;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Language;
 
 /// <summary>
 /// Service that searches installed localizations for playable objects.
 /// </summary>
-/// <param name="serviceProvider"></param>
+/// <param name="serviceProvider">The service provider.</param>
 public class InstalledLanguageFinder(IServiceProvider serviceProvider) : ILanguageFinder
 {
     /// <summary>
@@ -24,87 +21,83 @@ public class InstalledLanguageFinder(IServiceProvider serviceProvider) : ILangua
     /// Searches for installed languages for the specified playable object. When no languages are found the method returns an empty collection.
     /// </summary>
     /// <remarks>
-    /// For mods: If a mod has modinfo data and this data has specified languages other than the default collection (English - FullLocalized),
-    /// the value from modinfo is returned as is.
+    /// For mods: If a mod has modinfo data and this data has explicitly set languages, the value from modinfo is returned as is.
+    /// Also, in the case a mod does not have any languages (e.g, because it's virtual, or it only has visual assets),
+    /// the first dependency with languages provides the value. If no dependency has languages, the mod's game languages are used.
     /// </remarks>
-    /// <param name="playableObject">the playable object to search localization for.</param>
-    /// <param name="inheritFromDependencies">
-    /// When set to <see langword="true"/>, the language lookup also uses the languages from the object's dependencies. 
-    /// Default is <see langword="false"/>. The option is only application to mods.
-    /// </param>
+    /// <param name="playableObject">the playable object to search localizations for.</param>
     /// <returns>A collection of installed languages.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="playableObject"/> is <see langword="null"/>.</exception>
-    public IReadOnlyCollection<ILanguageInfo> FindLanguages(IPlayableObject playableObject, bool inheritFromDependencies = false)
+    public IReadOnlyCollection<ILanguageInfo> FindLanguages(IPlayableObject playableObject)
     {
         if (playableObject == null)
             throw new ArgumentNullException(nameof(playableObject));
         if (playableObject is IGame game)
             return GetInstalledGameLanguages(game);
         if (playableObject is IMod mod)
-            return GetInstalledModLanguages(mod, inheritFromDependencies);
-        throw new NotSupportedException($"The playable object of type '{playableObject.GetType().Name}' is not supported.");
+            return GetInstalledModLanguages(mod);
+        return playableObject.Game.InstalledLanguages;
     }
 
 
     /// <summary>
-    /// 
+    /// Searches for installed languages for the specified mod. If a mod has modinfo data and this data has explicitly set languages, the value from modinfo is returned as is.
+    /// Also, in the case a mod does not have any languages (e.g, because it's virtual, or it only has visual assets),
+    /// the first dependency with languages provides the value. If no dependency has languages, the mod's game languages are used.
+    /// When no languages are found the method returns an empty collection.
     /// </summary>
-    /// <param name="mod"></param>
-    /// <param name="inheritFromDependencies"></param>
-    /// <returns></returns>
-    protected virtual IReadOnlyCollection<ILanguageInfo> GetInstalledModLanguages(IMod mod, bool inheritFromDependencies)
+    /// <remarks>
+    /// The method returns an empty collection, when mod dependencies are not resolved.
+    /// </remarks>
+    /// <param name="mod">the mod to search localizations for.</param>
+    /// <returns>A collection of installed languages.</returns>
+    protected virtual IReadOnlyCollection<ILanguageInfo> GetInstalledModLanguages(IMod mod)
     {
-        // We don't "trust" the modinfo here as the default language (EN) also gets
-        // applied when nothing was specified by the mod developer.
-        // Only if we have more than the default language, we trust the modinfo.
+        // We only use modinfo data, if it was explicitly set by the mod creator.
         var modinfo = mod.ModInfo;
-        if (modinfo is not null && !IsEmptyOrDefault(modinfo.Languages))
+        if (modinfo is not null && modinfo.LanguagesExplicitlySet)
             return modinfo.Languages;
 
-        var foundLanguages = mod is not IPhysicalPlayableObject physicalPlayableObject ? [] : GetLanguagesFromPhysicalLocation(physicalPlayableObject);
-        
-        if (!IsEmptyOrDefault(foundLanguages))
+        var foundLanguages = mod is not IPhysicalPlayableObject physicalPlayableObject
+            ? []
+            : GetLanguagesFromPhysicalLocation(physicalPlayableObject);
+
+        if (foundLanguages.Count > 0)
             return foundLanguages;
 
-        if (!inheritFromDependencies || mod.DependencyResolveStatus != DependencyResolveStatus.Resolved)
-            return foundLanguages;
-
+        // Visual asset-only (sub) mods, may not have any localizations. Thus,
+        // as a fallback, we want to get the languages of the first dependency which has languages.
+        // NB: This strategy is not correct every time. E.g, if the next a dependency is a language pack,
+        // we would not only return this. Using the last dependency is also not perfect,
+        // because the next dependency may add so many changes, including localization,
+        // that the original localizations from the last dependency are overwritten. 
+        // In such complex cases the mod creators should always use modinfo data to express their actual intents.
         foreach (var dependency in mod.Dependencies)
         {
             var dependencyLanguages = dependency.Mod.InstalledLanguages;
-            if (!IsEmptyOrDefault(dependencyLanguages))
+            if (dependencyLanguages.Count != 0)
                 return dependencyLanguages;
         }
-        return foundLanguages;
+
+        // In the case the whole mod chain does not have languages, use the game language
+        return mod.Game.InstalledLanguages;
     }
 
     /// <summary>
-    /// 
+    /// Searches for installed languages for the specified game. When no languages are found the method returns an empty collection.
     /// </summary>
-    /// <param name="game"></param>
-    /// <returns></returns>
+    /// <param name="game">the game to search localizations for.</param>
+    /// <returns>A collection of installed languages.</returns>
     protected virtual IReadOnlyCollection<ILanguageInfo> GetInstalledGameLanguages(IGame game)
     {
         return GetLanguagesFromPhysicalLocation(game);
     }
 
-    private IReadOnlyCollection<ILanguageInfo> GetLanguagesFromPhysicalLocation(IPhysicalPlayableObject physicalPlayable)
+    private static IReadOnlyCollection<ILanguageInfo> GetLanguagesFromPhysicalLocation(IPhysicalPlayableObject physicalPlayable)
     {
         var text = GameLocalizationUtilities.GetTextLocalizations(physicalPlayable);
         var speech = GameLocalizationUtilities.GetSpeechLocalizationsFromMegs(physicalPlayable);
         var sfx = GameLocalizationUtilities.GetSfxMegLocalizations(physicalPlayable);
         return GameLocalizationUtilities.Merge(text, speech, sfx);
-    }
-
-    private static bool IsEmptyOrDefault(IReadOnlyCollection<ILanguageInfo> languages)
-    {
-        switch (languages.Count)
-        {
-            case 0:
-            case 1 when languages.First().Equals(LanguageInfo.Default):
-                return true;
-            default:
-                return false;
-        }
     }
 }
