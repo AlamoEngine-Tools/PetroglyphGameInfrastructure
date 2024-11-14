@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
+using EawModinfo.Model;
+using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
@@ -46,5 +48,21 @@ public abstract class CommonTestBase
     protected PetroglyphStarWarsGame CreateRandomGame()
     {
         return FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
+    }
+
+    private static readonly string[] PossibleLanguages = ["en", "de", "es", "it"]; 
+
+    protected ICollection<ILanguageInfo> GetRandomLanguages()
+    {
+        var languages = new HashSet<ILanguageInfo>(PossibleLanguages.Length);
+
+        for (var i = 0; i < PossibleLanguages.Length; i++)
+        {
+            var code = TestHelpers.GetRandom(PossibleLanguages);
+            var support = TestHelpers.GetRandomEnum<LanguageSupportLevel>();
+            languages.Add(new LanguageInfo(code, support));
+        }
+
+        return languages;
     }
 }

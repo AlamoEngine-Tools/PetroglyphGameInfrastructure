@@ -8,8 +8,7 @@ using PG.StarWarsGame.Infrastructure.Utilities;
 namespace PG.StarWarsGame.Infrastructure.Services.Icon;
 
 /// <summary>
-/// Provides a very simple implementation which searches returns the first .ico file in a mod's directory.
-/// For virtual mods it returns the icon of the first physical dependency which has a icon.
+/// Searches icon locations for playable objects.
 /// </summary>
 public class IconFinder : IIconFinder
 {
@@ -18,7 +17,9 @@ public class IconFinder : IIconFinder
 
     /// <inheritdoc />
     /// <remarks>
-    /// Virtual mods are currently not supported and always return <see langword="null"/>.
+    /// For Mods: If a mod has modinfo data and <see cref="IModinfo.Icon"/> is non-null, this value is taken.
+    /// Otherwise, icons are searched from the file system.
+    /// Virtual mods without specified modinfo data are currently not supported and always return <see langword="null"/>.
     /// </remarks>
     public string? FindIcon(IPlayableObject playableObject)
     {
@@ -40,6 +41,10 @@ public class IconFinder : IIconFinder
     /// <returns>The path to the found icon, or <see langword="null"/> if no icon was found.</returns>
     protected virtual string? FindIconForMod(IMod mod)
     {
+        var iconFile = mod.ModInfo?.Icon;
+        if (iconFile is not null)
+            return iconFile;
+
         if (mod is IPhysicalMod physicalMod)
             return physicalMod.DataFiles("*.ico", "..", false)
                 .FirstOrDefault()?.FullName;

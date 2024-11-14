@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using EawModinfo.Spec;
+using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Icon;
+using PG.StarWarsGame.Infrastructure.Services.Language;
 
 namespace PG.StarWarsGame.Infrastructure;
 
@@ -61,21 +64,13 @@ public abstract class PlayableObject(IServiceProvider serviceProvider) : IPlayab
         }
     }
 
-    /// <summary>
-    /// Initialization function to resolve a icon file. Default implements returns <see langword="null"/>.
-    /// </summary>
-    /// <returns>The resolved relative or absolute icon path, or <see langword="null"/>.</returns>
-    protected virtual string? ResolveIconFile()
+    private string? ResolveIconFile()
     {
-        return null;
+        return ServiceProvider.GetRequiredService<IIconFinder>().FindIcon(this);
     }
 
-    /// <summary>
-    /// Initialization function to resolve installed languages. Default implements returns an empty set.
-    /// </summary>
-    /// <returns></returns>
-    protected virtual IReadOnlyCollection<ILanguageInfo> ResolveInstalledLanguages()
+    private IReadOnlyCollection<ILanguageInfo> ResolveInstalledLanguages()
     {
-        return new HashSet<ILanguageInfo>();
+        return ServiceProvider.GetRequiredService<ILanguageFinder>().FindLanguages(this);
     }
 }

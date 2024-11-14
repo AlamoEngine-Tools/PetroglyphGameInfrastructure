@@ -202,33 +202,6 @@ public abstract class ModBase : PlayableModContainer, IMod
         return ModInfo?.Version;
     }
 
-    /// <summary>
-    /// Resolves the icon of this mod.
-    /// </summary>
-    /// <remarks
-    /// >The implementation returns the value from <see cref="IModinfo.Icon"/> if present.
-    /// If no modinfo is available or modinfo does not define an icon path, <see cref="IIconFinder"/> is used.
-    /// </remarks>
-    /// <returns>The resolved icon, or <see langword="null"/> if no icon is resolved.</returns>
-    protected override string? ResolveIconFile()
-    {
-        var iconFile = ModInfo?.Icon;
-        if (iconFile is not null)
-            return iconFile;
-        var finder = ServiceProvider.GetRequiredService<IIconFinder>();
-        return finder.FindIcon(this);
-    }
-
-    /// <summary>
-    /// Resolves the installed languages of this mod.
-    /// </summary>
-    /// <returns>The resolved languages.</returns>
-    protected override IReadOnlyCollection<ILanguageInfo> ResolveInstalledLanguages()
-    {
-        var finder = ServiceProvider.GetRequiredService<ILanguageFinder>();
-        return finder.FindLanguages(this);
-    }
-
     private IModinfo? ResolveModInfo()
     {
         var resolvingArgs = new ResolvingModinfoEventArgs(this);
@@ -245,7 +218,7 @@ public abstract class ModBase : PlayableModContainer, IMod
     }
 
     /// <summary>
-    /// Raised the <see cref="ResolvingModinfo"/> event.
+    /// Raises the <see cref="ResolvingModinfo"/> event.
     /// </summary>
     /// <param name="e">The event arguments</param>
     protected virtual void OnResolvingModinfo(ResolvingModinfoEventArgs e)

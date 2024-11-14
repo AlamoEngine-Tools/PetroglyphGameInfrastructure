@@ -15,16 +15,27 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class VirtualModTest : ModBaseTest
 {
-    private VirtualMod CreateVirtualMod()
+    private VirtualMod CreateVirtualMod(
+        string? iconPath = null,
+        ICollection<ILanguageInfo>? languages = null)
     {
         var game = CreateRandomGame();
         var dep = game.InstallAndAddMod("dep", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+
+        if (languages is not null)
+        {
+            foreach (var languageInfo in languages) 
+                dep.InstallLanguage(languageInfo);
+        }
+
         return new VirtualMod("virtualMod", game, [new ModDependencyEntry(dep)], DependencyResolveLayout.FullResolved, ServiceProvider);
     }
 
-    protected override IPlayableObject CreatePlayableObject()
+    protected override IPlayableObject CreatePlayableObject(
+        string? iconPath = null,
+        ICollection<ILanguageInfo>? languages = null)
     {
-        return CreateVirtualMod();
+        return CreateVirtualMod(iconPath, languages);
     }
 
     protected override PlayableModContainer CreateModContainer()
@@ -32,7 +43,9 @@ public class VirtualModTest : ModBaseTest
         return CreateVirtualMod();
     }
 
-    protected override ModBase CreateMod()
+    protected override ModBase CreateMod(
+        string? iconPath = null,
+        ICollection<ILanguageInfo>? languages = null)
     {
         return CreateVirtualMod();
     }

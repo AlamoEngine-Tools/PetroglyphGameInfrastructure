@@ -42,7 +42,7 @@ public struct EmptyStruct;
 
 public static class TestHelpers
 {
-    public static T GetRandomEnum<T>() where T : Enum
+    public static T GetRandomEnum<T>() where T : struct, Enum
     {
         var values = Enum.GetValues(typeof(T));
         var random = new Random();

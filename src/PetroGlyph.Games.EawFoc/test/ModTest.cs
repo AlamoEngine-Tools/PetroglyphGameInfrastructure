@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using EawModinfo;
 using EawModinfo.Spec;
 using Moq;
@@ -13,20 +14,34 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class ModTest : ModBaseTest
 {
-    private Mod CreatePhysicalMod()
+    private Mod CreatePhysicalMod(
+        string? iconPath = null,
+        ICollection<ILanguageInfo>? languages = null)
     {
         var game = CreateRandomGame();
-        return game.InstallMod("Mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var mod = game.InstallMod("Mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+
+        if (languages is not null)
+        {
+            foreach (var languageInfo in languages) 
+                mod.InstallLanguage(languageInfo);
+        }
+
+        return mod;
     }
 
-    protected override ModBase CreateMod()
+    protected override ModBase CreateMod(
+        string? iconPath = null,
+        ICollection<ILanguageInfo>? languages = null)
     {
-        return CreatePhysicalMod();
+        return CreatePhysicalMod(iconPath, languages);
     }
 
-    protected override IPlayableObject CreatePlayableObject()
+    protected override IPlayableObject CreatePlayableObject(
+        string? iconPath = null,
+        ICollection<ILanguageInfo>? languages = null)
     {
-        return CreateMod();
+        return CreateMod(iconPath, languages);
     }
 
     protected override PlayableModContainer CreateModContainer()

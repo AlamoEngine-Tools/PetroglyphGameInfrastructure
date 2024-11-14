@@ -1,14 +1,18 @@
-﻿using PG.StarWarsGame.Infrastructure.Games;
+﻿using EawModinfo.Spec;
+using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.TestingUtilities;
+using System.Collections.Generic;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
 public abstract class ModBaseTest : PlayableModContainerTest
 {
-    protected abstract ModBase CreateMod();
+    protected abstract ModBase CreateMod(
+        string? iconPath = null,
+        ICollection<ILanguageInfo>? languages = null);
 
     //[Fact]
     //public void ValidCtors_Properties()

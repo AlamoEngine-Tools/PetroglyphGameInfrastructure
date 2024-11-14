@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
@@ -9,15 +11,25 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class PetroglyphStarWarsGameTest : PlayableModContainerTest
 {
-    private PetroglyphStarWarsGame CreateGame()
+    private PetroglyphStarWarsGame CreateGame(
+        string? iconPath = null,
+        ICollection<ILanguageInfo>? languages = null)
     {
         var gameId = new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), TestHelpers.GetRandom(GITestUtilities.RealPlatforms));
-        return FileSystem.InstallGame(gameId, ServiceProvider);
+        var game =  FileSystem.InstallGame(gameId, ServiceProvider);
+        if (languages is not null)
+        {
+            foreach (var languageInfo in languages)
+                game.InstallLanguage(languageInfo);
+        }
+        return game;
     }
 
-    protected override IPlayableObject CreatePlayableObject()
+    protected override IPlayableObject CreatePlayableObject(
+        string? iconPath = null,
+        ICollection<ILanguageInfo>? languages = null)
     {
-        return CreateGame();
+        return CreateGame(iconPath, languages);
     }
 
     protected override PlayableModContainer CreateModContainer()

@@ -142,23 +142,4 @@ public class PetroglyphStarWarsGame : PlayableModContainer, IGame
     {
         return $"{Type}:{Platform} @{Directory}";
     }
-
-    /// <summary>
-    /// Resolves the game's installed languages.
-    /// </summary>
-    /// <returns>Set of resolved languages.</returns>
-    protected override IReadOnlyCollection<ILanguageInfo> ResolveInstalledLanguages()
-    {
-        return ServiceProvider.GetRequiredService<ILanguageFinder>().FindLanguages(this);
-    }
-
-    /// <summary>
-    /// Resolves the icon of this instance.
-    /// </summary>
-    /// <returns>The resolved icon path, or <see langword="null"/> if no icon is resolved.</returns>
-    protected override string? ResolveIconFile()
-    {
-        var finder = ServiceProvider.GetRequiredService<IIconFinder>();
-        return finder.FindIcon(this);
-    }
 }
