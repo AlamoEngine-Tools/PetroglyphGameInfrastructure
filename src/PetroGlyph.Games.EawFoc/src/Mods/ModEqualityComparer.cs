@@ -14,6 +14,9 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 /// For <see cref="IModReference"/> all operations are not <see cref="IModReference.VersionRange"/>-aware.</remarks>
 public sealed class ModEqualityComparer : IEqualityComparer<IMod>, IEqualityComparer<IModIdentity>, IEqualityComparer<IModReference>
 {
+    private readonly bool _includeDependencies;
+    private readonly bool _includeGameReference;
+
     /// <summary>
     /// Default instance which checks for dependency and game equality.
     /// </summary>
@@ -26,11 +29,6 @@ public sealed class ModEqualityComparer : IEqualityComparer<IMod>, IEqualityComp
     /// Instance which includes the dependencies but not the game reference.
     /// </summary>
     public static readonly ModEqualityComparer ExcludeGame = new(true, false);
-
-    private readonly bool _includeDependencies;
-    private readonly bool _includeGameReference;
-
-    private readonly StringComparer _ignoreCaseComparer = StringComparer.OrdinalIgnoreCase;
 
     /// <summary>
     /// Creates a new instance.
@@ -122,9 +120,7 @@ public sealed class ModEqualityComparer : IEqualityComparer<IMod>, IEqualityComp
     /// <returns><see langword="true"/>if both references are equal; <see langword="false"/> otherwise.</returns>
     public bool Equals(IModReference? x, IModReference? y)
     {
-        if (x is null || y is null)
-            return false;
-        return ReferenceEquals(x, y) || new ModReference(x).Equals(new ModReference(y));
+        return ModReferenceEqualityComparer.Default.Equals(x, y);
     }
 
     /// <inheritdoc/>

@@ -22,6 +22,13 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
             foreach (var languageInfo in languages)
                 game.InstallLanguage(languageInfo);
         }
+
+        if (iconPath is not null)
+        {
+            iconPath = game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
+            FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, iconPath));
+        }
+
         return game;
     }
 

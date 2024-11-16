@@ -1,9 +1,5 @@
 ﻿using EawModinfo.Spec;
-using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using PG.TestingUtilities;
 using System.Collections.Generic;
 
 namespace PG.StarWarsGame.Infrastructure.Test;

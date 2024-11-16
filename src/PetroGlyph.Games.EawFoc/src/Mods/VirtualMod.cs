@@ -23,9 +23,6 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     /// </summary>
     public override string Identifier { get; }
 
-    /// <inheritdoc/>
-    public override DependencyResolveLayout DependencyResolveLayout { get; }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="VirtualMod"/> class of the specified game and modinfo.
     /// </summary>
@@ -48,25 +45,14 @@ public sealed class VirtualMod : ModBase, IVirtualMod
 
         ModInfo = modInfoData;
 
-        // Since we are in a ctor we cannot use the common services.
-        // We have to use a lightweight implementation for resolving and checking dependencies.
-        // This means we cannot ensure at this point this instance has
-        // a) A cycle free dependency graph,
-        var hasPhysicalMod = false;
-        foreach (var dependency in modInfoData.Dependencies)
+        AddDependencies(game, modInfoData.Dependencies.Select(d =>
         {
-            var mod = game.FindMod(dependency);
+            var mod = game.FindMod(d);
             if (mod is null)
-                throw new ModNotFoundException(dependency, this);
-            DependenciesInternal.Add(new ModDependencyEntry(mod, dependency.VersionRange));
-            if (mod.Type is ModType.Default or ModType.Workshops)
-                hasPhysicalMod = true;
-        }
+                throw new ModNotFoundException(d, this);
+            return new ModDependencyEntry(mod, d.VersionRange);
+        }).ToList());
 
-        if (!hasPhysicalMod)
-            throw new ModException(this, "No physical dependency was found.");
-
-        DependencyResolveLayout = modInfoData.Dependencies.ResolveLayout;
         DependencyResolveStatus = DependencyResolveStatus.Resolved;
 
         Identifier = CalculateIdentifier();
@@ -85,7 +71,7 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     /// <paramref name="name"/> or <paramref name="game"/> or <paramref name="dependencies"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
-    public VirtualMod(string name, IGame game, IList<ModDependencyEntry> dependencies, DependencyResolveLayout layout, IServiceProvider serviceProvider)
+    public VirtualMod(string name, IGame game, IReadOnlyList<ModDependencyEntry> dependencies, DependencyResolveLayout layout, IServiceProvider serviceProvider)
         : base(game, ModType.Virtual, name, serviceProvider)
     {
         if (dependencies == null) 
@@ -93,16 +79,8 @@ public sealed class VirtualMod : ModBase, IVirtualMod
         if (dependencies.Count == 0)
             throw new PetroglyphException("Virtual mods must have at least one physical dependency.");
 
-        // Since we are in a ctor we cannot use the common services.
-        // We have to use a lightweight implementation for resolving and checking dependencies.
-        // This means we cannot ensure at this point this instance has a cycle free dependency graph.
-        foreach (var dependency in dependencies)
-        {
-            if (!dependency.Mod.Game.Equals(game))
-                throw new PetroglyphException($"Game of mod {dependency} does not match this mod's game.");
-            DependenciesInternal.Add(dependency);
-        }
-        DependencyResolveLayout = layout;
+        AddDependencies(game, dependencies);
+
         DependencyResolveStatus = DependencyResolveStatus.Resolved;
 
         ModInfo = new ModinfoData(name)
@@ -111,6 +89,27 @@ public sealed class VirtualMod : ModBase, IVirtualMod
         };
 
         Identifier = CalculateIdentifier();
+    }
+
+    private void AddDependencies(IGame game, IReadOnlyList<ModDependencyEntry> dependencies)
+    {
+        // Since we are in a ctor we cannot use the common services.
+        // We have to use a lightweight implementation for resolving and checking dependencies.
+        // This means we cannot ensure at this point this instance has
+        // a) A cycle free dependency graph,
+        var hasPhysicalMod = false;
+        foreach (var dependency in dependencies)
+        {
+            if (!ReferenceEquals(dependency.Mod.Game, game))
+                throw new PetroglyphException($"Game of mod {dependency} does not match this mod's game.");
+
+            DependenciesInternal.Add(dependency);
+            if (dependency.Mod.Type is ModType.Default or ModType.Workshops)
+                hasPhysicalMod = true;
+        }
+
+        if (!hasPhysicalMod)
+            throw new ModException(this, "No physical dependency was found.");
     }
 
     /// <inheritdoc/>

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using EawModinfo;
+using EawModinfo.Model;
 using EawModinfo.Spec;
-using Moq;
-using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
-using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
@@ -26,6 +23,9 @@ public class ModTest : ModBaseTest
             foreach (var languageInfo in languages) 
                 mod.InstallLanguage(languageInfo);
         }
+
+        if (iconPath is not null) 
+            FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, iconPath));
 
         return mod;
     }
@@ -52,45 +52,50 @@ public class ModTest : ModBaseTest
     [Fact]
     public void InvalidCtor_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new Mod(null, null, false, (IModinfo)null, null));
-        Assert.Throws<ArgumentNullException>(() => new Mod(null, null, false, (string)null, null));
-        var game = new Mock<IGame>();
-        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, null, false, (IModinfo)null, null));
-        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, null, false, (string)null, null));
-        var fs = new MockFileSystem();
-        var modDir = fs.DirectoryInfo.New("Game/Mods/A");
-        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (IModinfo)null, null));
-        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (string)null, new Mock<IServiceProvider>().Object));
-        Assert.Throws<ArgumentException>(() => new Mod(game.Object, modDir, false, string.Empty, new Mock<IServiceProvider>().Object));
-        var sp = new Mock<IServiceProvider>();
-        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (IModinfo)null, sp.Object));
-        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, (string)null, sp.Object));
-
-        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, new Mock<IModinfo>().Object, null));
-        Assert.Throws<ArgumentNullException>(() => new Mod(game.Object, modDir, false, "name", null));
-
-        Assert.Throws<ModinfoException>(() => new Mod(game.Object, modDir, false, new Mock<IModinfo>().Object, sp.Object));
+        var game = CreateRandomGame();
+        Assert.Throws<ArgumentNullException>(() => new Mod(null!, FileSystem.DirectoryInfo.New("modPath"), false, new ModinfoData("Name"), ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new Mod(game, null!, false, new ModinfoData("Name"), ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new Mod(game, FileSystem.DirectoryInfo.New("modPath"), false, (IModinfo)null!, ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new Mod(game, FileSystem.DirectoryInfo.New("modPath"), false, (string)null!, ServiceProvider));
+        Assert.Throws<ArgumentException>(() => new Mod(game, FileSystem.DirectoryInfo.New("modPath"), false, "", ServiceProvider));
     }
 
-    //[Fact]
-    //public void ValidCtors_Properties()
-    //{
-    //    var modIdBuilder = new Mock<IModIdentifierBuilder>();
-    //    var game = new Mock<IGame>();
-    //    var fs = new MockFileSystem();
-    //    var modDir = fs.DirectoryInfo.New("Game/Mods/A");
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(s => s.GetService(typeof(IModIdentifierBuilder))).Returns(modIdBuilder.Object);
+    [Fact]
+    public void ValidCtors_Properties_FromName()
+    {
+        var game = CreateRandomGame();
+        var ws = GITestUtilities.GetRandomWorkshopFlag(game);
 
-    //    var mod = new Mod(game.Object, modDir, false, "Name", sp.Object);
-    //    modIdBuilder.Setup(b => b.Build(mod)).Returns("somePath");
+        var mod = game.InstallAndAddMod("Mod", ws, ServiceProvider);
 
-    //    Assert.Equal("Name", mod.Name);
-    //    Assert.Equal(ModType.Default, mod.Type);
-    //    Assert.Equal("somePath", mod.Identifier);
-    //    Assert.Null(mod.ModInfo);
+        Assert.Equal("Mod", mod.Name);
+        Assert.Equal(ws ? ModType.Workshops : ModType.Default, mod.Type);
 
-    //    var modA = new Mod(game.Object, modDir, true, "Name", sp.Object);
-    //    Assert.Equal("somePath", modA.Identifier);
-    //}
+        if (ws)
+            Assert.True(uint.TryParse(mod.Identifier, out _));
+        else
+            Assert.Equal(mod.Directory.FullName.ToUpperInvariant(), mod.Identifier);
+
+        Assert.Null(mod.ModInfo);
+    }
+
+    [Fact]
+    public void ValidCtors_Properties_FromModinfo()
+    {
+        var game = CreateRandomGame();
+        var ws = GITestUtilities.GetRandomWorkshopFlag(game);
+
+        var modInfo = new ModinfoData("Mod");
+        var mod = game.InstallAndAddMod(ws, modInfo,ServiceProvider);
+
+        Assert.Equal("Mod", mod.Name);
+        Assert.Equal(ws ? ModType.Workshops : ModType.Default, mod.Type);
+
+        if (ws)
+            Assert.True(uint.TryParse(mod.Identifier, out _));
+        else
+            Assert.Equal(mod.Directory.FullName.ToUpperInvariant(), mod.Identifier);
+
+        Assert.Same(modInfo, mod.ModInfo);
+    }
 }

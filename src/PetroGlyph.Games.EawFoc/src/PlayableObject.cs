@@ -39,8 +39,6 @@ public abstract class PlayableObject(IServiceProvider serviceProvider) : IPlayab
         {
             if (_languageSearched)
                 return _installedLanguages!;
-            if (_installedLanguages is not null)
-                return _installedLanguages;
             _installedLanguages = ResolveInstalledLanguages();
             if (_installedLanguages is null)
                 throw new PetroglyphException("Resolved languages must not be null.");
@@ -55,8 +53,6 @@ public abstract class PlayableObject(IServiceProvider serviceProvider) : IPlayab
         get
         {
             if (_iconSearched)
-                return _iconFile;
-            if (_iconFile is not null)
                 return _iconFile;
             _iconFile = ResolveIconFile();
             _iconSearched = true;

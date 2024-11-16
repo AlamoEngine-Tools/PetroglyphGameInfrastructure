@@ -56,7 +56,7 @@ internal class ModFactory(IServiceProvider serviceProvider) : IModFactory
     }
 
     /// <inheritdoc/>
-    public IVirtualMod CreateVirtualMod(IGame game, string name, IList<ModDependencyEntry> dependencies, DependencyResolveLayout resolveLayout)
+    public IVirtualMod CreateVirtualMod(IGame game, string name, IReadOnlyList<ModDependencyEntry> dependencies, DependencyResolveLayout resolveLayout)
     {
         return new VirtualMod(name, game, dependencies, resolveLayout, _serviceProvider);
     }

@@ -65,5 +65,5 @@ public interface IModFactory
     /// <param name="resolveLayout">The resolve layout of the <paramref name="dependencies"/> list.</param>
     /// <returns>One or many virtual mods</returns>
     /// <exception cref="PetroglyphException">if the virtual mod could not be created.</exception>
-    IVirtualMod CreateVirtualMod(IGame game, string name, IList<ModDependencyEntry> dependencies, DependencyResolveLayout resolveLayout);
+    IVirtualMod CreateVirtualMod(IGame game, string name, IReadOnlyList<ModDependencyEntry> dependencies, DependencyResolveLayout resolveLayout);
 }

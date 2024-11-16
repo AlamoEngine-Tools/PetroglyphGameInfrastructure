@@ -7,11 +7,8 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using EawModinfo.Spec.Equality;
 using EawModinfo.Utilities;
-using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Services.Icon;
-using PG.StarWarsGame.Infrastructure.Services.Language;
 using Semver;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
@@ -85,7 +82,7 @@ public abstract class ModBase : PlayableModContainer, IMod
     public DependencyResolveStatus DependencyResolveStatus { get; protected set; }
 
     /// <inheritdoc/>
-    public virtual DependencyResolveLayout DependencyResolveLayout =>
+    public DependencyResolveLayout DependencyResolveLayout =>
         ModInfo?.Dependencies.ResolveLayout ?? DependencyResolveLayout.ResolveRecursive;
 
     /// <summary>

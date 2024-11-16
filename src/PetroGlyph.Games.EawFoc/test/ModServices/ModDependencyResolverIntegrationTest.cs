@@ -343,8 +343,6 @@ public class ModDependencyResolverIntegrationTest
     {
         private DependencyResolveLayout _layout;
 
-        public override DependencyResolveLayout DependencyResolveLayout => _layout;
-
         public TestMod(IGame game, IDirectoryInfo modDirectory, bool workshop, IModinfo modInfoData, IServiceProvider serviceProvider) : base(game, modDirectory, workshop, modInfoData, serviceProvider)
         {
         }

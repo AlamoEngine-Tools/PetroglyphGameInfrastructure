@@ -81,19 +81,60 @@ public static class PlayableObjectExtensions
         string? subPath,
         bool searchRecursive)
     {
-        if (playableObject == null) 
+        if (playableObject == null)
             throw new ArgumentNullException(nameof(playableObject));
-        if (fileSearchPattern == null) 
+
+        subPath ??= string.Empty;
+        var fs = playableObject.Directory.FileSystem;
+        var searchLocation = fs.Path.Combine("Data", subPath);
+        return EnumerateFiles(playableObject, fileSearchPattern, searchLocation, searchRecursive);
+    }
+
+    /// <summary>
+    /// Returns an enumerable collection of file information inside the object's root directory or specified subdirectory
+    /// that matches a specified search pattern and search recursive option.
+    /// If the specified directory does not exist an empty collection is returned.
+    /// </summary>
+    /// <remarks>
+    /// This method does not check whether <paramref name="subPath"/> leaves the objects directory
+    /// by e.g, using absolute paths or path operators ("..").
+    /// </remarks>
+    /// <param name="playableObject">The playable object to search the file information for.</param>
+    /// <param name="fileSearchPattern">
+    /// The search string to match against the names of files.
+    /// This parameter can contain a combination of valid literal path and wildcard (* and ?) characters,
+    /// but it doesn't support regular expressions.
+    /// </param>
+    /// <param name="subPath">
+    /// An optional path of subdirectories of the object's Data directory.
+    /// <see langword="null"/> if no subdirectories are requested.
+    /// </param>
+    /// <param name="searchRecursive">Specifies whether the search operation should include only the requested directory or all subdirectories.</param>
+    /// <returns>An enumerable collection of files inside the object's data directory or subdirectory that matches <paramref name="searchRecursive"/> and <paramref name="searchRecursive"/>.</returns>
+    public static IEnumerable<IFileInfo> EnumerateFiles(
+        this IPhysicalPlayableObject playableObject,
+        string fileSearchPattern,
+        string? subPath,
+        bool searchRecursive)
+    {
+        if (playableObject == null)
+            throw new ArgumentNullException(nameof(playableObject));
+        if (fileSearchPattern == null)
             throw new ArgumentNullException(nameof(fileSearchPattern));
 
-        var searchLocation = DataDirectory(playableObject, subPath);
+        subPath ??= string.Empty;
+
+        var fs = playableObject.Directory.FileSystem;
+        var searchPath = fs.Path.Combine(playableObject.Directory.FullName, subPath);
+        var searchLocation = fs.DirectoryInfo.New(searchPath);
+
         if (!searchLocation.Exists)
             return [];
 
 #if NET || NETSTANDARD2_1_OR_GREATER
         return searchLocation.EnumerateFiles(fileSearchPattern, new EnumerationOptions
         {
-            MatchCasing = MatchCasing.CaseInsensitive, 
+            MatchCasing = MatchCasing.CaseInsensitive,
             RecurseSubdirectories = searchRecursive
         });
 #else

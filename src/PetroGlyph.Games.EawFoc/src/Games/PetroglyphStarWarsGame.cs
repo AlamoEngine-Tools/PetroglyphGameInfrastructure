@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
-using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.StarWarsGame.Infrastructure.Services.Icon;
-using PG.StarWarsGame.Infrastructure.Services.Language;
 
 namespace PG.StarWarsGame.Infrastructure.Games;
 

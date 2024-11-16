@@ -17,21 +17,21 @@ public class IconFinder : IIconFinder
 
     /// <inheritdoc />
     /// <remarks>
-    /// For Mods: If a mod has modinfo data and <see cref="IModinfo.Icon"/> is non-null, this value is taken.
-    /// Otherwise, icons are searched from the file system.
-    /// Virtual mods without specified modinfo data are currently not supported and always return <see langword="null"/>.
+    /// For Mods: If a mod has modinfo data and <see cref="IModinfo.Icon"/> is not <see langword="null"/> and not empty, this value is taken.
+    /// Otherwise, icons are searched from the file system. As a fallback the icon from the game is used, 
+    /// or <see langword="null"/> is returned if no icon is found.
     /// </remarks>
     public string? FindIcon(IPlayableObject playableObject)
     {
         if (playableObject == null) 
             throw new ArgumentNullException(nameof(playableObject));
-
+        
         if (playableObject is IGame game)
             return FindIconForGame(game);
         if (playableObject is IMod mod)
             return FindIconForMod(mod);
-        
-        throw new NotSupportedException($"The playable object of type '{playableObject.GetType().Name}' is not supported.");
+
+        return playableObject.Game.IconFile;
     }
 
     /// <summary>
@@ -42,18 +42,14 @@ public class IconFinder : IIconFinder
     protected virtual string? FindIconForMod(IMod mod)
     {
         var iconFile = mod.ModInfo?.Icon;
-        if (iconFile is not null)
+        if (!string.IsNullOrEmpty(iconFile))
             return iconFile;
 
         if (mod is IPhysicalMod physicalMod)
-            return physicalMod.DataFiles("*.ico", "..", false)
+            iconFile = physicalMod.DataFiles("*.ico", "..", false)
                 .FirstOrDefault()?.FullName;
-        if (mod.Type == ModType.Virtual)
-        {
-            // TODO: For now, virtual mods don't have icons
-            return null;
-        }
-        return null;
+
+        return iconFile ?? mod.Game.IconFile;
     }
 
     /// <summary>
@@ -69,7 +65,7 @@ public class IconFinder : IIconFinder
             GameType.Foc => FocIconName,
             _ => throw new ArgumentOutOfRangeException()
         };
-        return game.DataFiles(expectedFileName, "..", false)
+        return game.EnumerateFiles(expectedFileName, null, false)
             .FirstOrDefault()?.FullName;
     }
 }

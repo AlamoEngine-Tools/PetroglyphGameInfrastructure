@@ -79,16 +79,6 @@ public class LanguageFinderTest : CommonTestBase
         }, langs, true);
     }
 
-    public static IEnumerable<object[]> GetModInheritanceTestExpectedResults()
-    {
-        yield return [false, new List<ILanguageInfo>()];
-        yield return [true, new List<ILanguageInfo>
-        {
-            new LanguageInfo("de", LanguageSupportLevel.SFX),
-            new LanguageInfo("en", LanguageSupportLevel.FullLocalized),
-        }];
-    }
-
     [Fact]
     public void FindLanguages_Mod_InheritLanguage_TargetModDoesNotHaveLanguages()
     {

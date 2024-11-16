@@ -14,8 +14,6 @@ public class Mod : ModBase, IPhysicalMod
 { 
     private string? _identifier;
 
-    internal string InternalPath { get; }
-
     /// <inheritdoc/>
     public IDirectoryInfo Directory { get; }
 
@@ -57,7 +55,6 @@ public class Mod : ModBase, IPhysicalMod
     {
         Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
         FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-        InternalPath = CreateInternalPath(modDirectory);
     }
 
     /// <summary>
@@ -76,17 +73,11 @@ public class Mod : ModBase, IPhysicalMod
     {
         Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
         FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-        InternalPath = CreateInternalPath(modDirectory);
     }
 
     /// <inheritdoc />
     public override string ToString()
     {
         return $"{Name}:{Type} @{Directory.FullName}";
-    }
-
-    internal string CreateInternalPath(IDirectoryInfo directory)
-    {
-        return FileSystem.Path.GetFullPath(directory.FullName);
     }
 }
