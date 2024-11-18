@@ -1,4 +1,5 @@
 ﻿using System;
+using Castle.Core;
 using EawModinfo.Model;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
@@ -28,21 +29,45 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
         var mod = game.InstallMod("myMod", false, ServiceProvider);
         var modSame = game.InstallMod("myMod", false, ServiceProvider);
 
-        Assert.Empty(container.Mods);
+        Assert.DoesNotContain(mod, container.Mods);
+        Assert.DoesNotContain(modSame, container.Mods);
+        Assert.DoesNotContain(mod, container);
+        Assert.DoesNotContain(modSame, container);
+        Assert.DoesNotContain(mod, container.Game.Mods);
 
         Assert.True(container.AddMod(mod));
-        Assert.Single(container.Mods);
+        Assert.Contains(mod, container.Mods);
+        Assert.Contains(mod, container);
+        Assert.Contains(mod, container.Game.Mods);
+        Assert.Contains(mod, container.Mods, ReferenceEqualityComparer<IMod>.Instance);
+        Assert.Contains(mod, container, ReferenceEqualityComparer<IMod>.Instance);
+        Assert.Contains(mod, container.Game.Mods, ReferenceEqualityComparer<IMod>.Instance);
+
         Assert.False(container.AddMod(mod));
+        Assert.Contains(mod, container.Mods);
+        Assert.Contains(mod, container);
+        Assert.Contains(mod, container.Game.Mods);
+        Assert.Contains(mod, container.Mods, ReferenceEqualityComparer<IMod>.Instance);
+        Assert.Contains(mod, container, ReferenceEqualityComparer<IMod>.Instance);
+        Assert.Contains(mod, container.Game.Mods, ReferenceEqualityComparer<IMod>.Instance);
+
         Assert.False(container.AddMod(modSame));
-        Assert.Single(container.Mods);
-        Assert.Single(container);
+        Assert.DoesNotContain(modSame, container.Mods, ReferenceEqualityComparer<IMod>.Instance);
+        Assert.DoesNotContain(modSame, container, ReferenceEqualityComparer<IMod>.Instance);
+        Assert.DoesNotContain(modSame, container.Game.Mods, ReferenceEqualityComparer<IMod>.Instance);
 
         Assert.True(container.RemoveMod(modSame));
-        Assert.Empty(container.Mods);
+        Assert.DoesNotContain(mod, container.Mods);
+        Assert.DoesNotContain(mod, container);
+        if (container is IMod)
+            Assert.Contains(mod, container.Game.Mods); // Should not remove from game
+
         Assert.False(container.RemoveMod(mod));
 
-        Assert.Empty(container.Mods);
-        Assert.Empty(container);
+        Assert.DoesNotContain(mod, container.Mods);
+        Assert.DoesNotContain(mod, container);
+        if (container is IMod)
+            Assert.Contains(mod, container.Game.Mods); // Should not remove from game
     }
 
     [Fact]
@@ -52,7 +77,7 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
         var game = container.Game;
 
         var otherGame = new PetroglyphStarWarsGame(game, game.Directory, game.Name, ServiceProvider);
-        var mod = otherGame.InstallMod("mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var mod = otherGame.InstallAndAddMod("mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
         Assert.Throws<ModException>(() => container.AddMod(mod));
     }
 
@@ -62,7 +87,7 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
         var game = CreateModContainer().Game;
 
         var isWs = GITestUtilities.GetRandomWorkshopFlag(game);
-        var mod = game.InstallMod("mod", isWs, ServiceProvider);
+        var mod = game.InstallAndAddMod("mod", isWs, ServiceProvider);
         var sameMod = new Mod(game, mod.Directory, isWs, mod.Name, ServiceProvider);
 
         Assert.False(mod.AddMod(mod));
@@ -102,21 +127,66 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
 
 
     [Fact]
-    public void RemoveModRaiseEvent()
+    public void RemoveMod_NotExisting_DoesNotRaiseEvent()
     {
         var container = CreateModContainer();
         var game = container.Game;
 
         var mod = game.InstallMod("mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
 
-        var raised = false;
+        var containerRaised = false;
         container.ModsCollectionModified += (_, _) =>
         {
-            raised = true;
+            containerRaised = true;
+        };
+
+        var gameRaised = false;
+        container.Game.ModsCollectionModified += (_, _) =>
+        {
+            gameRaised = true;
         };
 
         game.RemoveMod(mod);
-        Assert.False(raised);
+        Assert.False(containerRaised);
+        Assert.False(gameRaised);
+    }
+
+    [Fact]
+    public void AddMod_Existing_DoesNotRaiseEvent()
+    {
+        var container = CreateModContainer();
+        var game = container.Game;
+
+        var mod = game.InstallMod("mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        container.AddMod(mod);
+
+        var containerRaised = false;
+        container.ModsCollectionModified += (_, _) =>
+        {
+            containerRaised = true;
+        };
+
+        var gameRaised = false;
+        container.Game.ModsCollectionModified += (_, _) =>
+        {
+            gameRaised = true;
+        };
+
+        container.AddMod(mod);
+        Assert.False(containerRaised);
+        Assert.False(gameRaised);
+    }
+
+    [Fact]
+    public void AddMod_ExistingFromContainer_ShouldBeAlreadyInGame()
+    {
+        var container = CreateModContainer();
+        var game = container.Game;
+
+        var mod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        Assert.True(container.AddMod(mod));
+
+        Assert.False(game.AddMod(mod));
     }
 
     [Fact]

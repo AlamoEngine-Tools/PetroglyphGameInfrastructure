@@ -43,7 +43,12 @@ public abstract class PlayableModContainer(IServiceProvider serviceProvider) : P
             return false;
         var result = ModsInternal.Add(mod);
         if (result)
+        {
             OnModsCollectionModified(new ModCollectionChangedEventArgs(mod, ModCollectionChangedAction.Add));
+            if (this is IMod containerIsMod)
+                containerIsMod.Game.AddMod(mod);
+
+        }
         return result;
     }
 

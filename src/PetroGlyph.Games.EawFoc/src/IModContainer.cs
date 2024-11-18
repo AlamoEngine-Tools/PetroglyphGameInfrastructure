@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using EawModinfo.Spec;
-using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure;
@@ -23,13 +22,10 @@ public interface IModContainer : IEnumerable<IMod>
 
     /// <summary>
     /// Associates an <see cref="IMod"/> to the this <see cref="IModContainer"/>.
-    /// <remarks>
-    /// You cannot add a mod to the collection when this instance and <paramref name="mod"/> have the same mod references.
-    /// <br></br>
-    /// This operation is "in-memory" only, meaning the <paramref name="mod"/>'s <see cref="IModIdentity.Dependencies"/>
-    /// will NOT be updated.
-    /// </remarks>
     /// </summary>
+    /// <remarks>
+    /// When this <see cref="IModContainer"/> is a <see cref="IMod"/>, <paramref name="mod"/> also gets added to <see cref="IPlayableObject.Game"/>.
+    /// </remarks>
     /// <param name="mod">The mod instance</param>
     /// <returns><see langword="true"/> if the mod was added; otherwise <see langword="false"/> if the mod already existed.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="mod"/> is <see langword="null"/>.</exception>
