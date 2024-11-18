@@ -122,7 +122,7 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     /// This method is not supported, as virtual mods have pre-defined dependencies.
     /// </summary>
     /// <exception cref="NotSupportedException"></exception>
-    public override void ResolveDependencies(IDependencyResolver resolver, DependencyResolverOptions options)
+    public override void ResolveDependencies(DependencyResolverOptions options, IDependencyResolver? resolver = null)
     {
         throw new NotSupportedException("Virtual mods cannot resolve their dependencies after initialization");
     }

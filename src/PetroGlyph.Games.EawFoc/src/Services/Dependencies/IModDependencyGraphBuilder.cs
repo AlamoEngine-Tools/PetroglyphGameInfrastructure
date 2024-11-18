@@ -46,8 +46,8 @@ internal interface IModDependencyGraphBuilder
     bool TryBuildResolveFree(IMod rootMod, out IModDependencyGraph? graph);
 
     /// <summary>
-    /// Gets a mod's dependencies either from the <see cref="IMod.Dependencies"/> list, if the mod is already resolved
-    /// or otherwise it searches for mods from the <see cref="IMod.ModInfo"/> data in the <paramref name="targetMod"/> game instance.
+    /// Gets a mod's dependencies either from the <see cref="IMod.Dependencies"/> list, if the mod is already resolved,
+    /// or otherwise it searches, without further resolving, for mods from the modinfo data, if present, in the <paramref name="targetMod"/> game instance.
     /// If no modinfo is present an empty list will be returned.
     /// </summary>
     /// <remarks>The <paramref name="targetMod"/> is not part of the returned list.</remarks>

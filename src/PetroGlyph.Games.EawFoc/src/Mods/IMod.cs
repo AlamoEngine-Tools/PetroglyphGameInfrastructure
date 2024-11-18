@@ -61,13 +61,13 @@ public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContai
     /// This operation ignores whether dependencies have already been resolved or not.
     /// This operation sets the <see cref="DependencyResolveStatus"/> accordingly to the current state of the operation.
     /// </summary>
-    /// <param name="resolver">Resolver service to use.</param>
     /// <param name="options">The resolve options.</param>
+    /// <param name="resolver">An existing resolver to use or <see langword="null"/> if no specific resolver instance shall be used.</param>
     /// <remarks>This operation does <b>not</b> update the <see cref="Mods"/> collection of dependencies.</remarks>
     /// <exception cref="ModDependencyCycleException">A dependency cycle was found.</exception>
     /// <exception cref="ModDependencyCycleException">This method gets called while already resolving this instance.</exception>
     /// <exception cref="ModNotFoundException">A dependency could not be found.</exception>
     /// <exception cref="PetroglyphException">if some internal constrained failed.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="resolver"/> or <paramref name="options"/> is <see langword="null"/>.</exception>
-    void ResolveDependencies(IDependencyResolver resolver, DependencyResolverOptions options);
+    void ResolveDependencies(DependencyResolverOptions options, IDependencyResolver? resolver = null);
 }

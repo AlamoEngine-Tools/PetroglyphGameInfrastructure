@@ -176,7 +176,7 @@ public class VirtualModTest : ModBaseTest
     public void ResolveDependencies_NotSupportedOperation()
     {
         var mod = CreateMod();
-        Assert.Throws<NotSupportedException>(() => mod.ResolveDependencies(new ModDependencyResolver(ServiceProvider), new DependencyResolverOptions()));
+        Assert.Throws<NotSupportedException>(() => mod.ResolveDependencies(new DependencyResolverOptions()));
     }
 
     private class CustomVirtualMod(IGame game, IServiceProvider serviceProvider)

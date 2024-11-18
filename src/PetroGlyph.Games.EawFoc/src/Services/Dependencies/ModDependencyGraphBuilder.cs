@@ -74,7 +74,7 @@ internal class ModDependencyGraphBuilder : IModDependencyGraphBuilder
     {
         if (targetMod == null)
             throw new ArgumentNullException(nameof(targetMod));
-        return ResolveFreeDependenciesFactory(targetMod).Item1;
+        return ResolveFreeDependenciesFactory(targetMod).dependencies;
     }
 
     private static void AddToGraph(ModDependencyGraph graph, IMod root, Func<IMod, (IList<IMod>, DependencyResolveLayout)> dependencyFactory)

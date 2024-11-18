@@ -23,8 +23,7 @@ internal class ModDependencyTraverser : IModDependencyTraverser
     /// <inheritdoc/>
     public IList<ModDependencyEntry> Traverse(IMod targetMod)
     {
-        var graphBuilder = _serviceProvider.GetService<IModDependencyGraphBuilder>() ??
-                           new ModDependencyGraphBuilder();
+        var graphBuilder = _serviceProvider.GetRequiredService<IModDependencyGraphBuilder>();
         var dependencyGraph = graphBuilder.Build(targetMod);
         if (dependencyGraph.HasCycle())
             throw new ModDependencyCycleException(targetMod, $"Cycle detected while traversing {targetMod}.");

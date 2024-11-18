@@ -7,6 +7,7 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using EawModinfo.Spec.Equality;
 using EawModinfo.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using Semver;
@@ -133,14 +134,14 @@ public abstract class ModBase : PlayableModContainer, IMod
     }
 
     /// <inheritdoc/>
-    public virtual void ResolveDependencies(IDependencyResolver resolver, DependencyResolverOptions options)
+    public virtual void ResolveDependencies(DependencyResolverOptions options, IDependencyResolver? resolver = null)
     {
-        if (resolver == null) 
-            throw new ArgumentNullException(nameof(resolver));
         if (options == null)
             throw new ArgumentNullException(nameof(options));
         if (DependencyResolveStatus == DependencyResolveStatus.Resolving)
             throw new ModDependencyCycleException(this, "Already resolving the current instance's dependencies. Is there a Cycle?");
+
+        resolver ??= ServiceProvider.GetRequiredService<IDependencyResolver>();
 
         try
         {

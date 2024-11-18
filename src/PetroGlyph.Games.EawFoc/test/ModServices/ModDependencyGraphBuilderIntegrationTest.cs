@@ -23,8 +23,7 @@ public class ModDependencyGraphBuilderIntegrationTest : CommonTestBase
 
         var targetMod = game.InstallAndAddMod("Target", false, ServiceProvider);
 
-        var resolver = ServiceProvider.GetRequiredService<IDependencyResolver>();
-        targetMod.ResolveDependencies(resolver, new DependencyResolverOptions());
+        targetMod.ResolveDependencies(new DependencyResolverOptions());
         
         var graphBuilder = new ModDependencyGraphBuilder();
 

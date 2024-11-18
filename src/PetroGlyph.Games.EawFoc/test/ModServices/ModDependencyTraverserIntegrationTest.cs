@@ -10,16 +10,23 @@ using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-public class ModDependencyTraverserIntegrationTest
+public class ModDependencyTraverserIntegrationTest : CommonTestBase
 {
-    private readonly MockFileSystem _fileSystem;
+    private readonly ModDependencyTraverser _modDependencyTraverser;
     private readonly IGame _game;
-    private readonly IServiceProvider _serviceProvider;
+
+    public ModDependencyTraverserIntegrationTest()
+    {
+        _modDependencyTraverser = new ModDependencyTraverser(ServiceProvider);
+        _game = CreateRandomGame();
+    }
 
     //public ModDependencyTraverserIntegrationTest()
     //{
@@ -77,6 +84,18 @@ public class ModDependencyTraverserIntegrationTest
     //}
 
     //[Fact]
+    //public void Traverse_NoDependencies()
+    //{
+    //    var a = CreateMod("A");
+        
+    //    var actual = _modDependencyTraverser.Traverse(a);
+
+    //    var expected = new List<IMod> { a }.Select(m => new ModDependencyEntry(m)).ToList();
+
+    //    Assert.Equal(expected, actual);
+    //}
+
+    //[Fact]
     //public void TestTraverse_LayoutRecursive_ModinfoSpec_A()
     //{
     //    var a = CreateMod("A");
@@ -89,8 +108,7 @@ public class ModDependencyTraverserIntegrationTest
     //    b.SetDependencies(d);
     //    c.SetDependencies(e);
 
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
+    //    var actual = _modDependencyTraverser.Traverse(a);
 
     //    var expected = new List<IMod> { a, b, c, d, e }.Select(m => new ModDependencyEntry(m)).ToList();
 
@@ -333,18 +351,12 @@ public class ModDependencyTraverserIntegrationTest
     //    Assert.Throws<ModDependencyCycleException>(() => traverser.Traverse(a));
     //}
 
-    //private TestMod CreateMod(string name)
+    //private TestMod CreateMod(string name, params IModReference[] dependencies)
     //{
+    //    _game.InstallAndAddMod(name, )
+
     //    _fileSystem.Initialize().WithSubdirectory($"Game/Mods/{name}");
     //    return new TestMod(_game, _fileSystem.DirectoryInfo.New($"Game/Mods/{name}"), false, name, _serviceProvider);
-    //}
-
-    //private static IGame SetupGame(MockFileSystem fileSystem, IServiceProvider sp)
-    //{
-    //    fileSystem.Initialize().WithFile("Game/swfoc.exe");
-    //    var game = new PetroglyphStarWarsGame(new GameIdentity(GameType.Foc, GamePlatform.Disk),
-    //        fileSystem.DirectoryInfo.New("Game"), "Foc", sp);
-    //    return game;
     //}
 
     [DebuggerDisplay("Name = {Name}")]

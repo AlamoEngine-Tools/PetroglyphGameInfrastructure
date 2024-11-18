@@ -76,7 +76,7 @@ internal class ModDependencyResolver : IDependencyResolver
                 // the whole chain would be in an undefined state,
                 // where we could never trust the IMod.Dependencies property.
                 // This way we make sure the property always yields the correct 1st-level dependencies.
-                source.ResolveDependencies(this, new DependencyResolverOptions());
+                source.ResolveDependencies(new DependencyResolverOptions(), this);
             }
         }
     }
