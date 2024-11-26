@@ -371,25 +371,9 @@ public class ModDependencyTraverserIntegrationTest : CommonTestBase
             DependencyResolveStatus = DependencyResolveStatus.Resolved;
         }
 
-        private void DependencyAction(Action<IList<ModDependencyEntry>> action)
-        {
-            action(DependenciesInternal);
-        }
-
         public void SetLayout(DependencyResolveLayout layout)
         {
             _layout = layout;
-        }
-
-        public void SetDependencies(params IMod[] mods)
-        {
-            DependencyAction(dl =>
-            {
-                foreach (var dep in mods)
-                {
-                    dl.Add(new ModDependencyEntry(dep));
-                }
-            });
         }
     }
 }

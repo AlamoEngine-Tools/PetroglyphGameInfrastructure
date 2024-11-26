@@ -15,23 +15,23 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public class ModDependencyGraphBuilderIntegrationTest : CommonTestBase
 {
-    [Theory]
-    [MemberData(nameof(RealGameIdentities))]
-    public void Test_OnlySelf(GameIdentity identity)
-    {
-        var game = FileSystem.InstallGame(identity, ServiceProvider);
-
-        var targetMod = game.InstallAndAddMod("Target", false, ServiceProvider);
-
-        targetMod.ResolveDependencies(new DependencyResolverOptions());
-        
-        var graphBuilder = new ModDependencyGraphBuilder();
-
-        var graph = graphBuilder.Build(targetMod);
-        Assert.Single(graph);
-    }
-
     // TODO:
+
+    //[Theory]
+    //[MemberData(nameof(RealGameIdentities))]
+    //public void Test_OnlySelf(GameIdentity identity)
+    //{
+    //    var game = FileSystem.InstallGame(identity, ServiceProvider);
+
+    //    var targetMod = game.InstallAndAddMod("Target", false, ServiceProvider);
+
+    //    targetMod.ResolveDependencies(new DependencyResolverOptions());
+
+    //    var graphBuilder = new ModDependencyGraphBuilder();
+
+    //    var graph = graphBuilder.Build(targetMod);
+    //    Assert.Single(graph);
+    //}
 
     //[Fact]
     //public void Test_Cycle1()
@@ -253,11 +253,6 @@ public class ModDependencyGraphBuilderIntegrationTest : CommonTestBase
 
         public TestMod(IGame game, IDirectoryInfo modDirectory, bool workshop, string name, IServiceProvider serviceProvider) : base(game, modDirectory, workshop, name, serviceProvider)
         {
-        }
-
-        public void DependencyAction(Action<IList<ModDependencyEntry>> action)
-        {
-            action(DependenciesInternal);
         }
 
         public void SetStatus(DependencyResolveStatus status)

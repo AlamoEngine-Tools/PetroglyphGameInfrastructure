@@ -1,39 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using EawModinfo;
 using EawModinfo.Model;
 using EawModinfo.Spec;
-using EawModinfo.Spec.Equality;
 using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies.New;
 using Semver;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// Base implementation for Mods
+/// The base implementation for Mods.
 /// </summary>
 public abstract class ModBase : PlayableModContainer, IMod
-{
+{ 
     /// <inheritdoc/>
-    public event EventHandler<ResolvingModinfoEventArgs>? ResolvingModinfo;
-    /// <inheritdoc/>
-    public event EventHandler<ModinfoResolvedEventArgs>? ModinfoResolved;
-    /// <inheritdoc/>
-    public event EventHandler<ModDependenciesChangedEventArgs>? DependenciesChanged;
+    public event EventHandler<ModDependenciesResolvedEventArgs>? DependenciesResolved;
 
     private SemVersion? _modVersion;
-    private IModinfo? _modInfo;
-    private bool _modinfoSearched;
-
-    /// <summary>
-    /// Shared, internal, mutable, dependency list which gets used for <see cref="Dependencies"/>.
-    /// </summary>
-    protected readonly List<ModDependencyEntry> DependenciesInternal = new();
 
     /// <inheritdoc/>
     public abstract string Identifier { get; }
@@ -56,28 +44,18 @@ public abstract class ModBase : PlayableModContainer, IMod
     string IModIdentity.Name => Name;
 
     /// <inheritdoc/>
-    public virtual IModinfo? ModInfo
-    {
-        get
-        {
-            if (_modinfoSearched)
-                return _modInfo;
-            if (_modInfo != null)
-                return _modInfo;
-            _modInfo = ResolveModInfo();
-            _modinfoSearched = true;
-            return _modInfo;
-        }
-    }
+    public IModinfo? ModInfo { get; protected init; }
 
     /// <inheritdoc/>
     public SemVersion? Version => _modVersion ??= InitializeVersion();
 
-    IModDependencyList IModIdentity.Dependencies =>
-        new DependencyList(Dependencies.Select(d => d.Mod).OfType<IModReference>().ToList(), DependencyResolveLayout);
+    /// <summary>
+    /// Gets the mod's dependency list from the modinfo data or an empty list if no modinfo data is specified.
+    /// </summary>
+    IModDependencyList IModIdentity.Dependencies => ModInfo?.Dependencies ?? DependencyList.EmptyDependencyList;
 
     /// <inheritdoc cref="IMod.Dependencies"/>
-    public IReadOnlyList<ModDependencyEntry> Dependencies => DependenciesInternal.ToList();
+    public IReadOnlyList<ModDependencyEntry> Dependencies { get; protected set; } = [];
 
     /// <inheritdoc/>
     public DependencyResolveStatus DependencyResolveStatus { get; protected set; }
@@ -126,31 +104,27 @@ public abstract class ModBase : PlayableModContainer, IMod
         if (modinfo == null)
             throw new ArgumentNullException(nameof(modinfo));
         modinfo.Validate();
-        _modInfo = modinfo;
+        ModInfo = modinfo;
         ServiceProvider = serviceProvider;
         Game = game;
         Name = modinfo.Name;
         Type = type;
     }
 
-    /// <inheritdoc/>
-    public virtual void ResolveDependencies(DependencyResolverOptions options, IDependencyResolver? resolver = null)
+    /// <inheritdoc />
+    public void ResolveDependencies()
     {
-        if (options == null)
-            throw new ArgumentNullException(nameof(options));
+        if (DependencyResolveStatus == DependencyResolveStatus.Resolved)
+            return;
         if (DependencyResolveStatus == DependencyResolveStatus.Resolving)
-            throw new ModDependencyCycleException(this, "Already resolving the current instance's dependencies. Is there a Cycle?");
-
-        resolver ??= ServiceProvider.GetRequiredService<IDependencyResolver>();
+            throw new ModDependencyCycleException(this, "Already resolving the current instance's dependencies. Possible dependency cycle?");
 
         try
         {
             DependencyResolveStatus = DependencyResolveStatus.Resolving;
-            var oldList = DependenciesInternal.ToList();
-            DependenciesInternal.Clear();
-            var result = resolver.Resolve(this, options);
-            DependenciesInternal.AddRange(result);
-            OnDependenciesChanged(new ModDependenciesChangedEventArgs(this, oldList, result, DependencyResolveLayout));
+            var resolver = ServiceProvider.GetRequiredService<NewModDependencyResolver>();
+            Dependencies = resolver.Resolve(this);
+            OnDependenciesResolved(new ModDependenciesResolvedEventArgs(this));
             DependencyResolveStatus = DependencyResolveStatus.Resolved;
         }
         catch
@@ -177,18 +151,6 @@ public abstract class ModBase : PlayableModContainer, IMod
     {
         return ModEqualityComparer.Default.Equals(this, other);
     }
-    
-    /// <summary>
-    /// Implementation to resolve the <see cref="ModInfo"/> property.
-    /// </summary>
-    /// <remarks>This implementation returns <see langword="null"/></remarks>
-    /// <returns>The resolved <see cref="IModinfo"/>.</returns>
-    protected virtual IModinfo? ResolveModInfoCore()
-    {
-        // Intentionally return null in base implementation,
-        // since we cannot know which modinfo, if multiple found shall get used.
-        return null;
-    }
 
     /// <summary>
     /// Resolves the version of this mod.
@@ -200,46 +162,13 @@ public abstract class ModBase : PlayableModContainer, IMod
         return ModInfo?.Version;
     }
 
-    private IModinfo? ResolveModInfo()
-    {
-        var resolvingArgs = new ResolvingModinfoEventArgs(this);
-        OnResolvingModinfo(resolvingArgs);
-        IModinfo? modinfo = null;
-        if (!resolvingArgs.Cancel)
-            modinfo = ResolveModInfoCore();
-        if (modinfo is null)
-            return modinfo;
-        OnModinfoResolved(new ModinfoResolvedEventArgs(this, modinfo));
-        if (!new ModIdentityEqualityComparer(false, false, StringComparer.Ordinal).Equals(this, modinfo))
-            throw new ModinfoException("Resolved modinfo does not match the current mod");
-        return modinfo;
-    }
-
     /// <summary>
-    /// Raises the <see cref="ResolvingModinfo"/> event.
+    /// Raises the <see cref="DependenciesResolved"/> event.
     /// </summary>
     /// <param name="e">The event arguments</param>
-    protected virtual void OnResolvingModinfo(ResolvingModinfoEventArgs e)
+    protected virtual void OnDependenciesResolved(ModDependenciesResolvedEventArgs e)
     {
-        ResolvingModinfo?.Invoke(this, e);
-    }
-
-    /// <summary>
-    /// Raised the <see cref="ModinfoResolved"/> event.
-    /// </summary>
-    /// <param name="e">The event arguments</param>
-    protected virtual void OnModinfoResolved(ModinfoResolvedEventArgs e)
-    {
-        ModinfoResolved?.Invoke(this, e);
-    }
-
-    /// <summary>
-    /// Raised the <see cref="DependenciesChanged"/> event.
-    /// </summary>
-    /// <param name="e">The event arguments</param>
-    protected virtual void OnDependenciesChanged(ModDependenciesChangedEventArgs e)
-    {
-        DependenciesChanged?.Invoke(this, e);
+        DependenciesResolved?.Invoke(this, e);
     }
 
     string IConvertibleToJson.ToJson()

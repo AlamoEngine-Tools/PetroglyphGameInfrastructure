@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
@@ -55,6 +56,7 @@ public class Mod : ModBase, IPhysicalMod
     {
         Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
         FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+        DependencyResolveStatus = DependencyResolveStatus.Resolved;
     }
 
     /// <summary>
@@ -73,6 +75,8 @@ public class Mod : ModBase, IPhysicalMod
     {
         Directory = modDirectory ?? throw new ArgumentNullException(nameof(modDirectory));
         FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+        if (modInfoData.Dependencies.Count == 0)
+            DependencyResolveStatus = DependencyResolveStatus.Resolved;
     }
 
     /// <inheritdoc />

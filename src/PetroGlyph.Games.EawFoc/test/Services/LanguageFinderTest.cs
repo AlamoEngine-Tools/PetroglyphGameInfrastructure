@@ -95,7 +95,7 @@ public class LanguageFinderTest : CommonTestBase
             }, DependencyResolveLayout.FullResolved)
         };
         var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
-        mod.ResolveDependencies(new DependencyResolverOptions{ResolveCompleteChain = true});
+        mod.ResolveDependencies();
 
         var langs = _languageFinder.FindLanguages(mod);
 
@@ -120,7 +120,7 @@ public class LanguageFinderTest : CommonTestBase
             }, DependencyResolveLayout.FullResolved)
         };
         var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
-        mod.ResolveDependencies(new DependencyResolverOptions { ResolveCompleteChain = true });
+        mod.ResolveDependencies();
 
         var langs = _languageFinder.FindLanguages(mod);
 
@@ -164,7 +164,7 @@ public class LanguageFinderTest : CommonTestBase
             }, DependencyResolveLayout.FullResolved)
         };
         var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
-        mod.ResolveDependencies(new DependencyResolverOptions { ResolveCompleteChain = true });
+        mod.ResolveDependencies();
 
         // Only english is installed
         mod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
@@ -196,7 +196,7 @@ public class LanguageFinderTest : CommonTestBase
             }
         };
         var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
-        mod.ResolveDependencies(new DependencyResolverOptions { ResolveCompleteChain = true });
+        mod.ResolveDependencies();
 
         // Should not be considered
         mod.InstallLanguage(new LanguageInfo("it", LanguageSupportLevel.FullLocalized));
@@ -230,7 +230,7 @@ public class LanguageFinderTest : CommonTestBase
             Languages = new List<ILanguageInfo> { LanguageInfo.Default }
         };
         var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
-        mod.ResolveDependencies(new DependencyResolverOptions());
+        mod.ResolveDependencies();
 
         // Should not be considered
         mod.InstallLanguage(new LanguageInfo("it", LanguageSupportLevel.FullLocalized));
@@ -258,15 +258,15 @@ public class LanguageFinderTest : CommonTestBase
             }, DependencyResolveLayout.FullResolved)
         };
         var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
-        mod.ResolveDependencies(new DependencyResolverOptions());
+        mod.ResolveDependencies();
 
         var langs = _languageFinder.FindLanguages(mod);
 
-        Assert.Equivalent(new List<ILanguageInfo>{ new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
+        Assert.Equivalent(new List<ILanguageInfo> { new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
     }
 
     [Fact]
-    public void FindLanguages_Mod_TargetModDoesNotHaveLanguagesAndSecondDependencyHasLanguages()
+    public void FindLanguages_Mod_TargetModDoesNotHaveLanguagesAndTransitiveDependencyHasLanguages()
     {
         var game = CreateRandomGame();
         var baseMod = game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
@@ -287,7 +287,7 @@ public class LanguageFinderTest : CommonTestBase
             }, DependencyResolveLayout.ResolveRecursive)
         };
         var mod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modInfo, ServiceProvider);
-        mod.ResolveDependencies(new DependencyResolverOptions{ResolveCompleteChain = true});
+        mod.ResolveDependencies();
 
         var langs = _languageFinder.FindLanguages(mod);
 

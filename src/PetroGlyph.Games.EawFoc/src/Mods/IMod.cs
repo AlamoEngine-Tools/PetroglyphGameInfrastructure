@@ -1,73 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// This instance represents a mod for a Petroglyph Star Wars game.
+/// Represents a mod for a Petroglyph Star Wars game.
 /// </summary>
 public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContainer, IEquatable<IMod>
 {
     /// <summary>
-    /// Gets fired when this instance is about to lazy-load <see cref="ModInfo"/>.
-    /// <br></br>
-    /// This operation can be cancelled by settings <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/>. 
-    /// In this case <see cref="ModInfo"/> will be set to <see langword="null"/>
+    /// The event that is raised when the mod's dependencies have been resolved.
     /// </summary>
-    event EventHandler<ResolvingModinfoEventArgs> ResolvingModinfo;
+    event EventHandler<ModDependenciesResolvedEventArgs> DependenciesResolved;
 
     /// <summary>
-    /// Gets fired after the lazy-load of <see cref="ModInfo"/> was completed.
+    /// Gets the name of the mod.
     /// </summary>
-    event EventHandler<ModinfoResolvedEventArgs> ModinfoResolved;
-
-    /// <summary>
-    /// Gets fired when the <see cref="IModIdentity.Dependencies"/> list was altered.
-    /// </summary>
-    event EventHandler<ModDependenciesChangedEventArgs> DependenciesChanged;
-
-    /// <inheritdoc cref="IModIdentity.Name" />
     new string Name { get; }
 
     /// <summary>
-    /// If a modinfo.json file is available its data gets stored here; otherwise this returns <see langword="null"/>
+    /// Gets the modinfo data of the mod, or <see langword="null"/> if no modinfo data was specified.
     /// </summary>
     IModinfo? ModInfo { get; }
 
     /// <summary>
-    /// Ordered List of <see cref="IMod"/>s this instance depends on. Initially this list will be empty. To fill it,
-    /// once resolve the dependencies by calling <see cref="ResolveDependencies"/>.
+    /// Gets an ordered List of mods this instance depends on.
     /// </summary>
+    /// <remarks>
+    /// Initially this list will be empty. You need to call <see cref="ResolveDependencies"/> first, in order to fill it.
+    /// </remarks>
     new IReadOnlyList<ModDependencyEntry> Dependencies { get; }
 
-
     /// <summary>
-    /// DependencyResolveStatus flag if and at which result dependencies have been resolved for this instance.
+    /// Gets the status about the mod's dependency resolve status.
     /// </summary>
     DependencyResolveStatus DependencyResolveStatus { get; }
 
     /// <summary>
-    /// Resolve layout of the <see cref="Dependencies"/> property.
+    /// Gets the resolve layout of the <see cref="Dependencies"/> property.
     /// Correct value only available if dependencies have been resolved.
     /// Default value is <see cref="EawModinfo.Spec.DependencyResolveLayout.ResolveRecursive"/>.
     /// </summary>
     DependencyResolveLayout DependencyResolveLayout { get; }
 
     /// <summary>
-    /// Searches for direct <see cref="IMod"/> dependencies and updates the <see cref="Dependencies"/> list.
-    /// This operation ignores whether dependencies have already been resolved or not.
-    /// This operation sets the <see cref="DependencyResolveStatus"/> accordingly to the current state of the operation.
+    /// Resolves the mod's dependencies by filling the <see cref="Dependencies"/> list
+    /// and sets the <see cref="DependencyResolveStatus"/> accordingly.
     /// </summary>
-    /// <param name="options">The resolve options.</param>
-    /// <param name="resolver">An existing resolver to use or <see langword="null"/> if no specific resolver instance shall be used.</param>
     /// <remarks>This operation does <b>not</b> update the <see cref="Mods"/> collection of dependencies.</remarks>
     /// <exception cref="ModDependencyCycleException">A dependency cycle was found.</exception>
     /// <exception cref="ModDependencyCycleException">This method gets called while already resolving this instance.</exception>
     /// <exception cref="ModNotFoundException">A dependency could not be found.</exception>
-    /// <exception cref="PetroglyphException">if some internal constrained failed.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="resolver"/> or <paramref name="options"/> is <see langword="null"/>.</exception>
-    void ResolveDependencies(DependencyResolverOptions options, IDependencyResolver? resolver = null);
+    void ResolveDependencies();
 }

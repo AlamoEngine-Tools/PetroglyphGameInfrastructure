@@ -15,9 +15,6 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 /// </summary>
 public sealed class VirtualMod : ModBase, IVirtualMod
 {
-    /// <inheritdoc />
-    public override IModinfo? ModInfo { get; }
-
     /// <summary>
     /// The identifier is a unique representation of the mod's name and its dependencies.
     /// </summary>
@@ -97,52 +94,30 @@ public sealed class VirtualMod : ModBase, IVirtualMod
         // We have to use a lightweight implementation for resolving and checking dependencies.
         // This means we cannot ensure at this point this instance has
         // a) A cycle free dependency graph,
+
+        var deps = new List<ModDependencyEntry>();
+
         var hasPhysicalMod = false;
         foreach (var dependency in dependencies)
         {
             if (!ReferenceEquals(dependency.Mod.Game, game))
                 throw new PetroglyphException($"Game of mod {dependency} does not match this mod's game.");
 
-            DependenciesInternal.Add(dependency);
+            deps.Add(dependency);
             if (dependency.Mod.Type is ModType.Default or ModType.Workshops)
                 hasPhysicalMod = true;
         }
 
         if (!hasPhysicalMod)
             throw new ModException(this, "No physical dependency was found.");
+
+        Dependencies = deps;
     }
 
     /// <inheritdoc/>
     public override string ToString()
     {
         return Name + "-" + Identifier;
-    }
-
-    /// <summary>
-    /// This method is not supported, as virtual mods have pre-defined dependencies.
-    /// </summary>
-    /// <exception cref="NotSupportedException"></exception>
-    public override void ResolveDependencies(DependencyResolverOptions options, IDependencyResolver? resolver = null)
-    {
-        throw new NotSupportedException("Virtual mods cannot resolve their dependencies after initialization");
-    }
-
-    /// <summary>
-    /// This method is not supported, as virtual mods have pre-defined dependencies.
-    /// </summary>
-    /// <exception cref="NotSupportedException"></exception>
-    protected override void OnResolvingModinfo(ResolvingModinfoEventArgs e)
-    {
-        throw new NotSupportedException("Virtual mods cannot lazy load modinfo data");
-    }
-
-    /// <summary>
-    /// This method is not supported, as virtual mods have pre-defined dependencies.
-    /// </summary>
-    /// <exception cref="NotSupportedException"></exception>
-    protected override void OnDependenciesChanged(ModDependenciesChangedEventArgs e)
-    {
-        throw new NotSupportedException("Virtual mods cannot lazy load modinfo data");
     }
 
     private string CalculateIdentifier()

@@ -2,13 +2,13 @@
 using PG.StarWarsGame.Infrastructure.Games.Registry;
 using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies.New;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 using PG.StarWarsGame.Infrastructure.Services.Icon;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Services.Name;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
-using PG.StarWarsGame.Infrastructure.Utilities;
 
 namespace PG.StarWarsGame.Infrastructure;
 
@@ -32,8 +32,12 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
         serviceCollection.AddSingleton<IModReferenceFinder>(sp => new ModFinder(sp));
         serviceCollection.AddSingleton<IModReferenceLocationResolver>(sp => new ModReferenceLocationResolver(sp));
+
+
         serviceCollection.AddSingleton<IModDependencyGraphBuilder>(_ => new ModDependencyGraphBuilder());
         serviceCollection.AddSingleton<IModDependencyTraverser>(sp => new ModDependencyTraverser(sp));
+        serviceCollection.AddSingleton(sp => new NewModDependencyResolver(sp));
+        serviceCollection.AddSingleton(sp => new ModReferenceDependencyGraphBuilder(sp));
 
         serviceCollection.AddSingleton<ILanguageFinder>(sp => new InstalledLanguageFinder(sp));
         serviceCollection.AddSingleton<ISteamWorkshopCache>(_ => new KnownSteamWorkshopCache());
@@ -47,6 +51,6 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IIconFinder>(_ => new IconFinder());
 
         // Must be transient
-        serviceCollection.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));
+        //serviceCollection.AddTransient<IDependencyResolver>(sp => new ModDependencyResolver(sp));
     }
 }
