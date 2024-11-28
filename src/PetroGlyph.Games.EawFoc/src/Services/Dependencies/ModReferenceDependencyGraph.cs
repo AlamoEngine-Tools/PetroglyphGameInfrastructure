@@ -5,17 +5,6 @@ using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-
-/* Nicht gemergte Änderung aus Projekt "PG.StarWarsGame.Infrastructure (netstandard2.0)"
-Vor:
-using PG.StarWarsGame.Infrastructure.Services.Detection;
-Nach:
-using PG.StarWarsGame.Infrastructure.Services;
-using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Services.Dependencies.New;
-using PG.StarWarsGame.Infrastructure.Services.Detection;
-*/
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using QuikGraph;
 using QuikGraph.Algorithms;
