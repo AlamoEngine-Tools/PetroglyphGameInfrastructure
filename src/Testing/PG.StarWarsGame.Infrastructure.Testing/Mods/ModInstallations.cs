@@ -38,16 +38,26 @@ public static class ModInstallations
             modDir => new Mod(game, modDir, workshop, modinfo, serviceProvider));
     }
 
+    public static Mod InstallMod(this IGame game, IDirectoryInfo directory, bool isWorkshop, IModinfo modinfo, IServiceProvider serviceProvider)
+    {
+        return CreateMod(game, directory, dir => new Mod(game, dir, isWorkshop, modinfo, serviceProvider));
+    }
+
     private static Mod CreateMod(IGame game, string modName, bool workshop, IServiceProvider serviceProvider, Func<IDirectoryInfo, Mod> modFactory)
     {
+        var modDir = game.Directory.FileSystem.DirectoryInfo.New(game.GetModDirectory(modName, workshop, serviceProvider));
+        return CreateMod(game, modDir, modFactory);
+    }
+
+    private static Mod CreateMod(IGame game, IDirectoryInfo directory, Func<IDirectoryInfo, Mod> modFactory)
+    {
         Assert.True(game.ModsLocation.Exists);
-        var modDir = game.Directory.FileSystem.DirectoryInfo.New(GetModDirectory(game, modName, workshop, serviceProvider));
-        var mod = modFactory(modDir); 
+        var mod = modFactory(directory);
         mod.DataDirectory().Create();
         return mod;
     }
 
-    private static string GetModDirectory(IGame game, string name, bool workshop, IServiceProvider serviceProvider)
+    public static string GetModDirectory(this IGame game, string name, bool workshop, IServiceProvider serviceProvider)
     {
         var fs = game.Directory.FileSystem;
         if (!workshop)
@@ -62,16 +72,12 @@ public static class ModInstallations
         var wsDir = steamHelpers.GetWorkshopsLocation(game);
         Assert.True(wsDir.Exists);
 
-        uint steamId;
-        while (true)
+        var nameHash = name.GetHashCode();
+        var steamId = (uint)nameHash;
+        if (!fs.Directory.Exists(fs.Path.Combine(wsDir.FullName, steamId.ToString())))
         {
-            steamId = (uint)new Random().Next(1, int.MaxValue);
-            if (!fs.Directory.Exists(fs.Path.Combine(wsDir.FullName, steamId.ToString())))
-            {
-                steamHelpers.ToSteamWorkshopsId(steamId.ToString(), out var id);
-                Assert.Equal(steamId, id);
-                break;
-            }
+            steamHelpers.ToSteamWorkshopsId(steamId.ToString(), out var id);
+            Assert.Equal(steamId, id);
         }
         return fs.Path.Combine(wsDir.FullName, steamId.ToString());
     }

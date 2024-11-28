@@ -122,8 +122,8 @@ public abstract class ModBase : PlayableModContainer, IMod
         try
         {
             DependencyResolveStatus = DependencyResolveStatus.Resolving;
-            var resolver = ServiceProvider.GetRequiredService<NewModDependencyResolver>();
-            Dependencies = resolver.Resolve(this);
+            var dependencies = ResolveDependenciesCore();
+            Dependencies = dependencies ?? throw new PetroglyphException("Resolved dependency list is null!");
             OnDependenciesResolved(new ModDependenciesResolvedEventArgs(this));
             DependencyResolveStatus = DependencyResolveStatus.Resolved;
         }
@@ -132,6 +132,16 @@ public abstract class ModBase : PlayableModContainer, IMod
             DependencyResolveStatus = DependencyResolveStatus.Faulted;
             throw;
         }
+    }
+
+    /// <summary>
+    /// Resolves the dependencies of the mod.
+    /// </summary>
+    /// <returns>The resolved dependencies as specified by the resolve layout.</returns>
+    protected virtual IReadOnlyList<ModDependencyEntry> ResolveDependenciesCore()
+    {
+        var resolver = ServiceProvider.GetRequiredService<NewModDependencyResolver>(); 
+        return resolver.Resolve(this);
     }
 
     /// <inheritdoc/>

@@ -1,214 +1,181 @@
-﻿using EawModinfo.Spec;
-using PG.StarWarsGame.Infrastructure.Mods;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using EawModinfo.Model;
+using EawModinfo.Spec;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.TestingUtilities;
+using Xunit;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
 public abstract class ModBaseTest : PlayableModContainerTest
 {
+    protected IGame Game;
+
+    protected ModBaseTest()
+    {
+        Game = CreateRandomGame();
+    }
+
     protected abstract ModBase CreateMod(
-        string? iconPath = null,
-        ICollection<ILanguageInfo>? languages = null);
+        string name,
+        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
+        params IList<IModReference> deps);
 
-    //[Fact]
-    //public void ValidCtors_Properties()
-    //{
-    //    var game = new Mock<IGame>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
-    //    Assert.Equal("Name", mod.Name);
-    //    Assert.Equal(ModType.Default, mod.Type);
-    //    Assert.Empty(mod.Dependencies);
-    //    Assert.Equal(DependencyResolveLayout.FullResolved, mod.DependencyResolveLayout);
-    //    Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);
-    //    Assert.Empty(mod.Mods);
-    //    Assert.Null(mod.Version);
-    //    Assert.Null(mod.VersionRange);
+    protected IMod CreateOtherMod(
+        string name, 
+        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
+        params IList<IModReference> deps)
+    {
+        return CreateAndAddMod(Game, name, layout, deps);
+    }
 
-    //    var modinfo = new ModinfoData("Name")
-    //    {
-    //        Icon = "IconPath",
-    //        Version = new SemVersion(1, 0, 0),
-    //        Languages = new List<ILanguageInfo>(),
-    //        Dependencies = new DependencyList(new List<IModReference> { mod }, DependencyResolveLayout.ResolveLastItem)
-    //    };
-    //    var modA = new ModMock(game.Object, ModType.Default, modinfo, sp.Object);
-    //    Assert.Equal("Name", modA.Name);
-    //    Assert.Equal(ModType.Default, modA.Type);
-    //    Assert.Equal(modinfo, modA.ModInfo);
-    //    Assert.Empty(modA.Dependencies); // Dependencies list is empty until resolved
-    //    Assert.Equal(DependencyResolveLayout.ResolveLastItem, modA.DependencyResolveLayout);
-    //    Assert.Equal(DependencyResolveStatus.None, modA.DependencyResolveStatus);
-    //    Assert.Empty(modA.Mods);
-    //    Assert.Equal(modinfo.Version, modA.Version);
-    //    Assert.Null(modA.VersionRange);
-    //    Assert.Equal(modinfo.Icon, modA.IconFile);
-    //}
+    [Fact]
+    public void VersionRange_IsNull()
+    {
+        var mod = CreateMod("Mod");
+        Assert.Null(mod.VersionRange);
+    }
 
-    //[Fact]
-    //public void TestModinfoResolving()
-    //{
-    //    var game = new Mock<IGame>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
+    [Theory]
+    [MemberData(nameof(ModTestScenarios.ValidScenarios), MemberType = typeof(ModTestScenarios))]
+    public void ResolveDependencies_ResolvesCorrectly(ModTestScenarios.TestScenario testScenario)
+    {
+        var mod = ModTestScenarios.CreateTestScenario(
+                testScenario, 
+                CreateMod, 
+                CreateOtherMod)
+            .Mod;
 
-    //    var counter = 0;
+        var expectedDirectDeps = mod.ModInfo!.Dependencies.Select(d =>
+        {
+            var dep = Game.FindMod(d);
+            Assert.NotNull(dep);
+            return dep;
+        });
 
-    //    void OnModOnResolvingModinfoA(object? sender, ResolvingModinfoEventArgs args)
-    //    {
-    //        counter++;
-    //        args.Cancel = true;
-    //    }
+        mod.ResolveDependencies();
 
-    //    void OnModOnResolvingModinfoB(object? sender, ResolvingModinfoEventArgs args)
-    //    {
-    //        counter++;
-    //    }
+        Assert.Equal(expectedDirectDeps, mod.Dependencies.Select(x => x.Mod));
+        Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
 
-    //    mod.ResolvingModinfo += OnModOnResolvingModinfoA;
-    //    var flag = false;
-    //    mod.ModinfoResolved += (_, _) => flag = true;
-    //    Assert.Null(mod.ResetModinfo());
-    //    Assert.Null(mod.ModInfo);
-    //    Assert.Equal(1, counter);
-    //    Assert.Null(mod.ModInfo);
-    //    Assert.Equal(1, counter);
-    //    Assert.False(flag);
-    //    mod.ResolvingModinfo -= OnModOnResolvingModinfoA;
-    //    mod.ResolvingModinfo += OnModOnResolvingModinfoB;
-    //    Assert.Null(mod.ResetModinfo());
-    //    Assert.NotNull(mod.ModInfo);
-    //    Assert.Equal(2, counter);
-    //    Assert.True(flag);
+        AssertDependenciesResolved(mod);
+    }
 
-    //}
+    [Fact]
+    public void ResolveDependencies_DepNotAdded_Throws_ThenAddingModResolvesCorrectly()
+    {
+        // Do not add mod to game
+        var notAddedDep = Game.InstallMod("NotAddedMod", false, ServiceProvider);
 
-    //[Fact]
-    //public void TestModinfoResolving_Throws()
-    //{
-    //    var game = new Mock<IGame>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
-    //    Assert.Throws<ModinfoException>(() => mod.ModInfo);
-    //}
+        var mod = CreateMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), notAddedDep);
+        Game.AddMod(mod);
+        Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
+        Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
 
-    //[Fact]
-    //public void TestIconResolving()
-    //{
-    //    var flag = false;
-    //    var resolver = new Mock<IModIconFinder>();
-    //    resolver.Setup(r => r.FindIcon(It.IsAny<IMod>())).Returns((string)null!).Callback(() => flag = true);
-    //    var game = new Mock<IGame>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    sp.Setup(p => p.GetService(typeof(IModIconFinder))).Returns(resolver.Object);
-    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
-    //    Assert.Null(mod.IconFile);
-    //    Assert.True(flag);
-    //}
+        // Add dep to game
+        Game.AddMod(notAddedDep);
 
-    //[Fact]
-    //public void TestLanguageResolving_Throws()
-    //{
-    //    var flag = false;
-    //    var sp = new Mock<IServiceProvider>();
-    //    var resolver = new Mock<IModLanguageFinderFactory>();
-    //    resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>())).Callback(() => flag = true).Returns(new Mock<IModLanguageFinder>().Object);
-    //    var game = new Mock<IGame>();
-    //    sp.Setup(p => p.GetService(typeof(IModLanguageFinderFactory))).Returns(resolver.Object);
-    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
-    //    Assert.Throws<PetroglyphException>(() => mod.InstalledLanguages);
-    //    Assert.True(flag);
-    //}
+        mod.ResolveDependencies();
 
-    //[Fact]
-    //public void TestLanguageResolving()
-    //{
-    //    var flag = false;
-    //    var sp = new Mock<IServiceProvider>();
-    //    var finder = new Mock<IModLanguageFinder>();
-    //    finder.Setup(f => f.FindInstalledLanguages(It.IsAny<IMod>())).Returns(new HashSet<ILanguageInfo>());
-    //    var resolver = new Mock<IModLanguageFinderFactory>();
-    //    resolver.Setup(r => r.CreateLanguageFinder(It.IsAny<IMod>())).Callback(() => flag = true).Returns(finder.Object);
-    //    var game = new Mock<IGame>();
-    //    sp.Setup(p => p.GetService(typeof(IModLanguageFinderFactory))).Returns(resolver.Object);
-    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
-    //    Assert.Empty(mod.InstalledLanguages);
-    //    Assert.True(flag);
-    //}
+        Assert.Equal([notAddedDep], mod.Dependencies.Select(x => x.Mod));
+        Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
+    }
 
-    //[Fact]
-    //public void Resolve_NullArgs()
-    //{
-    //    var game = new Mock<IGame>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
-    //    Assert.Throws<ArgumentNullException>(() => mod.ResolveDependencies(null, null));
-    //    Assert.Throws<ArgumentNullException>(() => mod.ResolveDependencies(null, new DependencyResolverOptions()));
-    //    Assert.Throws<ArgumentNullException>(() => mod.ResolveDependencies(new Mock<IDependencyResolver>().Object, null));
-    //}
+    [Fact]
+    public void ResolveDependencies_DepOfWrongGame_Throws()
+    {
+        var otherGameReference = new PetroglyphStarWarsGame(Game, Game.Directory, Game.Name, ServiceProvider);
+        var wrongGameDep = CreateAndAddMod(otherGameReference, "WrongGameRefMod");
+        var mod = CreateMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), wrongGameDep);
+        
+        Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
+        Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+    }
 
-    //[Fact]
-    //public void Resolve_AlreadyResolving()
-    //{
-    //    var game = new Mock<IGame>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
+    private static void AssertDependenciesResolved(IMod mod)
+    {
+        if (mod.DependencyResolveLayout == DependencyResolveLayout.FullResolved)
+            return;
 
-    //    mod.SetResolveStatus(DependencyResolveStatus.Resolving);
+        Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
 
-    //    var resolver = new Mock<IDependencyResolver>();
-    //    Assert.Throws<ModDependencyCycleException>(() =>
-    //        mod.ResolveDependencies(resolver.Object, new DependencyResolverOptions()));
-    //}
+        for (var i = 0; i < mod.Dependencies.Count; i++)
+        {
+            var dependency = mod.Dependencies[i];
+            if (mod.DependencyResolveLayout == DependencyResolveLayout.ResolveRecursive ||
+                mod.DependencyResolveLayout == DependencyResolveLayout.ResolveLastItem && i == mod.Dependencies.Count - 1)
+                AssertDependenciesResolved(dependency.Mod);
+        }
+    }
 
-    //[Fact]
-    //public void Resolve_ResolvingThrows()
-    //{
-    //    var game = new Mock<IGame>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    var mod = new ModMock(game.Object, ModType.Default, "Other", sp.Object);
-    //    var resolver = new Mock<IDependencyResolver>();
-    //    resolver.Setup(r => r.Resolve(It.IsAny<IMod>(), It.IsAny<DependencyResolverOptions>())).Throws<Exception>();
-    //    Assert.Throws<Exception>(() => mod.ResolveDependencies(resolver.Object, new DependencyResolverOptions()));
-    //    Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
-    //}
+    public class ModBaseAbstractTest : CommonTestBaseWithRandomGame
+    {
+        [Fact]
+        public void ResolveDependenciesCore_ReturnNull_Throws()
+        {
+            var dep = CreateAndAddMod("Dep");
+            var modinfo = new ModinfoData("CustomMod")
+            {
+                Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)
+            };
+            var mod = new NullResolvingMod(Game, modinfo, ServiceProvider);
 
-    //[Fact]
-    //public void ResolveTest()
-    //{
-    //    var game = new Mock<IGame>();
-    //    var sp = new Mock<IServiceProvider>();
-    //    var mod = new ModMock(game.Object, ModType.Default, "Name", sp.Object);
-    //    var resolver = new Mock<IDependencyResolver>();
-    //    resolver.Setup(r => r.Resolve(It.IsAny<IMod>(), It.IsAny<DependencyResolverOptions>())).Returns(new List<ModDependencyEntry>());
-    //    var flag = false;
-    //    mod.DependenciesChanged += (_, _) => flag = true;
-    //    mod.ResolveDependencies(resolver.Object, new DependencyResolverOptions());
-    //    Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
-    //    Assert.Empty(mod.Dependencies);
-    //    Assert.True(flag);
-    //}
+            Assert.Throws<PetroglyphException>(mod.ResolveDependencies);
+            Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
 
-    //private class ModMock : ModBase
-    //{
-    //    public override string Identifier => "Mod";
+            // Attempt to try again should try to resolve again, but we expect the same result.
+            Assert.Throws<PetroglyphException>(mod.ResolveDependencies);
+            Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+        }
 
-    //    public void SetResolveStatus(DependencyResolveStatus status)
-    //    {
-    //        DependencyResolveStatus = status;
-    //    }
+        [Fact]
+        public void ResolveDependencies_CalledTwice_Throws()
+        {
+            var dep = CreateAndAddMod("Dep");
+            var modinfo = new ModinfoData("CustomMod")
+            {
+                Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)
+            };
+            var mod = new SelfResolvingMod(Game, modinfo, ServiceProvider);
 
-    //    public ModMock(IGame game, ModType type, string name, IServiceProvider serviceProvider) : base(game, type, name, serviceProvider)
-    //    {
-    //    }
+            Assert.Throws<ModDependencyCycleException>(mod.ResolveDependencies);
+            Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
 
-    //    public ModMock(IGame game, ModType type, IModinfo modinfo, IServiceProvider serviceProvider) : base(game, type, modinfo, serviceProvider)
-    //    {
-    //    }
+            // Attempt to try again should try to resolve again, but we expect the same result.
+            Assert.Throws<ModDependencyCycleException>(mod.ResolveDependencies);
+            Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+        }
 
-    //    protected override IModinfo? ResolveModInfoCore()
-    //    {
-    //        return new ModinfoData("Name");
-    //    }
-    //}
+        private class NullResolvingMod(IGame game, IModinfo modinfo, IServiceProvider serviceProvider)
+            : ModBase(game, ModType.Default, modinfo, serviceProvider)
+        {
+            public override string Identifier => "CustomMod";
+
+            protected override IReadOnlyList<ModDependencyEntry> ResolveDependenciesCore()
+            {
+                Assert.Equal(DependencyResolveStatus.Resolving, DependencyResolveStatus);
+                return null!;
+            }
+        }
+
+        private class SelfResolvingMod(IGame game, IModinfo modinfo, IServiceProvider serviceProvider)
+            : ModBase(game, ModType.Default, modinfo, serviceProvider)
+        {
+            public override string Identifier => "CustomMod";
+
+            protected override IReadOnlyList<ModDependencyEntry> ResolveDependenciesCore()
+            {
+                Assert.Equal(DependencyResolveStatus.Resolving, DependencyResolveStatus);
+                // We should not end up in a StackOverflowException, cause ModBase handles the reentry.
+                ResolveDependencies();
+                return [];
+            }
+        }
+    }
 }

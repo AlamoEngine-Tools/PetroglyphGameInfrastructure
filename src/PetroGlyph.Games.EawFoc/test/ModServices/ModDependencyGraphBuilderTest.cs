@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using EawModinfo.Model;
-using EawModinfo.Spec;
-using Moq;
-using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;

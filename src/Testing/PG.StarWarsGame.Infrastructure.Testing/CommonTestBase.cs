@@ -6,7 +6,9 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 
@@ -52,7 +54,7 @@ public abstract class CommonTestBase
 
     private static readonly string[] PossibleLanguages = ["en", "de", "es", "it"]; 
 
-    protected ICollection<ILanguageInfo> GetRandomLanguages()
+    protected static ICollection<ILanguageInfo> GetRandomLanguages()
     {
         var languages = new HashSet<ILanguageInfo>(PossibleLanguages.Length);
 
@@ -64,5 +66,18 @@ public abstract class CommonTestBase
         }
 
         return languages;
+    }
+
+    protected IMod CreateAndAddMod(IGame game, string name, DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, params IList<IModReference> deps)
+    {
+        if (deps.Count == 0)
+            return game.InstallAndAddMod(name, GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+
+        var modinfo = new ModinfoData(name)
+        {
+            Dependencies = new DependencyList(deps, layout)
+        };
+
+        return game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(game), modinfo, ServiceProvider);
     }
 }

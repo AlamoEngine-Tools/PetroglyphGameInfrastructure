@@ -26,10 +26,12 @@ public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContai
     IModinfo? ModInfo { get; }
 
     /// <summary>
-    /// Gets an ordered List of mods this instance depends on.
+    /// Gets an ordered List of the mod's direct dependencies.
     /// </summary>
     /// <remarks>
     /// Initially this list will be empty. You need to call <see cref="ResolveDependencies"/> first, in order to fill it.
+    /// <br/>
+    /// To get a dependency list including, transitive dependencies, use <see cref="IModDependencyTraverser"/>.
     /// </remarks>
     new IReadOnlyList<ModDependencyEntry> Dependencies { get; }
 
@@ -53,5 +55,6 @@ public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContai
     /// <exception cref="ModDependencyCycleException">A dependency cycle was found.</exception>
     /// <exception cref="ModDependencyCycleException">This method gets called while already resolving this instance.</exception>
     /// <exception cref="ModNotFoundException">A dependency could not be found.</exception>
+    /// <exception cref="PetroglyphException">The dependencies could not be resolved.</exception>
     void ResolveDependencies();
 }

@@ -9,7 +9,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
-public class GameLocalizationUtilitiesTest : CommonTestBase
+public class GameLocalizationUtilitiesTest : CommonTestBaseWithRandomGame
 {
     [Fact]
     public void ArgumentNull_Throws()
@@ -55,49 +55,44 @@ public class GameLocalizationUtilitiesTest : CommonTestBase
     [Fact]
     public void GetTextLocalizations_None()
     {
-        var game = CreateRandomGame();
-        var actual = GameLocalizationUtilities.GetTextLocalizations(game);
+        var actual = GameLocalizationUtilities.GetTextLocalizations(Game);
         Assert.Empty(actual);
     }
 
     [Fact]
     public void GetSfxMegLocalizations_None()
     {
-        var game = CreateRandomGame();
-        var actual = GameLocalizationUtilities.GetSfxMegLocalizations(game);
+        var actual = GameLocalizationUtilities.GetSfxMegLocalizations(Game);
         Assert.Empty(actual);
     }
 
     [Fact]
     public void GetSpeechLocalizationsFromFolder_None()
     {
-        var game = CreateRandomGame();
-        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromFolder(game);
+        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromFolder(Game);
         Assert.Empty(actual);
     }
 
     [Fact]
     public void GetSpeechLocalizationsFromMegs_None()
     {
-        var game = CreateRandomGame();
-        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromMegs(game);
+        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromMegs(Game);
         Assert.Empty(actual);
     }
 
     [Fact]
     public void GetTextLocalizations()
     {
-        var game = CreateRandomGame();
-        var dir = FileSystem.Path.Combine(game.Directory.FullName, "Data", "Text");
+        var dir = FileSystem.Path.Combine(Game.Directory.FullName, "Data", "Text");
         FileSystem.Directory.CreateDirectory(dir);
 
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "MasterTextFile_English.txt"));
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "MASTERTEXTFILE_GERMAN.DAT"));
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "mastertextfile_spanish.DAT"));
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "mastertextfile_en.dat"));
-        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "Data", "mastertextfile_eng.dat"));
+        FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "Data", "mastertextfile_eng.dat"));
 
-        var actual = GameLocalizationUtilities.GetTextLocalizations(game);
+        var actual = GameLocalizationUtilities.GetTextLocalizations(Game);
 
         Assert.Equivalent(new HashSet<ILanguageInfo>
         {
@@ -109,8 +104,7 @@ public class GameLocalizationUtilitiesTest : CommonTestBase
     [Fact]
     public void GetSfxMegLocalizations()
     {
-        var game = CreateRandomGame();
-        var dir = FileSystem.Path.Combine(game.Directory.FullName, "Data", "Audio", "SFX");
+        var dir = FileSystem.Path.Combine(Game.Directory.FullName, "Data", "Audio", "SFX");
         FileSystem.Directory.CreateDirectory(dir);
 
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "sfx2d_english.txt"));
@@ -121,7 +115,7 @@ public class GameLocalizationUtilitiesTest : CommonTestBase
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "SFX2D_.meg"));
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "sfx2d_non_localized.meg"));
 
-        var actual = GameLocalizationUtilities.GetSfxMegLocalizations(game);
+        var actual = GameLocalizationUtilities.GetSfxMegLocalizations(Game);
 
         Assert.Equivalent(new HashSet<ILanguageInfo>
         {
@@ -133,8 +127,7 @@ public class GameLocalizationUtilitiesTest : CommonTestBase
     [Fact]
     public void GetSpeechLocalizationsFromMegs()
     {
-        var game = CreateRandomGame();
-        var dir = FileSystem.Path.Combine(game.Directory.FullName, "Data");
+        var dir = FileSystem.Path.Combine(Game.Directory.FullName, "Data");
         FileSystem.Directory.CreateDirectory(dir);
 
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "EnglishSpeech.txt"));
@@ -143,7 +136,7 @@ public class GameLocalizationUtilitiesTest : CommonTestBase
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "GermanSpeech.meg"));
         FileSystem.File.Create(FileSystem.Path.Combine(dir, "SPANISHSPEECH.MEG"));
 
-        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromMegs(game);
+        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromMegs(Game);
 
         Assert.Equivalent(new HashSet<ILanguageInfo>
         {
@@ -155,15 +148,14 @@ public class GameLocalizationUtilitiesTest : CommonTestBase
     [Fact]
     public void GetSpeechLocalizationsFromFolder()
     {
-        var game = CreateRandomGame();
-        var dir = FileSystem.Path.Combine(game.Directory.FullName, "Data", "Audio", "Speech");
+        var dir = FileSystem.Path.Combine(Game.Directory.FullName, "Data", "Audio", "Speech");
         FileSystem.Directory.CreateDirectory(dir);
 
         FileSystem.Directory.CreateDirectory(FileSystem.Path.Combine(dir, "Eng"));
         FileSystem.Directory.CreateDirectory(FileSystem.Path.Combine(dir, "German"));
         FileSystem.Directory.CreateDirectory(FileSystem.Path.Combine(dir, "Spanish"));
 
-        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromFolder(game);
+        var actual = GameLocalizationUtilities.GetSpeechLocalizationsFromFolder(Game);
 
         Assert.Equivalent(new HashSet<ILanguageInfo>
         {

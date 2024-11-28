@@ -47,7 +47,7 @@ public abstract class PlayableObjectTest : CommonTestBase
         Assert.Equivalent(expected, obj.InstalledLanguages, true);
     }
 
-    public class PlayableObjectAbstractTest : CommonTestBase
+    public class PlayableObjectAbstractTest : CommonTestBaseWithRandomGame
     { 
         protected override void SetupServiceProvider(IServiceCollection sc)
         {
@@ -58,8 +58,7 @@ public abstract class PlayableObjectTest : CommonTestBase
         [Fact]
         public void InstalledLanguages_FinderReturnsNull_Throws()
         {
-            var game = CreateRandomGame();
-            Assert.Throws<PetroglyphException>(() => game.InstalledLanguages);
+            Assert.Throws<PetroglyphException>(() => Game.InstalledLanguages);
         }
 
         private class NullLanguageFinder : ILanguageFinder

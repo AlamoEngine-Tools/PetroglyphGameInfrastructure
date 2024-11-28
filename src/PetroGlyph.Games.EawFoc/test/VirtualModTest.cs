@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -7,6 +8,7 @@ using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using Semver;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
@@ -14,171 +16,154 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 public class VirtualModTest : ModBaseTest
 {
     private VirtualMod CreateVirtualMod(
+        string name,
         string? iconPath = null,
-        ICollection<ILanguageInfo>? languages = null)
+        ICollection<ILanguageInfo>? languages = null,
+        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
+        params IList<IModReference> deps)
     {
-        var game = CreateRandomGame();
-        var dep = game.InstallAndAddMod("dep", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
-
-        if (languages is not null)
+        IModDependencyList depList;
+        if (deps.Count == 0)
         {
-            foreach (var languageInfo in languages) 
-                dep.InstallLanguage(languageInfo);
+            var dep = CreateOtherMod("dep");
+            depList = new DependencyList(new List<IModReference> { dep }, layout);
+        }
+        else
+        {
+            depList = new DependencyList(deps, layout);
         }
 
-        var modinfo = new ModinfoData("virtualMod")
+        var modinfo = new ModinfoData(name)
         {
             Icon = iconPath,
-            Dependencies = new DependencyList(new List<IModReference>
-            {
-                new ModReference(dep)
-            }, DependencyResolveLayout.FullResolved)
+            Languages = languages?.ToList() ?? new List<ILanguageInfo>(),
+            Dependencies = depList
         };
 
-        return new VirtualMod(game, modinfo, ServiceProvider);
+        var mod = new VirtualMod(Game, modinfo, ServiceProvider);
+        Game.AddMod(mod);
+        return mod;
+    }
+
+    protected override ModBase CreateMod(
+        string name,
+        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
+        params IList<IModReference> deps)
+    {
+        return CreateVirtualMod(name, layout: layout, deps: deps);
     }
 
     protected override IPlayableObject CreatePlayableObject(
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null)
     {
-        return CreateVirtualMod(iconPath, languages);
+        return CreateVirtualMod("Mod", iconPath, languages);
     }
 
     protected override PlayableModContainer CreateModContainer()
     {
-        return CreateVirtualMod();
-    }
-
-    protected override ModBase CreateMod(
-        string? iconPath = null,
-        ICollection<ILanguageInfo>? languages = null)
-    {
-        return CreateVirtualMod();
+        return CreateMod("Mod");
     }
 
     [Fact]
     public void InvalidCtor_ArgumentNull_Throws()
     {
-        var game = CreateRandomGame();
-        var dep = game.InstallAndAddMod("Dep", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var dep = Game.InstallAndAddMod("Dep", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, new ModinfoData("Name"), ServiceProvider));
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, game, new List<ModDependencyEntry> { new(dep) }, DependencyResolveLayout.FullResolved, ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, Game, new DependencyList(new List<IModReference>{dep}, DependencyResolveLayout.FullResolved), ServiceProvider));
 
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod(game, null!, ServiceProvider));
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod("name", null!, new List<ModDependencyEntry>{new(dep)}, DependencyResolveLayout.FullResolved, ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, null!, ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod("name", null!, new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved), ServiceProvider));
 
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod("name", game, null!, DependencyResolveLayout.FullResolved, ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod("name", Game, null!, ServiceProvider));
 
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod(game, new ModinfoData("Name"), null!));
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod("name", game, new List<ModDependencyEntry> { new(dep) }, DependencyResolveLayout.FullResolved, null!));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, new ModinfoData("Name"), null!));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod("name", Game, new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved), null!));
     }
 
     [Fact]
     public void Ctor_EmptyDependencies_Throws()
     {
-        var game = CreateRandomGame();
-
-        // Empty dependency lists
-        Assert.Throws<PetroglyphException>(() => new VirtualMod(game, new ModinfoData("Name"), ServiceProvider));
-        Assert.Throws<PetroglyphException>(() => new VirtualMod("name", game, new List<ModDependencyEntry>(), DependencyResolveLayout.FullResolved, ServiceProvider));
+        Assert.Throws<ModException>(() => new VirtualMod(Game, new ModinfoData("Name"), ServiceProvider));
+        Assert.Throws<ModException>(() => new VirtualMod("name", Game, DependencyList.EmptyDependencyList, ServiceProvider));
         var modInfo = new ModinfoData("Name")
         {
             Dependencies = new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved)
         };
-        Assert.Throws<PetroglyphException>(() => new VirtualMod(game, modInfo, ServiceProvider));
-    }
-
-    [Fact]
-    public void Ctor_DepNotAdded_Throws()
-    {
-        var game = CreateRandomGame();
-        var notAddedDep = game.InstallMod("NotAddedMod", false, ServiceProvider);
-
-        var modInfo = new ModinfoData("Name")
-        {
-            Dependencies = new DependencyList(new List<IModReference>{new ModReference(notAddedDep) }, DependencyResolveLayout.FullResolved)
-        };
-        Assert.Throws<ModNotFoundException>(() => new VirtualMod(game, modInfo, ServiceProvider));
-    }
-
-    [Fact]
-    public void Ctor_DepOfWrongGame_Throws()
-    {
-        var game = CreateRandomGame();
-        var otherGameReference = new PetroglyphStarWarsGame(game, game.Directory, game.Name, ServiceProvider);
-
-        var wrongGameDep = otherGameReference.InstallAndAddMod("NotAddedMod", false, ServiceProvider);
-
-        Assert.Throws<PetroglyphException>(() => new VirtualMod("VirtualMod", game,
-            new List<ModDependencyEntry> { new(wrongGameDep) }, DependencyResolveLayout.FullResolved, ServiceProvider));
-    }
-
-    [Fact]
-    public void Ctor_NonPhysicalDependencies_Throws()
-    {
-        var game = CreateRandomGame();
-        var customDep = new CustomVirtualMod(game, ServiceProvider);
-        game.AddMod(customDep);
-
-        Assert.Throws<ModException>(() => new VirtualMod("VirtualMod", game,
-            new List<ModDependencyEntry> { new(customDep) }, DependencyResolveLayout.FullResolved, ServiceProvider));
-
-        var modInfo = new ModinfoData("Name")
-        {
-            Dependencies = new DependencyList(new List<IModReference> { new ModReference(customDep) }, DependencyResolveLayout.FullResolved)
-        };
-        Assert.Throws<ModException>(() => new VirtualMod(game, modInfo, ServiceProvider));
+        Assert.Throws<ModException>(() => new VirtualMod(Game, modInfo, ServiceProvider));
     }
 
     [Fact]
     public void Ctor_FromName_Properties()
     {
-        var game = CreateRandomGame();
-        var dep = game.InstallAndAddMod("dep", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var dep = CreateOtherMod("dep");
+
+        var mod = new VirtualMod(
+            "VirtualMod",
+            Game,
+            new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved),
+            ServiceProvider);
         
-        var mod = new VirtualMod("VirtualMod", game, new List<ModDependencyEntry>(new List<ModDependencyEntry>
-        {
-            new(dep)
-        }), DependencyResolveLayout.FullResolved, ServiceProvider);
-        
-        Assert.Single(mod.Dependencies);
+        Assert.Empty(mod.Dependencies);
+        Assert.Single(((IModIdentity)mod).Dependencies);
         Assert.Equal(DependencyResolveLayout.FullResolved, mod.DependencyResolveLayout);
-        Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
+        Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);
         Assert.NotNull(mod.ModInfo);
         Assert.Equal("VirtualMod", mod.ModInfo.Name);
+        Assert.Equal(ModType.Virtual, mod.Type);
+        Assert.Empty(mod.Mods);
+        Assert.Null(mod.Version);
+
+        Assert.StartsWith(mod.Name, mod.Identifier);
     }
 
     [Fact]
     public void Ctor_FromModinfo_Properties()
     {
-        var game = CreateRandomGame();
-        var dep = game.InstallAndAddMod("dep", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var dep = CreateOtherMod("dep");
 
         var modinfo = new ModinfoData("VirtualMod")
         {
+            Icon = "IconPath",
+            Version = new SemVersion(1, 0, 0),
+            Languages = new List<ILanguageInfo>(),
             Dependencies = new DependencyList(new List<IModReference>
             {
                 new ModReference(dep)
             }, DependencyResolveLayout.ResolveLastItem)
         };
 
-        var mod = new VirtualMod(game, modinfo, ServiceProvider);
+        var mod = new VirtualMod(Game, modinfo, ServiceProvider);
 
-        Assert.Single(mod.Dependencies);
+        Assert.Empty(mod.Dependencies);
+        Assert.Single(((IModIdentity)mod).Dependencies);
         Assert.Equal(DependencyResolveLayout.ResolveLastItem, mod.DependencyResolveLayout);
-        Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
+        Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);
         Assert.NotNull(mod.ModInfo);
         Assert.Equal("VirtualMod", mod.ModInfo.Name);
+        Assert.Equal(modinfo.Version, mod.Version);
+        Assert.Null(mod.VersionRange);
+        Assert.Equal(modinfo.Icon, mod.IconFile);
+
+        Assert.StartsWith(mod.Name, mod.Identifier);
     }
 
-    // TODO:
-    //[Fact]
-    //public void ResolveDependencies_NotSupportedOperation()
-    //{
-    //    var mod = CreateMod();
-    //    Assert.Throws<NotSupportedException>(() => mod.ResolveDependencies(new DependencyResolverOptions()));
-    //}
+    [Fact]
+    public void Ctor_NonPhysicalDependencies_Throws()
+    {
+        var customDep = new CustomVirtualMod(Game, ServiceProvider);
+        Game.AddMod(customDep);
+
+        var modInfo = new ModinfoData("Name")
+        {
+            Dependencies = new DependencyList(new List<IModReference> { new ModReference(customDep) },
+                DependencyResolveLayout.FullResolved)
+        };
+
+        var mod = new VirtualMod(Game, modInfo, ServiceProvider);
+        Game.AddMod(mod);
+        Assert.Throws<ModException>(mod.ResolveDependencies);
+    }
 
     private class CustomVirtualMod(IGame game, IServiceProvider serviceProvider)
         : ModBase(game, ModType.Virtual, "CustomVirtualMod", serviceProvider)

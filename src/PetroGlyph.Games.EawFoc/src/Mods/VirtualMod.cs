@@ -5,19 +5,19 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// Represents a virtual, in-memory mod.
+/// Represents a virtual mod which only exists in memory.
 /// </summary>
 public sealed class VirtualMod : ModBase, IVirtualMod
 {
-    /// <summary>
-    /// The identifier is a unique representation of the mod's name and its dependencies.
-    /// </summary>
+    /// <inheritdoc />
+    /// <remarks>
+    ///  The identifier is a unique representation of the mod's name and its dependencies.
+    /// </remarks>
     public override string Identifier { get; }
 
     /// <summary>
@@ -29,38 +29,22 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     /// <exception cref="ArgumentNullException">
     /// <paramref name="game"/> or <paramref name="modInfoData"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
     /// </exception>
-    /// <exception cref="PetroglyphException">If the <paramref name="modInfoData"/> has no dependencies.</exception>
-    /// <exception cref="ModNotFoundException">A dependency was not found.</exception>
-    /// <exception cref="ModException">No physical dependency was not found.</exception>
+    /// <exception cref="ModException">If the <paramref name="modInfoData"/> has no dependencies.</exception>
     public VirtualMod(IGame game, IModinfo modInfoData, IServiceProvider serviceProvider)
         : base(game, ModType.Virtual, modInfoData, serviceProvider)
     {
-        if (modInfoData.Dependencies is null)
-            throw new ArgumentException("dependencies cannot be null.", nameof(modInfoData));
         if (modInfoData.Dependencies.Count == 0)
-            throw new PetroglyphException("Virtual mods must be initialized with pre-defined dependencies");
+            throw new ModException(this, "Virtual mods must be initialized with pre-defined dependencies");
 
         ModInfo = modInfoData;
-
-        AddDependencies(game, modInfoData.Dependencies.Select(d =>
-        {
-            var mod = game.FindMod(d);
-            if (mod is null)
-                throw new ModNotFoundException(d, this);
-            return new ModDependencyEntry(mod, d.VersionRange);
-        }).ToList());
-
-        DependencyResolveStatus = DependencyResolveStatus.Resolved;
-
         Identifier = CalculateIdentifier();
     }
 
     /// <summary>
-    /// Creates a new instance.
+    /// Initializes a new instance of the <see cref="VirtualMod"/> class of the specified game and name and dependency list.
     /// </summary>
     /// <param name="name">The name of the mod.</param>
     /// <param name="game">The game of the mod.</param>
-    /// <param name="layout">The layout of the <paramref name="dependencies"/> list.</param>
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="dependencies">list of dependencies.</param>
     /// <exception cref="ModException">If the <paramref name="dependencies"/> is empty.</exception>
@@ -68,56 +52,34 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     /// <paramref name="name"/> or <paramref name="game"/> or <paramref name="dependencies"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
-    public VirtualMod(string name, IGame game, IReadOnlyList<ModDependencyEntry> dependencies, DependencyResolveLayout layout, IServiceProvider serviceProvider)
+    public VirtualMod(string name, IGame game, IModDependencyList dependencies, IServiceProvider serviceProvider)
         : base(game, ModType.Virtual, name, serviceProvider)
     {
         if (dependencies == null) 
             throw new ArgumentNullException(nameof(dependencies));
         if (dependencies.Count == 0)
-            throw new PetroglyphException("Virtual mods must have at least one physical dependency.");
-
-        AddDependencies(game, dependencies);
-
-        DependencyResolveStatus = DependencyResolveStatus.Resolved;
+            throw new ModException(this, "Virtual mods must have at least one physical dependency.");
 
         ModInfo = new ModinfoData(name)
         {
-            Dependencies = new DependencyList(new List<IModReference>(Dependencies.Select(x => x.Mod)), layout)
+            Dependencies = new DependencyList(dependencies)
         };
-
         Identifier = CalculateIdentifier();
     }
 
-    private void AddDependencies(IGame game, IReadOnlyList<ModDependencyEntry> dependencies)
+    /// <inheritdoc />
+    protected override IReadOnlyList<ModDependencyEntry> ResolveDependenciesCore()
     {
-        // Since we are in a ctor we cannot use the common services.
-        // We have to use a lightweight implementation for resolving and checking dependencies.
-        // This means we cannot ensure at this point this instance has
-        // a) A cycle free dependency graph,
-
-        var deps = new List<ModDependencyEntry>();
-
-        var hasPhysicalMod = false;
-        foreach (var dependency in dependencies)
-        {
-            if (!ReferenceEquals(dependency.Mod.Game, game))
-                throw new PetroglyphException($"Game of mod {dependency} does not match this mod's game.");
-
-            deps.Add(dependency);
-            if (dependency.Mod.Type is ModType.Default or ModType.Workshops)
-                hasPhysicalMod = true;
-        }
-
-        if (!hasPhysicalMod)
-            throw new ModException(this, "No physical dependency was found.");
-
-        Dependencies = deps;
+        var dependencies = base.ResolveDependenciesCore();
+        if (dependencies.Any(x => x.Mod is not IPhysicalMod))
+            throw new ModException(this, "Virtual Mods must have at least one physical mod as dependency.");
+        return dependencies;
     }
 
     /// <inheritdoc/>
     public override string ToString()
     {
-        return Name + "-" + Identifier;
+        return Identifier;
     }
 
     private string CalculateIdentifier()

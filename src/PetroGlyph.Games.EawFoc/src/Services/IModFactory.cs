@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -9,7 +8,7 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 namespace PG.StarWarsGame.Infrastructure.Services;
 
 /// <summary>
-/// Factory to create one or more <see cref="IMod"/>
+/// Factory to create mods.
 /// </summary>
 public interface IModFactory
 {
@@ -60,10 +59,8 @@ public interface IModFactory
     /// <remarks>The created mods dot NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
     /// <param name="game">The parent <see cref="IGame"/> instance of the mods.</param>
     /// <param name="name">The name of the virtual mod.</param>
-    /// <param name="dependencies">dependencies of the mod.
-    /// The value are the sorted dependencies of the virtual mod</param>
-    /// <param name="resolveLayout">The resolve layout of the <paramref name="dependencies"/> list.</param>
+    /// <param name="dependencies">The dependencies of the virtual mod.</param>
     /// <returns>One or many virtual mods</returns>
     /// <exception cref="PetroglyphException">if the virtual mod could not be created.</exception>
-    IVirtualMod CreateVirtualMod(IGame game, string name, IReadOnlyList<ModDependencyEntry> dependencies, DependencyResolveLayout resolveLayout);
+    IVirtualMod CreateVirtualMod(IGame game, string name, IModDependencyList dependencies);
 }

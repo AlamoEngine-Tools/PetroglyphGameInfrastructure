@@ -23,9 +23,11 @@ public class Mod : ModBase, IPhysicalMod
     /// </summary>
     protected readonly IFileSystem FileSystem;
 
-    /// <summary>
-    /// Is this mod is a workshops mod, it holds the workshop ID, otherwise a normalized, absolute path
-    /// </summary>
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// If this mod is a workshops mod, it holds the workshop ID, otherwise a normalized, absolute path.
+    /// </remarks>
     public override string Identifier
     {
         get

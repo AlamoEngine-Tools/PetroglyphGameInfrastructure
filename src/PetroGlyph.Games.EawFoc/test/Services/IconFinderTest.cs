@@ -12,7 +12,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Services;
 
-public class IconFinderTest : CommonTestBase
+public class IconFinderTest : CommonTestBaseWithRandomGame
 {
     private readonly IconFinder _iconFinder = new();
 
@@ -25,43 +25,38 @@ public class IconFinderTest : CommonTestBase
     [Fact]
     public void FindIcon_Game_NotInstalled()
     {
-        var game = CreateRandomGame();
-        Assert.Null(_iconFinder.FindIcon(game));
+        Assert.Null(_iconFinder.FindIcon(Game));
     }
-
 
     [Fact]
     public void FindIcon_Game_Installed()
     {
-        var game = CreateRandomGame();
-        var expectedFileName = game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
-        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "eaw.ico"));
-        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "foc.ico"));
+        var expectedFileName = Game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
+        FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "eaw.ico"));
+        FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "foc.ico"));
 
-        var icon = _iconFinder.FindIcon(game);
+        var icon = _iconFinder.FindIcon(Game);
         Assert.NotNull(icon);
         Assert.Equal(
-            FileSystem.Path.GetFullPath(FileSystem.Path.Combine(game.Directory.FullName, expectedFileName)),
+            FileSystem.Path.GetFullPath(FileSystem.Path.Combine(Game.Directory.FullName, expectedFileName)),
             FileSystem.Path.GetFullPath(icon));
     }
 
     [Fact]
     public void FindIcon_Game_NotInstalledWrongLocation()
     {
-        var game = CreateRandomGame();
-        game.DataDirectory().Create();
-        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "Data", "eaw.ico"));
-        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "Data", "foc.ico"));
-        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "eaw.txt"));
-        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "foc.ic"));
-        Assert.Null(_iconFinder.FindIcon(game));
+        Game.DataDirectory().Create();
+        FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "Data", "eaw.ico"));
+        FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "Data", "foc.ico"));
+        FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "eaw.txt"));
+        FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "foc.ic"));
+        Assert.Null(_iconFinder.FindIcon(Game));
     }
 
     [Fact]
     public void FindIcon_Mod_NotInstalled()
     {
-        var game = CreateRandomGame();
-        var mod = game.InstallAndAddMod("Mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var mod = Game.InstallAndAddMod("Mod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "Data", "icon.ico"));
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "icon.txt"));
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "icon.ic"));
@@ -71,8 +66,7 @@ public class IconFinderTest : CommonTestBase
     [Fact]
     public void FindIcon_Mod_Installed()
     {
-        var game = CreateRandomGame();
-        var mod = game.InstallAndAddMod("Mod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var mod = Game.InstallAndAddMod("Mod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
 
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
@@ -92,8 +86,7 @@ public class IconFinderTest : CommonTestBase
     [Fact]
     public void FindIcon_Mod_UseIconFromFs_ModinfoIconIsNull()
     {
-        var game = CreateRandomGame();
-        var mod = game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(game), new ModinfoData("name"), ServiceProvider);
+        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name"), ServiceProvider);
 
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
@@ -113,8 +106,7 @@ public class IconFinderTest : CommonTestBase
     [Fact]
     public void FindIcon_Mod_UseIconFromFs_ModinfoIconIsEmpty()
     {
-        var game = CreateRandomGame();
-        var mod = game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(game), new ModinfoData("name")
+        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name")
         {
             Icon = string.Empty
         }, ServiceProvider);
@@ -137,8 +129,7 @@ public class IconFinderTest : CommonTestBase
     [Fact]
     public void FindIcon_Mod_UseIconFromModinfo()
     {
-        var game = CreateRandomGame();
-        var mod = game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(game), new ModinfoData("name")
+        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name")
         {
             Icon = "icon.ico"
         }, ServiceProvider);
@@ -157,12 +148,11 @@ public class IconFinderTest : CommonTestBase
     [Fact]
     public void FindIcon_Mod_UseIconFromGame()
     {
-        var game = CreateRandomGame();
-        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "eaw.ico"));
-        FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "foc.ico"));
-        var expectedFileName = game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
+        FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "eaw.ico"));
+        FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "foc.ico"));
+        var expectedFileName = Game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
 
-        var mod = game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(game), new ModinfoData("name"), ServiceProvider);
+        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name"), ServiceProvider);
 
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "Data", "notAnIcon.ico"));
 
@@ -176,9 +166,8 @@ public class IconFinderTest : CommonTestBase
     [Fact]
     public void FindIcon_VirtualMod_UseIconFromModinfo()
     {
-        var game = CreateRandomGame();
-        var dep = game.InstallAndAddMod("dep", false, ServiceProvider);
-        var mod = new VirtualMod(game,
+        var dep = Game.InstallAndAddMod("dep", false, ServiceProvider);
+        var mod = new VirtualMod(Game,
             new ModinfoData("Mod")
             {
                 Icon = "icon.ico",

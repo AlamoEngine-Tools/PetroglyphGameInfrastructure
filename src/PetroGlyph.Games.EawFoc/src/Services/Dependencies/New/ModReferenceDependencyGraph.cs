@@ -51,7 +51,7 @@ internal enum DependencyKind
     Transitive
 }
 
-internal class ModReferenceEdge(GraphModReference source, GraphModReference target) : Edge<GraphModReference>(source, target), IEquatable<ModReferenceEdge>
+internal sealed class ModReferenceEdge(GraphModReference source, GraphModReference target) : Edge<GraphModReference>(source, target), IEquatable<ModReferenceEdge>
 { 
     public bool Equals(ModReferenceEdge? other)
     {
@@ -62,12 +62,11 @@ internal class ModReferenceEdge(GraphModReference source, GraphModReference targ
 
     public override bool Equals(object? obj)
     {
-        if (obj is null) return false;
+        if (obj is null) 
+            return false;
         if (ReferenceEquals(this, obj))
             return true;
-        if (obj.GetType() != GetType())
-            return false;
-        return Equals((ModReferenceEdge)obj);
+        return obj is ModReferenceEdge other && Equals(other);
     }
 
     public override int GetHashCode()
@@ -92,6 +91,9 @@ internal class ModReferenceDependencyGraphBuilder
         if (rootMod == null) 
             throw new ArgumentNullException(nameof(rootMod));
         var game = rootMod.Game;
+
+        // Assure rootMod itself is added to the game.
+        GetModOrThrow(game, rootMod);
 
         
         var graph = new ModReferenceDependencyGraph();
@@ -170,13 +172,6 @@ internal class ModReferenceDependencyGraphBuilder
     }
 }
 
-/// <summary>
-/// 
-/// </summary>
-/// <remarks>
-/// This class is not Thread-Safe.
-/// </remarks>
-/// <param name="serviceProvider"></param>
 internal class NewModDependencyResolver(IServiceProvider serviceProvider)
 {
     public IReadOnlyList<ModDependencyEntry> Resolve(IMod mod)
