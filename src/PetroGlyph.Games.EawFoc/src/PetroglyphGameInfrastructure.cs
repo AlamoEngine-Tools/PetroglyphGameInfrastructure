@@ -32,7 +32,7 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IModReferenceFinder>(sp => new ModFinder(sp));
         serviceCollection.AddSingleton<IModReferenceLocationResolver>(sp => new ModReferenceLocationResolver(sp));
 
-        serviceCollection.AddSingleton(sp => new NewModDependencyResolver(sp));
+        serviceCollection.AddSingleton(sp => new ModDependencyResolver(sp));
         serviceCollection.AddSingleton(sp => new ModReferenceDependencyGraphBuilder(sp));
 
         serviceCollection.AddSingleton<ILanguageFinder>(sp => new InstalledLanguageFinder(sp));

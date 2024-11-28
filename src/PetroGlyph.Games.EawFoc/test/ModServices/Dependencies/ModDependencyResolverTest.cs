@@ -16,13 +16,13 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
 public class ModDependencyResolverTest : CommonTestBase
 {
-    private readonly NewModDependencyResolver _resolver;
+    private readonly ModDependencyResolver _resolver;
     private readonly IGame _game;
     private readonly IModIdentifierBuilder _identifierBuilder;
 
     public ModDependencyResolverTest()
     {
-        _resolver = new NewModDependencyResolver(ServiceProvider);
+        _resolver = new ModDependencyResolver(ServiceProvider);
         _game = CreateRandomGame();
         _identifierBuilder = ServiceProvider.GetRequiredService<IModIdentifierBuilder>();
     }
@@ -30,8 +30,8 @@ public class ModDependencyResolverTest : CommonTestBase
     [Fact]
     public void InvalidArgs_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new NewModDependencyResolver(null!));
-        Assert.Throws<ArgumentNullException>(() => new NewModDependencyResolver(ServiceProvider).Resolve(null!));
+        Assert.Throws<ArgumentNullException>(() => new ModDependencyResolver(null!));
+        Assert.Throws<ArgumentNullException>(() => new ModDependencyResolver(ServiceProvider).Resolve(null!));
     }
 
     [Fact]

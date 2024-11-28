@@ -139,7 +139,7 @@ public abstract class ModBase : PlayableModContainer, IMod
     /// <returns>The resolved dependencies as specified by the resolve layout.</returns>
     protected virtual IReadOnlyList<ModDependencyEntry> ResolveDependenciesCore()
     {
-        var resolver = ServiceProvider.GetRequiredService<NewModDependencyResolver>(); 
+        var resolver = ServiceProvider.GetRequiredService<ModDependencyResolver>(); 
         return resolver.Resolve(this);
     }
 

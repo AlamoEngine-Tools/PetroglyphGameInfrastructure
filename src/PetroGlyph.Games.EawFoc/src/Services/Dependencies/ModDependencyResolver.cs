@@ -7,7 +7,7 @@ using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
-internal class NewModDependencyResolver(IServiceProvider serviceProvider)
+internal class ModDependencyResolver(IServiceProvider serviceProvider)
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
