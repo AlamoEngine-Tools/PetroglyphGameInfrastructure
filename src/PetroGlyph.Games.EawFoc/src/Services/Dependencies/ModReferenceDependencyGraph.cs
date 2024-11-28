@@ -1,16 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
+
+/* Nicht gemergte Änderung aus Projekt "PG.StarWarsGame.Infrastructure (netstandard2.0)"
+Vor:
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+Nach:
+using PG.StarWarsGame.Infrastructure.Services;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies.New;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+*/
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using QuikGraph;
 using QuikGraph.Algorithms;
 
-namespace PG.StarWarsGame.Infrastructure.Services.Dependencies.New;
+namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 internal class ModReferenceDependencyGraph : AdjacencyGraph<GraphModReference, ModReferenceEdge>
 {
@@ -52,7 +62,7 @@ internal enum DependencyKind
 }
 
 internal sealed class ModReferenceEdge(GraphModReference source, GraphModReference target) : Edge<GraphModReference>(source, target), IEquatable<ModReferenceEdge>
-{ 
+{
     public bool Equals(ModReferenceEdge? other)
     {
         if (other is null)
@@ -62,7 +72,7 @@ internal sealed class ModReferenceEdge(GraphModReference source, GraphModReferen
 
     public override bool Equals(object? obj)
     {
-        if (obj is null) 
+        if (obj is null)
             return false;
         if (ReferenceEquals(this, obj))
             return true;
@@ -81,21 +91,21 @@ internal class ModReferenceDependencyGraphBuilder
 
     public ModReferenceDependencyGraphBuilder(IServiceProvider serviceProvider)
     {
-        if (serviceProvider == null) 
+        if (serviceProvider == null)
             throw new ArgumentNullException(nameof(serviceProvider));
         _identifierBuilder = serviceProvider.GetRequiredService<IModIdentifierBuilder>();
     }
 
     public ModReferenceDependencyGraph Build(IMod rootMod)
     {
-        if (rootMod == null) 
+        if (rootMod == null)
             throw new ArgumentNullException(nameof(rootMod));
         var game = rootMod.Game;
 
         // Assure rootMod itself is added to the game.
         GetModOrThrow(game, rootMod);
 
-        
+
         var graph = new ModReferenceDependencyGraph();
         graph.AddVertex(new GraphModReference(rootMod, DependencyKind.Root));
 
@@ -125,10 +135,10 @@ internal class ModReferenceDependencyGraphBuilder
                 var depKind = GetDependencyKind(rootMod, currentMod);
 
                 graph.AddVerticesAndEdge(new ModReferenceEdge(
-                    currentModVertex, 
+                    currentModVertex,
                     new GraphModReference(dependency, depKind)));
 
-                if (ShallEnqueueMod(dependencyList.ResolveLayout, i, dependencyList.Count)) 
+                if (ShallEnqueueMod(dependencyList.ResolveLayout, i, dependencyList.Count))
                     pendingQueue.Enqueue(dependency);
             }
         }
@@ -161,73 +171,13 @@ internal class ModReferenceDependencyGraphBuilder
             case DependencyResolveLayout.ResolveRecursive:
                 return true;
             case DependencyResolveLayout.ResolveLastItem:
-            {
-                if (index == maxCount - 1)
-                    return true;
-                return false;
-            }
+                {
+                    if (index == maxCount - 1)
+                        return true;
+                    return false;
+                }
             default:
                 throw new ArgumentOutOfRangeException(nameof(resolveLayout), resolveLayout, null);
         }
-    }
-}
-
-internal class NewModDependencyResolver(IServiceProvider serviceProvider)
-{
-    public IReadOnlyList<ModDependencyEntry> Resolve(IMod mod)
-    {
-        if (mod == null)
-            throw new ArgumentNullException(nameof(mod));
-
-        if (mod.DependencyResolveStatus == DependencyResolveStatus.Resolved)
-            return mod.Dependencies;
-
-        var game = mod.Game;
-
-        var graphBuilder = serviceProvider.GetRequiredService<ModReferenceDependencyGraphBuilder>();
-        var dependencyGraph = graphBuilder.Build(mod);
-
-        if (dependencyGraph.HasCycle())
-            throw new ModDependencyCycleException(mod, $"The mod '{mod}' has a dependency cycle.");
-
-        GraphModReference rootVertex = null!;
-        var directDeps = new List<ModDependencyEntry>();
-
-        // Resolve all dependencies as specified by the resolve layout. 
-        // This way we support strange things like:
-        //              A : B, C, D [FullResolved]
-        //      where   D : B
-        // If we would resolve this fully recursive we would have a cycle.
-        // However, as the dependency list of 'A' is FullResolved, the cycle never occurs at play time of 'A'.
-        // Thus, we do not resolve the dependencies of 'D'.
-        // This means we only need to resolve dependencies which have out-going edges in the graph.
-        // In other words, if vertex is a source of at least one edge, we resolve it.
-        foreach (var vertex in dependencyGraph.Vertices)
-        {
-            var outEdges = dependencyGraph.OutEdges(vertex);
-
-            if (vertex.Kind == DependencyKind.Root)
-            {
-                Debug.Assert(rootVertex is null);
-                rootVertex = vertex;
-                
-                foreach (var outEdge in outEdges)
-                {
-                    var dep = game.FindMod(outEdge.Target.ModReference);
-                    directDeps.Add(new ModDependencyEntry(dep!, null));
-                }
-            }
-            else
-            {
-                if (!outEdges.Any())
-                    continue;
-                var currentMod = game.FindMod(vertex.ModReference);
-                Debug.Assert(currentMod is not null);
-                currentMod!.ResolveDependencies();
-            }
-        }
-
-        Debug.Assert(rootVertex is not null);
-        return directDeps;
     }
 }

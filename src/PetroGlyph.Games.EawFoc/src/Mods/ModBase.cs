@@ -8,7 +8,6 @@ using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Services.Dependencies.New;
 using Semver;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;

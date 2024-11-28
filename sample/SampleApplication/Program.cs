@@ -56,12 +56,8 @@ IList<IMod> FindMods()
         game.AddMod(mod);
 
     // Mods need to be added to the game first, before resolving their dependencies.
-    foreach(var mod in modList)
-    {
-        var resolver = services.GetRequiredService<IDependencyResolver>();
-        mod.ResolveDependencies(resolver,
-            new DependencyResolverOptions { CheckForCycle = true, ResolveCompleteChain = true });
-    }
+    foreach(var mod in modList) 
+        mod.ResolveDependencies();
 
     return modList;
 
@@ -70,7 +66,7 @@ IList<IMod> FindMods()
 IGame FindGame()
 {
     var detector = services.GetRequiredService<IGameDetector>();
-    var detectionResult = detector.Detect(new GameDetectorOptions(GameType.Foc));
+    var detectionResult = detector.Detect(GameType.Foc, new List<GamePlatform>());
     var gameFactory = services.GetRequiredService<IGameFactory>();
     return gameFactory.CreateGame(detectionResult, CultureInfo.CurrentCulture);
 }

@@ -1,34 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
-using System.Linq;
 using EawModinfo.Spec;
-using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
-using Testably.Abstractions.Testing;
-using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
+namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
-public class ModDependencyTraverserIntegrationTest : CommonTestBase
+public class ModDependencyTraverserTest : CommonTestBase
 {
-    private readonly ModDependencyTraverser _modDependencyTraverser;
-    private readonly IGame _game;
+    //private readonly ModDependencyTraverser _modDependencyTraverser;
+    //private readonly IGame _game;
 
-    public ModDependencyTraverserIntegrationTest()
-    {
-        _modDependencyTraverser = new ModDependencyTraverser(ServiceProvider);
-        _game = CreateRandomGame();
-    }
+    //public ModDependencyTraverserTest()
+    //{
+    //    _modDependencyTraverser = new ModDependencyTraverser(ServiceProvider);
+    //    _game = CreateRandomGame();
+    //}
 
-    //public ModDependencyTraverserIntegrationTest()
+    //public ModDependencyTraverserTest()
     //{
     //    _fileSystem = new MockFileSystem();
     //    var sc = new ServiceCollection();
@@ -87,7 +79,7 @@ public class ModDependencyTraverserIntegrationTest : CommonTestBase
     //public void Traverse_NoDependencies()
     //{
     //    var a = CreateMod("A");
-        
+
     //    var actual = _modDependencyTraverser.Traverse(a);
 
     //    var expected = new List<IMod> { a }.Select(m => new ModDependencyEntry(m)).ToList();

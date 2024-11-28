@@ -4,14 +4,14 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Services.Dependencies.New;
+using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.TestingUtilities;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
+namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
 public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGame
 {
@@ -79,7 +79,7 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
                 new GraphModReference(b, DependencyKind.DirectDependency)
             ]
             , graph.Vertices); // Mod C should not exist, cause A's layout is full resolved
-        
+
         Assert.Equivalent(new List<ModReferenceEdge>
         {
             new(new GraphModReference(mod, DependencyKind.Root),
