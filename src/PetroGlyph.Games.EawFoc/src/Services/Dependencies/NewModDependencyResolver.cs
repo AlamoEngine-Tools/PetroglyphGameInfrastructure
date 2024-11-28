@@ -51,7 +51,7 @@ internal class NewModDependencyResolver(IServiceProvider serviceProvider)
                 foreach (var outEdge in outEdges)
                 {
                     var dep = game.FindMod(outEdge.Target.ModReference);
-                    directDeps.Add(new ModDependencyEntry(dep!, null));
+                    directDeps.Add(new ModDependencyEntry(dep!, null!));
                 }
             }
             else

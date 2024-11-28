@@ -1,4 +1,6 @@
-﻿using EawModinfo.Spec;
+﻿using System.Collections.Generic;
+using EawModinfo.Model;
+using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 
@@ -13,8 +15,16 @@ public abstract class CommonTestBaseWithRandomGame : CommonTestBase
         Game = CreateRandomGame();
     }
 
-    protected IMod CreateAndAddMod(string name, DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, params IModReference[] deps)
+    protected IMod CreateAndAddMod(
+        string name, 
+        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
+        params IList<IModReference> deps)
     {
-        return CreateAndAddMod(Game, name, layout, deps);
+        return CreateAndAddMod(Game, name, new DependencyList(deps, layout));
+    }
+
+    protected IMod CreateAndAddMod(IModinfo modinfo)
+    {
+        return CreateAndAddMod(Game, modinfo);
     }
 }

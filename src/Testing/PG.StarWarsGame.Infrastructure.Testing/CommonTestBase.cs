@@ -68,16 +68,20 @@ public abstract class CommonTestBase
         return languages;
     }
 
-    protected IMod CreateAndAddMod(IGame game, string name, DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, params IList<IModReference> deps)
+    protected IMod CreateAndAddMod(IGame game, string name, IModDependencyList dependencies)
     {
-        if (deps.Count == 0)
+        if (dependencies.Count == 0)
             return game.InstallAndAddMod(name, GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
 
         var modinfo = new ModinfoData(name)
         {
-            Dependencies = new DependencyList(deps, layout)
+            Dependencies = dependencies
         };
+        return CreateAndAddMod(game, modinfo);
+    }
 
+    protected IMod CreateAndAddMod(IGame game, IModinfo modinfo)
+    {
         return game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(game), modinfo, ServiceProvider);
     }
 }

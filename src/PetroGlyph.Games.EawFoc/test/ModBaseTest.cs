@@ -32,7 +32,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
     {
-        return CreateAndAddMod(Game, name, layout, deps);
+        return CreateAndAddMod(Game, name, new DependencyList(deps, layout));
     }
 
     [Fact]
@@ -91,7 +91,8 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_DepOfWrongGame_Throws()
     {
         var otherGameReference = new PetroglyphStarWarsGame(Game, Game.Directory, Game.Name, ServiceProvider);
-        var wrongGameDep = CreateAndAddMod(otherGameReference, "WrongGameRefMod");
+        var wrongGameDep = otherGameReference.InstallAndAddMod("WrongGameRefMod", 
+            GITestUtilities.GetRandomWorkshopFlag(otherGameReference), ServiceProvider);
         var mod = CreateMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), wrongGameDep);
         
         Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);

@@ -9,6 +9,7 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.TestingUtilities;
+using Semver;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
@@ -318,5 +319,150 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c);
         var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
         Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
+    }
+
+
+    public static IEnumerable<object[]> GetMatchingVersionRanges()
+    {
+        yield return [null!, SemVersionRange.All];
+        yield return [null!, SemVersionRange.Empty];
+        yield return [null!, SemVersionRange.Equals(new SemVersion(1, 2, 3))];
+        yield return [new SemVersion(2, 0, 0), SemVersionRange.All];
+        yield return [new SemVersion(1, 0, 0), SemVersionRange.AllRelease];
+        yield return [new SemVersion(2, 0, 0), SemVersionRange.AtLeast(new SemVersion(1, 0, 0))];
+        yield return [new SemVersion(1, 0, 0), SemVersionRange.AtMost(new SemVersion(2, 0, 0))];
+        yield return [new SemVersion(1, 0, 0), SemVersionRange.Equals(new SemVersion(1, 0, 0))];
+    }
+
+    [Theory]
+    [MemberData(nameof(GetMatchingVersionRanges))]
+    public void Build_OneDependency_VersionRangeMatches(SemVersion? version, SemVersionRange ranges)
+    {
+        var b = CreateAndAddMod(new ModinfoData("B") { Version = version });
+        Assert.Equal(version, b.Version);
+
+        var mod = CreateAndAddMod("A", TestHelpers.GetRandomEnum<DependencyResolveLayout>(),
+            new ModReference(b.Identifier, b.Type, ranges));
+
+        var graph = _graphBuilder.Build(mod);
+
+        Assert.False(graph.HasCycle());
+        Assert.Equal(
+            [
+                new GraphModReference(mod, DependencyKind.Root),
+                new GraphModReference(b, DependencyKind.DirectDependency)
+            ]
+            , graph.Vertices);
+
+        Assert.Equivalent(new List<ModReferenceEdge>
+        {
+            new(new GraphModReference(mod, DependencyKind.Root),
+                new GraphModReference(b, DependencyKind.DirectDependency))
+        }, graph.Edges, true);
+    }
+
+
+    public static IEnumerable<object[]> GetMismatchingVersionsAndRange()
+    {
+        yield return [
+            new SemVersion(2, 0, 0),
+            SemVersionRange.Equals(new SemVersion(1, 0, 0))];
+        yield return [
+            new SemVersion(1, 0, 0),
+            SemVersionRange.Equals(new SemVersion(2, 0, 0))];
+        yield return [
+            new SemVersion(1, 0, 0, new List<string>{"BETA-1"}),
+            SemVersionRange.AllRelease];
+        yield return [
+            new SemVersion(1, 1, 0),
+            SemVersionRange.GreaterThan(new SemVersion(1, 2, 0))];
+        yield return [
+            new SemVersion(3, 0, 0), 
+            SemVersionRange.Empty];
+    }
+
+    [Theory]
+    [MemberData(nameof(GetMismatchingVersionsAndRange))]
+    public void Build_OneDependency_VersionRangeDoesNotMatches_Throws(SemVersion version, SemVersionRange? range)
+    {
+        var b = CreateAndAddMod(new ModinfoData("B")
+        {
+            Version = version
+        });
+        Assert.Equal(version, b.Version);
+
+        var mod = CreateAndAddMod("A", TestHelpers.GetRandomEnum<DependencyResolveLayout>(),
+            new ModReference(b.Identifier, b.Type, range));
+
+        Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+    }
+
+    [Theory]
+    [MemberData(nameof(GetMismatchingVersionsAndRange))]
+    public void Build_TransitiveDependency_VersionRangeDoesNotMatches_Throws(SemVersion version, SemVersionRange? range)
+    {
+        var c = CreateAndAddMod(new ModinfoData("C")
+        {
+            Version = version
+        });
+        Assert.Equal(version, c.Version);
+
+        var b = CreateAndAddMod("B", deps: new List<IModReference>{new ModReference(c.Identifier, c.Type, range)});
+
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
+
+        Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+    }
+
+    [Fact]
+    public void Build_VersionMismatchInOnlyOneRef_WhereEqualRefHasMatchingVersion_Throws_Variant1()
+    {
+        /*
+           A : B, C
+           C : B
+            (1.0.0)
+           A ->B(1.0.0)
+            \  | 
+             \ | (2.0.0)
+              \^
+               C
+         */
+        var b = CreateAndAddMod(new ModinfoData("B") { Version = new SemVersion(1, 0, 0) });
+
+        var c = CreateAndAddMod("C",
+            deps: new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(2, 0, 0))));
+
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, deps:
+        [
+            new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(1, 0, 0))),
+            c
+        ]);
+        Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+    }
+
+    [Fact]
+    public void Build_VersionMismatchInOnlyOneRef_WhereEqualRefHasMatchingVersion_Throws_Variant2()
+    {
+        /*
+           A : C, B
+           C : B      
+            (1.0.0)
+           A -----> B(1.0.0)
+             \   /
+              \ /  (2.0.0)
+           	   >
+           	   C
+         */
+        var b = CreateAndAddMod(new ModinfoData("B") { Version = new SemVersion(1, 0, 0) });
+
+        var c = CreateAndAddMod("C", DependencyResolveLayout.ResolveRecursive,
+            deps: new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(2, 0, 0))));
+
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, deps:
+        [
+            c, // Before b in this variant
+            new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(1, 0, 0)))
+        ]);
+        Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
     }
 }

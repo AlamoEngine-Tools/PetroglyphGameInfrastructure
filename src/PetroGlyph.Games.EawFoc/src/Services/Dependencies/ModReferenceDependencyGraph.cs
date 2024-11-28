@@ -105,7 +105,6 @@ internal class ModReferenceDependencyGraphBuilder
         // Assure rootMod itself is added to the game.
         GetModOrThrow(game, rootMod);
 
-
         var graph = new ModReferenceDependencyGraph();
         graph.AddVertex(new GraphModReference(rootMod, DependencyKind.Root));
 
@@ -129,6 +128,8 @@ internal class ModReferenceDependencyGraphBuilder
                 var dependencyRef = dependencyList[i];
                 var dependency = GetModOrThrow(game, dependencyRef);
 
+                IsVersionMatchOrThrow(dependencyRef, dependency);
+
                 var currentModVertex = graph.Vertices.FirstOrDefault(x => x.ModReference.Equals(currentMod))
                                        ?? new GraphModReference(currentMod, DependencyKind.Transitive);
 
@@ -144,6 +145,18 @@ internal class ModReferenceDependencyGraphBuilder
         }
 
         return graph;
+    }
+
+    private static void IsVersionMatchOrThrow(IModReference dependencyRef, IMod dependency)
+    {
+        if (dependency.Version is null || dependencyRef.VersionRange is null)
+            return;
+
+        if (!dependencyRef.VersionRange.Contains(dependency.Version))
+            throw new VersionMismatchException(
+                dependencyRef,
+                dependency,
+                $"Dependency '{dependency.Identifier}' with version '{dependency.Version}' does not match the expected version-range '{dependencyRef.VersionRange}'");
     }
 
     private static DependencyKind GetDependencyKind(IMod root, IMod currentMod)
@@ -179,5 +192,87 @@ internal class ModReferenceDependencyGraphBuilder
             default:
                 throw new ArgumentOutOfRangeException(nameof(resolveLayout), resolveLayout, null);
         }
+    }
+}
+
+/// <summary>
+/// 
+/// </summary>
+public class VersionMismatchException : ModDependencyException
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dependency"></param>
+    public VersionMismatchException(IModReference source, IModReference dependency) : base(source, dependency)
+    {
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dependency"></param>
+    /// <param name="message"></param>
+    public VersionMismatchException(IModReference source, IModReference dependency, string message) : base(source, dependency, message)
+    {
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dependency"></param>
+    /// <param name="message"></param>
+    /// <param name="exception"></param>
+    public VersionMismatchException(IModReference source, IModReference dependency, string message, Exception exception) : base(source, dependency, message, exception)
+    {
+    }
+}
+
+/// <summary>
+/// 
+/// </summary>
+public class ModDependencyException : ModException
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    public IModReference Dependency { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dependency"></param>
+    public ModDependencyException(IModReference source, IModReference dependency) : base(source)
+    {
+        Dependency = dependency;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dependency"></param>
+    /// <param name="message"></param>
+    public ModDependencyException(IModReference source, IModReference dependency, string message) 
+        : base(source, message)
+    {
+        Dependency = dependency;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dependency"></param>
+    /// <param name="message"></param>
+    /// <param name="exception"></param>
+    public ModDependencyException(IModReference source, IModReference dependency, string message, Exception exception) 
+        : base(source, message, exception)
+    {
+        Dependency = dependency;
     }
 }
