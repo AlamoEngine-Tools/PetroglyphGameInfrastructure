@@ -301,7 +301,9 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
     public void Build_SelfNotFound_Throws()
     {
         var mod = Game.InstallMod("A", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
+        var e = Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
+        Assert.Same(Game, e.ModContainer);
+        Assert.Equal(mod, e.Mod);
     }
 
     [Fact]
@@ -309,7 +311,9 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
     {
         var b = Game.InstallMod("B", false, ServiceProvider);
         var mod = CreateAndAddMod("A", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), b);
-        Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
+        var e = Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
+        Assert.Same(Game, e.ModContainer);
+        Assert.Equal(b, e.Mod);
     }
 
     [Fact]
@@ -318,7 +322,9 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         var c = Game.InstallMod("C", false, ServiceProvider);
         var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c);
         var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
-        Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
+        var e = Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
+        Assert.Same(Game, e.ModContainer);
+        Assert.Equal(c, e.Mod);
     }
 
 
@@ -394,7 +400,9 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         var mod = CreateAndAddMod("A", TestHelpers.GetRandomEnum<DependencyResolveLayout>(),
             new ModReference(b.Identifier, b.Type, range));
 
-        Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+        var e = Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+        Assert.Equal(new ModReference(b), e.Mod);
+        Assert.Equal(b, e.Dependency);
     }
 
     [Theory]
@@ -411,7 +419,9 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
 
         var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
 
-        Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+        var e = Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+        Assert.Equal(new ModReference(c), e.Mod);
+        Assert.Equal(c, e.Dependency);
     }
 
     [Fact]
@@ -437,7 +447,9 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
             new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(1, 0, 0))),
             c
         ]);
-        Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+        var e = Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+        Assert.Equal(new ModReference(b), e.Mod);
+        Assert.Equal(b, e.Dependency);
     }
 
     [Fact]
@@ -463,6 +475,8 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
             c, // Before b in this variant
             new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(1, 0, 0)))
         ]);
-        Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+        var e = Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
+        Assert.Equal(new ModReference(b), e.Mod);
+        Assert.Equal(b, e.Dependency);
     }
 }

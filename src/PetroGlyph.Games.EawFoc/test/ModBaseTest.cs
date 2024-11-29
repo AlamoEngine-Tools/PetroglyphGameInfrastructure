@@ -75,7 +75,9 @@ public abstract class ModBaseTest : PlayableModContainerTest
 
         var mod = CreateMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), notAddedDep);
         Game.AddMod(mod);
-        Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
+        var e = Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
+        Assert.Same(Game, e.ModContainer);
+        Assert.Equal(notAddedDep, e.Mod);
         Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
 
         // Add dep to game
@@ -95,7 +97,9 @@ public abstract class ModBaseTest : PlayableModContainerTest
             GITestUtilities.GetRandomWorkshopFlag(otherGameReference), ServiceProvider);
         var mod = CreateMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), wrongGameDep);
         
-        Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
+        var e = Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
+        Assert.Same(Game, e.ModContainer);
+        Assert.Equal(wrongGameDep, e.Mod);
         Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
     }
 

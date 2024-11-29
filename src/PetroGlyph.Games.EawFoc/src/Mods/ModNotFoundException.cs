@@ -13,7 +13,7 @@ public class ModNotFoundException : ModException
     public IModContainer ModContainer { get; }
 
     /// <inheritdoc/>
-    public override string Message => $"Unable to find mod '{Mod.Identifier}' from {ModContainer}";
+    public override string Message => $"Unable to find mod '{Mod.Identifier}' from container '{ModContainer}'.";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ModNotFoundException"/> class

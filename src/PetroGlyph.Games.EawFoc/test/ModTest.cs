@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Xml.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
@@ -187,7 +188,7 @@ public class ModTest : ModBaseTest
 
     [Theory]
     [MemberData(nameof(ModTestScenarios.CycleScenarios), MemberType = typeof(ModTestScenarios))]
-    public void ResolveDependencies_ResolvesCycle(ModTestScenarios.CycleTestScenario testScenario)
+    public void ResolveDependencies_ResolvesCycle_Throws(ModTestScenarios.CycleTestScenario testScenario)
     {
         var mod = ModTestScenarios.CreateTestScenarioCycle(
                 testScenario,
@@ -196,7 +197,48 @@ public class ModTest : ModBaseTest
                 CreateModRef)
             .Mod;
 
-        Assert.Throws<ModDependencyCycleException>(mod.ResolveDependencies);
+        var e = Assert.Throws<ModDependencyCycleException>(mod.ResolveDependencies);
+        Assert.Equal(mod, e.Mod);
+        Assert.Equal(mod, e.Dependency);
         Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+    }
+
+    [Fact]
+    public void ResolveDependencies_VersionMismatch_Throws()
+    {
+        var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
+        var depLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
+        var dep = Game.InstallMod(depLoc, ws, new ModinfoData("B") { Version = new SemVersion(1) }, ServiceProvider);
+        Game.AddMod(dep);
+
+        var mod = CreateMod("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2))));
+
+        var e = Assert.Throws<VersionMismatchException>(mod.ResolveDependencies);
+        Assert.Equal(new ModReference(dep), e.Mod);
+        Assert.Equal(dep, e.Dependency);
+        Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+    }
+
+    [Fact]
+    public void ResolveDependencies_VersionMatch_Throws()
+    {
+        var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
+        var bLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
+        var cLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("C", ws, ServiceProvider));
+        var b = Game.InstallMod(bLoc, ws, new ModinfoData("B") { Version = new SemVersion(3) }, ServiceProvider);
+        var c = Game.InstallMod(cLoc, ws, new ModinfoData("C") { Version = null! }, ServiceProvider);
+        Game.AddMod(b);
+        Game.AddMod(c);
+
+        var mod = CreateMod("Mod", deps:
+            [
+                new ModReference(b.Identifier, b.Type, SemVersionRange.AtLeast(new SemVersion(2))),
+                new ModReference(c.Identifier, c.Type, SemVersionRange.AtLeast(new SemVersion(2)))
+            ]
+        );
+
+        mod.ResolveDependencies();
+        Assert.Equal([b, c], mod.Dependencies);
+        Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
     }
 }

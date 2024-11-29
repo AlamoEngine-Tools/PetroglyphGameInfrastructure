@@ -3,7 +3,7 @@
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// Events arguments used for <see cref="IMod.DependenciesResolved"/>.
+/// Events arguments used when a mod has its dependencies resolved.
 /// </summary>
 public sealed class ModDependenciesResolvedEventArgs(IMod mod) : EventArgs
 {
