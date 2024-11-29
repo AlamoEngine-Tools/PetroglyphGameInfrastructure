@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
@@ -81,7 +80,7 @@ public class ModDependencyResolverTest : CommonTestBase
         var deps = _resolver.Resolve(mod);
 
         Assert.Single(deps);
-        Assert.Equal(dep, deps[0].Mod);
+        Assert.Equal(dep, deps[0]);
     }
 
     [Fact]
@@ -93,7 +92,7 @@ public class ModDependencyResolverTest : CommonTestBase
 
         var deps = _resolver.Resolve(mod);
 
-        Assert.Equal([b, c], deps.Select(x => x.Mod));
+        Assert.Equal([b, c], deps);
     }
 
     [Fact]
@@ -109,7 +108,7 @@ public class ModDependencyResolverTest : CommonTestBase
         var deps = _resolver.Resolve(mod);
 
         // Only b and c, because a has layout FullResolved
-        Assert.Equal([b, c], deps.Select(x => x.Mod));
+        Assert.Equal([b, c], deps);
 
         // ResolveCompleteChain should not have done anything
         Assert.Equal(DependencyResolveStatus.None, b.DependencyResolveStatus);
@@ -130,7 +129,7 @@ public class ModDependencyResolverTest : CommonTestBase
         var deps = _resolver.Resolve(mod);
 
         // Only b and c, because a has layout FullResolved
-        Assert.Equal([b, c], deps.Select(x => x.Mod));
+        Assert.Equal([b, c], deps);
     }
 
     private IMod CreateMod(string name, DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, params IModReference[] deps)

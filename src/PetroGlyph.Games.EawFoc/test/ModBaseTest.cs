@@ -61,7 +61,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
 
         mod.ResolveDependencies();
 
-        Assert.Equal(expectedDirectDeps, mod.Dependencies.Select(x => x.Mod));
+        Assert.Equal(expectedDirectDeps, mod.Dependencies);
         Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
 
         AssertDependenciesResolved(mod);
@@ -83,7 +83,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
 
         mod.ResolveDependencies();
 
-        Assert.Equal([notAddedDep], mod.Dependencies.Select(x => x.Mod));
+        Assert.Equal([notAddedDep], mod.Dependencies);
         Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
     }
 
@@ -111,7 +111,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
             var dependency = mod.Dependencies[i];
             if (mod.DependencyResolveLayout == DependencyResolveLayout.ResolveRecursive ||
                 mod.DependencyResolveLayout == DependencyResolveLayout.ResolveLastItem && i == mod.Dependencies.Count - 1)
-                AssertDependenciesResolved(dependency.Mod);
+                AssertDependenciesResolved(dependency);
         }
     }
 
@@ -158,7 +158,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         {
             public override string Identifier => "CustomMod";
 
-            protected override IReadOnlyList<ModDependencyEntry> ResolveDependenciesCore()
+            protected override IReadOnlyList<IMod> ResolveDependenciesCore()
             {
                 Assert.Equal(DependencyResolveStatus.Resolving, DependencyResolveStatus);
                 return null!;
@@ -170,7 +170,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         {
             public override string Identifier => "CustomMod";
 
-            protected override IReadOnlyList<ModDependencyEntry> ResolveDependenciesCore()
+            protected override IReadOnlyList<IMod> ResolveDependenciesCore()
             {
                 Assert.Equal(DependencyResolveStatus.Resolving, DependencyResolveStatus);
                 // We should not end up in a StackOverflowException, cause ModBase handles the reentry.

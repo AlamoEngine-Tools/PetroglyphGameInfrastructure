@@ -54,7 +54,7 @@ public abstract class ModBase : PlayableModContainer, IMod
     IModDependencyList IModIdentity.Dependencies => ModInfo?.Dependencies ?? DependencyList.EmptyDependencyList;
 
     /// <inheritdoc cref="IMod.Dependencies"/>
-    public IReadOnlyList<ModDependencyEntry> Dependencies { get; protected set; } = [];
+    public IReadOnlyList<IMod> Dependencies { get; protected set; } = [];
 
     /// <inheritdoc/>
     public DependencyResolveStatus DependencyResolveStatus { get; protected set; }
@@ -137,7 +137,7 @@ public abstract class ModBase : PlayableModContainer, IMod
     /// Resolves the dependencies of the mod.
     /// </summary>
     /// <returns>The resolved dependencies as specified by the resolve layout.</returns>
-    protected virtual IReadOnlyList<ModDependencyEntry> ResolveDependenciesCore()
+    protected virtual IReadOnlyList<IMod> ResolveDependenciesCore()
     {
         var resolver = ServiceProvider.GetRequiredService<ModDependencyResolver>(); 
         return resolver.Resolve(this);

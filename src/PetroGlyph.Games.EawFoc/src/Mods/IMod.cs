@@ -33,7 +33,7 @@ public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContai
     /// <br/>
     /// To get a dependency list including, transitive dependencies, use <see cref="IModDependencyTraverser"/>.
     /// </remarks>
-    new IReadOnlyList<ModDependencyEntry> Dependencies { get; }
+    new IReadOnlyList<IMod> Dependencies { get; }
 
     /// <summary>
     /// Gets the status about the mod's dependency resolve status.

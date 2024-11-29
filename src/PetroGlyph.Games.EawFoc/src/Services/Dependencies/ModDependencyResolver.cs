@@ -11,7 +11,7 @@ internal class ModDependencyResolver(IServiceProvider serviceProvider)
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
-    public IReadOnlyList<ModDependencyEntry> Resolve(IMod mod)
+    public IReadOnlyList<IMod> Resolve(IMod mod)
     {
         if (mod == null)
             throw new ArgumentNullException(nameof(mod));
@@ -28,7 +28,7 @@ internal class ModDependencyResolver(IServiceProvider serviceProvider)
             throw new ModDependencyCycleException(mod, $"The mod '{mod}' has a dependency cycle.");
 
         GraphModReference rootVertex = null!;
-        var directDeps = new List<ModDependencyEntry>();
+        var directDeps = new List<IMod>();
 
         // Resolve all dependencies as specified by the resolve layout. 
         // This way we support strange things like:
@@ -51,7 +51,7 @@ internal class ModDependencyResolver(IServiceProvider serviceProvider)
                 foreach (var outEdge in outEdges)
                 {
                     var dep = game.FindMod(outEdge.Target.ModReference);
-                    directDeps.Add(new ModDependencyEntry(dep!, null!));
+                    directDeps.Add(dep!);
                 }
             }
             else

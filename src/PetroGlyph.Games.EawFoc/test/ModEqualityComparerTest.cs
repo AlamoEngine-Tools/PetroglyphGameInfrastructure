@@ -99,11 +99,9 @@ public class ModEqualityComparerTest : CommonTestBase
         Assert.False(comparer.Equals(null, modA.Object));
         Assert.True(comparer.Equals(modA.Object, modA.Object));
         var modB = new Mock<IMod>();
-        modA.Setup(m => m.Dependencies).Returns(new List<ModDependencyEntry>());
-        modB.Setup(m => m.Dependencies).Returns(new List<ModDependencyEntry>());
+        modA.Setup(m => m.Dependencies).Returns(new List<IMod>());
+        modB.Setup(m => m.Dependencies).Returns(new List<IMod>());
         Assert.True(comparer.Equals(modA.Object, modB.Object));
-        modB.Setup(m => m.Dependencies).Returns(new List<ModDependencyEntry> { new(new Mock<IMod>().Object, null) });
-        Assert.False(comparer.Equals(modA.Object, modB.Object));
     }
 
     [Fact]

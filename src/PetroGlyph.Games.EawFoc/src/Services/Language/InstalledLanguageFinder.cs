@@ -74,7 +74,7 @@ public class InstalledLanguageFinder(IServiceProvider serviceProvider) : ILangua
         // In such complex cases the mod creators should always use modinfo data to express their actual intents.
         foreach (var dependency in mod.Dependencies)
         {
-            var dependencyLanguages = dependency.Mod.InstalledLanguages;
+            var dependencyLanguages = dependency.InstalledLanguages;
             if (dependencyLanguages.Count != 0)
                 return dependencyLanguages;
         }

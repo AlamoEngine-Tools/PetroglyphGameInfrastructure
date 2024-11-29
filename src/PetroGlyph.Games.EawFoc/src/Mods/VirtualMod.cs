@@ -68,10 +68,10 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     }
 
     /// <inheritdoc />
-    protected override IReadOnlyList<ModDependencyEntry> ResolveDependenciesCore()
+    protected override IReadOnlyList<IMod> ResolveDependenciesCore()
     {
         var dependencies = base.ResolveDependenciesCore();
-        if (dependencies.Any(x => x.Mod is not IPhysicalMod))
+        if (dependencies.Any(x => x is not IPhysicalMod))
             throw new ModException(this, "Virtual Mods must have at least one physical mod as dependency.");
         return dependencies;
     }
