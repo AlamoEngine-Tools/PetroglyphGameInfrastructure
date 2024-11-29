@@ -3,25 +3,26 @@
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// Exception indicating a queried mod, <see cref="IMod"/> or <see cref="IModReference"/>, was not found in some <see cref="IModContainer"/> instance.
+/// The exception that is thrown when a mod or mod reference could not be found.
 /// </summary>
-public class ModNotFoundException : PetroglyphException
+public class ModNotFoundException : ModException
 {
-    private readonly IModReference _modReference;
-    private readonly IModContainer _modContainer;
+    /// <summary>
+    /// Gets the mod container from which it was unable to find the mod reference.
+    /// </summary>
+    public IModContainer ModContainer { get; }
 
     /// <inheritdoc/>
-    public override string Message =>
-        $"Unable to find mod '{_modReference.Identifier}' from {_modContainer}";
+    public override string Message => $"Unable to find mod '{Mod.Identifier}' from {ModContainer}";
 
     /// <summary>
-    /// Creates a new instance.
+    /// Initializes a new instance of the <see cref="ModNotFoundException"/> class
+    /// of the specified mod container and the mod reference which was not found.
     /// </summary>
-    /// <param name="modReference">The <see cref="IModReference"/>which could not be found.</param>
+    /// <param name="modReference">The <see cref="IModReference"/> which could not be found.</param>
     /// <param name="modContainer">The container which was queried.</param>
-    public ModNotFoundException(IModReference modReference, IModContainer modContainer)
+    public ModNotFoundException(IModReference modReference, IModContainer modContainer) : base(modReference)
     {
-        _modReference = modReference;
-        _modContainer = modContainer;
+        ModContainer = modContainer;
     }
 }

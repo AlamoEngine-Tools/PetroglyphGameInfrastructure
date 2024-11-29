@@ -3,7 +3,7 @@
 namespace PG.StarWarsGame.Infrastructure.Games;
 
 /// <summary>
-/// Exception that is thrown anything related to an <see cref="IGame"/>.
+/// The exception that is thrown for anything related to Petroplyph Star Wars game.
 /// </summary>
 public class GameException : PetroglyphException
 {

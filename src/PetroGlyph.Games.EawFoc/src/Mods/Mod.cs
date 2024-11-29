@@ -9,7 +9,7 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// An ordinary, physical mod.
+/// Represents an ordinary, physical mod.
 /// </summary>
 public class Mod : ModBase, IPhysicalMod
 { 

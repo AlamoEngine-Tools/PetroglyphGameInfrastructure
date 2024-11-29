@@ -1,7 +1,6 @@
 ﻿namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// Represents an <see cref="IMod"/> which is bound to a real location on the file system.
-/// Implements <see cref="IPhysicalPlayableObject"/>
+/// Represents an <see cref="IMod"/> which can be located on the file system.
 /// </summary>
 public interface IPhysicalMod : IMod, IPhysicalPlayableObject;

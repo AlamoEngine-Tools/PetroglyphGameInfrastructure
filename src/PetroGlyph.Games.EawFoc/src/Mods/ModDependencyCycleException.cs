@@ -1,15 +1,14 @@
 ﻿using EawModinfo.Spec;
-using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
 
 /// <summary>
-/// A <see cref="ModException"/> which gets thrown whenever a dependency cycle was detected.
+/// The exception that gets thrown whenever a dependency cycle was detected.
 /// </summary>
 public sealed class ModDependencyCycleException : ModDependencyException
 {
     /// <summary>
-    /// Creates a new exception where <paramref name="mod"/> is the root mod of the requested dependency chain.
+    /// Initializes a new instance of the <see cref="ModDependencyCycleException"/> class is the root mod of the requested dependency chain.
     /// </summary>
     /// <param name="mod">The root mod of the dependency chain.</param>
     public ModDependencyCycleException(IModReference mod) : base(mod, mod)
