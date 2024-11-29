@@ -18,7 +18,7 @@ namespace PG.StarWarsGame.Infrastructure.Mods;
 public abstract class ModBase : PlayableModContainer, IMod
 { 
     /// <inheritdoc/>
-    public event EventHandler<ModDependenciesResolvedEventArgs>? DependenciesResolved;
+    public event EventHandler? DependenciesResolved;
 
     private SemVersion? _modVersion;
 
@@ -123,7 +123,7 @@ public abstract class ModBase : PlayableModContainer, IMod
             DependencyResolveStatus = DependencyResolveStatus.Resolving;
             var dependencies = ResolveDependenciesCore();
             Dependencies = dependencies ?? throw new PetroglyphException("Resolved dependency list is null!");
-            OnDependenciesResolved(new ModDependenciesResolvedEventArgs(this));
+            OnDependenciesResolved();
             DependencyResolveStatus = DependencyResolveStatus.Resolved;
         }
         catch
@@ -174,10 +174,9 @@ public abstract class ModBase : PlayableModContainer, IMod
     /// <summary>
     /// Raises the <see cref="DependenciesResolved"/> event.
     /// </summary>
-    /// <param name="e">The event arguments</param>
-    protected virtual void OnDependenciesResolved(ModDependenciesResolvedEventArgs e)
+    protected virtual void OnDependenciesResolved()
     {
-        DependenciesResolved?.Invoke(this, e);
+        DependenciesResolved?.Invoke(this, EventArgs.Empty);
     }
 
     string IConvertibleToJson.ToJson()

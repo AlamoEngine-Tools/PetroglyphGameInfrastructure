@@ -13,7 +13,7 @@ public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContai
     /// <summary>
     /// The event that is raised when the mod's dependencies have been resolved.
     /// </summary>
-    event EventHandler<ModDependenciesResolvedEventArgs> DependenciesResolved;
+    event EventHandler DependenciesResolved;
 
     /// <summary>
     /// Gets the name of the mod.

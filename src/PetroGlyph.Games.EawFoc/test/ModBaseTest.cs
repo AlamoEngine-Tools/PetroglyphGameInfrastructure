@@ -10,6 +10,7 @@ using PG.TestingUtilities;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
+using Semver;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
@@ -101,6 +102,115 @@ public abstract class ModBaseTest : PlayableModContainerTest
         Assert.Same(Game, e.ModContainer);
         Assert.Equal(wrongGameDep, e.Mod);
         Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+    }
+
+    [Fact]
+    public void ResolveDependencies_VersionMismatch_Throws()
+    {
+        var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
+        var depLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
+        var dep = Game.InstallMod(depLoc, ws, new ModinfoData("B") { Version = new SemVersion(1) }, ServiceProvider);
+        Game.AddMod(dep);
+
+        var mod = CreateMod("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2))));
+
+        var e = Assert.Throws<VersionMismatchException>(mod.ResolveDependencies);
+        Assert.Equal(new ModReference(dep), e.Mod);
+        Assert.Equal(dep, e.Dependency);
+        Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+    }
+
+    [Fact]
+    public void ResolveDependencies_VersionMatch_Throws()
+    {
+        var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
+        var bLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
+        var cLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("C", ws, ServiceProvider));
+        var b = Game.InstallMod(bLoc, ws, new ModinfoData("B") { Version = new SemVersion(3) }, ServiceProvider);
+        var c = Game.InstallMod(cLoc, ws, new ModinfoData("C") { Version = null! }, ServiceProvider);
+        Game.AddMod(b);
+        Game.AddMod(c);
+
+        var mod = CreateMod("Mod", deps:
+            [
+                new ModReference(b.Identifier, b.Type, SemVersionRange.AtLeast(new SemVersion(2))),
+                new ModReference(c.Identifier, c.Type, SemVersionRange.AtLeast(new SemVersion(2)))
+            ]
+        );
+
+        mod.ResolveDependencies();
+        Assert.Equal([b, c], mod.Dependencies);
+        Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
+    }
+
+    [Fact]
+    public void ResolveDependencies_RaiseEvent()
+    {
+        var scenario = ModTestScenarios.CreateTestScenario(
+            ModTestScenarios.TestScenario.SingleDepAndTransitive,
+            CreateMod,
+            CreateOtherMod);
+
+        var mod = scenario.Mod;
+        var b = Game.FindMod(scenario.ExpectedTraversedList![1])!;
+
+        var bRaised = false;
+        var modRaised = false;
+        b.DependenciesResolved += (sender, _) =>
+        {
+            Assert.Equal(b, sender);
+            bRaised = true;
+        };
+        mod.DependenciesResolved += (sender, _) =>
+        {
+            Assert.Equal(mod, sender);
+            modRaised = true;
+        };
+
+        mod.ResolveDependencies();
+
+        Assert.True(bRaised);
+        Assert.True(modRaised);
+    }
+
+    [Fact]
+    public void ResolveDependencies_AlreadyResolved_DoesNotRaiseEvent()
+    {
+        var mod = CreateMod("A");
+        mod.ResolveDependencies();
+        Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
+
+        var depsResolvedRaised = false;
+        mod.DependenciesResolved += (_, _) =>
+        {
+            depsResolvedRaised = true;
+        };
+        
+        mod.ResolveDependencies();
+
+        Assert.False(depsResolvedRaised);
+    }
+
+    [Fact]
+    public void ResolveDependencies_Faulted_DoesNotRaiseEvent()
+    {
+        var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
+        var depLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
+        var dep = Game.InstallMod(depLoc, ws, new ModinfoData("B") { Version = new SemVersion(1) }, ServiceProvider);
+        Game.AddMod(dep);
+
+        var mod = CreateMod("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2))));
+
+        var depsResolvedRaised = false;
+        mod.DependenciesResolved += (_, _) =>
+        {
+            depsResolvedRaised = true;
+        };
+
+        Assert.Throws<VersionMismatchException>(mod.ResolveDependencies);
+        Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+
+        Assert.False(depsResolvedRaised);
     }
 
     private static void AssertDependenciesResolved(IMod mod)

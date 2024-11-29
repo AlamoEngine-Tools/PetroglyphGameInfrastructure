@@ -28,6 +28,7 @@ public static class ModTestScenarios
         J,
         NoDep,
         SingleDep,
+        SingleDepAndTransitive,
         SingleDepFullResolved,
         ResolveLastTriggered,
         ResolveLastNotTriggered,
@@ -56,6 +57,7 @@ public static class ModTestScenarios
         yield return [TestScenario.J];
         yield return [TestScenario.NoDep];
         yield return [TestScenario.SingleDep];
+        yield return [TestScenario.SingleDepAndTransitive];
         yield return [TestScenario.SingleDepFullResolved];
         yield return [TestScenario.ResolveLastTriggered];
         yield return [TestScenario.ResolveLastNotTriggered];
@@ -89,6 +91,7 @@ public static class ModTestScenarios
             TestScenario.J => ScenarioJ(createRootFactory, createDepFactory),
             TestScenario.NoDep => ScenarioNoDependencies(createRootFactory, createDepFactory),
             TestScenario.SingleDep => ScenarioSingleDependency(createRootFactory, createDepFactory),
+            TestScenario.SingleDepAndTransitive => ScenarioSingleDependencyAndTransitive(createRootFactory, createDepFactory),
             TestScenario.SingleDepFullResolved => ScenarioSingleDependencyFullResolved(createRootFactory, createDepFactory),
             TestScenario.ResolveLastTriggered => ScenarioResolveLast_WithDependency(createRootFactory, createDepFactory),
             TestScenario.ResolveLastNotTriggered => ScenarioResolveLast_WithOutDependency(createRootFactory, createDepFactory),
@@ -303,6 +306,16 @@ public static class ModTestScenarios
         var b = createDepFactory("B", dependencies: c);
         var a = createRootFactory("A", DependencyResolveLayout.FullResolved, dependencies: b);
         return (a, [a, b]);
+    }
+
+    public static (IMod Mod, IList<IModReference>? ExpectedTraversedList) ScenarioSingleDependencyAndTransitive(
+        ModFactoryDelegate createRootFactory,
+        ModFactoryDelegate createDepFactory)
+    {
+        var c = createDepFactory("C");
+        var b = createDepFactory("B", dependencies: c);
+        var a = createRootFactory("A", dependencies: b);
+        return (a, [a, b, c]);
     }
 
     public static (IMod Mod, IList<IModReference>? ExpectedTraversedList) ScenarioResolveLast_WithDependency(

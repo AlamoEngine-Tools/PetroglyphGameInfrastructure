@@ -11,9 +11,9 @@ internal sealed class GraphModReference(IModReference modReference, DependencyKi
 
     public bool Equals(GraphModReference? other)
     {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return ModReference.Equals(other.ModReference);
+        if (other is null) 
+            return false;
+        return ReferenceEquals(this, other) || ModReference.Equals(other.ModReference);
     }
 
     public override bool Equals(object? obj)
