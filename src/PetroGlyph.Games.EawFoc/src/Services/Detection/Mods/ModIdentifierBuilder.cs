@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO.Abstractions;
-using System.Linq;
-using System.Text;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using EawModinfo.Model;
 using EawModinfo.Spec;
@@ -49,7 +47,11 @@ internal class ModIdentifierBuilder : IModIdentifierBuilder
         }
 
         if (mod.Type == ModType.Virtual)
-            return BuildVirtualModId(mod);
+        {
+            if (mod is not IVirtualMod virtualMod)
+                throw new InvalidOperationException();
+            return BuildVirtualModId(virtualMod);
+        }
 
         throw new NotSupportedException($"Cannot create identifier for unsupported mod type {mod.Type}.");
     }
@@ -75,18 +77,11 @@ internal class ModIdentifierBuilder : IModIdentifierBuilder
         return modDir.Name;
     }
 
-    private static string BuildVirtualModId(IMod mod)
+    private static string BuildVirtualModId(IVirtualMod mod)
     {
-        var sb = new StringBuilder();
-        sb.Append(mod.Name);
-        if (mod.Dependencies.Any())
-            sb.Append("-");
-        foreach (var dependency in mod.Dependencies)
-        {
-            sb.Append(dependency.GetHashCode());
-            sb.Append("-");
-        }
-        return sb.ToString().TrimEnd('-');
+        if (mod.ModInfo is null)
+            throw new NotSupportedException("Virtual mods without modinfo data are not supported.");
+        return mod.ModInfo.ToJson();
     }
 
     public ModReference Normalize(IModReference modReference)

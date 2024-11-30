@@ -1,56 +1,38 @@
-﻿using System.Collections.Generic;
-using System.IO.Abstractions;
-using EawModinfo.Model;
+﻿using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.TestingUtilities;
-using Semver;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-public class ModIdentifierBuilderTest
+public class ModIdentifierBuilderTest : CommonTestBaseWithRandomGame
 {
-    //private readonly ModIdentifierBuilder _service;
-    //private readonly Mock<IPhysicalMod> _physicalMod;
-    //private readonly Mock<IVirtualMod> _virtualMod;
-    //private readonly MockFileSystem _fileSystem;
+    private readonly ModIdentifierBuilder _service;
 
-    //public ModIdentifierBuilderTest()
-    //{
-    //    _physicalMod = new Mock<IPhysicalMod>();
-    //    _virtualMod = new Mock<IVirtualMod>();
-    //    _fileSystem = new MockFileSystem();
-    //    var sc = new ServiceCollection();
-    //    sc.AddSingleton<IFileSystem>(_fileSystem);
-    //    sc.AddSingleton<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
-    //    _service = new ModIdentifierBuilder(sc.BuildServiceProvider());
-    //}
+    public ModIdentifierBuilderTest()
+    {
+        _service = new ModIdentifierBuilder(ServiceProvider);
+    }
 
-    //[PlatformSpecificFact(TestPlatformIdentifier.Windows)]
-    //public void TestDefaultMod_Windows()
-    //{
-    //    _physicalMod.Setup(m => m.Type).Returns(ModType.Default);
-    //    _physicalMod.Setup(m => m.Directory).Returns(_fileSystem.DirectoryInfo.New("ModPath"));
+    [Fact]
+    public void Build_DefaultMod()
+    { 
+        var mod = Game.InstallMod("Mod", false, ServiceProvider);
 
-    //    var identifier = _service.Build(_physicalMod.Object);
-    //    Assert.Equal("C:\\MODPATH", identifier);
-    //}
-
-    //[PlatformSpecificFact(TestPlatformIdentifier.Linux)]
-    //public void TestDefaultMod_Linux()
-    //{
-    //    _physicalMod.Setup(m => m.Type).Returns(ModType.Default);
-    //    _physicalMod.Setup(m => m.Directory).Returns(_fileSystem.DirectoryInfo.New("ModPath"));
-
-    //    var identifier = _service.Build(_physicalMod.Object);
-    //    Assert.Equal("/ModPath", identifier);
-    //}
+        var expected = mod.Directory.FullName.TrimEnd(FileSystem.Path.DirectorySeparatorChar, FileSystem.Path.AltDirectorySeparatorChar);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            expected = expected.ToUpperInvariant();
+        Assert.Equal(expected, _service.Build(mod));
+    }
 
     //[Fact]
     //public void TestWorkshopMod()
