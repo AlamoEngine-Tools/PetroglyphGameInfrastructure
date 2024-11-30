@@ -11,8 +11,13 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 internal class ModIdentifierBuilder : IModIdentifierBuilder
 {
-    private readonly IFileSystem _fileSystem;
     private readonly ISteamGameHelpers _steamGameHelper;
+
+    private static readonly PathNormalizeOptions PathNormalizeOptions = new()
+    {
+        UnifyCase = UnifyCasingKind.UpperCase,
+        TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
+    };
 
     /// <summary>
     /// Creates a new instance.
@@ -20,7 +25,6 @@ internal class ModIdentifierBuilder : IModIdentifierBuilder
     /// <param name="serviceProvider">The service provider.</param>
     public ModIdentifierBuilder(IServiceProvider serviceProvider)
     {
-        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         _steamGameHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
     }
 
@@ -56,18 +60,16 @@ internal class ModIdentifierBuilder : IModIdentifierBuilder
         throw new NotSupportedException($"Cannot create identifier for unsupported mod type {mod.Type}.");
     }
 
-    private string BuildDefaultModId(IDirectoryInfo modDir)
+    private static string BuildDefaultModId(IDirectoryInfo modDir)
     {
         return BuildDefaultModId(modDir.FullName);
     }
 
-    private string BuildDefaultModId(string modDirPath)
+    private static string BuildDefaultModId(string modDirPath)
     {
-        return PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(modDirPath), new PathNormalizeOptions
-        {
-            UnifyCase = UnifyCasingKind.UpperCase,
-            TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
-        });
+        // NB: We don't want to resolve the path, cause the string is user data which could be abused to traverse paths.
+        // Though, this is not a complete fix. Consumers of a mod's Identifier property still must validate the data.
+        return PathNormalizer.Normalize(modDirPath, PathNormalizeOptions);
     }
 
     private string BuildWorkshopsModId(IDirectoryInfo modDir)

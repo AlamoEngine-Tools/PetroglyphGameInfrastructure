@@ -42,18 +42,39 @@ public struct EmptyStruct;
 
 public static class TestHelpers
 {
+    private static Random random = new();
+
     public static T GetRandomEnum<T>() where T : struct, Enum
     {
         var values = Enum.GetValues(typeof(T));
-        var random = new Random();
         return (T)values.GetValue(random.Next(values.Length));
     }
 
     public static T GetRandom<T>(IEnumerable<T> items)
     {
         var list = items.ToList();
-        var r = new Random().Next(list.Count);
+        var r = random.Next(list.Count);
         return list[r];
+    }
+
+    public static string ShuffleCasing(string input)
+    {
+        var characters = input.ToCharArray();
+
+        for (var i = 0; i < characters.Length; i++)
+        {
+            if (char.IsLetter(characters[i]))
+            {
+                if (random.Next(2) == 0)
+                {
+                    characters[i] = char.IsUpper(characters[i])
+                        ? char.ToLower(characters[i])
+                        : char.ToUpper(characters[i]);
+                }
+            }
+        }
+
+        return new string(characters);
     }
 }
 

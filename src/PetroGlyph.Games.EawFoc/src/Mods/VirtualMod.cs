@@ -43,16 +43,16 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     /// <summary>
     /// Initializes a new instance of the <see cref="VirtualMod"/> class of the specified game and name and dependency list.
     /// </summary>
-    /// <param name="name">The name of the mod.</param>
     /// <param name="game">The game of the mod.</param>
-    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="name">The name of the mod.</param>
     /// <param name="dependencies">list of dependencies.</param>
+    /// <param name="serviceProvider">The service provider.</param>
     /// <exception cref="ModException">If the <paramref name="dependencies"/> is empty.</exception>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="name"/> or <paramref name="game"/> or <paramref name="dependencies"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
-    public VirtualMod(string name, IGame game, IModDependencyList dependencies, IServiceProvider serviceProvider)
+    public VirtualMod(IGame game, string name, IModDependencyList dependencies, IServiceProvider serviceProvider)
         : base(game, ModType.Virtual, name, serviceProvider)
     {
         if (dependencies == null) 
