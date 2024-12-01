@@ -23,7 +23,7 @@ public abstract class ModBase : PlayableModContainer, IMod
     private SemVersion? _modVersion;
 
     /// <inheritdoc/>
-    public abstract string Identifier { get; }
+    public string Identifier { get; }
 
     /// <inheritdoc/>
     public override IGame Game { get; }
@@ -67,19 +67,22 @@ public abstract class ModBase : PlayableModContainer, IMod
     /// Creates a new <see cref="IMod"/> instances with a constant name
     /// </summary>
     /// <param name="game">The game of the mod</param>
+    /// <param name="identifier">The identifier of the mod.</param>
     /// <param name="type">The mod's platform</param>
     /// <param name="name">The name of the mod.</param>
     /// <param name="serviceProvider">The service provider.</param>
     /// <exception cref="ArgumentNullException">
-    /// <paramref name="game"/> or <paramref name="name"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
+    /// <paramref name="game"/> or <paramref name="identifier"/> or <paramref name="name"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
     /// </exception>
-    /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
-    protected ModBase(IGame game, ModType type, string name, IServiceProvider serviceProvider) : base(serviceProvider)
+    /// <exception cref="ArgumentException"><paramref name="identifier"/> or <paramref name="name"/> is empty.</exception>
+    protected ModBase(IGame game, string identifier, ModType type, string name, IServiceProvider serviceProvider) : base(serviceProvider)
     {
         if (game == null) 
             throw new ArgumentNullException(nameof(game));
         AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
+        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(identifier);
         ServiceProvider = serviceProvider;
+        Identifier = identifier;
         Name = name;
         Game = game;
         Type = type;
@@ -89,20 +92,24 @@ public abstract class ModBase : PlayableModContainer, IMod
     /// Creates a new <see cref="IMod"/> instances from a modinfo. The modinfo must not be <see langword="null"/>!
     /// </summary>
     /// <param name="game">The game of the mod</param>
+    /// <param name="identifier">The identifier of the mod.</param>
     /// <param name="type">The mod's platform</param>
     /// <param name="modinfo">The modinfo data.</param>
     /// <param name="serviceProvider">The service provider.</param>
     /// <exception cref="ArgumentNullException">
-    /// <paramref name="game"/> or <paramref name="modinfo"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
+    /// <paramref name="game"/> or <paramref name="identifier"/> or <paramref name="modinfo"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
     /// </exception>
+    /// <exception cref="ArgumentException"><paramref name="identifier"/> is empty.</exception>
     /// <exception cref="ModinfoException">when <paramref name="modinfo"/> is not valid.</exception>
-    protected ModBase(IGame game, ModType type, IModinfo modinfo, IServiceProvider serviceProvider) : base(serviceProvider)
+    protected ModBase(IGame game, string identifier, ModType type, IModinfo modinfo, IServiceProvider serviceProvider) : base(serviceProvider)
     {
         if (game == null) 
             throw new ArgumentNullException(nameof(game));
         if (modinfo == null)
             throw new ArgumentNullException(nameof(modinfo));
+        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(identifier);
         modinfo.Validate();
+        Identifier = identifier;
         ModInfo = modinfo;
         ServiceProvider = serviceProvider;
         Game = game;

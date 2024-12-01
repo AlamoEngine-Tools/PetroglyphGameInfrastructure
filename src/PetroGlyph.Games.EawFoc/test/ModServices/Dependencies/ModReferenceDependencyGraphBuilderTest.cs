@@ -16,19 +16,11 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
 public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGame
 {
-    private readonly IModIdentifierBuilder _identifierBuilder;
-    private readonly ModReferenceDependencyGraphBuilder _graphBuilder;
-
-    public ModReferenceDependencyGraphBuilderTest()
-    {
-        _identifierBuilder = ServiceProvider.GetRequiredService<IModIdentifierBuilder>();
-        _graphBuilder = new ModReferenceDependencyGraphBuilder(ServiceProvider);
-    }
+    private readonly ModReferenceDependencyGraphBuilder _graphBuilder = new();
 
     [Fact]
     public void NullArgs_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new ModReferenceDependencyGraphBuilder(null!));
         Assert.Throws<ArgumentNullException>(() => _graphBuilder.Build(null!));
     }
 
@@ -263,7 +255,7 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
     [Fact]
     public void Build_DirectCycle()
     {
-        var depA = _identifierBuilder.Normalize(new ModReference(FileSystem.Path.Combine(Game.ModsLocation.FullName, "A"), ModType.Default));
+        var depA = new ModReference("A", ModType.Default);
         var modinfo = new ModinfoData("A")
         {
             Dependencies = new DependencyList(new List<IModReference>
@@ -280,7 +272,7 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
     [Fact]
     public void Build_TransitiveCycle()
     {
-        var depA = _identifierBuilder.Normalize(new ModReference(FileSystem.Path.Combine(Game.ModsLocation.FullName, "A"), ModType.Default));
+        var depA = new ModReference("A", ModType.Default);
 
         var b = CreateAndAddMod("B", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), depA);
 

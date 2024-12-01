@@ -268,10 +268,8 @@ public abstract class ModBaseTest : PlayableModContainerTest
         }
 
         private class NullResolvingMod(IGame game, IModinfo modinfo, IServiceProvider serviceProvider)
-            : ModBase(game, ModType.Default, modinfo, serviceProvider)
+            : ModBase(game, "CustomMod", ModType.Default, modinfo, serviceProvider)
         {
-            public override string Identifier => "CustomMod";
-
             protected override IReadOnlyList<IMod> ResolveDependenciesCore()
             {
                 Assert.Equal(DependencyResolveStatus.Resolving, DependencyResolveStatus);
@@ -280,10 +278,8 @@ public abstract class ModBaseTest : PlayableModContainerTest
         }
 
         private class SelfResolvingMod(IGame game, IModinfo modinfo, IServiceProvider serviceProvider)
-            : ModBase(game, ModType.Default, modinfo, serviceProvider)
+            : ModBase(game, "CustomMod", ModType.Default, modinfo, serviceProvider)
         {
-            public override string Identifier => "CustomMod";
-
             protected override IReadOnlyList<IMod> ResolveDependenciesCore()
             {
                 Assert.Equal(DependencyResolveStatus.Resolving, DependencyResolveStatus);

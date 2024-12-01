@@ -15,13 +15,13 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-public class ModFactoryTest
-{
-    private readonly ModFactory _service;
-    private readonly Mock<IModNameResolver> _nameResolver;
-    private readonly Mock<IModReferenceLocationResolver> _locationResolver;
-    private readonly Mock<IModGameTypeResolver> _gameTypeResolver;
-    private readonly MockFileSystem _fileSystem;
+//public class ModFactoryTest
+//{
+//    private readonly ModFactory _service;
+//    private readonly Mock<IModNameResolver> _nameResolver;
+//    private readonly Mock<IModReferenceLocationResolver> _locationResolver;
+//    private readonly Mock<IModGameTypeResolver> _gameTypeResolver;
+//    private readonly MockFileSystem _fileSystem;
 
     //public ModFactoryTest()
     //{
@@ -40,11 +40,11 @@ public class ModFactoryTest
     //}
 
 
-    [Fact]
-    public void NullCtor_Throws()
-    {
-        Assert.Throws<ArgumentNullException>(() => new ModFactory(null));
-    }
+    //[Fact]
+    //public void NullCtor_Throws()
+    //{
+    //    Assert.Throws<ArgumentNullException>(() => new ModFactory(null));
+    //}
 
     //[Fact]
     //public void TestModInfoSpecCreation_NoModinfoFiles()
@@ -232,4 +232,4 @@ public class ModFactoryTest
     //    GameType result;
     //    _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, modinfo.Object, out result), Times.Once);
     //}
-}
+//}

@@ -73,7 +73,7 @@ public class ModIdentifierBuilderTest : CommonTestBaseWithRandomGame
             }, DependencyResolveLayout.FullResolved),
             Languages = [new LanguageInfo("de", LanguageSupportLevel.FullLocalized)]
         };
-        var mod = new VirtualMod(Game, modinfo, ServiceProvider);
+        var mod = new VirtualMod(Game, "VirtualModId", modinfo, ServiceProvider);
 
         var id = _idBuilder.Build(mod);
         var parsedModInfo = ModinfoData.Parse(id);

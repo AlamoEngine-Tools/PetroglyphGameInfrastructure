@@ -296,7 +296,7 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
                 new ModReference(middleMod), new ModReference(baseMod)
             }, DependencyResolveLayout.ResolveRecursive)
         };
-        var mod = new VirtualMod(Game, modInfo, ServiceProvider);
+        var mod = new VirtualMod(Game, "VirtualModId", modInfo, ServiceProvider);
         Game.AddMod(mod);
         mod.ResolveDependencies();
 

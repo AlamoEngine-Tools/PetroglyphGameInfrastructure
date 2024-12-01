@@ -28,19 +28,19 @@ public static class ModInstallations
     public static Mod InstallMod(this IGame game, string name, bool workshop, IServiceProvider serviceProvider)
     {
         return CreateMod(game, name, workshop, serviceProvider,
-            modDir => new Mod(game, modDir, workshop, name, serviceProvider));
+            modDir => new Mod(game, name, modDir, workshop, name, serviceProvider));
     }
 
     public static Mod InstallMod(this IGame game, bool workshop, IModinfo modinfo, IServiceProvider serviceProvider)
     {
         var name = modinfo.Name;
         return CreateMod(game, name, workshop, serviceProvider,
-            modDir => new Mod(game, modDir, workshop, modinfo, serviceProvider));
+            modDir => new Mod(game, name, modDir, workshop, modinfo, serviceProvider));
     }
 
     public static Mod InstallMod(this IGame game, IDirectoryInfo directory, bool isWorkshop, IModinfo modinfo, IServiceProvider serviceProvider)
     {
-        return CreateMod(game, directory, dir => new Mod(game, dir, isWorkshop, modinfo, serviceProvider));
+        return CreateMod(game, directory, dir => new Mod(game, modinfo.Name, dir, isWorkshop, modinfo, serviceProvider));
     }
 
     private static Mod CreateMod(IGame game, string modName, bool workshop, IServiceProvider serviceProvider, Func<IDirectoryInfo, Mod> modFactory)

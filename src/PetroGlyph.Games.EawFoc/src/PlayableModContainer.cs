@@ -68,9 +68,7 @@ public abstract class PlayableModContainer(IServiceProvider serviceProvider) : P
     {
         if (modReference is null) 
             throw new ArgumentNullException(nameof(modReference));
-        var identifierBuilder = ServiceProvider.GetRequiredService<IModIdentifierBuilder>();
-        var normalized = identifierBuilder.Normalize(modReference);
-        return Mods.FirstOrDefault(normalized.Equals);
+        return Mods.FirstOrDefault(modReference.Equals);
     }
 
     /// <summary>

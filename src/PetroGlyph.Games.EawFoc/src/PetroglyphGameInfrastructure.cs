@@ -27,13 +27,13 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IGamePlatformIdentifier>(sp => new GamePlatformIdentifier(sp));
         serviceCollection.AddSingleton<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
         serviceCollection.AddSingleton<IGameFactory>(sp => new GameFactory(sp));
-        serviceCollection.AddSingleton<IModFactory>(sp => new ModFactory(sp));
+        //serviceCollection.AddSingleton<IModFactory>(sp => new ModFactory(sp));
         serviceCollection.AddSingleton<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
         serviceCollection.AddSingleton<IModReferenceFinder>(sp => new ModFinder(sp));
         serviceCollection.AddSingleton<IModReferenceLocationResolver>(sp => new ModReferenceLocationResolver(sp));
 
         serviceCollection.AddSingleton(sp => new ModDependencyResolver(sp));
-        serviceCollection.AddSingleton(sp => new ModReferenceDependencyGraphBuilder(sp));
+        serviceCollection.AddSingleton(_ => new ModReferenceDependencyGraphBuilder());
 
         serviceCollection.AddSingleton<ILanguageFinder>(sp => new InstalledLanguageFinder(sp));
         serviceCollection.AddSingleton<ISteamWorkshopCache>(_ => new KnownSteamWorkshopCache());

@@ -96,7 +96,7 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
 
         var isWs = GITestUtilities.GetRandomWorkshopFlag(game);
         var mod = game.InstallAndAddMod(_randomModName, isWs, ServiceProvider);
-        var sameMod = new Mod(game, mod.Directory, isWs, mod.Name, ServiceProvider);
+        var sameMod = new Mod(game, mod.Identifier, mod.Directory, isWs, mod.Name, ServiceProvider);
 
         Assert.False(mod.AddMod(mod));
         Assert.False(mod.AddMod(sameMod));

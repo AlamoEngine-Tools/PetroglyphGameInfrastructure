@@ -351,21 +351,21 @@ public class ModDependencyTraverserTest : CommonTestBase
     //    return new TestMod(_game, _fileSystem.DirectoryInfo.New($"Game/Mods/{name}"), false, name, _serviceProvider);
     //}
 
-    [DebuggerDisplay("Name = {Name}")]
-    private class TestMod : Mod
-    {
-        private DependencyResolveLayout _layout;
+    //[DebuggerDisplay("Name = {Name}")]
+    //private class TestMod : Mod
+    //{
+    //    private DependencyResolveLayout _layout;
 
-        //public override DependencyResolveLayout DependencyResolveLayout => _layout;
+    //    //public override DependencyResolveLayout DependencyResolveLayout => _layout;
 
-        public TestMod(IGame game, IDirectoryInfo modDirectory, bool workshop, string name, IServiceProvider serviceProvider) : base(game, modDirectory, workshop, name, serviceProvider)
-        {
-            DependencyResolveStatus = DependencyResolveStatus.Resolved;
-        }
+    //    public TestMod(IGame game, IDirectoryInfo modDirectory, bool workshop, string name, IServiceProvider serviceProvider) : base(game, modDirectory, workshop, name, serviceProvider)
+    //    {
+    //        DependencyResolveStatus = DependencyResolveStatus.Resolved;
+    //    }
 
-        public void SetLayout(DependencyResolveLayout layout)
-        {
-            _layout = layout;
-        }
-    }
+    //    public void SetLayout(DependencyResolveLayout layout)
+    //    {
+    //        _layout = layout;
+    //    }
+    //}
 }

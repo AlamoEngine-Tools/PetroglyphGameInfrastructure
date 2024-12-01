@@ -58,7 +58,7 @@ public class ModDependencyResolverTest : CommonTestBase
     [Fact]
     public void Resolve_SelfDependency_WithCycleCheck_Throws()
     {
-        var depA = _identifierBuilder.Normalize(new ModReference(FileSystem.Path.Combine(_game.ModsLocation.FullName, "A"), ModType.Default));
+        var depA = new ModReference("A", ModType.Default);
 
         var modinfo = new ModinfoData("A")
         {

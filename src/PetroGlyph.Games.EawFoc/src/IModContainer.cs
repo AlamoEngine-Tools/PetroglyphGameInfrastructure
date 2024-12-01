@@ -43,11 +43,8 @@ public interface IModContainer : IEnumerable<IMod>
     /// <summary>
     /// Searches <see cref="Mods"/> for a mod that matches the specified mod reference.
     /// </summary>
-    /// <remarks>
-    /// The mod identifier of <paramref name="modReference"/> gets normalized before searching the mod reference.
-    /// </remarks>
     /// <param name="modReference">The <see cref="IModReference"/> to search for.</param>
-    /// <returns>The first mod that matched the normalized mod reference, if found; otherwise, <see langword="null"/>.</returns>
+    /// <returns>The first mod that matched the mod reference, if found; otherwise, <see langword="null"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="modReference"/> is <see langword="null"/>.</exception>
     IMod? FindMod(IModReference modReference);
 }

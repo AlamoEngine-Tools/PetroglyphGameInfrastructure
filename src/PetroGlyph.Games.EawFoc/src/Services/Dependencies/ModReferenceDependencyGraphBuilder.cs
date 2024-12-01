@@ -2,24 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using EawModinfo.Spec;
-using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Services.Detection;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 internal class ModReferenceDependencyGraphBuilder
 {
-    private readonly IModIdentifierBuilder _identifierBuilder;
-
-    public ModReferenceDependencyGraphBuilder(IServiceProvider serviceProvider)
-    {
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
-        _identifierBuilder = serviceProvider.GetRequiredService<IModIdentifierBuilder>();
-    }
-
     public ModReferenceDependencyGraph Build(IMod rootMod)
     {
         if (rootMod == null)
@@ -92,7 +81,7 @@ internal class ModReferenceDependencyGraphBuilder
 
     private IMod GetModOrThrow(IGame game, IModReference modRef)
     {
-        var mod = game.FindMod(_identifierBuilder.Normalize(modRef));
+        var mod = game.FindMod(modRef);
 
         if (mod is null)
             throw new ModNotFoundException(modRef, game);

@@ -40,7 +40,7 @@ public class VirtualModTest : ModBaseTest
             Dependencies = depList
         };
 
-        var mod = new VirtualMod(Game, modinfo, ServiceProvider);
+        var mod = new VirtualMod(Game, "VirtualModId", modinfo, ServiceProvider);
         Game.AddMod(mod);
         return mod;
     }
@@ -69,28 +69,30 @@ public class VirtualModTest : ModBaseTest
     public void InvalidCtor_ArgumentNull_Throws()
     {
         var dep = Game.InstallAndAddMod("Dep", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, new ModinfoData("Name"), ServiceProvider));
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, null!, new DependencyList(new List<IModReference>{dep}, DependencyResolveLayout.FullResolved), ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, "VirtualModId", new ModinfoData("Name"), ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, null!, "Name", new DependencyList(new List<IModReference>{dep}, DependencyResolveLayout.FullResolved), ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "VirtualModId", null!, new DependencyList(new List<IModReference>{dep}, DependencyResolveLayout.FullResolved), ServiceProvider));
 
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, null!, ServiceProvider));
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, "name", new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved), ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "VirtualModId", null!, ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, "VirtualModId", "name", new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved), ServiceProvider));
 
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "name", null!, ServiceProvider));
 
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, new ModinfoData("Name"), null!));
-        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "name", new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved), null!));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "VirtualModId", new ModinfoData("Name"), null!));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, null!, new ModinfoData("Name"), ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "VirtualModId", "name", new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved), null!));
     }
 
     [Fact]
     public void Ctor_EmptyDependencies_Throws()
     {
-        Assert.Throws<ModException>(() => new VirtualMod(Game, new ModinfoData("Name"), ServiceProvider));
-        Assert.Throws<ModException>(() => new VirtualMod(Game, "name", DependencyList.EmptyDependencyList, ServiceProvider));
+        Assert.Throws<ModException>(() => new VirtualMod(Game, "VirtualModId", new ModinfoData("Name"), ServiceProvider));
+        Assert.Throws<ModException>(() => new VirtualMod(Game, "VirtualModId", "name", DependencyList.EmptyDependencyList, ServiceProvider));
         var modInfo = new ModinfoData("Name")
         {
             Dependencies = new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved)
         };
-        Assert.Throws<ModException>(() => new VirtualMod(Game, modInfo, ServiceProvider));
+        Assert.Throws<ModException>(() => new VirtualMod(Game, "VirtualModId", modInfo, ServiceProvider));
     }
 
     [Fact]
@@ -99,6 +101,7 @@ public class VirtualModTest : ModBaseTest
         var dep = CreateOtherMod("dep");
 
         var mod = new VirtualMod(Game,
+            "VirtualModId",
             "VirtualMod",
             new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved), ServiceProvider);
         
@@ -112,7 +115,7 @@ public class VirtualModTest : ModBaseTest
         Assert.Empty(mod.Mods);
         Assert.Null(mod.Version);
 
-        Assert.StartsWith(mod.ModInfo.ToJson(), mod.Identifier);
+        Assert.StartsWith("VirtualModId", mod.Identifier);
     }
 
     [Fact]
@@ -131,7 +134,7 @@ public class VirtualModTest : ModBaseTest
             }, DependencyResolveLayout.ResolveLastItem)
         };
 
-        var mod = new VirtualMod(Game, modinfo, ServiceProvider);
+        var mod = new VirtualMod(Game, "VirtualModId", modinfo, ServiceProvider);
 
         Assert.Empty(mod.Dependencies);
         Assert.Single(((IModIdentity)mod).Dependencies);
@@ -143,7 +146,7 @@ public class VirtualModTest : ModBaseTest
         Assert.Null(mod.VersionRange);
         Assert.Equal(modinfo.Icon, mod.IconFile);
 
-        Assert.StartsWith(mod.ModInfo.ToJson(), mod.Identifier);
+        Assert.StartsWith("VirtualModId", mod.Identifier);
     }
 
     [Fact]
@@ -158,14 +161,11 @@ public class VirtualModTest : ModBaseTest
                 DependencyResolveLayout.FullResolved)
         };
 
-        var mod = new VirtualMod(Game, modInfo, ServiceProvider);
+        var mod = new VirtualMod(Game, "VirtualModId", modInfo, ServiceProvider);
         Game.AddMod(mod);
         Assert.Throws<ModException>(mod.ResolveDependencies);
     }
 
     private class CustomVirtualMod(IGame game, IServiceProvider serviceProvider)
-        : ModBase(game, ModType.Virtual, "CustomVirtualMod", serviceProvider)
-    {
-        public override string Identifier => "CustomVirtualMod";
-    }
+        : ModBase(game, "CustomVirtualMod", ModType.Virtual, "CustomVirtualMod", serviceProvider);
 }

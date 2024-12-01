@@ -167,7 +167,7 @@ public class IconFinderTest : CommonTestBaseWithRandomGame
     public void FindIcon_VirtualMod_UseIconFromModinfo()
     {
         var dep = Game.InstallAndAddMod("dep", false, ServiceProvider);
-        var mod = new VirtualMod(Game,
+        var mod = new VirtualMod(Game, "Mod",
             new ModinfoData("Mod")
             {
                 Icon = "icon.ico",
