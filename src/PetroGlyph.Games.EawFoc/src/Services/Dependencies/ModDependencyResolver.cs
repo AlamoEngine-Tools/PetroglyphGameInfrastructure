@@ -21,13 +21,13 @@ internal class ModDependencyResolver(IServiceProvider serviceProvider)
 
         var game = mod.Game;
 
-        var graphBuilder = _serviceProvider.GetRequiredService<ModReferenceDependencyGraphBuilder>();
+        var graphBuilder = _serviceProvider.GetRequiredService<ModDependencyGraphBuilder>();
         var dependencyGraph = graphBuilder.Build(mod);
 
         if (dependencyGraph.HasCycle())
             throw new ModDependencyCycleException(mod, $"The mod '{mod}' has a dependency cycle.");
 
-        GraphModReference rootVertex = null!;
+        ModDependencyGraphVertex rootVertex = null!;
         var directDeps = new List<IMod>();
 
         // Resolve all dependencies as specified by the resolve layout. 

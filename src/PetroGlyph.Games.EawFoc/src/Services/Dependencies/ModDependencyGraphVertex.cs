@@ -3,13 +3,13 @@ using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
-internal sealed class GraphModReference(IMod mod, DependencyKind kind) : IEquatable<GraphModReference>
+internal sealed class ModDependencyGraphVertex(IMod mod, DependencyKind kind) : IEquatable<ModDependencyGraphVertex>
 {
     public IMod Mod { get; } = mod;
 
     public DependencyKind Kind { get; } = kind;
 
-    public bool Equals(GraphModReference? other)
+    public bool Equals(ModDependencyGraphVertex? other)
     {
         if (other is null) 
             return false;
@@ -18,7 +18,7 @@ internal sealed class GraphModReference(IMod mod, DependencyKind kind) : IEquata
 
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) || obj is GraphModReference other && Equals(other);
+        return ReferenceEquals(this, obj) || obj is ModDependencyGraphVertex other && Equals(other);
     }
 
     public override int GetHashCode()

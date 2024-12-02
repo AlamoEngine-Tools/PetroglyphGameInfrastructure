@@ -3,9 +3,9 @@ using QuikGraph;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
-internal sealed class ModReferenceEdge(GraphModReference source, GraphModReference target) : Edge<GraphModReference>(source, target), IEquatable<ModReferenceEdge>
+internal sealed class ModDependencyGraphEdge(ModDependencyGraphVertex source, ModDependencyGraphVertex target) : Edge<ModDependencyGraphVertex>(source, target), IEquatable<ModDependencyGraphEdge>
 {
-    public bool Equals(ModReferenceEdge? other)
+    public bool Equals(ModDependencyGraphEdge? other)
     {
         if (other is null)
             return false;
@@ -18,7 +18,7 @@ internal sealed class ModReferenceEdge(GraphModReference source, GraphModReferen
             return false;
         if (ReferenceEquals(this, obj))
             return true;
-        return obj is ModReferenceEdge other && Equals(other);
+        return obj is ModDependencyGraphEdge other && Equals(other);
     }
 
     public override int GetHashCode()

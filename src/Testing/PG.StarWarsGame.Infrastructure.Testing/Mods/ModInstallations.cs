@@ -73,7 +73,7 @@ public static class ModInstallations
         Assert.True(wsDir.Exists);
 
         var nameHash = name.GetHashCode();
-        var steamId = (uint)nameHash;
+        var steamId = (ulong)nameHash;
         if (!fs.Directory.Exists(fs.Path.Combine(wsDir.FullName, steamId.ToString())))
         {
             steamHelpers.ToSteamWorkshopsId(steamId.ToString(), out var id);

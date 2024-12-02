@@ -47,7 +47,7 @@ public class ModIdentifierBuilderTest : CommonTestBaseWithRandomGame
         var mod = steamGame.InstallMod("Mod", true, ServiceProvider);
 
         var expected = mod.Directory.Name;
-        _ = uint.Parse(expected); // Check this conversion does not throw
+        _ = ulong.Parse(expected); // Check this conversion does not throw
 
         Assert.Equal(expected, _idBuilder.Build(mod));
         Assert.Equal(expected, _idBuilder.Build(mod.Directory, true));

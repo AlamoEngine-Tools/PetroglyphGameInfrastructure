@@ -30,6 +30,6 @@ public sealed class ModArgument : NamedArgument<string>
     /// <remarks>Path checking is already completed if this method is invoked.</remarks>
     protected override bool IsDataValid()
     {
-        return !_workshops || uint.TryParse(Value, out _);
+        return !_workshops || ulong.TryParse(Value, out _);
     }
 }

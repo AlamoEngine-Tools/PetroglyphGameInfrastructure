@@ -14,9 +14,9 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
-public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGame
+public class ModDependencyGraphBuilderTest : CommonTestBaseWithRandomGame
 {
-    private readonly ModReferenceDependencyGraphBuilder _graphBuilder = new();
+    private readonly ModDependencyGraphBuilder _graphBuilder = new();
 
     [Fact]
     public void NullArgs_Throws()
@@ -31,7 +31,7 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
-        Assert.Equal([new GraphModReference(mod, DependencyKind.Root)], graph.Vertices);
+        Assert.Equal([new ModDependencyGraphVertex(mod, DependencyKind.Root)], graph.Vertices);
     }
 
     [Fact]
@@ -44,15 +44,15 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         Assert.False(graph.HasCycle());
         Assert.Equal(
             [
-                new GraphModReference(mod, DependencyKind.Root),
-                new GraphModReference(b, DependencyKind.DirectDependency)
+                new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                new ModDependencyGraphVertex(b, DependencyKind.DirectDependency)
             ]
             , graph.Vertices);
 
-        Assert.Equivalent(new List<ModReferenceEdge>
+        Assert.Equivalent(new List<ModDependencyGraphEdge>
         {
-            new(new GraphModReference(mod, DependencyKind.Root),
-                new GraphModReference(b, DependencyKind.DirectDependency))
+            new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                new ModDependencyGraphVertex(b, DependencyKind.DirectDependency))
         }, graph.Edges, true);
     }
 
@@ -68,15 +68,15 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         Assert.False(graph.HasCycle());
         Assert.Equal(
             [
-                new GraphModReference(mod, DependencyKind.Root),
-                new GraphModReference(b, DependencyKind.DirectDependency)
+                new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                new ModDependencyGraphVertex(b, DependencyKind.DirectDependency)
             ]
             , graph.Vertices); // Mod C should not exist, cause A's layout is full resolved
 
-        Assert.Equivalent(new List<ModReferenceEdge>
+        Assert.Equivalent(new List<ModDependencyGraphEdge>
         {
-            new(new GraphModReference(mod, DependencyKind.Root),
-                new GraphModReference(b, DependencyKind.DirectDependency))
+            new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                new ModDependencyGraphVertex(b, DependencyKind.DirectDependency))
         }, graph.Edges, true); // B --> C should not exist
     }
 
@@ -91,16 +91,16 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         Assert.False(graph.HasCycle());
         Assert.Equal(
         [
-            new GraphModReference(mod, DependencyKind.Root),
-            new GraphModReference(b, DependencyKind.DirectDependency),
-            new GraphModReference(c, DependencyKind.Transitive),
+            new ModDependencyGraphVertex(mod, DependencyKind.Root),
+            new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+            new ModDependencyGraphVertex(c, DependencyKind.Transitive),
         ], graph.Vertices);
-        Assert.Equivalent(new List<ModReferenceEdge>
+        Assert.Equivalent(new List<ModDependencyGraphEdge>
             {
-                new(new GraphModReference(mod, DependencyKind.Root),
-                    new GraphModReference(b, DependencyKind.DirectDependency)),
-                new(new GraphModReference(b, DependencyKind.DirectDependency),
-                    new GraphModReference(c, DependencyKind.Transitive))
+                new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                    new ModDependencyGraphVertex(b, DependencyKind.DirectDependency)),
+                new(new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+                    new ModDependencyGraphVertex(c, DependencyKind.Transitive))
             },
             graph.Edges, true);
     }
@@ -117,16 +117,16 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         Assert.False(graph.HasCycle());
         Assert.Equal(
         [
-            new GraphModReference(mod, DependencyKind.Root),
-            new GraphModReference(b, DependencyKind.DirectDependency),
-            new GraphModReference(d, DependencyKind.DirectDependency)
+            new ModDependencyGraphVertex(mod, DependencyKind.Root),
+            new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+            new ModDependencyGraphVertex(d, DependencyKind.DirectDependency)
         ], graph.Vertices); // Mod C should not exist, cause B is not last item
-        Assert.Equivalent(new List<ModReferenceEdge>
+        Assert.Equivalent(new List<ModDependencyGraphEdge>
             {
-                new(new GraphModReference(mod, DependencyKind.Root),
-                    new GraphModReference(b, DependencyKind.DirectDependency)),
-                new(new GraphModReference(mod, DependencyKind.Root),
-                    new GraphModReference(d, DependencyKind.DirectDependency))
+                new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                    new ModDependencyGraphVertex(b, DependencyKind.DirectDependency)),
+                new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                    new ModDependencyGraphVertex(d, DependencyKind.DirectDependency))
             },
             graph.Edges, true);
     }
@@ -143,19 +143,19 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         Assert.False(graph.HasCycle());
         Assert.Equal(
         [
-            new GraphModReference(mod, DependencyKind.Root),
-            new GraphModReference(d, DependencyKind.DirectDependency),
-            new GraphModReference(b, DependencyKind.DirectDependency),
-            new GraphModReference(c, DependencyKind.Transitive)
+            new ModDependencyGraphVertex(mod, DependencyKind.Root),
+            new ModDependencyGraphVertex(d, DependencyKind.DirectDependency),
+            new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+            new ModDependencyGraphVertex(c, DependencyKind.Transitive)
         ], graph.Vertices); // Mod C should exist, cause B is last item
-        Assert.Equivalent(new List<ModReferenceEdge>
+        Assert.Equivalent(new List<ModDependencyGraphEdge>
             {
-                new(new GraphModReference(mod, DependencyKind.Root),
-                    new GraphModReference(b, DependencyKind.DirectDependency)),
-                new(new GraphModReference(mod, DependencyKind.Root),
-                    new GraphModReference(d, DependencyKind.DirectDependency)),
-                new(new GraphModReference(b, DependencyKind.DirectDependency),
-                    new GraphModReference(c, DependencyKind.Transitive)),
+                new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                    new ModDependencyGraphVertex(b, DependencyKind.DirectDependency)),
+                new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                    new ModDependencyGraphVertex(d, DependencyKind.DirectDependency)),
+                new(new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+                    new ModDependencyGraphVertex(c, DependencyKind.Transitive)),
             },
             graph.Edges, true);
     }
@@ -172,19 +172,19 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         Assert.False(graph.HasCycle());
         Assert.Equal(
         [
-            new GraphModReference(mod, DependencyKind.Root),
-            new GraphModReference(b, DependencyKind.DirectDependency),
-            new GraphModReference(c, DependencyKind.Transitive),
-            new GraphModReference(d, DependencyKind.Transitive)
+            new ModDependencyGraphVertex(mod, DependencyKind.Root),
+            new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+            new ModDependencyGraphVertex(c, DependencyKind.Transitive),
+            new ModDependencyGraphVertex(d, DependencyKind.Transitive)
         ], graph.Vertices);
-        Assert.Equivalent(new List<ModReferenceEdge>
+        Assert.Equivalent(new List<ModDependencyGraphEdge>
             {
-                new(new GraphModReference(mod, DependencyKind.Root),
-                    new GraphModReference(b, DependencyKind.DirectDependency)),
-                new(new GraphModReference(b, DependencyKind.DirectDependency),
-                    new GraphModReference(c, DependencyKind.Transitive)),
-                new(new GraphModReference(c, DependencyKind.Transitive),
-                    new GraphModReference(d, DependencyKind.Transitive)),
+                new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                    new ModDependencyGraphVertex(b, DependencyKind.DirectDependency)),
+                new(new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+                    new ModDependencyGraphVertex(c, DependencyKind.Transitive)),
+                new(new ModDependencyGraphVertex(c, DependencyKind.Transitive),
+                    new ModDependencyGraphVertex(d, DependencyKind.Transitive)),
             },
             graph.Edges, true);
     }
@@ -202,22 +202,22 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         Assert.False(graph.HasCycle());
         Assert.Equal(
         [
-            new GraphModReference(mod, DependencyKind.Root),
-            new GraphModReference(b, DependencyKind.DirectDependency),
-            new GraphModReference(e, DependencyKind.Transitive),
-            new GraphModReference(c, DependencyKind.Transitive),
-            new GraphModReference(d, DependencyKind.Transitive),
+            new ModDependencyGraphVertex(mod, DependencyKind.Root),
+            new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+            new ModDependencyGraphVertex(e, DependencyKind.Transitive),
+            new ModDependencyGraphVertex(c, DependencyKind.Transitive),
+            new ModDependencyGraphVertex(d, DependencyKind.Transitive),
         ], graph.Vertices);
-        Assert.Equivalent(new List<ModReferenceEdge>
+        Assert.Equivalent(new List<ModDependencyGraphEdge>
             {
-                new(new GraphModReference(mod, DependencyKind.Root),
-                    new GraphModReference(b, DependencyKind.DirectDependency)),
-                new(new GraphModReference(b, DependencyKind.DirectDependency),
-                    new GraphModReference(e, DependencyKind.Transitive)),
-                new(new GraphModReference(b, DependencyKind.DirectDependency),
-                    new GraphModReference(c, DependencyKind.Transitive)),
-                new(new GraphModReference(c, DependencyKind.Transitive),
-                    new GraphModReference(d, DependencyKind.Transitive)),
+                new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                    new ModDependencyGraphVertex(b, DependencyKind.DirectDependency)),
+                new(new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+                    new ModDependencyGraphVertex(e, DependencyKind.Transitive)),
+                new(new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+                    new ModDependencyGraphVertex(c, DependencyKind.Transitive)),
+                new(new ModDependencyGraphVertex(c, DependencyKind.Transitive),
+                    new ModDependencyGraphVertex(d, DependencyKind.Transitive)),
             },
             graph.Edges, true);
     }
@@ -235,19 +235,19 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         Assert.False(graph.HasCycle());
         Assert.Equal(
         [
-            new GraphModReference(mod, DependencyKind.Root),
-            new GraphModReference(b, DependencyKind.DirectDependency),
-            new GraphModReference(c, DependencyKind.Transitive),
-            new GraphModReference(e, DependencyKind.Transitive),
+            new ModDependencyGraphVertex(mod, DependencyKind.Root),
+            new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+            new ModDependencyGraphVertex(c, DependencyKind.Transitive),
+            new ModDependencyGraphVertex(e, DependencyKind.Transitive),
         ], graph.Vertices);
-        Assert.Equivalent(new List<ModReferenceEdge>
+        Assert.Equivalent(new List<ModDependencyGraphEdge>
             {
-                new(new GraphModReference(mod, DependencyKind.Root),
-                    new GraphModReference(b, DependencyKind.DirectDependency)),
-                new(new GraphModReference(b, DependencyKind.DirectDependency),
-                    new GraphModReference(c, DependencyKind.Transitive)),
-                new(new GraphModReference(b, DependencyKind.DirectDependency),
-                    new GraphModReference(e, DependencyKind.Transitive)),
+                new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                    new ModDependencyGraphVertex(b, DependencyKind.DirectDependency)),
+                new(new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+                    new ModDependencyGraphVertex(c, DependencyKind.Transitive)),
+                new(new ModDependencyGraphVertex(b, DependencyKind.DirectDependency),
+                    new ModDependencyGraphVertex(e, DependencyKind.Transitive)),
             },
             graph.Edges, true);
     }
@@ -347,15 +347,15 @@ public class ModReferenceDependencyGraphBuilderTest : CommonTestBaseWithRandomGa
         Assert.False(graph.HasCycle());
         Assert.Equal(
             [
-                new GraphModReference(mod, DependencyKind.Root),
-                new GraphModReference(b, DependencyKind.DirectDependency)
+                new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                new ModDependencyGraphVertex(b, DependencyKind.DirectDependency)
             ]
             , graph.Vertices);
 
-        Assert.Equivalent(new List<ModReferenceEdge>
+        Assert.Equivalent(new List<ModDependencyGraphEdge>
         {
-            new(new GraphModReference(mod, DependencyKind.Root),
-                new GraphModReference(b, DependencyKind.DirectDependency))
+            new(new ModDependencyGraphVertex(mod, DependencyKind.Root),
+                new ModDependencyGraphVertex(b, DependencyKind.DirectDependency))
         }, graph.Edges, true);
     }
 

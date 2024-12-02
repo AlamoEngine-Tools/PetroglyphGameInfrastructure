@@ -10,7 +10,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 /// <inheritdoc cref="IModDependencyTraverser"/>
 internal class ModDependencyTraverser(IServiceProvider serviceProvider) : IModDependencyTraverser
 {
-    private readonly ModReferenceDependencyGraphBuilder _graphBuilder = serviceProvider.GetRequiredService<ModReferenceDependencyGraphBuilder>();
+    private readonly ModDependencyGraphBuilder _graphBuilder = serviceProvider.GetRequiredService<ModDependencyGraphBuilder>();
 
     public IList<IMod> Traverse(IMod targetMod)
     {
@@ -43,7 +43,7 @@ internal class ModDependencyTraverser(IServiceProvider serviceProvider) : IModDe
     }
 
     private static IList<IMod> TraverseCore(
-        ModReferenceDependencyGraph graph,
+        ModDependencyGraph graph,
         IMod head,
         IList<IMod> result,
         Queue<IMod> queue)

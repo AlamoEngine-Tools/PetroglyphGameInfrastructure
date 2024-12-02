@@ -7,9 +7,9 @@ using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
-internal class ModReferenceDependencyGraphBuilder
+internal class ModDependencyGraphBuilder
 {
-    public ModReferenceDependencyGraph Build(IMod rootMod)
+    public ModDependencyGraph Build(IMod rootMod)
     {
         if (rootMod == null)
             throw new ArgumentNullException(nameof(rootMod));
@@ -18,8 +18,8 @@ internal class ModReferenceDependencyGraphBuilder
         // Assure rootMod itself is added to the game.
         GetModOrThrow(game, rootMod);
 
-        var graph = new ModReferenceDependencyGraph();
-        graph.AddVertex(new GraphModReference(rootMod, DependencyKind.Root));
+        var graph = new ModDependencyGraph();
+        graph.AddVertex(new ModDependencyGraphVertex(rootMod, DependencyKind.Root));
 
         var pendingQueue = new Queue<IMod>();
         pendingQueue.Enqueue(rootMod);
@@ -44,13 +44,13 @@ internal class ModReferenceDependencyGraphBuilder
                 IsVersionMatchOrThrow(dependencyRef, dependency);
 
                 var currentModVertex = graph.Vertices.FirstOrDefault(x => x.Mod.Equals(currentMod))
-                                       ?? new GraphModReference(currentMod, DependencyKind.Transitive);
+                                       ?? new ModDependencyGraphVertex(currentMod, DependencyKind.Transitive);
 
                 var depKind = GetDependencyKind(rootMod, currentMod);
 
-                graph.AddVerticesAndEdge(new ModReferenceEdge(
+                graph.AddVerticesAndEdge(new ModDependencyGraphEdge(
                     currentModVertex,
-                    new GraphModReference(dependency, depKind)));
+                    new ModDependencyGraphVertex(dependency, depKind)));
 
                 if (ShallEnqueueMod(dependencyList.ResolveLayout, i, dependencyList.Count))
                     pendingQueue.Enqueue(dependency);
@@ -95,9 +95,7 @@ internal class ModReferenceDependencyGraphBuilder
                 return true;
             case DependencyResolveLayout.ResolveLastItem:
             {
-                if (index == maxCount - 1)
-                    return true;
-                return false;
+                return index == maxCount - 1;
             }
             default:
                 throw new ArgumentOutOfRangeException(nameof(resolveLayout), resolveLayout, null);

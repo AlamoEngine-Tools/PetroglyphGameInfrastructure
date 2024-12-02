@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -6,20 +8,9 @@ using PG.StarWarsGame.Infrastructure.Games;
 namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 
 /// <inheritdoc cref="ISteamGameHelpers"/>
-internal class SteamGameHelpers : ISteamGameHelpers
+internal class SteamGameHelpers(IServiceProvider serviceProvider) : ISteamGameHelpers
 {
-    private readonly IFileSystem _fileSystem;
-
-    /// <summary>
-    /// Creates a new instance
-    /// </summary>
-    /// <param name="serviceProvider">The service provider.</param>
-    public SteamGameHelpers(IServiceProvider serviceProvider)
-    {
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
-        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-    }
+    private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
 
     /// <inheritdoc/>
     public IDirectoryInfo GetWorkshopsLocation(IGame game)
@@ -40,7 +31,7 @@ internal class SteamGameHelpers : ISteamGameHelpers
     }
 
     /// <inheritdoc/>
-    public bool TryGetWorkshopsLocation(IGame game, out IDirectoryInfo? workshopsLocation)
+    public bool TryGetWorkshopsLocation(IGame game, [NotNullWhen(true)] out IDirectoryInfo? workshopsLocation)
     {
         workshopsLocation = null;
         try
@@ -48,7 +39,7 @@ internal class SteamGameHelpers : ISteamGameHelpers
             workshopsLocation = GetWorkshopsLocation(game);
             return true;
         }
-        catch (PetroglyphException)
+        catch(GameException)
         {
             return false;
         }
@@ -57,6 +48,7 @@ internal class SteamGameHelpers : ISteamGameHelpers
     /// <inheritdoc/>
     public bool ToSteamWorkshopsId(string input, out ulong steamId)
     {
-        return ulong.TryParse(input, out steamId);
+        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(input);
+        return ulong.TryParse(input, NumberStyles.None, null, out steamId);
     }
 }

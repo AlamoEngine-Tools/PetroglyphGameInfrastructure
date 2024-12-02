@@ -2,28 +2,21 @@
 using System.Collections.Generic;
 using EawModinfo.Model;
 using EawModinfo.Spec;
-using Microsoft.Extensions.DependencyInjection;
-using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
-public class ModDependencyResolverTest : CommonTestBase
+public class ModDependencyResolverTest : CommonTestBaseWithRandomGame
 {
     private readonly ModDependencyResolver _resolver;
-    private readonly IGame _game;
-    private readonly IModIdentifierBuilder _identifierBuilder;
 
     public ModDependencyResolverTest()
     {
         _resolver = new ModDependencyResolver(ServiceProvider);
-        _game = CreateRandomGame();
-        _identifierBuilder = ServiceProvider.GetRequiredService<IModIdentifierBuilder>();
     }
 
     [Fact]
@@ -51,7 +44,7 @@ public class ModDependencyResolverTest : CommonTestBase
                 new ModReference("B", ModType.Default)
             }, DependencyResolveLayout.FullResolved)
         };
-        var mod = _game.InstallAndAddMod(false, modinfo, ServiceProvider);
+        var mod = Game.InstallAndAddMod(false, modinfo, ServiceProvider);
         Assert.Throws<ModNotFoundException>(() => _resolver.Resolve(mod));
     }
 
@@ -67,7 +60,7 @@ public class ModDependencyResolverTest : CommonTestBase
                 depA
             }, DependencyResolveLayout.FullResolved)
         };
-        var mod = _game.InstallAndAddMod(false, modinfo, ServiceProvider);
+        var mod = Game.InstallAndAddMod(false, modinfo, ServiceProvider);
         Assert.Throws<ModDependencyCycleException>(() => _resolver.Resolve(mod));
     }
 
@@ -135,13 +128,13 @@ public class ModDependencyResolverTest : CommonTestBase
     private IMod CreateMod(string name, DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, params IModReference[] deps)
     {
         if (deps.Length == 0)
-            return _game.InstallAndAddMod(name, GITestUtilities.GetRandomWorkshopFlag(_game), ServiceProvider);
+            return Game.InstallAndAddMod(name, GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
 
         var modinfo = new ModinfoData("A")
         {
             Dependencies = new DependencyList(deps, layout)
         };
 
-        return _game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(_game), modinfo, ServiceProvider);
+        return Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), modinfo, ServiceProvider);
     }
 }
