@@ -1,11 +1,11 @@
 ﻿using System;
-using EawModinfo.Spec;
+using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
-internal sealed class GraphModReference(IModReference modReference, DependencyKind kind) : IEquatable<GraphModReference>
+internal sealed class GraphModReference(IMod mod, DependencyKind kind) : IEquatable<GraphModReference>
 {
-    public IModReference ModReference { get; } = modReference;
+    public IMod Mod { get; } = mod;
 
     public DependencyKind Kind { get; } = kind;
 
@@ -13,7 +13,7 @@ internal sealed class GraphModReference(IModReference modReference, DependencyKi
     {
         if (other is null) 
             return false;
-        return ReferenceEquals(this, other) || ModReference.Equals(other.ModReference);
+        return ReferenceEquals(this, other) || Mod.Equals(other.Mod);
     }
 
     public override bool Equals(object? obj)
@@ -23,6 +23,6 @@ internal sealed class GraphModReference(IModReference modReference, DependencyKi
 
     public override int GetHashCode()
     {
-        return ModReference.GetHashCode();
+        return Mod.GetHashCode();
     }
 }

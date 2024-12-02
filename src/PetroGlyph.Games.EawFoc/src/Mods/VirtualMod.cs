@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
@@ -60,12 +59,12 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     }
 
     /// <inheritdoc />
-    protected override IReadOnlyList<IMod> ResolveDependenciesCore()
+    /// <exception cref="ModDependencyException">No physical mod was found.</exception>
+    protected override void OnDependenciesResolved()
     {
-        var dependencies = base.ResolveDependenciesCore();
-        if (dependencies.Any(x => x is not IPhysicalMod))
-            throw new ModException(this, "Virtual Mods must have at least one physical mod as dependency.");
-        return dependencies;
+        if (Dependencies.Any(x => x is not IPhysicalMod))
+            throw new ModDependencyException(this, null, "Virtual Mods must have at least one physical mod as dependency.");
+        base.OnDependenciesResolved();
     }
 
     /// <inheritdoc/>

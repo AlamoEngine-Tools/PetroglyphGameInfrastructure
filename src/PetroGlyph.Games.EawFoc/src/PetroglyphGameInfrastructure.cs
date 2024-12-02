@@ -34,6 +34,7 @@ public static class PetroglyphGameInfrastructure
 
         serviceCollection.AddSingleton(sp => new ModDependencyResolver(sp));
         serviceCollection.AddSingleton(_ => new ModReferenceDependencyGraphBuilder());
+        serviceCollection.AddSingleton<IModDependencyTraverser>(sp => new ModDependencyTraverser(sp));
 
         serviceCollection.AddSingleton<ILanguageFinder>(sp => new InstalledLanguageFinder(sp));
         serviceCollection.AddSingleton<ISteamWorkshopCache>(_ => new KnownSteamWorkshopCache());

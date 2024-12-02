@@ -24,7 +24,7 @@ internal class ModReferenceDependencyGraphBuilder
         var pendingQueue = new Queue<IMod>();
         pendingQueue.Enqueue(rootMod);
 
-        var visitedMods = new HashSet<IModReference>();
+        var visitedMods = new HashSet<IMod>();
 
         while (pendingQueue.Count > 0)
         {
@@ -43,7 +43,7 @@ internal class ModReferenceDependencyGraphBuilder
 
                 IsVersionMatchOrThrow(dependencyRef, dependency);
 
-                var currentModVertex = graph.Vertices.FirstOrDefault(x => x.ModReference.Equals(currentMod))
+                var currentModVertex = graph.Vertices.FirstOrDefault(x => x.Mod.Equals(currentMod))
                                        ?? new GraphModReference(currentMod, DependencyKind.Transitive);
 
                 var depKind = GetDependencyKind(rootMod, currentMod);
@@ -74,15 +74,12 @@ internal class ModReferenceDependencyGraphBuilder
 
     private static DependencyKind GetDependencyKind(IMod root, IMod currentMod)
     {
-        if (root.Equals(currentMod))
-            return DependencyKind.DirectDependency;
-        return DependencyKind.Transitive;
+        return root.Equals(currentMod) ? DependencyKind.DirectDependency : DependencyKind.Transitive;
     }
 
-    private IMod GetModOrThrow(IGame game, IModReference modRef)
+    private static IMod GetModOrThrow(IGame game, IModReference modRef)
     {
         var mod = game.FindMod(modRef);
-
         if (mod is null)
             throw new ModNotFoundException(modRef, game);
         return mod;

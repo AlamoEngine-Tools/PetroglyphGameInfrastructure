@@ -163,7 +163,7 @@ public class VirtualModTest : ModBaseTest
 
         var mod = new VirtualMod(Game, "VirtualModId", modInfo, ServiceProvider);
         Game.AddMod(mod);
-        Assert.Throws<ModException>(mod.ResolveDependencies);
+        Assert.Throws<ModDependencyException>(mod.ResolveDependencies);
     }
 
     private class CustomVirtualMod(IGame game, IServiceProvider serviceProvider)

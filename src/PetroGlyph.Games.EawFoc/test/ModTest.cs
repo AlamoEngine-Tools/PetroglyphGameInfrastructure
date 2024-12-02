@@ -192,7 +192,7 @@ public class ModTest : ModBaseTest
 
         var e = Assert.Throws<ModDependencyCycleException>(mod.ResolveDependencies);
         Assert.Equal(mod, e.Mod);
-        Assert.Equal(mod, e.Dependency);
+        Assert.Null(e.Dependency);
         Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
     }
 }

@@ -24,7 +24,7 @@ namespace PG.StarWarsGame.Infrastructure.Services;
 //    /// <inheritdoc/>
 //    public IMod FromReference(IGame game, DetectedModReference modReference, CultureInfo culture)
 //    {
-//        return FromReference(game, modReference.ModReference, modReference.ModInfo, culture);
+//        return FromReference(game, modReference.Mod, modReference.ModInfo, culture);
 //    }
 
 //    /// <inheritdoc/>

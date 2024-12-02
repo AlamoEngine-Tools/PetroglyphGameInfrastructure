@@ -55,6 +55,6 @@ public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContai
     /// <exception cref="ModDependencyCycleException">A dependency cycle was found.</exception>
     /// <exception cref="ModDependencyCycleException">This method gets called while already resolving this instance.</exception>
     /// <exception cref="ModNotFoundException">A dependency could not be found.</exception>
-    /// <exception cref="PetroglyphException">The dependencies could not be resolved.</exception>
+    /// <exception cref="ModDependencyException">The dependencies could not be resolved.</exception>
     void ResolveDependencies();
 }

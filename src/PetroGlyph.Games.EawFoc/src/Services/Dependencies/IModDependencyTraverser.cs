@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
@@ -18,7 +19,7 @@ public interface IModDependencyTraverser
     /// </remarks>
     /// <param name="targetMod">The mod which dependencies shall get flattened.</param>
     /// <returns>A flattened list of the mod's dependencies. The <paramref name="targetMod"/> is the first item of the result.</returns>
-    /// <exception cref="ModDependencyException">The dependencies are not resolved.</exception>
-    /// <exception cref="ModDependencyCycleException">The dependency chain contains a cycle.</exception>
+    /// <exception cref="InvalidOperationException">The dependencies are not successfully resolved.</exception>
+    /// <exception cref="ModDependencyException">The mod's dependencies could not be traversed</exception>
     IList<IMod> Traverse(IMod targetMod);
 }

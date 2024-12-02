@@ -1,69 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
-///// <inheritdoc cref="IModDependencyTraverser"/>
-//internal class ModDependencyTraverser : IModDependencyTraverser
-//{
-//    private readonly IServiceProvider _serviceProvider;
+/// <inheritdoc cref="IModDependencyTraverser"/>
+internal class ModDependencyTraverser(IServiceProvider serviceProvider) : IModDependencyTraverser
+{
+    private readonly ModReferenceDependencyGraphBuilder _graphBuilder = serviceProvider.GetRequiredService<ModReferenceDependencyGraphBuilder>();
 
-//    /// <summary>
-//    /// Creates a new instance.
-//    /// </summary>
-//    /// <param name="serviceProvider">The service provider.</param>
-//    public ModDependencyTraverser(IServiceProvider serviceProvider)
-//    {
-//        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-//    }
+    public IList<IMod> Traverse(IMod targetMod)
+    {
+        if (targetMod.DependencyResolveStatus != DependencyResolveStatus.Resolved)
+            throw new InvalidOperationException($"Dependencies of '{targetMod}' are not resolved.");
 
-//    /// <inheritdoc/>
-//    public IList<ModDependencyEntry> Traverse(IMod targetMod)
-//    {
-//        var graphBuilder = _serviceProvider.GetRequiredService<ModReferenceDependencyGraphBuilder>();
-//        var dependencyGraph = graphBuilder.Build(targetMod);
-//        if (dependencyGraph.HasCycle())
-//            throw new ModDependencyCycleException(targetMod, $"Cycle detected while traversing {targetMod}.");
+        var dependencyGraph = _graphBuilder.Build(targetMod);
+        Debug.Assert(!dependencyGraph.HasCycle(), "resolved dependencies should never have a cycle!");
 
-//        var result = TraverseCore(dependencyGraph, new ModDependencyEntry(targetMod), new List<ModDependencyEntry>(), new Queue<ModDependencyEntry>());
-//        RemoveDuplicates(result);
-//        return result.ToList();
-//    }
+        var result = TraverseCore(dependencyGraph, targetMod, new List<IMod>(), new());
+        RemoveDuplicates(result);
+        return result.ToList();
+    }
 
-//    private static void RemoveDuplicates(ICollection<ModDependencyEntry> list)
-//    {
-//        var known = new HashSet<ModDependencyEntry>();
-//        var entriesToRemove = new List<ModDependencyEntry>();
+    private static void RemoveDuplicates(ICollection<IMod> list)
+    {
+        var known = new HashSet<IMod>();
+        var entriesToRemove = new List<IMod>();
 
-//        foreach (var entry in list.Reverse())
-//        {
-//            if (known.Contains(entry))
-//            {
-//                entriesToRemove.Add(entry);
-//                continue;
-//            }
+        foreach (var entry in list.Reverse())
+        {
+            if (!known.Add(entry)) 
+                entriesToRemove.Add(entry);
+        }
 
-//            known.Add(entry);
-//        }
+        foreach (var entry in entriesToRemove)
+        {
+            list.Remove(entry);
+        }
+    }
 
-//        foreach (var entry in entriesToRemove)
-//        {
-//            list.Remove(entry);
-//        }
-//    }
+    private static IList<IMod> TraverseCore(
+        ModReferenceDependencyGraph graph,
+        IMod head,
+        IList<IMod> result,
+        Queue<IMod> queue)
+    {
+        result.Add(head);
 
-//    private static IList<ModDependencyEntry> TraverseCore(
-//        ModReferenceDependencyGraph graph, 
-//        ModDependencyEntry head, 
-//        IList<ModDependencyEntry> result, 
-//        Queue<ModDependencyEntry> queue)
-//    {
-//        result.Add(head);
-//        foreach (var dependency in graph.DependenciesOf(head.Mod))
-//            queue.Enqueue(dependency);
-//        return !queue.Any() ? result : TraverseCore(graph, queue.Dequeue(), result, queue);
-//    }
-//}
+        foreach (var edge in graph.DependenciesOf(head)) 
+            queue.Enqueue(edge.Target.Mod);
+        return !queue.Any() ? result : TraverseCore(graph, queue.Dequeue(), result, queue);
+    }
+}

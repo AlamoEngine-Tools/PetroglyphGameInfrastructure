@@ -232,24 +232,6 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public class ModBaseAbstractTest : CommonTestBaseWithRandomGame
     {
         [Fact]
-        public void ResolveDependenciesCore_ReturnNull_Throws()
-        {
-            var dep = CreateAndAddMod("Dep");
-            var modinfo = new ModinfoData("CustomMod")
-            {
-                Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)
-            };
-            var mod = new NullResolvingMod(Game, modinfo, ServiceProvider);
-
-            Assert.Throws<PetroglyphException>(mod.ResolveDependencies);
-            Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
-
-            // Attempt to try again should try to resolve again, but we expect the same result.
-            Assert.Throws<PetroglyphException>(mod.ResolveDependencies);
-            Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
-        }
-
-        [Fact]
         public void ResolveDependencies_CalledTwice_Throws()
         {
             var dep = CreateAndAddMod("Dep");
@@ -258,6 +240,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
                 Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)
             };
             var mod = new SelfResolvingMod(Game, modinfo, ServiceProvider);
+            Game.AddMod(mod);
 
             Assert.Throws<ModDependencyCycleException>(mod.ResolveDependencies);
             Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
@@ -267,25 +250,13 @@ public abstract class ModBaseTest : PlayableModContainerTest
             Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
         }
 
-        private class NullResolvingMod(IGame game, IModinfo modinfo, IServiceProvider serviceProvider)
-            : ModBase(game, "CustomMod", ModType.Default, modinfo, serviceProvider)
-        {
-            protected override IReadOnlyList<IMod> ResolveDependenciesCore()
-            {
-                Assert.Equal(DependencyResolveStatus.Resolving, DependencyResolveStatus);
-                return null!;
-            }
-        }
-
         private class SelfResolvingMod(IGame game, IModinfo modinfo, IServiceProvider serviceProvider)
             : ModBase(game, "CustomMod", ModType.Default, modinfo, serviceProvider)
         {
-            protected override IReadOnlyList<IMod> ResolveDependenciesCore()
+            protected override void OnDependenciesResolved()
             {
-                Assert.Equal(DependencyResolveStatus.Resolving, DependencyResolveStatus);
-                // We should not end up in a StackOverflowException, cause ModBase handles the reentry.
                 ResolveDependencies();
-                return [];
+                base.OnDependenciesResolved();
             }
         }
     }

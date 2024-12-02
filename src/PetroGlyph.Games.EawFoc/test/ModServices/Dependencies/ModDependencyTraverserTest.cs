@@ -1,371 +1,72 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO.Abstractions;
 using EawModinfo.Spec;
-using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.TestingUtilities;
+using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
-public class ModDependencyTraverserTest : CommonTestBase
+public class ModDependencyTraverserTest : CommonTestBaseWithRandomGame
 {
-    //private readonly ModDependencyTraverser _modDependencyTraverser;
-    //private readonly IGame _game;
-
-    //public ModDependencyTraverserTest()
-    //{
-    //    _modDependencyTraverser = new ModDependencyTraverser(ServiceProvider);
-    //    _game = CreateRandomGame();
-    //}
-
-    //public ModDependencyTraverserTest()
-    //{
-    //    _fileSystem = new MockFileSystem();
-    //    var sc = new ServiceCollection();
-    //    sc.AddSingleton<IModIdentifierBuilder>(sp => new ModIdentifierBuilder(sp));
-    //    sc.AddSingleton<IFileSystem>(_fileSystem);
-    //    sc.AddSingleton<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
-    //    _serviceProvider = sc.BuildServiceProvider();
-    //    _game = SetupGame(_fileSystem, _serviceProvider);
-    //}
-
-
-    //[Fact]
-    //public void TestTraverse_LayoutLastItem()
-    //{
-    //    var targetMod = CreateMod("Target");
-    //    var depMod = CreateMod("dep");
-    //    var dep2Mod = CreateMod("dep2");
-    //    var subDepMod = CreateMod("subdep");
-    //    var subDep2Mod = CreateMod("SubDep2");
-
-    //    targetMod.SetDependencies(depMod, dep2Mod);
-    //    targetMod.SetLayout(DependencyResolveLayout.ResolveLastItem);
-
-    //    depMod.SetDependencies(subDepMod);
-    //    dep2Mod.SetDependencies(subDep2Mod);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(targetMod);
-
-    //    var expected = new List<IMod> { targetMod, depMod, dep2Mod, subDep2Mod }.Select(m => new ModDependencyEntry(m)).ToList();
-
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutFullResolved()
-    //{
-    //    var targetMod = CreateMod("Target");
-    //    var depMod = CreateMod("dep");
-    //    var dep2Mod = CreateMod("dep2");
-    //    var subDepMod = CreateMod("subdep");
-
-    //    targetMod.SetDependencies(depMod, dep2Mod);
-    //    targetMod.SetLayout(DependencyResolveLayout.FullResolved);
-    //    depMod.SetDependencies(subDepMod);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(targetMod);
-
-    //    var expected = new List<IMod> { targetMod, depMod, dep2Mod }.Select(m => new ModDependencyEntry(m)).ToList();
-
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void Traverse_NoDependencies()
-    //{
-    //    var a = CreateMod("A");
-
-    //    var actual = _modDependencyTraverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a }.Select(m => new ModDependencyEntry(m)).ToList();
-
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_A()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-
-    //    a.SetDependencies(b, c);
-    //    b.SetDependencies(d);
-    //    c.SetDependencies(e);
-
-    //    var actual = _modDependencyTraverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, b, c, d, e }.Select(m => new ModDependencyEntry(m)).ToList();
-
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_B()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-
-    //    a.SetDependencies(c, b);
-    //    b.SetDependencies(d);
-    //    c.SetDependencies(e);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, c, b, e, d }.Select(m => new ModDependencyEntry(m)).ToList();
-
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_C()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-
-    //    a.SetDependencies(b, c);
-    //    b.SetDependencies(d);
-    //    c.SetDependencies(d);
-    //    d.SetDependencies(e);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, b, c, d, e }.Select(m => new ModDependencyEntry(m)).ToList();
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_D()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-
-    //    a.SetDependencies(b, c, d);
-    //    b.SetDependencies(e);
-    //    c.SetDependencies(e);
-    //    d.SetDependencies(e);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, b, c, d, e }.Select(m => new ModDependencyEntry(m)).ToList();
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_E()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-
-    //    a.SetDependencies(b, c, d);
-    //    b.SetDependencies(e);
-    //    c.SetDependencies(d);
-    //    e.SetDependencies(d);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, b, c, e, d }.Select(m => new ModDependencyEntry(m)).ToList();
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_F()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-
-    //    a.SetDependencies(b, c, d);
-    //    b.SetDependencies(d);
-    //    c.SetDependencies(e);
-    //    e.SetDependencies(d);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, b, c, e, d }.Select(m => new ModDependencyEntry(m)).ToList();
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_G()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-    //    var f = CreateMod("F");
-    //    var g = CreateMod("G");
-
-    //    a.SetDependencies(b, c, d, e, f, g);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, b, c, d, e, f, g }.Select(m => new ModDependencyEntry(m)).ToList();
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_H()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-    //    var f = CreateMod("F");
-    //    var g = CreateMod("G");
-    //    var i = CreateMod("I");
-
-    //    a.SetDependencies(b, c);
-    //    b.SetDependencies(d);
-    //    c.SetDependencies(g);
-    //    d.SetDependencies(e, f);
-    //    g.SetDependencies(i);
-    //    f.SetDependencies(i);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, b, c, d, g, e, f, i }.Select(m => new ModDependencyEntry(m)).ToList();
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_I()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-    //    var f = CreateMod("F");
-    //    var x = CreateMod("X");
-
-    //    a.SetDependencies(c, b);
-    //    b.SetDependencies(e);
-    //    c.SetDependencies(d);
-    //    d.SetDependencies(f);
-    //    e.SetDependencies(x);
-    //    x.SetDependencies(d, f);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, c, b, e, x, d, f }.Select(m => new ModDependencyEntry(m)).ToList();
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_J()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-    //    var f = CreateMod("F");
-    //    var x = CreateMod("X");
-
-    //    a.SetDependencies(b, c, d);
-    //    b.SetDependencies(x);
-    //    c.SetDependencies(x, f);
-    //    d.SetDependencies(e);
-    //    e.SetDependencies(x, f);
-
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    var actual = traverser.Traverse(a);
-
-    //    var expected = new List<IMod> { a, b, c, d, e, x, f }.Select(m => new ModDependencyEntry(m)).ToList();
-    //    Assert.Equal(expected, actual);
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_K_Throws()
-    //{
-    //    var a = CreateMod("A");
-    //    a.SetDependencies(a);
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    Assert.Throws<ModDependencyCycleException>(() => traverser.Traverse(a));
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_L_Throws()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    a.SetDependencies(b);
-    //    b.SetDependencies(a);
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    Assert.Throws<ModDependencyCycleException>(() => traverser.Traverse(a));
-    //}
-
-    //[Fact]
-    //public void TestTraverse_LayoutRecursive_ModinfoSpec_M_Throws()
-    //{
-    //    var a = CreateMod("A");
-    //    var b = CreateMod("B");
-    //    var c = CreateMod("C");
-    //    var d = CreateMod("D");
-    //    var e = CreateMod("E");
-    //    a.SetDependencies(b);
-    //    b.SetDependencies(c, d);
-    //    d.SetDependencies(e);
-    //    e.SetDependencies(a);
-    //    var traverser = new ModDependencyTraverser(_serviceProvider);
-    //    Assert.Throws<ModDependencyCycleException>(() => traverser.Traverse(a));
-    //}
-
-    //private TestMod CreateMod(string name, params IModReference[] dependencies)
-    //{
-    //    _game.InstallAndAddMod(name, )
-
-    //    _fileSystem.Initialize().WithSubdirectory($"Game/Mods/{name}");
-    //    return new TestMod(_game, _fileSystem.DirectoryInfo.New($"Game/Mods/{name}"), false, name, _serviceProvider);
-    //}
-
-    //[DebuggerDisplay("Name = {Name}")]
-    //private class TestMod : Mod
-    //{
-    //    private DependencyResolveLayout _layout;
-
-    //    //public override DependencyResolveLayout DependencyResolveLayout => _layout;
-
-    //    public TestMod(IGame game, IDirectoryInfo modDirectory, bool workshop, string name, IServiceProvider serviceProvider) : base(game, modDirectory, workshop, name, serviceProvider)
-    //    {
-    //        DependencyResolveStatus = DependencyResolveStatus.Resolved;
-    //    }
-
-    //    public void SetLayout(DependencyResolveLayout layout)
-    //    {
-    //        _layout = layout;
-    //    }
-    //}
+    private readonly ModDependencyTraverser _traverser;
+
+    // Note that we cannot test the cycle scenarios here,
+    // as these cases already get handled when resolving a mod's dependencies.
+    public ModDependencyTraverserTest()
+    {
+        _traverser = new ModDependencyTraverser(ServiceProvider);
+    }
+
+    [Theory]
+    [MemberData(nameof(ModTestScenarios.ValidScenarios), MemberType = typeof(ModTestScenarios))]
+    public void Traverse_ValidScenarios(ModTestScenarios.TestScenario testScenario)
+    {
+
+        var scenario = ModTestScenarios.CreateTestScenario(
+            testScenario,
+            CreateAndAddMod,
+            CreateAndAddMod);
+
+        var mod = scenario.Mod;
+        mod.ResolveDependencies();
+
+        var traversedList = _traverser.Traverse(mod);
+
+        Assert.Equal(scenario.ExpectedTraversedList, traversedList);
+    }
+    
+    [Fact]
+    public void Traverse_FaultedResolvedMod_Throws()
+    {
+        // Do not add to provoke faulted
+        var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+
+        var mod = CreateAndAddMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), dep);
+
+        try
+        {
+            mod.ResolveDependencies();
+        }
+        catch (ModNotFoundException)
+        {
+            // Ignore
+        }
+
+        Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+        Assert.Throws<InvalidOperationException>(() => _traverser.Traverse(mod));
+    }
+
+    [Fact]
+    public void Traverse_NotResolvedMod_Throws()
+    {
+        // Do not add to provoke faulted
+        var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        var mod = CreateAndAddMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), dep);
+        
+        Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);
+        Assert.Throws<InvalidOperationException>(() => _traverser.Traverse(mod));
+    }
 }

@@ -60,7 +60,7 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
     //    _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
     //        .Returns(new ModinfoFinderCollection(modLoc));
 
-    //    var modRef = new ModReference("Mods/Name", ModType.Default);
+    //    var modRef = new Mod("Mods/Name", ModType.Default);
 
     //    var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
     //    Assert.Single(mods);
@@ -88,7 +88,7 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
     //    _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
     //        .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
 
-    //    var modRef = new ModReference("Mods/Name", ModType.Default);
+    //    var modRef = new Mod("Mods/Name", ModType.Default);
 
     //    var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
     //    Assert.Single(mods);
@@ -118,7 +118,7 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
     //    _gameTypeResolver.Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, modinfo.Object, out resolveResult))
     //        .Returns(true);
 
-    //    var modRef = new ModReference("Mods/Name", ModType.Default);
+    //    var modRef = new Mod("Mods/Name", ModType.Default);
 
     //    Assert.Throws<ModException>(() => _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture));
     //}
@@ -154,7 +154,7 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
     //        .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object }));
 
 
-    //    var modRef = new ModReference("Mods/Name", ModType.Default);
+    //    var modRef = new Mod("Mods/Name", ModType.Default);
 
     //    var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
     //    Assert.Equal(2, mods.Count());
@@ -195,7 +195,7 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
     //    _gameTypeResolver.Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, variantB.Object, out resolveResult))
     //        .Returns(true);
 
-    //    var modRef = new ModReference("Mods/Name", ModType.Default);
+    //    var modRef = new Mod("Mods/Name", ModType.Default);
 
     //    var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
     //    Assert.Single(mods);
@@ -223,7 +223,7 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
     //    _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
     //        .Returns(new ModinfoFinderCollection(modLoc));
 
-    //    var modRef = new ModReference("Mods/Name", ModType.Default);
+    //    var modRef = new Mod("Mods/Name", ModType.Default);
 
     //    var mod = _service.FromReference(game.Object, modRef, modinfo.Object, CultureInfo.CurrentCulture);
     //    Assert.NotNull(mod);

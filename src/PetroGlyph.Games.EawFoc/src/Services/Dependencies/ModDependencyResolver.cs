@@ -50,7 +50,7 @@ internal class ModDependencyResolver(IServiceProvider serviceProvider)
 
                 foreach (var outEdge in outEdges)
                 {
-                    var dep = game.FindMod(outEdge.Target.ModReference);
+                    var dep = game.FindMod(outEdge.Target.Mod);
                     directDeps.Add(dep!);
                 }
             }
@@ -58,7 +58,7 @@ internal class ModDependencyResolver(IServiceProvider serviceProvider)
             {
                 if (!outEdges.Any())
                     continue;
-                var currentMod = game.FindMod(vertex.ModReference);
+                var currentMod = game.FindMod(vertex.Mod);
                 Debug.Assert(currentMod is not null);
                 currentMod!.ResolveDependencies();
             }
