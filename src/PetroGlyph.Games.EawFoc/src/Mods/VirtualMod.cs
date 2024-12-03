@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
@@ -68,8 +69,9 @@ public sealed class VirtualMod : ModBase, IVirtualMod
     }
 
     /// <inheritdoc/>
+    [ExcludeFromCodeCoverage]
     public override string ToString()
     {
-        return Identifier;
+        return $"Virtual Mod: {Name}; Identifier={Identifier}";
     }
 }

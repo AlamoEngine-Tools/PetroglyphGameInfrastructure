@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace PG.TestingUtilities;
+
+public static class TestHelpers
+{
+    private static readonly Random Random = new();
+
+    public static bool RandomBool()
+    {
+        return Random.Next() % 2 == 0;
+    }
+
+    public static T GetRandomEnum<T>() where T : struct, Enum
+    {
+        var values = Enum.GetValues(typeof(T));
+        return (T)values.GetValue(Random.Next(values.Length));
+    }
+
+    public static T GetRandom<T>(IEnumerable<T> items)
+    {
+        var list = items.ToList();
+        var r = Random.Next(list.Count);
+        return list[r];
+    }
+
+    public static string ShuffleCasing(string input)
+    {
+        var characters = input.ToCharArray();
+
+        for (var i = 0; i < characters.Length; i++)
+        {
+            if (char.IsLetter(characters[i]))
+            {
+                if (Random.Next(2) == 0)
+                {
+                    characters[i] = char.IsUpper(characters[i])
+                        ? char.ToLower(characters[i])
+                        : char.ToUpper(characters[i]);
+                }
+            }
+        }
+
+        return new string(characters);
+    }
+}

@@ -8,7 +8,7 @@ namespace PG.StarWarsGame.Infrastructure.Testing;
 public static class GITestUtilities
 {
     public static ICollection<GamePlatform> RealPlatforms { get; } =
-        [GamePlatform.Disk, GamePlatform.DiskGold, GamePlatform.DiskGold, GamePlatform.GoG, GamePlatform.Origin];
+        [GamePlatform.Disk, GamePlatform.DiskGold, GamePlatform.SteamGold, GamePlatform.GoG, GamePlatform.Origin];
 
     public static void AssertEqual(this GameDetectionResult expected, GameDetectionResult actual)
     {

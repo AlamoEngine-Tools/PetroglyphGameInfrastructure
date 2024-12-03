@@ -21,9 +21,8 @@ internal class SteamWorkshopWebpageDownloader : ISteamWorkshopWebpageDownloader
         try
         {
             var address = $"{SteamWorkshopsBaseUrl}{queryString}";
-            var client = new HttpClient();
+            using var client = new HttpClient();
             var reply = await client.GetStringAsync(address);
-
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(reply);
             return htmlDocument;

@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Threading.Tasks;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 using Xunit;
 
@@ -7,7 +8,7 @@ namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 public class SteamWorkshopWebpageDownloaderTest
 {
     [Fact]
-    public async void Test()
+    public async Task GetSteamWorkshopsPageHtmlAsync()
     {
         var downloader = new SteamWorkshopWebpageDownloader();
         var html = await downloader.GetSteamWorkshopsPageHtmlAsync(1129810972, CultureInfo.InvariantCulture);

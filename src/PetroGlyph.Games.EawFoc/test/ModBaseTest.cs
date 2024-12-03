@@ -229,6 +229,49 @@ public abstract class ModBaseTest : PlayableModContainerTest
         }
     }
 
+    [Fact]
+    public void EqualsHashCode()
+    {
+        var dep = CreateOtherMod("B");
+        var mod = CreateMod("A");
+        var samish = CreateMod("A");
+        var otherA = CreateMod("A", deps: dep);
+
+        ModBase custom;
+        if (mod.ModInfo is not null)
+            custom = new CustomMod(Game, mod.Identifier, mod.Type, mod.ModInfo, ServiceProvider);
+        else
+            custom = new CustomMod(Game, mod.Identifier, mod.Type, mod.Name, ServiceProvider);
+
+        Assert.False(mod.Equals(null));
+        Assert.False(mod.Equals((object)null!));
+        Assert.False(mod.Equals((IModIdentity)null!));
+        Assert.False(mod.Equals((IModReference)null!));
+
+        Assert.True(mod.Equals(mod));
+        Assert.True(mod.Equals((object)mod));
+        Assert.True(mod.Equals((IModIdentity)mod));
+        Assert.True(mod.Equals((IModReference)mod));
+        Assert.Equal(mod.GetHashCode(), mod.GetHashCode());
+
+        Assert.True(mod.Equals(samish));
+        Assert.True(mod.Equals((object)samish));
+        Assert.True(mod.Equals((IModIdentity)samish));
+        Assert.True(mod.Equals((IModReference)samish));
+        Assert.Equal(mod.GetHashCode(), samish.GetHashCode());
+
+        Assert.False(mod.Equals(otherA));
+        Assert.False(mod.Equals((object)otherA));
+        Assert.False(mod.Equals((IModIdentity)otherA));
+        Assert.True(mod.Equals((IModReference)otherA));
+        Assert.NotEqual(mod.GetHashCode(), otherA.GetHashCode());
+
+        Assert.True(mod.Equals(custom));
+        Assert.False(mod.Equals((object)custom));
+        Assert.True(mod.Equals((IModIdentity)custom));
+        Assert.True(mod.Equals((IModReference)custom));
+    }
+
     public class ModBaseAbstractTest : CommonTestBaseWithRandomGame
     {
         [Fact]
@@ -258,6 +301,17 @@ public abstract class ModBaseTest : PlayableModContainerTest
                 ResolveDependencies();
                 base.OnDependenciesResolved();
             }
+        }
+    }
+
+    private class CustomMod : ModBase
+    {
+        public CustomMod(IGame game, string identifier, ModType type, string name, IServiceProvider serviceProvider) : base(game, identifier, type, name, serviceProvider)
+        {
+        }
+
+        public CustomMod(IGame game, string identifier, ModType type, IModinfo modinfo, IServiceProvider serviceProvider) : base(game, identifier, type, modinfo, serviceProvider)
+        {
         }
     }
 }

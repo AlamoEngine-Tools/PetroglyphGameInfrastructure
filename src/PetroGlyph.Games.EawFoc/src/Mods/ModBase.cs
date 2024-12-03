@@ -4,6 +4,7 @@ using System.IO;
 using EawModinfo;
 using EawModinfo.Model;
 using EawModinfo.Spec;
+using EawModinfo.Spec.Equality;
 using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -64,7 +65,7 @@ public abstract class ModBase : PlayableModContainer, IMod
         ModInfo?.Dependencies.ResolveLayout ?? DependencyResolveLayout.ResolveRecursive;
 
     /// <summary>
-    /// Creates a new <see cref="IMod"/> instances with a constant name
+    /// Initializes a new instance of the <see cref="ModBase"/> class of the specified game, mod identifier, mod type, name and service provider.
     /// </summary>
     /// <param name="game">The game of the mod</param>
     /// <param name="identifier">The identifier of the mod.</param>
@@ -89,7 +90,7 @@ public abstract class ModBase : PlayableModContainer, IMod
     }
 
     /// <summary>
-    /// Creates a new <see cref="IMod"/> instances from a modinfo. The modinfo must not be <see langword="null"/>!
+    /// Initializes a new instance of the <see cref="ModBase"/> class of the specified game, mod identifier, mod type, modinfo data and service provider.
     /// </summary>
     /// <param name="game">The game of the mod</param>
     /// <param name="identifier">The identifier of the mod.</param>
@@ -140,22 +141,41 @@ public abstract class ModBase : PlayableModContainer, IMod
         }
     }
 
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        if (obj == null)
+            return false;
+        if (ReferenceEquals(this, obj))
+            return true;
+        if (GetType() != obj.GetType())
+            return false;
+        var other = (IMod)obj;
+        return Equals(other);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return ModEqualityComparer.Default.GetHashCode(this);
+    }
+
     /// <inheritdoc/>
-    public virtual bool Equals(IMod? other)
+    public bool Equals(IMod? other)
     {
         return ModEqualityComparer.Default.Equals(this, other);
     }
 
     /// <inheritdoc/>
-    public virtual bool Equals(IModIdentity? other)
+    public bool Equals(IModIdentity? other)
     {
-        return ModEqualityComparer.Default.Equals(this, other);
+        return ModIdentityEqualityComparer.Default.Equals(this, other);
     }
 
     /// <inheritdoc/>
-    public virtual bool Equals(IModReference? other)
+    public bool Equals(IModReference? other)
     {
-        return ModEqualityComparer.Default.Equals(this, other);
+        return ModReferenceEqualityComparer.Default.Equals(this, other);
     }
 
     /// <summary>

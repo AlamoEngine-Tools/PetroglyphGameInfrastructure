@@ -77,6 +77,7 @@ public class VirtualModTest : ModBaseTest
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, "VirtualModId", "name", new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved), ServiceProvider));
 
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "name", null!, ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "name", "Name", null!, ServiceProvider));
 
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "VirtualModId", new ModinfoData("Name"), null!));
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, null!, new ModinfoData("Name"), ServiceProvider));
