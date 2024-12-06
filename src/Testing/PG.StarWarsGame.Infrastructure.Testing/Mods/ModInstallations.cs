@@ -64,7 +64,7 @@ public static class ModInstallations
             return fs.Path.Combine(game.ModsLocation.FullName, name);
         if (workshop && game.Platform is not GamePlatform.SteamGold)
         {
-            Assert.Fail();
+            Assert.Fail($"Game: {game}, Mod: {name}, {workshop}");
             throw new InvalidOperationException("compiler flow");
         }
 

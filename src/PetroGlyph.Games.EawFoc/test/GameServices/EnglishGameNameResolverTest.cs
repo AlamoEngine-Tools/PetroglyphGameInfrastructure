@@ -1,50 +1,42 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Name;
+using PG.StarWarsGame.Infrastructure.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
-public class EnglishGameNameResolverTest
+public class EnglishGameNameResolverTest : CommonTestBase
 {
-    [Fact]
-    public void IgnoreCulture()
+    public static IEnumerable<object[]> GetCultures()
+    {
+        yield return [CultureInfo.InvariantCulture];
+        yield return [CultureInfo.CurrentUICulture];
+        yield return [new CultureInfo("en")];
+        yield return [new CultureInfo("de")];
+        yield return [new CultureInfo("es")];
+        yield return [new CultureInfo("fr")];
+    }
+
+    [Theory]
+    [MemberData(nameof(GetCultures))]
+    public void ResolveName_IgnoreCulture(CultureInfo culture)
     {
         var resolver = new EnglishGameNameResolver();
-        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
-        resolver.ResolveName(id, CultureInfo.GetCultureInfo("de"));
+        var id = CreateRandomGameIdentity();
+        resolver.ResolveName(id, culture);
         var name = resolver.ResolveName(id, CultureInfo.CurrentCulture);
-        Assert.Contains("Steam", name);
-        Assert.Contains("Empire at War", name);
+
+        Assert.Contains(id.Platform.ToString(), name);
+        Assert.Contains(id.Type == GameType.Eaw ? "Empire at War" : "Forces of Corruption", name);
     }
 
     [Fact]
-    public void EawSteamName()
+    public void ResolveName_NullArgThrows()
     {
         var resolver = new EnglishGameNameResolver();
-        var id = new GameIdentity(GameType.Eaw, GamePlatform.SteamGold);
-        var name = resolver.ResolveName(id, CultureInfo.InvariantCulture);
-        Assert.Contains("Steam", name);
-        Assert.Contains("Empire at War", name);
-    }
-
-    [Fact]
-    public void FocSteamName()
-    {
-        var resolver = new EnglishGameNameResolver();
-        var id = new GameIdentity(GameType.Foc, GamePlatform.SteamGold);
-        var name = resolver.ResolveName(id, CultureInfo.CurrentCulture);
-        Assert.Contains("Steam", name);
-        Assert.Contains("Corruption", name);
-    }
-
-    [Fact]
-    public void DiskSteamName()
-    {
-        var resolver = new EnglishGameNameResolver();
-        var id = new GameIdentity(GameType.Foc, GamePlatform.Disk);
-        var name = resolver.ResolveName(id, CultureInfo.InvariantCulture);
-        Assert.DoesNotContain("Steam", name);
-        Assert.Contains("Corruption", name);
+        Assert.Throws<ArgumentNullException>(() => resolver.ResolveName(null!, CultureInfo.CurrentCulture));
     }
 }

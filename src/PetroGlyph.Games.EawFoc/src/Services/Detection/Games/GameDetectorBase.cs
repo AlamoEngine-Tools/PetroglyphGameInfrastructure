@@ -69,7 +69,7 @@ public abstract class GameDetectorBase : IGameDetector
     }
 
     /// <inheritdoc/>
-    public GameDetectionResult Detect(GameType gameType, ICollection<GamePlatform> platforms)
+    public GameDetectionResult Detect(GameType gameType, params ICollection<GamePlatform> platforms)
     {
         platforms = NormalizePlatforms(platforms);
 

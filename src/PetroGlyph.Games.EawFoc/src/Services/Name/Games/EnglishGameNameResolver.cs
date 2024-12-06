@@ -10,17 +10,9 @@ namespace PG.StarWarsGame.Infrastructure.Services.Name;
 public sealed class EnglishGameNameResolver : IGameNameResolver
 {
     /// <summary>
-    /// Returns the english name of the game, regardless of the given <paramref name="culture"/>
+    /// Returns the English name of the game, regardless of the given <paramref name="culture"/>
     /// </summary>
     public string ResolveName(IGameIdentity game, CultureInfo culture)
-    {
-        return ResolveName(game);
-    }
-
-    /// <summary>
-    /// Returns the english name of the game.
-    /// </summary>
-    private string ResolveName(IGameIdentity game)
     {
         if (game == null)
             throw new ArgumentNullException(nameof(game));
@@ -30,5 +22,4 @@ public sealed class EnglishGameNameResolver : IGameNameResolver
         var platform = game.Platform.ToString();
         return $"{gameName} ({platform})";
     }
-
 }

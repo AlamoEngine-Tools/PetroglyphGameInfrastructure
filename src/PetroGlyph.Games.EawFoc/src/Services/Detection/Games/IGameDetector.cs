@@ -23,7 +23,7 @@ public interface IGameDetector
     /// <remarks>
     /// If <paramref name="platforms"/> is empty or contains <see cref="GamePlatform.Undefined"/> all platforms are supported.
     /// </remarks>
-    GameDetectionResult Detect(GameType gameType, ICollection<GamePlatform> platforms);
+    GameDetectionResult Detect(GameType gameType, params ICollection<GamePlatform> platforms);
 
     /// <summary>
     /// Tries to detect a game installation.

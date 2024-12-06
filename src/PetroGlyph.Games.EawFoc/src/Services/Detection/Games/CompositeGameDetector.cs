@@ -51,7 +51,7 @@ public sealed class CompositeGameDetector : IGameDetector
     /// <param name="platforms">Collection of the platforms to search for.</param>
     /// <returns>Data which holds the game's location or error information.</returns>
     /// <exception cref="AggregateException"></exception>
-    public GameDetectionResult Detect(GameType gameType, ICollection<GamePlatform> platforms)
+    public GameDetectionResult Detect(GameType gameType, params ICollection<GamePlatform> platforms)
     {
         var errors = new List<Exception>();
         GameDetectionResult? lastResult = null;
@@ -72,7 +72,7 @@ public sealed class CompositeGameDetector : IGameDetector
                 _logger?.LogTrace($"Failed detecting game using detector {detector}. {e}");
                 errors.Add(e);
 
-                if (detector.Equals(SortedDetectors[SortedDetectors.Count - 1]))
+                if (detector.Equals(SortedDetectors[^1]))
                     throw new AggregateException(errors);
             }
             finally

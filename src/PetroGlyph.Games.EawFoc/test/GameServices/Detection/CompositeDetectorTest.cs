@@ -49,7 +49,7 @@ public class CompositeDetectorTest : CommonTestBase
             ServiceProvider,
             disposeDetectors: false);
 
-        var result = detector.Detect(identity.Type, [identity.Platform]);
+        var result = detector.Detect(identity.Type, identity.Platform);
         Assert.Equal([firstDetector, secondDetector], executedDetectors);
         expectedResult.AssertEqual(result);
         Assert.False(firstDetector.IsDisposed);
@@ -90,7 +90,7 @@ public class CompositeDetectorTest : CommonTestBase
 
         var detector = new CompositeGameDetector([firstDetector, secondDetector], ServiceProvider);
 
-        var result = detector.Detect(identity.Type, [identity.Platform]);
+        var result = detector.Detect(identity.Type, identity.Platform);
         Assert.Equal([firstDetector], executedDetectors);
         expectedResult.AssertEqual(result);
 
@@ -113,7 +113,7 @@ public class CompositeDetectorTest : CommonTestBase
 
         var detector = new CompositeGameDetector([firstDetector, secondDetector], ServiceProvider);
 
-        var result = detector.Detect(identity.Type, [identity.Platform]);
+        var result = detector.Detect(identity.Type, identity.Platform);
         expectedResult.AssertEqual(result);
 
         var success = detector.TryDetect(identity.Type, [identity.Platform], out result);
@@ -132,7 +132,7 @@ public class CompositeDetectorTest : CommonTestBase
 
         var detector = new CompositeGameDetector([firstDetector, secondDetector], ServiceProvider);
 
-        var result = detector.Detect(identity.Type, [identity.Platform]);
+        var result = detector.Detect(identity.Type, identity.Platform);
         expectedResult.AssertEqual(result);
 
         var success = detector.TryDetect(identity.Type, [identity.Platform], out result);
@@ -151,7 +151,7 @@ public class CompositeDetectorTest : CommonTestBase
 
         var detector = new CompositeGameDetector([firstDetector, secondDetector], ServiceProvider);
 
-        var result = detector.Detect(identity.Type, [identity.Platform]);
+        var result = detector.Detect(identity.Type, identity.Platform);
         expectedResult.AssertEqual(result);
 
         var success = detector.TryDetect(identity.Type, [identity.Platform], out result);
@@ -170,7 +170,7 @@ public class CompositeDetectorTest : CommonTestBase
 
         var detector = new CompositeGameDetector([firstDetector, secondDetector], ServiceProvider);
 
-        Assert.Throws<AggregateException>(() => detector.Detect(identity.Type, [identity.Platform]));
+        Assert.Throws<AggregateException>(() => detector.Detect(identity.Type, identity.Platform));
 
         var success = detector.TryDetect(identity.Type, [identity.Platform], out var result);
         Assert.False(success);
@@ -202,7 +202,7 @@ public class CompositeDetectorTest : CommonTestBase
             count++;
         };
 
-        var result = detector.Detect(identity.Type, [identity.Platform]);
+        var result = detector.Detect(identity.Type, identity.Platform);
         Assert.Equal(2, count);
         expectedResult.AssertEqual(result);
 
@@ -247,7 +247,7 @@ public class CompositeDetectorTest : CommonTestBase
             ServiceProvider, 
             disposeDetectors: true);
 
-        var result = detector.Detect(identity.Type, [identity.Platform]);
+        var result = detector.Detect(identity.Type, identity.Platform);
         expectedResult.AssertEqual(result);
         Assert.True(firstDetector.IsDisposed);
         Assert.True(secondDetector.IsDisposed);

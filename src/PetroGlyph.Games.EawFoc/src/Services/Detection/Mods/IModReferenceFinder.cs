@@ -10,9 +10,9 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 public interface IModReferenceFinder
 {
     /// <summary>
-    /// Searches for <see cref="IModReference"/> for a given game
+    /// Searches for <see cref="IModReference"/> for a given game.
     /// </summary>
-    /// <param name="game">The target game.</param>
-    /// <returns>A set of found <see cref="IModReference"/>s.</returns>
+    /// <param name="game">The game to search mods for.</param>
+    /// <returns>A set of detected mod references.</returns>
     ISet<DetectedModReference> FindMods(IGame game);
 }

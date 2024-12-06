@@ -36,7 +36,7 @@ public class CustomGameDetectorTest
 
             var detector = new CallbackGameDetectorBase(FindGameThrowsException, _serviceProvider, false);
 
-            Assert.Throws<Exception>(() => detector.Detect(gameType, []));
+            Assert.Throws<Exception>(() => detector.Detect(gameType));
 
             Assert.False(detector.TryDetect(gameType, [], out var result));
             expected.AssertEqual(result);
@@ -51,7 +51,7 @@ public class CustomGameDetectorTest
         var expected = GameDetectionResult.NotInstalled(gameType);
         var detector = new CallbackGameDetectorBase(ReturnsGame, _serviceProvider, false);
 
-        var result = detector.Detect(gameType, []);
+        var result = detector.Detect(gameType);
         expected.AssertEqual(result);
 
         Assert.False(detector.TryDetect(gameType, [], out result));
@@ -84,7 +84,7 @@ public class CustomGameDetectorTest
                 e.Handled = false;
             };
 
-            var result = detector.Detect(gameType, [platform]);
+            var result = detector.Detect(gameType, platform);
             requiredInit.AssertEqual(result);
             Assert.Equal(supportInitialization, eventRaised);
 
@@ -121,7 +121,7 @@ public class CustomGameDetectorTest
                 e.Handled = true;
                 eventRaised = true;
             };
-            var result = detector.Detect(gameType, [platform]);
+            var result = detector.Detect(gameType, platform);
             installed.AssertEqual(result);
             Assert.True(eventRaised);
 

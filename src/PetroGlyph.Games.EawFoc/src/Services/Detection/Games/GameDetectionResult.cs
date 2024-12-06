@@ -6,7 +6,7 @@ using PG.StarWarsGame.Infrastructure.Games;
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
 /// <summary>
-/// Result object used by <see cref="IGameDetector"/> containing all necessary information to create a game instance.
+/// Represents the result data created by an <see cref="IGameDetector"/> containing all necessary information to create a game instance.
 /// </summary>
 public sealed class GameDetectionResult
 {
@@ -43,7 +43,8 @@ public sealed class GameDetectionResult
     /// </summary>
     /// <param name="gameIdentity">The identity of the detected game.</param>
     /// <param name="location">The location of the detected game.</param>
-    public static GameDetectionResult FromInstalled(GameIdentity gameIdentity, IDirectoryInfo location)
+    /// <exception cref="ArgumentNullException"><paramref name="gameIdentity"/> or <paramref name="location"/> is <see langword="null"/>.</exception>
+    public static GameDetectionResult FromInstalled(IGameIdentity gameIdentity, IDirectoryInfo location)
     {
         if (gameIdentity == null) 
             throw new ArgumentNullException(nameof(gameIdentity));

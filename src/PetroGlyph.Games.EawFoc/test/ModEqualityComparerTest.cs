@@ -94,14 +94,14 @@ public class ModEqualityComparerTest : CommonTestBaseWithRandomGame
     [InlineData(true)]
     public void Equals_GameAware(bool gameAware)
     { 
+
         var modA = CreateAndAddMod("A");
 
         var sameishGame = new PetroglyphStarWarsGame(Game, Game.Directory, Game.Name, ServiceProvider);
         var modSamish = sameishGame.InstallAndAddMod(modA.Name, modA.Type == ModType.Workshops, ServiceProvider);
 
         var diffGame = FileSystem.InstallGame(
-                new GameIdentity(Game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw,
-                    TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
+                new GameIdentity(Game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw, Game.Platform), ServiceProvider);
 
         var diffGameMod = diffGame.InstallMod("A", modA.Type == ModType.Workshops, ServiceProvider);
 

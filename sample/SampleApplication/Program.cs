@@ -66,7 +66,7 @@ IList<IMod> FindMods()
 IGame FindGame()
 {
     var detector = services.GetRequiredService<IGameDetector>();
-    var detectionResult = detector.Detect(GameType.Foc, new List<GamePlatform>());
+    var detectionResult = detector.Detect(GameType.Foc);
     var gameFactory = services.GetRequiredService<IGameFactory>();
     return gameFactory.CreateGame(detectionResult, CultureInfo.CurrentCulture);
 }

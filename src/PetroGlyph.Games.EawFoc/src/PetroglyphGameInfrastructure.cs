@@ -37,14 +37,16 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IModDependencyTraverser>(sp => new ModDependencyTraverser(sp));
 
         serviceCollection.AddSingleton<ILanguageFinder>(sp => new InstalledLanguageFinder(sp));
+        serviceCollection.AddSingleton<IIconFinder>(_ => new IconFinder());
+
         serviceCollection.AddSingleton<ISteamWorkshopCache>(_ => new KnownSteamWorkshopCache());
+        serviceCollection.AddSingleton<ISteamWorkshopWebpageDownloader>(_ => new SteamWorkshopWebpageDownloader());
 
         serviceCollection.AddSingleton<IModNameResolver>(sp => new DirectoryModNameResolver(sp));
         serviceCollection.AddSingleton<IGameNameResolver>(_ => new EnglishGameNameResolver());
+
         serviceCollection.AddSingleton<IModGameTypeResolver>(sp => new OfflineModGameTypeResolver(sp));
 
-        serviceCollection.AddSingleton<ISteamWorkshopWebpageDownloader>(_ => new SteamWorkshopWebpageDownloader());
-
-        serviceCollection.AddSingleton<IIconFinder>(_ => new IconFinder());
+        serviceCollection.AddSingleton<IModGameTypeResolver>(sp => new OfflineModGameTypeResolver(sp));
     }
 }
