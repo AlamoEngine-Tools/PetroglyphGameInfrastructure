@@ -46,7 +46,5 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IGameNameResolver>(_ => new EnglishGameNameResolver());
 
         serviceCollection.AddSingleton<IModGameTypeResolver>(sp => new OfflineModGameTypeResolver(sp));
-
-        serviceCollection.AddSingleton<IModGameTypeResolver>(sp => new OfflineModGameTypeResolver(sp));
     }
 }

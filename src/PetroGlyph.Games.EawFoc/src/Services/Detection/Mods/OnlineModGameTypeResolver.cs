@@ -47,11 +47,10 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
 
     private bool GetGameTypeFromSteamPage(string steamIdValue, out GameType gameType)
     {
-        if (!_steamGameHelpers.ToSteamWorkshopsId(steamIdValue, out var steamId))
-            throw new InvalidOperationException($"Unable to convert '{steamIdValue}' to valid Steam Workshop ID.");
-
         gameType = default;
-
+        if (!_steamGameHelpers.ToSteamWorkshopsId(steamIdValue, out var steamId))
+            return false;
+        
         var nullableGameType = _gameTypeCache.GetOrAdd(steamId, id =>
         {
             var webPage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(steamId, CultureInfo.InvariantCulture)

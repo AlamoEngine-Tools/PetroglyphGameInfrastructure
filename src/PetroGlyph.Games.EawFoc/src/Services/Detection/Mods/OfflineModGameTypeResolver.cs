@@ -52,7 +52,7 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
         if (modType == ModType.Workshops)
         {
             if (!_steamGameHelpers.ToSteamWorkshopsId(directory.Name, out var steamId))
-                throw new InvalidOperationException($"Unable to convert '{directory.Name}' to valid Steam Workshop ID.");
+                return false;
 
             if (_cache.ContainsMod(steamId))
             {
