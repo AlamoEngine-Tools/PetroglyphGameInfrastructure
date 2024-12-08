@@ -78,13 +78,16 @@ internal class ModFinder : IModReferenceFinder
             var modinfoFiles = ModinfoFileFinder.FindModinfoFiles(modDirectory);
 
             IModinfo? mainModinfo = null;
+
+            // Since the concept of modinfo files is completely optional,
+            // a malformed modinfo file should not cause a crash. The mod in question gets fond without a modinfo.
             modinfoFiles.MainModinfo?.TryGetModinfo(out mainModinfo);
 
             if (IsDefinitelyNotGameType(requestedGameType, modDirectory, type, mainModinfo))
                 continue;
 
             var id = _idBuilder.Build(modDirectory, isWorkshopsPath);
-            yield return new DetectedModReference(new ModReference(id, type), mainModinfo);
+            yield return new DetectedModReference(new ModReference(id, type), modDirectory, mainModinfo);
 
             foreach (var variantModinfoFile in modinfoFiles.Variants)
             {
@@ -95,7 +98,7 @@ internal class ModFinder : IModReferenceFinder
                     continue;
 
                 id = _idBuilder.Build(modDirectory, isWorkshopsPath);
-                yield return new DetectedModReference(new ModReference(id, type), variantModinfo);
+                yield return new DetectedModReference(new ModReference(id, type), modDirectory, variantModinfo);
             }
         }
     }
