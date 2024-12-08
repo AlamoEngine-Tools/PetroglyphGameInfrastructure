@@ -105,6 +105,6 @@ internal class ModFinder : IModReferenceFinder
         // If the type resolver was unable to find the type, we have to assume that the current mod matches to the game.
         // Otherwise, we'd produce false negatives. Only if the resolver was able to determine a result, we use that finding.
         return _gameTypeResolver.TryGetGameType(modDirectory, modType, modinfo, out var variantGameType) &&
-               expected != variantGameType;
+               variantGameType.Contains(expected);
     }
 }

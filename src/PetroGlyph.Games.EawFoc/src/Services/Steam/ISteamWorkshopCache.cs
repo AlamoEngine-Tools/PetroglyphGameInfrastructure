@@ -8,5 +8,5 @@ internal interface ISteamWorkshopCache
 
     string GetName(ulong id);
 
-    GameType GetGameType(ulong id);
+    GameType[] GetGameTypes(ulong id);
 }

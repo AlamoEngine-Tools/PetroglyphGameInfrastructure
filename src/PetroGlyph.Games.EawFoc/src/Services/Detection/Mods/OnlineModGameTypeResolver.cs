@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
+using AnakinRaW.CommonUtilities.Collections;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -25,53 +26,39 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
     private readonly ConcurrentDictionary<ulong, GameType?> _gameTypeCache = new();
 
     /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out GameType gameType)
+    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out ReadOnlyFrugalList<GameType> gameTypes)
     {
-        if (_offlineResolver.TryGetGameType(modLocation, modType, modinfo, out gameType))
+        if (_offlineResolver.TryGetGameType(modLocation, modType, modinfo, out gameTypes))
             return true;
 
         if (modType != ModType.Workshops)
             return false;
-        return GetGameTypeFromSteamPage(modLocation.Name, out gameType);
+        return GetGameTypeFromSteamPage(modLocation.Name, out gameTypes);
     }
 
     /// <inheritdoc />
-    public bool TryGetGameType(IModinfo? modinfo, out GameType gameType)
+    public bool TryGetGameType(IModinfo? modinfo, out ReadOnlyFrugalList<GameType> gameTypes)
     {
-        if (_offlineResolver.TryGetGameType(modinfo, out gameType))
-            return true;
-        if (modinfo?.SteamData is null)
-            return false;
-        return GetGameTypeFromSteamPage(modinfo.SteamData.Id, out gameType);
+        gameTypes = default;
+        return _offlineResolver.TryGetGameType(modinfo, out gameTypes);
     }
 
-    private bool GetGameTypeFromSteamPage(string steamIdValue, out GameType gameType)
+    private bool GetGameTypeFromSteamPage(string steamIdValue, out ReadOnlyFrugalList<GameType> gameTypes)
     {
-        gameType = default;
+        gameTypes = default;
         if (!_steamGameHelpers.ToSteamWorkshopsId(steamIdValue, out var steamId))
             return false;
-        
-        var nullableGameType = _gameTypeCache.GetOrAdd(steamId, id =>
-        {
-            var webPage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(steamId, CultureInfo.InvariantCulture)
-                .GetAwaiter().GetResult();
-            if (webPage is null)
-                return null;
-            var tagNodes = webPage.DocumentNode.SelectNodes("//div[@class='workshopTags']/a/text()");
-            var tags = new HashSet<string>(tagNodes.Select(x => x.InnerHtml.ToUpperInvariant().Trim()));
-            if (tags.Contains("FOC"))
-                return GameType.Foc;
-            if (tags.Contains("EAW"))
-                return GameType.Eaw;
-            return null;
-        });
+        var webPage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(steamId, CultureInfo.InvariantCulture)
+            .GetAwaiter().GetResult();
+        if (webPage is null)
+            return false;
 
-        if (nullableGameType.HasValue)
-        {
-            gameType = nullableGameType.Value;
-            return true;
-        }
+        var tagNodes = webPage.DocumentNode.SelectNodes("//div[@class='workshopTags']/a/text()");
+        if (tagNodes is null || tagNodes.Count == 0)
+            return false;
 
-        return false;
+        var tags = new HashSet<string>(tagNodes.Select(x => x.InnerHtml));
+
+        return OfflineModGameTypeResolver.GetGameTypesFromTags(tags, out gameTypes);
     }
 }

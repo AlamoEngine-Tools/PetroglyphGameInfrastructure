@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.Linq;
+using AnakinRaW.CommonUtilities.Collections;
 using EawModinfo.Spec;
 using EawModinfo.Spec.Steam;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,63 +23,97 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
     private readonly ISteamGameHelpers _steamGameHelpers = serviceProvider.GetRequiredService<ISteamGameHelpers>();
 
     /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out GameType gameType)
+    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out ReadOnlyFrugalList<GameType> gameTypes)
     {
-        gameType = default;
+        gameTypes = default;
 
-        if (modType == ModType.Virtual)
+        if (modType is ModType.Virtual)
             return false;
 
-        if (HandleWorkshop(modLocation, modType, out gameType))
+        if (HandleWorkshop(modLocation, modType, modinfo, out var gameType))
+        {
+            gameTypes = new ReadOnlyFrugalList<GameType>(gameType);
             return true;
+        }
 
-        if (TryGetGameType(modinfo, out gameType))
+        var gameCandidateDir = modLocation.Parent?.Parent;
+        if (gameCandidateDir is null)
+            return false;
+
+        var detector = new DirectoryGameDetector(gameCandidateDir, serviceProvider);
+
+        if (detector.Detect(GameType.Foc, GamePlatform.Undefined).Installed)
+        {
+            gameTypes = new ReadOnlyFrugalList<GameType>(GameType.Foc);
             return true;
+        }
 
-        // TODO: If mod is in game\mods\modDir return gametype of the game.
+        if (detector.Detect(GameType.Eaw, GamePlatform.Undefined).Installed)
+        {
+            gameTypes = new ReadOnlyFrugalList<GameType>(GameType.Eaw);
+            return true;
+        }
+
         return false;
     }
 
     /// <inheritdoc />
-    public bool TryGetGameType(IModinfo? modinfo, out GameType gameType)
+    public bool TryGetGameType(IModinfo? modinfo, out ReadOnlyFrugalList<GameType> gameTypes)
     {
-        return GetGameType(modinfo?.SteamData, out gameType);
+        return GetGameType(modinfo?.SteamData, out gameTypes);
     }
 
-    private bool HandleWorkshop(IDirectoryInfo directory, ModType modType, out GameType gameType)
-    {
-        gameType = default;
+    private bool HandleWorkshop(IDirectoryInfo directory, ModType modType, IModinfo? modinfo, out ReadOnlyFrugalList<GameType> gameTypes)
+    { 
+        gameTypes = default;
         if (modType == ModType.Workshops)
         {
+            // Modinfo is superior, even to cache, because, this value can change faster,
+            // than new distribution of this library might release.
+            // so that the cache would then be invalid.
+            if (TryGetGameType(modinfo, out gameTypes))
+                return true;
+
             if (!_steamGameHelpers.ToSteamWorkshopsId(directory.Name, out var steamId))
                 return false;
 
             if (_cache.ContainsMod(steamId))
             {
-                gameType = _cache.GetGameType(steamId);
+                gameTypes = new ReadOnlyFrugalList<GameType>(_cache.GetGameTypes(steamId));
                 return true;
             }
         }
 
         return false;
     }
-    
-    private static bool GetGameType(ISteamData? steamData, out GameType gameType)
+
+    internal static bool GetGameTypesFromTags(IEnumerable<string> tags, out ReadOnlyFrugalList<GameType> gameTypes)
     {
-        gameType = GameType.Eaw;
-        if (steamData is null)
-            return false;
-        var tags = new HashSet<string>(steamData.Tags.Select(x => x.Trim().ToUpperInvariant()));
-        if (tags.Contains("FOC"))
+        var mutableGameTypes = new FrugalList<GameType>();
+        
+        foreach (var tag in tags)
         {
-            gameType = GameType.Foc;
-            return true;
+            var trimmed = tag.AsSpan().Trim();
+
+            if (trimmed.Equals("EAW".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            {
+                mutableGameTypes.Add(GameType.Eaw);
+            }
+
+            if (trimmed.Equals("FOC".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            {
+                mutableGameTypes.Add(GameType.Foc);
+            }
         }
-        if (tags.Contains("EAW"))
-        {
-            gameType = GameType.Eaw;
-            return true;
-        }
-        return false;
+
+        gameTypes = mutableGameTypes.AsReadOnly();
+        return gameTypes.Count >= 1;
+    }
+
+
+    private static bool GetGameType(ISteamData? steamData, out ReadOnlyFrugalList<GameType> gameTypes)
+    {
+        gameTypes = default;
+        return steamData is not null && GetGameTypesFromTags(steamData.Tags, out gameTypes);
     }
 }
