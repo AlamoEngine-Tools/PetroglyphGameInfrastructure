@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <summary>
 /// Service to search for <see cref="IModReference"/>s.
 /// </summary>
-public interface IModReferenceFinder
+public interface IModFinder
 {
     /// <summary>
     /// Searches for <see cref="IModReference"/> for a given game.

@@ -11,19 +11,12 @@ using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 
-/// <summary>
-/// Searches for <see cref="IModReference"/>s for a give <see cref="IGame"/>.
-/// </summary>
-internal class ModFinder : IModReferenceFinder
+internal class ModFinder : IModFinder
 {
     private readonly ISteamGameHelpers _steamHelper;
     private readonly IModIdentifierBuilder _idBuilder;
     private readonly IModGameTypeResolver _gameTypeResolver;
 
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    /// <param name="serviceProvider">The service provider</param>
     public ModFinder(IServiceProvider serviceProvider)
     {
         if (serviceProvider == null)
@@ -33,13 +26,6 @@ internal class ModFinder : IModReferenceFinder
         _gameTypeResolver = serviceProvider.GetRequiredService<IModGameTypeResolver>();
     }
 
-    /// <summary>
-    /// Searches mods for the given <paramref name="game"/>.
-    /// </summary>
-    /// <param name="game">The game which hosts the mods.</param>
-    /// <returns>A set of <see cref="IModReference"/>s.
-    /// The <see cref="IModReference.Identifier"/> either holds the absolute path or Steam Workshops ID.</returns>
-    /// <exception cref="GameException">If the <paramref name="game"/> is not installed.</exception>
     public ISet<DetectedModReference> FindMods(IGame game)
     {
         if (game == null)
