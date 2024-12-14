@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EawModinfo.Spec;
+using EawModinfo.Utilities;
 using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
@@ -10,9 +12,11 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 public interface IModFinder
 {
     /// <summary>
-    /// Searches for <see cref="IModReference"/> for a given game.
+    /// Searches for physically installed mods for the specified game.
     /// </summary>
     /// <param name="game">The game to search mods for.</param>
-    /// <returns>A set of detected mod references.</returns>
-    ISet<DetectedModReference> FindMods(IGame game);
+    /// <returns>A collection of installed mods of <paramref name="game"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="game"/> is <see langword="null"/>.</exception>
+    /// <exception cref="GameException"><paramref name="game"/> does not exist.</exception>
+    ICollection<DetectedModReference> FindMods(IGame game);
 }

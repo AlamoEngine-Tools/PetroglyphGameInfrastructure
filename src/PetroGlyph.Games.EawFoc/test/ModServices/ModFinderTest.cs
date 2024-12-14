@@ -1,302 +1,277 @@
 ﻿using System;
-using System.IO.Abstractions;
+using System.Collections.Generic;
+using System.Linq;
+using EawModinfo.Model;
+using EawModinfo.Spec.Steam;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using Testably.Abstractions.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-public class ModFinderTest
+public class ModFinderTest : CommonTestBase
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ModFinder _service;
-    private readonly Mock<ISteamGameHelpers> _steamHelper;
-    private readonly MockFileSystem _fileSystem;
-    private readonly Mock<IModIdentifierBuilder> _idBuilder;
-    private readonly Mock<IModGameTypeResolver> _gameTypeResolver;
+    private readonly ModFinder _modFinder;
+    private readonly ISteamGameHelpers _steamGameHelpers;
 
     public ModFinderTest()
     {
-        var sc = new ServiceCollection();
-        _steamHelper = new Mock<ISteamGameHelpers>();
-        _fileSystem = new MockFileSystem();
-        _idBuilder = new Mock<IModIdentifierBuilder>();
-        _gameTypeResolver = new Mock<IModGameTypeResolver>();
-        sc.AddSingleton(_ => _steamHelper.Object);
-        sc.AddSingleton<IFileSystem>(_ => _fileSystem);
-        sc.AddSingleton(_ => _idBuilder.Object);
-        sc.AddSingleton(_ => _gameTypeResolver.Object);
-
-        _serviceProvider = sc.BuildServiceProvider();
-        _service = new ModFinder(_serviceProvider);
+        _modFinder = new ModFinder(ServiceProvider);
+        _steamGameHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
     }
 
     [Fact]
-    public void GameNotExists_Throws()
+    public void FindMods_NullArg_Throws()
     {
-        var game = new Mock<IGame>();
-        Assert.Throws<GameException>(() => _service.FindMods(game.Object));
+        Assert.Throws<ArgumentNullException>(() => _modFinder.FindMods(null!));
     }
 
-    [Fact]
-    public void TestNoMods_Normal()
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_GameNotExists_Throws(GameIdentity gameIdentity)
     {
-        var game = _fileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.Disk), _serviceProvider);
-        var mods = _service.FindMods(game);
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        game.Directory.Delete(true);
+        Assert.Throws<GameException>(() => _modFinder.FindMods(game));
+    }
+
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_NoModsDirectory_ShouldNotFindMods(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        game.ModsLocation.Delete(true);
+
+        if (game.Platform is GamePlatform.SteamGold)
+        {
+            var wsDir = _steamGameHelpers.GetWorkshopsLocation(game);
+            wsDir.Delete(true);
+        }
+
+        var mods = _modFinder.FindMods(game);
         Assert.Empty(mods);
     }
 
-    [Fact]
-    public void TestNoMods_Normal_NoFolder()
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_EmptyModsDirectory_ShouldNotFindMods(GameIdentity gameIdentity)
     {
-        _fileSystem.Initialize().WithSubdirectory("Game");
-        var game = new Mock<IGame>();
-        game.Setup(g => g.Exists()).Returns(true);
-        game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
-        var mods = _service.FindMods(game.Object);
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        game.ModsLocation.Create();
+
+        if (game.Platform is GamePlatform.SteamGold)
+        {
+            var wsDir = _steamGameHelpers.GetWorkshopsLocation(game);
+            wsDir.Create();
+        }
+
+        var mods = _modFinder.FindMods(game);
         Assert.Empty(mods);
     }
 
-    [Fact]
-    public void TestNoMods_Steam()
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_OneMod_WithoutModinfo(GameIdentity gameIdentity)
     {
-        _fileSystem.Initialize().WithSubdirectory("Lib/Game/Eaw/Mods");
-        var game = new Mock<IGame>();
-        game.Setup(g => g.Exists()).Returns(true);
-        game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-        game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-        game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-        _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-            .Returns(_fileSystem.DirectoryInfo.New("wsDir"));
-        var mods = _service.FindMods(game.Object);
-        Assert.Empty(mods);
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+
+        var installedMods = _modFinder.FindMods(game);
+
+        var foundMod = Assert.Single(installedMods);
+
+        Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
+        Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
+        Assert.Equal(expectedMod.ModInfo, foundMod.Modinfo);
+
+        // Cannot assert on expectedMod.Identifier, cause this test framework builds the wrong identifiers.
+        Assert.Equal(expectedMod.Directory.Name, foundMod.ModReference.Identifier);
     }
 
-    //[Fact]
-    //public void TestOneMods_Normal()
-    //{
-    //    _fileSystem.Initialize().WithSubdirectory("Game/Mods/ModA");
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Exists()).Returns(true);
-    //    game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
-    //    game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_OneMod_WithInvalidModinfo(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-    //    _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), false))
-    //        .Returns("somePath");
+        var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        expectedMod.InstallInvalidModinfoFile();
 
-    //    var mods = _service.FindMods(game.Object);
-    //    var mod = Assert.Single(mods);
-    //    Assert.Equal("somePath", mod.Identifier);
-    //    Assert.Equal(ModType.Default, mod.Type);
-    //}
 
-    //[Fact]
-    //public void TestNoModOfPlatform_Normal()
-    //{
-    //    _fileSystem.Initialize().WithSubdirectory("Game/Mods/ModA");
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Exists()).Returns(true);
-    //    game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-    //    game.Setup(g => g.Type).Returns(GameType.Eaw);
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
-    //    game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
+        var installedMods = _modFinder.FindMods(game);
 
-    //    _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), false))
-    //        .Returns("somePath");
+        var foundMod = Assert.Single(installedMods);
 
-    //    var resolverResult = GameType.Foc;
-    //    _gameTypeResolver
-    //        .Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, true, out resolverResult))
-    //        .Returns(true);
+        Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
+        Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
+        Assert.Equal(expectedMod.ModInfo, foundMod.Modinfo);
 
-    //    var mods = _service.FindMods(game.Object);
-    //    Assert.Empty(mods);
-    //}
+        // Cannot assert on expectedMod.Identifier, cause this test framework builds the wrong identifiers.
+        Assert.Equal(expectedMod.Directory.Name, foundMod.ModReference.Identifier);
+    }
 
-    //[Fact]
-    //public void TestModOfCorrectPlatform_Normal()
-    //{
-    //    _fileSystem.Initialize().WithSubdirectory("Game/Mods/ModA");
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Exists()).Returns(true);
-    //    game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-    //    game.Setup(g => g.Type).Returns(GameType.Eaw);
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
-    //    game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_OneMod_WithOneInvalidModinfoVariant(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-    //    _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), false))
-    //        .Returns("somePath");
+        var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        expectedMod.InstallModinfoFile(new ModinfoData("Variant1"), "variant1");
+        expectedMod.InstallInvalidModinfoFile("variant2");
 
-    //    var resolverResult = GameType.Eaw;
-    //    _gameTypeResolver
-    //        .Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, true, out resolverResult))
-    //        .Returns(true);
 
-    //    var mods = _service.FindMods(game.Object);
-    //    var mod = Assert.Single(mods);
-    //    Assert.Equal("somePath", mod.Identifier);
-    //    Assert.Equal(ModType.Default, mod.Type);
-    //}
+        var installedMods = _modFinder.FindMods(game);
 
-    //[Fact]
-    //public void TestTwoMods_Normal()
-    //{
-    //    _fileSystem.Initialize()
-    //        .WithSubdirectory("Game/Mods/ModA")
-    //        .WithSubdirectory("Game/Mods/ModB");
+        var foundMod = Assert.Single(installedMods);
 
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Exists()).Returns(true);
-    //    game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Game"));
-    //    game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Game/Mods"));
+        Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
+        Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
+        Assert.Equal("Variant1", foundMod.Modinfo!.Name);
 
-    //    _idBuilder.SetupSequence(ib => ib.Build(It.IsAny<IDirectoryInfo>(), false))
-    //        .Returns("somePath1")
-    //        .Returns("somePath2");
+        // Cannot assert on expectedMod.Identifier, cause this test framework builds the wrong identifiers.
+        Assert.Equal($"{expectedMod.Directory.Name}:Variant1", foundMod.ModReference.Identifier);
+    }
 
-    //    var mods = _service.FindMods(game.Object);
-    //    Assert.Equal(2, mods.Count);
-    //}
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_OneMod_WithMainModinfo(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-    //[Fact]
-    //public void TestOneDefaultMod_Steam()
-    //{
-    //    _fileSystem.Initialize()
-    //        .WithSubdirectory("Lib/Game/Eaw/Mods/ModA");
+        var modinfoData = new ModinfoData("MyMod");
+        var expectedMod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modinfoData, ServiceProvider);
+        expectedMod.InstallModinfoFile(modinfoData);
 
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Exists()).Returns(true);
-    //    game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-    //        .Returns(_fileSystem.DirectoryInfo.New("path"));
+        var installedMods = _modFinder.FindMods(game);
 
-    //    _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), false))
-    //        .Returns("builderPath");
+        var foundMod = Assert.Single(installedMods);
 
-    //    var mods = _service.FindMods(game.Object);
-    //    var mod = Assert.Single(mods);
+        Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
+        Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
 
-    //    Assert.Equal("builderPath", mod.Identifier);
-    //    Assert.Equal(ModType.Default, mod.Type);
-    //}
+        // Cannot assert on expectedMod.Identifier, cause this test framework builds the wrong identifiers.
+        Assert.Equal(expectedMod.Directory.Name, foundMod.ModReference.Identifier);
+    }
 
-    //[Fact]
-    //public void TestOneDefaultModOneWsMod_Steam()
-    //{
-    //    _fileSystem.Initialize()
-    //        .WithSubdirectory("Lib/Game/Eaw/Mods/ModA")
-    //        .WithSubdirectory("Lib/workshop/content/32470/12345678");
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_WithOnlyManyVariantModinfos(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Exists()).Returns(true);
-    //    game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-    //        .Returns(_fileSystem.DirectoryInfo.New("Lib/workshop/content/32470/"));
+        var info1 = new ModinfoData("MyName1");
+        var info2 = new ModinfoData("MyName2");
+        var expectedMod = game.InstallMod("DirName", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        expectedMod.InstallModinfoFile(info1, "variant1");
+        expectedMod.InstallModinfoFile(info2, "variant2");
 
-    //    _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), false))
-    //        .Returns("defaultPath");
-    //    _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), true))
-    //        .Returns("workshopPath");
+        var installedMods = _modFinder.FindMods(game);
 
-    //    var mods = _service.FindMods(game.Object);
-    //    Assert.Equal(2, mods.Count);
+        Assert.Equal(2, installedMods.Count);
 
-    //    var wsMod = mods.First(m => m.Type == ModType.Workshops);
-    //    Assert.Equal("workshopPath", wsMod.Identifier);
+        foreach (var foundMod in installedMods)
+        {
+            Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
+            Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
+        }
 
-    //    var defaultMod = mods.First(m => m.Type == ModType.Default);
-    //    Assert.Equal("defaultPath", defaultMod.Identifier);
-    //}
+        Assert.Equivalent(new List<string>{ "MyName1", "MyName2" }, installedMods.Select(x => x.Modinfo!.Name), true);
+        Assert.Equivalent(
+            new List<string> { $"{expectedMod.Directory.Name}:MyName1", $"{expectedMod.Directory.Name}:MyName2" },
+            installedMods.Select(x => x.ModReference.Identifier), true);
+    }
 
-    //[Fact]
-    //public void TestOneWsMod_Steam()
-    //{
-    //    _fileSystem.Initialize()
-    //        .WithSubdirectory("Lib/workshop/content/32470/12345678");
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_WithMainAndManyVariantModinfos(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Exists()).Returns(true);
-    //    game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-    //        .Returns(_fileSystem.DirectoryInfo.New("Lib/workshop/content/32470/"));
+        var main = new ModinfoData("Main");
+        var info1 = new ModinfoData("MyName1");
+        var info2 = new ModinfoData("MyName2");
+        var expectedMod = game.InstallMod("DirName", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        expectedMod.InstallModinfoFile(main);
+        expectedMod.InstallModinfoFile(info1, "variant1");
+        expectedMod.InstallModinfoFile(info2, "variant2");
 
-    //    _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), true))
-    //        .Returns("workshopPath");
+        var installedMods = _modFinder.FindMods(game);
 
-    //    var mods = _service.FindMods(game.Object);
-    //    var mod = Assert.Single(mods);
-    //    Assert.Equal("workshopPath", mod.Identifier);
-    //    Assert.Equal(ModType.Workshops, mod.Type);
-    //}
+        Assert.Equal(3, installedMods.Count);
 
-    //[Fact]
-    //public void TestNoWsModMatchingType_Steam()
-    //{
-    //    _fileSystem.Initialize()
-    //        .WithSubdirectory("Lib/workshop/content/32470/12345678");
+        foreach (var foundMod in installedMods)
+        {
+            Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
+            Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
+        }
 
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Exists()).Returns(true);
-    //    game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-    //    game.Setup(g => g.Type).Returns(GameType.Foc);
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-    //        .Returns(_fileSystem.DirectoryInfo.New("Lib/workshop/content/32470/"));
+        Assert.Equivalent(new List<string> { "Main", "MyName1", "MyName2" }, installedMods.Select(x => x.Modinfo!.Name),
+            true);
 
-    //    _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), true))
-    //        .Returns("workshopPath");
+        Assert.Equivalent(
+            new List<string> { expectedMod.Directory.Name, $"{expectedMod.Directory.Name}:MyName1", $"{expectedMod.Directory.Name}:MyName2" },
+            installedMods.Select(x => x.ModReference.Identifier), true);
+    }
 
-    //    var resolverResult = GameType.Eaw;
-    //    _gameTypeResolver
-    //        .Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Workshops, true, out resolverResult))
-    //        .Returns(true);
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindMods_Steam_ShouldAddWorkshopsAndMods(GameType type)
+    {
+        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
 
-    //    var mods = _service.FindMods(game.Object);
-    //    Assert.Empty(mods);
-    //}
+        var steamMod = game.InstallMod("SteamMod", true, ServiceProvider);
 
-    //[Fact]
-    //public void TestNoWsMatchesType_Steam()
-    //{
-    //    _fileSystem.Initialize()
-    //        .WithSubdirectory("Lib/workshop/content/32470/12345678");
+        var modinfo = new ModinfoData("Name");
+        var defaultMod = game.InstallMod(false, modinfo, ServiceProvider);
+        defaultMod.InstallModinfoFile(modinfo);
 
-    //    var game = new Mock<IGame>();
-    //    game.Setup(g => g.Exists()).Returns(true);
-    //    game.Setup(g => g.Platform).Returns(GamePlatform.SteamGold);
-    //    game.Setup(g => g.Type).Returns(GameType.Foc);
-    //    game.Setup(g => g.Directory).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    game.Setup(g => g.ModsLocation).Returns(_fileSystem.DirectoryInfo.New("Lib/Game/Eaw/Mods"));
-    //    _steamHelper.Setup(h => h.GetWorkshopsLocation(game.Object))
-    //        .Returns(_fileSystem.DirectoryInfo.New("Lib/workshop/content/32470/"));
 
-    //    _idBuilder.Setup(ib => ib.Build(It.IsAny<IDirectoryInfo>(), true))
-    //        .Returns("workshopPath");
+        var installedMods = _modFinder.FindMods(game);
 
-    //    var resolverResult = GameType.Foc;
-    //    _gameTypeResolver
-    //        .Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Workshops, true, out resolverResult))
-    //        .Returns(true);
+        Assert.Equal(2, installedMods.Count);
 
-    //    var mods = _service.FindMods(game.Object);
-    //    var mod = Assert.Single(mods);
-    //    Assert.Equal("workshopPath", mod.Identifier);
-    //    Assert.Equal(ModType.Workshops, mod.Type);
-    //}
+        Assert.Contains(installedMods,
+            x => x.ModReference.Type == steamMod.Type && steamMod.Directory.FullName.Equals(x.Directory.FullName) &&
+                 x.Modinfo is null && x.ModReference.Identifier.Equals(steamMod.Directory.Name));
+
+        Assert.Contains(installedMods, x => x.ModReference.Type == defaultMod.Type &&
+                                            defaultMod.Directory.FullName.Equals(x.Directory.FullName)
+                                            && x.Modinfo is not null && x.Modinfo.Name.Equals(defaultMod.Name) &&
+                                            x.ModReference.Identifier.Equals(defaultMod.Directory.Name));
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindMods_Steam_ShouldNotContainModOfWrongGame(GameType type)
+    {
+        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+
+        var oppositeGameType = type is GameType.Eaw ? GameType.Foc : GameType.Eaw;
+
+        var steamData = new SteamData(
+            new Random().Next(0, int.MaxValue).ToString(),
+            "path",
+            TestHelpers.GetRandomEnum<SteamWorkshopVisibility>(),
+            "Title",
+            [$"{oppositeGameType.ToString().ToUpper()}"]);
+        var modinfo = new ModinfoData("Name")
+        {
+            SteamData = steamData
+        };
+
+        
+        var defaultMod = game.InstallMod(true, modinfo, ServiceProvider);
+        defaultMod.InstallModinfoFile(modinfo);
+
+        Assert.Empty(_modFinder.FindMods(game));
+    }
 }

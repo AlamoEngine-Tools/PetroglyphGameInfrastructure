@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Abstractions;
-using Moq;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
@@ -28,10 +27,9 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<EmptyStruct>
     [Fact]
     public void InvalidArgs_Throws()
     {
-        var sp = new Mock<IServiceProvider>();
         Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null!, null!));
         Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(FileSystem.DirectoryInfo.New("Game"), null!));
-        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null!, sp.Object));
+        Assert.Throws<ArgumentNullException>(() => new DirectoryGameDetector(null!, ServiceProvider));
     }
 
     [Theory]

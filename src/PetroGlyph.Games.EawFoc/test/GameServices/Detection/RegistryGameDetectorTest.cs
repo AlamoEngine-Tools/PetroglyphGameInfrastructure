@@ -107,7 +107,7 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
             false, ServiceProvider);
         detector.Dispose();
 
-        Assert.Throws<ObjectDisposedException>(() => info.DetectorSetupInfo.EawRegistry.CdKey);
-        Assert.Throws<ObjectDisposedException>(() => info.DetectorSetupInfo.FocRegistry.CdKey);
+        Assert.Throws<ObjectDisposedException>(() => info.DetectorSetupInfo.EawRegistry!.CdKey);
+        Assert.Throws<ObjectDisposedException>(() => info.DetectorSetupInfo.FocRegistry!.CdKey);
     }
 }

@@ -9,7 +9,7 @@ using PG.StarWarsGame.Infrastructure.Utilities;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Mods;
 
-public static class ModInstallations
+public static partial class ModInstallations
 {
     public static Mod InstallAndAddMod(this IGame game, string name, bool workshop, IServiceProvider serviceProvider)
     {
