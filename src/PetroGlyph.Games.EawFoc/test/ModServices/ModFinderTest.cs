@@ -389,9 +389,9 @@ public class ModFinderTest : CommonTestBase
     public void FindMods_ModInstalledInWrongGameModsDirectoryShouldBeSkipped(GameType type)
     {
         var oppositeGameType = type is GameType.Eaw ? GameType.Foc : GameType.Eaw;
-        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+        var game = FileSystem.InstallGame(new GameIdentity(type, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
         // Other, random platform to shuffle a bit more.
-        var otherTypeGame = FileSystem.InstallGame(new GameIdentity(oppositeGameType, GamePlatform.SteamGold), ServiceProvider);
+        var otherTypeGame = FileSystem.InstallGame(new GameIdentity(oppositeGameType, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
 
         var wrongMod = otherTypeGame.InstallMod("MyMod", false, ServiceProvider);
 
