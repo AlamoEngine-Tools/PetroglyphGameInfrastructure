@@ -48,67 +48,57 @@ public static partial class GameInstallation
 
     private static IDirectoryInfo InstallFocDisk(this MockFileSystem fs)
     {
-        Clean(fs, FocNormalPath);
-        fs.Initialize()
-            .WithSubdirectory(FocNormalPath)
-            .WithFile(fs.Path.Combine(FocNormalPath, "swfoc.exe"));
+        fs.Initialize();
+        CreateFile(fs, fs.Path.Combine(FocNormalPath, "swfoc.exe"));
         var gameDir = fs.DirectoryInfo.New(FocNormalPath);
         return gameDir;
     }
 
     private static IDirectoryInfo InstallFocOrigin(this MockFileSystem fs)
     {
-        Clean(fs, OriginBasePath);
-
         var basePath = fs.Path.Combine(OriginBasePath, FocOriginSubPath);
 
         fs.InstallOriginFiles(init =>
         {
-            init.WithFile(fs.Path.Combine(basePath, "swfoc.exe"));
-            init.WithFile(fs.Path.Combine(basePath, "EALaunchHelper.exe"));
+            CreateFile(fs, fs.Path.Combine(basePath, "swfoc.exe"));
+            CreateFile(fs, fs.Path.Combine(basePath, "EALaunchHelper.exe"));
         });
         return fs.DirectoryInfo.New(basePath);
     }
 
     private static IDirectoryInfo InstallFocGog(this MockFileSystem fs)
     {
-        Clean(fs, GogBasePath);
-
         var basePath = fs.Path.Combine(GogBasePath, FocGogSubPath);
 
         fs.InstallGoGFiles(init =>
         {
-            init.WithFile(fs.Path.Combine(basePath, "swfoc.exe"));
+            CreateFile(fs, fs.Path.Combine(basePath, "swfoc.exe"));
         });
         return fs.DirectoryInfo.New(basePath);
     }
 
     private static IDirectoryInfo InstallFocSteam(this MockFileSystem fs)
     {
-        Clean(fs, SteamBasePath);
-
         var basePath = fs.Path.Combine(SteamBasePath, FocSteamSubPath);
 
         fs.InstallSteamFiles(init =>
         {
-            init.WithFile(fs.Path.Combine(basePath, "swfoc.exe"))
-                .WithFile(fs.Path.Combine(basePath, "StarWarsG.exe"));
+            CreateFile(fs, fs.Path.Combine(basePath, "swfoc.exe"));
+            CreateFile(fs, fs.Path.Combine(basePath, "StarWarsG.exe"));
         });
         return fs.DirectoryInfo.New(basePath);
     }
 
     private static IDirectoryInfo InstallFocDiskGold(this MockFileSystem fs)
     {
-        Clean(fs, FocGoldPath);
+        fs.Initialize();
+        CreateFile(fs, fs.Path.Combine(FocGoldPath, "swfoc.exe"));
+        CreateFile(fs, fs.Path.Combine(FocGoldPath, "fpupdate.exe"));
+        CreateFile(fs, fs.Path.Combine(FocGoldPath, "LaunchEAWX.exe"));
+        CreateFile(fs, fs.Path.Combine(FocGoldPath, "main.wav"));
 
-        fs.Initialize()
-            .WithFile(fs.Path.Combine(FocGoldPath, "swfoc.exe"))
-            .WithFile(fs.Path.Combine(FocGoldPath, "fpupdate.exe"))
-            .WithFile(fs.Path.Combine(FocGoldPath, "LaunchEAWX.exe"))
-            .WithFile(fs.Path.Combine(FocGoldPath, "main.wav"))
-            .WithSubdirectories(
-                fs.Path.Combine(FocGoldPath, "Install"),
-                fs.Path.Combine(FocGoldPath, "Manuals"));
+        fs.Directory.CreateDirectory(fs.Path.Combine(FocGoldPath, "Install"));
+        fs.Directory.CreateDirectory(fs.Path.Combine(FocGoldPath, "Manuals"));
 
         return fs.DirectoryInfo.New(FocGoldPath);
     }

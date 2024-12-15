@@ -20,11 +20,11 @@ public abstract class CommonTestBaseWithRandomGame : CommonTestBase
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
     {
-        return CreateAndAddMod(Game, name, new DependencyList(deps, layout));
+        return CreateAndAddMod(Game, GITestUtilities.GetRandomWorkshopFlag(Game), name, new DependencyList(deps, layout));
     }
 
     protected IMod CreateAndAddMod(IModinfo modinfo)
     {
-        return CreateAndAddMod(Game, modinfo);
+        return CreateAndAddMod(Game, GITestUtilities.GetRandomWorkshopFlag(Game), modinfo);
     }
 }

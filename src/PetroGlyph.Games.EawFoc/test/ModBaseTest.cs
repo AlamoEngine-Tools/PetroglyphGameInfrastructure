@@ -33,7 +33,17 @@ public abstract class ModBaseTest : PlayableModContainerTest
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
     {
-        return CreateAndAddMod(Game, name, new DependencyList(deps, layout));
+        return CreateOtherMod(name, GITestUtilities.GetRandomWorkshopFlag(Game), layout, deps);
+    }   
+    
+    
+    protected IMod CreateOtherMod(
+        string name, 
+        bool isWorkshop,
+        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
+        params IList<IModReference> deps)
+    {
+        return CreateAndAddMod(Game, isWorkshop, name, new DependencyList(deps, layout));
     }
 
     [Fact]
@@ -253,8 +263,8 @@ public abstract class ModBaseTest : PlayableModContainerTest
         Assert.True(mod.Equals((IModIdentity)mod));
         Assert.True(mod.Equals((IModReference)mod));
         Assert.Equal(mod.GetHashCode(), mod.GetHashCode());
-
-        Assert.True(mod.Equals(samish));
+        
+        Assert.True(mod.Equals(samish), $"{mod} AND {samish}");
         Assert.True(mod.Equals((object)samish));
         Assert.True(mod.Equals((IModIdentity)samish));
         Assert.True(mod.Equals((IModReference)samish));

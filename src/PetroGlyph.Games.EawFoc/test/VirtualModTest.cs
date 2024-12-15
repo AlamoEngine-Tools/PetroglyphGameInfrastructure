@@ -25,7 +25,7 @@ public class VirtualModTest : ModBaseTest
         IModDependencyList depList;
         if (deps.Count == 0)
         {
-            var dep = CreateOtherMod("dep");
+            var dep = CreateOtherMod("dep", false);
             depList = new DependencyList(new List<IModReference> { dep }, layout);
         }
         else

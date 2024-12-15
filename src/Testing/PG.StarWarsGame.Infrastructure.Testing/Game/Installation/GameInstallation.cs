@@ -32,39 +32,42 @@ public static partial class GameInstallation
 
     private static void InstallDataAndMegaFilesXml(this MockFileSystem fs, IDirectoryInfo directory)
     {
-        fs.Initialize().WithFile(fs.Path.Combine(directory.FullName, "Data", "megafiles.xml"));
+        fs.Initialize();
+        CreateFile(fs, fs.Path.Combine(directory.FullName, "Data", "megafiles.xml"));
     }
 
-    private static void InstallSteamFiles(this MockFileSystem fs, Action<IFileSystemInitializer<MockFileSystem>> initAction)
+    private static void InstallSteamFiles(this MockFileSystem fs,
+        Action<IFileSystemInitializer<MockFileSystem>> initAction)
     {
-        var initializer = fs.Initialize()
-            .WithFile(fs.Path.Combine(SteamBasePath, "32470_install.vdf"))
-            .WithFile(fs.Path.Combine(SteamBasePath, "32472_install.vdf"))
-            .WithFile(fs.Path.Combine(SteamBasePath, "runme.dat"))
-            .WithFile(fs.Path.Combine(SteamBasePath, "runm2.dat"))
-            .WithFile(fs.Path.Combine(SteamBasePath, "runme.exe"))
-            .WithFile(fs.Path.Combine(SteamBasePath, "runme2.exe"));
+        var initializer = fs.Initialize();
+        CreateFile(fs, fs.Path.Combine(SteamBasePath, "32470_install.vdf"));
+        CreateFile(fs, fs.Path.Combine(SteamBasePath, "32472_install.vdf"));
+        CreateFile(fs, fs.Path.Combine(SteamBasePath, "runme.dat"));
+        CreateFile(fs, fs.Path.Combine(SteamBasePath, "runm2.dat"));
+        CreateFile(fs, fs.Path.Combine(SteamBasePath, "runme.exe"));
+        CreateFile(fs, fs.Path.Combine(SteamBasePath, "runme2.exe"));
 
         fs.Directory.CreateDirectory(fs.Path.Combine(SteamBasePath, "..", "..", "workshop", "content", "32470"));
 
         initAction(initializer);
     }
 
-    private static void InstallGoGFiles(this MockFileSystem fs, Action<IFileSystemInitializer<MockFileSystem>> initAction)
+    private static void InstallGoGFiles(this MockFileSystem fs,
+        Action<IFileSystemInitializer<MockFileSystem>> initAction)
     {
-        var initializer = fs.Initialize()
-            .WithFile(fs.Path.Combine(GogBasePath, "goggame.sdb"))
-            .WithFile(fs.Path.Combine(GogBasePath, "goggame-1421404887.hashdb"))
-            .WithFile(fs.Path.Combine(GogBasePath, "goggame-1421404887.info"))
-            .WithFile(fs.Path.Combine(GogBasePath, "Language.exe"));
+        var initializer = fs.Initialize();
+        CreateFile(fs, fs.Path.Combine(GogBasePath, "goggame.sdb"));
+        CreateFile(fs, fs.Path.Combine(GogBasePath, "goggame-1421404887.hashdb"));
+        CreateFile(fs, fs.Path.Combine(GogBasePath, "goggame-1421404887.info"));
+        CreateFile(fs, fs.Path.Combine(GogBasePath, "Language.exe"));
         initAction(initializer);
     }
 
     private static void InstallOriginFiles(this MockFileSystem fs, Action<IFileSystemInitializer<MockFileSystem>> initAction)
     {
-        var initializer = fs.Initialize()
-            .WithSubdirectories(fs.Path.Combine(OriginBasePath, "Manuals"))
-            .WithSubdirectories(fs.Path.Combine(OriginBasePath, "__Installer"));
+        var initializer = fs.Initialize();
+        fs.Directory.CreateDirectory(fs.Path.Combine(OriginBasePath, "Manuals"));
+        fs.Directory.CreateDirectory(fs.Path.Combine(OriginBasePath, "__Installer"));
         initAction(initializer);
     }
 
@@ -72,10 +75,11 @@ public static partial class GameInstallation
     {
         fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(directory.FullName, "Mods"));
     }
-
-    private static void Clean(MockFileSystem fs, string path)
+    
+    private static void CreateFile(MockFileSystem fs, string path)
     {
-        if (fs.Directory.Exists(path))
-            fs.Directory.Delete(path, true);
+        var dir = fs.Path.GetDirectoryName(path);
+        fs.Directory.CreateDirectory(dir);
+        using var file = fs.File.Create(path);
     }
 }

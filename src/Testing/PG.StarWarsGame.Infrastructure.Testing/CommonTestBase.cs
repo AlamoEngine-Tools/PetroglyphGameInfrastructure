@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
-using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,20 +68,20 @@ public abstract class CommonTestBase
         return languages;
     }
 
-    protected IMod CreateAndAddMod(IGame game, string name, IModDependencyList dependencies)
+    protected IMod CreateAndAddMod(IGame game, bool isWorkshop, string name, IModDependencyList dependencies)
     {
         if (dependencies.Count == 0)
-            return game.InstallAndAddMod(name, GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+            return game.InstallAndAddMod(name, isWorkshop, ServiceProvider);
 
         var modinfo = new ModinfoData(name)
         {
             Dependencies = dependencies
         };
-        return CreateAndAddMod(game, modinfo);
+        return CreateAndAddMod(game, isWorkshop, modinfo);
     }
 
-    protected IMod CreateAndAddMod(IGame game, IModinfo modinfo)
+    protected IMod CreateAndAddMod(IGame game, bool isWorkshop, IModinfo modinfo)
     {
-        return game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(game), modinfo, ServiceProvider);
+        return game.InstallAndAddMod(isWorkshop, modinfo, ServiceProvider);
     }
 }
