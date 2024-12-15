@@ -29,7 +29,6 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IGameFactory>(sp => new GameFactory(sp));
         //serviceCollection.AddSingleton<IModFactory>(sp => new ModFactory(sp));
         serviceCollection.AddSingleton<IModFinder>(sp => new ModFinder(sp));
-        serviceCollection.AddSingleton<IModReferenceLocationResolver>(sp => new ModReferenceLocationResolver(sp));
 
         serviceCollection.AddSingleton(sp => new ModDependencyResolver(sp));
         serviceCollection.AddSingleton(_ => new ModDependencyGraphBuilder());
