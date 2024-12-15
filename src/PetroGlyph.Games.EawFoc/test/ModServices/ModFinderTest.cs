@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using EawModinfo.Model;
+using EawModinfo.Spec;
 using EawModinfo.Spec.Steam;
+using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Testing;
@@ -30,6 +33,9 @@ public class ModFinderTest : CommonTestBase
     public void FindMods_NullArg_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => _modFinder.FindMods(null!));
+        Assert.Throws<ArgumentNullException>(() => _modFinder.FindMods(null!, FileSystem.Directory.CreateDirectory("path")));
+        var game = FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
+        Assert.Throws<ArgumentNullException>(() => _modFinder.FindMods(game, null!));
     }
 
     [Theory]
@@ -39,6 +45,7 @@ public class ModFinderTest : CommonTestBase
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
         game.Directory.Delete(true);
         Assert.Throws<GameException>(() => _modFinder.FindMods(game));
+        Assert.Throws<GameException>(() => _modFinder.FindMods(game, FileSystem.DirectoryInfo.New("path")));
     }
 
     [Theory]
@@ -56,6 +63,9 @@ public class ModFinderTest : CommonTestBase
 
         var mods = _modFinder.FindMods(game);
         Assert.Empty(mods);
+
+        var modsFromDir = _modFinder.FindMods(game, game.ModsLocation);
+        Assert.Empty(modsFromDir);
     }
 
     [Theory]
@@ -83,15 +93,10 @@ public class ModFinderTest : CommonTestBase
         var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
 
         var installedMods = _modFinder.FindMods(game);
+        AssertSingleFoundMod(installedMods, expectedMod, expectedMod.Directory.Name, null);
 
-        var foundMod = Assert.Single(installedMods);
-
-        Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
-        Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
-        Assert.Equal(expectedMod.ModInfo, foundMod.Modinfo);
-
-        // Cannot assert on expectedMod.Identifier, cause this test framework builds the wrong identifiers.
-        Assert.Equal(expectedMod.Directory.Name, foundMod.ModReference.Identifier);
+        var foundModsFromDir = _modFinder.FindMods(game, expectedMod.Directory);
+        AssertSingleFoundMod(foundModsFromDir, expectedMod, expectedMod.Directory.Name, null);
     }
 
     [Theory]
@@ -103,17 +108,11 @@ public class ModFinderTest : CommonTestBase
         var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
         expectedMod.InstallInvalidModinfoFile();
 
-
         var installedMods = _modFinder.FindMods(game);
+        AssertSingleFoundMod(installedMods, expectedMod, expectedMod.Directory.Name, null);
 
-        var foundMod = Assert.Single(installedMods);
-
-        Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
-        Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
-        Assert.Equal(expectedMod.ModInfo, foundMod.Modinfo);
-
-        // Cannot assert on expectedMod.Identifier, cause this test framework builds the wrong identifiers.
-        Assert.Equal(expectedMod.Directory.Name, foundMod.ModReference.Identifier);
+        var foundModsFromDir = _modFinder.FindMods(game, expectedMod.Directory);
+        AssertSingleFoundMod(foundModsFromDir, expectedMod, expectedMod.Directory.Name, null);
     }
 
     [Theory]
@@ -123,20 +122,16 @@ public class ModFinderTest : CommonTestBase
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
         var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
-        expectedMod.InstallModinfoFile(new ModinfoData("Variant1"), "variant1");
+        var expectedModinfo = new ModinfoData("Variant1");
+
+        expectedMod.InstallModinfoFile(expectedModinfo, "variant1");
         expectedMod.InstallInvalidModinfoFile("variant2");
 
-
         var installedMods = _modFinder.FindMods(game);
+        AssertSingleFoundMod(installedMods, expectedMod, $"{expectedMod.Directory.Name}:Variant1", expectedModinfo);
 
-        var foundMod = Assert.Single(installedMods);
-
-        Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
-        Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
-        Assert.Equal("Variant1", foundMod.Modinfo!.Name);
-
-        // Cannot assert on expectedMod.Identifier, cause this test framework builds the wrong identifiers.
-        Assert.Equal($"{expectedMod.Directory.Name}:Variant1", foundMod.ModReference.Identifier);
+        var foundModsFromDir = _modFinder.FindMods(game, expectedMod.Directory);
+        AssertSingleFoundMod(foundModsFromDir, expectedMod, $"{expectedMod.Directory.Name}:Variant1", expectedModinfo);
     }
 
     [Theory]
@@ -150,14 +145,10 @@ public class ModFinderTest : CommonTestBase
         expectedMod.InstallModinfoFile(modinfoData);
 
         var installedMods = _modFinder.FindMods(game);
+        AssertSingleFoundMod(installedMods, expectedMod, expectedMod.Directory.Name, modinfoData);
 
-        var foundMod = Assert.Single(installedMods);
-
-        Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
-        Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
-
-        // Cannot assert on expectedMod.Identifier, cause this test framework builds the wrong identifiers.
-        Assert.Equal(expectedMod.Directory.Name, foundMod.ModReference.Identifier);
+        var foundModsFromDir = _modFinder.FindMods(game, expectedMod.Directory);
+        AssertSingleFoundMod(foundModsFromDir, expectedMod, expectedMod.Directory.Name, modinfoData);
     }
 
     [Theory]
@@ -172,20 +163,25 @@ public class ModFinderTest : CommonTestBase
         expectedMod.InstallModinfoFile(info1, "variant1");
         expectedMod.InstallModinfoFile(info2, "variant2");
 
-        var installedMods = _modFinder.FindMods(game);
-
-        Assert.Equal(2, installedMods.Count);
-
-        foreach (var foundMod in installedMods)
-        {
-            Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
-            Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
-        }
+        var installedMods = _modFinder.FindMods(game).ToList();
+        AssertMultipleModsOfSameLocation(
+            installedMods,
+            2,
+            expectedMod.Directory.FullName,
+            expectedMod.Type,
+            [$"{expectedMod.Directory.Name}:MyName1", $"{expectedMod.Directory.Name}:MyName2"],
+            ["MyName1", "MyName2"]);
 
         Assert.Equivalent(new List<string>{ "MyName1", "MyName2" }, installedMods.Select(x => x.Modinfo!.Name), true);
-        Assert.Equivalent(
-            new List<string> { $"{expectedMod.Directory.Name}:MyName1", $"{expectedMod.Directory.Name}:MyName2" },
-            installedMods.Select(x => x.ModReference.Identifier), true);
+
+        var installedModsFromDir = _modFinder.FindMods(game, expectedMod.Directory).ToList();
+        AssertMultipleModsOfSameLocation(
+            installedModsFromDir,
+            2,
+            expectedMod.Directory.FullName,
+            expectedMod.Type,
+            [$"{expectedMod.Directory.Name}:MyName1", $"{expectedMod.Directory.Name}:MyName2"],
+            ["MyName1", "MyName2"]);
     }
 
     [Theory]
@@ -202,22 +198,41 @@ public class ModFinderTest : CommonTestBase
         expectedMod.InstallModinfoFile(info1, "variant1");
         expectedMod.InstallModinfoFile(info2, "variant2");
 
-        var installedMods = _modFinder.FindMods(game);
+        var installedMods = _modFinder.FindMods(game).ToList();
+        AssertMultipleModsOfSameLocation(
+            installedMods,
+            3,
+            expectedMod.Directory.FullName,
+            expectedMod.Type,
+            [expectedMod.Directory.Name, $"{expectedMod.Directory.Name}:MyName1", $"{expectedMod.Directory.Name}:MyName2"],
+            ["Main", "MyName1", "MyName2"]);
 
-        Assert.Equal(3, installedMods.Count);
+        var installedModsFromDir = _modFinder.FindMods(game, expectedMod.Directory).ToList();
+        AssertMultipleModsOfSameLocation(
+            installedModsFromDir,
+            3,
+            expectedMod.Directory.FullName,
+            expectedMod.Type,
+            [expectedMod.Directory.Name, $"{expectedMod.Directory.Name}:MyName1", $"{expectedMod.Directory.Name}:MyName2"],
+            ["Main", "MyName1", "MyName2"]);
+    }
 
-        foreach (var foundMod in installedMods)
-        {
-            Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
-            Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
-        }
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_FindAllInstalledMods(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var mod1 = game.InstallMod("Mod1", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var mod2 = game.InstallMod("Mod2", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
 
-        Assert.Equivalent(new List<string> { "Main", "MyName1", "MyName2" }, installedMods.Select(x => x.Modinfo!.Name),
-            true);
+        var expectedDirs = new[] {mod1.Directory.FullName, mod2.Directory.FullName};
+        var expectedIds = new[] {mod1.Directory.Name, mod2.Directory.Name};
 
-        Assert.Equivalent(
-            new List<string> { expectedMod.Directory.Name, $"{expectedMod.Directory.Name}:MyName1", $"{expectedMod.Directory.Name}:MyName2" },
-            installedMods.Select(x => x.ModReference.Identifier), true);
+        var installedMods = _modFinder.FindMods(game).ToList();
+
+        Assert.Equal(2, installedMods.Count);
+        Assert.Equivalent(expectedDirs, installedMods.Select(x => x.Directory.FullName), true);
+        Assert.Equivalent(expectedIds, installedMods.Select(x => x.ModReference.Identifier), true);
     }
 
     [Theory]
@@ -234,7 +249,7 @@ public class ModFinderTest : CommonTestBase
         defaultMod.InstallModinfoFile(modinfo);
 
 
-        var installedMods = _modFinder.FindMods(game);
+        var installedMods = _modFinder.FindMods(game).ToList();
 
         Assert.Equal(2, installedMods.Count);
 
@@ -269,9 +284,172 @@ public class ModFinderTest : CommonTestBase
         };
 
         
-        var defaultMod = game.InstallMod(true, modinfo, ServiceProvider);
-        defaultMod.InstallModinfoFile(modinfo);
+        var modOfWrongGameType = game.InstallMod(true, modinfo, ServiceProvider);
+        modOfWrongGameType.InstallModinfoFile(modinfo);
 
         Assert.Empty(_modFinder.FindMods(game));
+        Assert.Empty(_modFinder.FindMods(game, modOfWrongGameType.Directory));
+    }
+
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_FromExternal(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var modPath = FileSystem.DirectoryInfo.New("external/myMod");
+        modPath.Create();
+
+        var mod = game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        
+        var installedMods = _modFinder.FindMods(game, mod.Directory).ToList();
+        AssertSingleFoundMod(installedMods, mod, mod.Directory.FullName, null);
+    }
+
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_FromExternal_DirectoryNotFoundShouldSkip(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var modPath = FileSystem.DirectoryInfo.New("external/myMod");
+        modPath.Create();
+
+        var mod = game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        modPath.Delete(true);
+
+        var installedMods = _modFinder.FindMods(game, mod.Directory).ToList();
+        Assert.Empty(installedMods);
+    }
+
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_FromExternal_WithVariantModinfoLayout(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var modPath = FileSystem.DirectoryInfo.New("external/123456"); // Use a number so it may look like a Steam WS ID
+        modPath.Create();
+
+        var main = new ModinfoData("Main");
+        var info1 = new ModinfoData("MyName1");
+        var info2 = new ModinfoData("MyName2");
+        var expectedMod = game.InstallMod(modPath, false, main, ServiceProvider);
+        expectedMod.InstallModinfoFile(main);
+        expectedMod.InstallModinfoFile(info1, "variant1");
+        expectedMod.InstallModinfoFile(info2, "variant2");
+
+        var baseId = expectedMod.Directory.FullName;
+
+        var installedMods = _modFinder.FindMods(game, expectedMod.Directory).ToList();
+        AssertMultipleModsOfSameLocation(installedMods, 3, expectedMod.Directory.FullName, ModType.Default, 
+            [$"{baseId}", $"{baseId}:MyName1", $"{baseId}:MyName2"], 
+            ["Main", "MyName1", "MyName2"]);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindMods_FromExternal_InsideSteamWsDirWithNonIdName(GameType type)
+    {
+        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+        var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
+        var steamLocation = steamHelper.GetWorkshopsLocation(game);
+        steamLocation.Create();
+
+        var modPath = FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(steamLocation.FullName, "notASteamID"));
+        modPath.Create();
+
+        var expectedMod = game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        Assert.Equal(ModType.Default ,expectedMod.Type);
+        
+        var installedMods = _modFinder.FindMods(game, expectedMod.Directory).ToList();
+        AssertSingleFoundMod(installedMods, expectedMod, modPath.FullName, null);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindMods_ModInsideSteamWsDirWithNonIdName_ShouldBeSkipped(GameType type)
+    {
+        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+        var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
+        var steamLocation = steamHelper.GetWorkshopsLocation(game);
+        steamLocation.Create();
+
+        var modPath = FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(steamLocation.FullName, "notASteamID"));
+        modPath.Create();
+
+        game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+
+        var installedMods = _modFinder.FindMods(game).ToList();
+        Assert.Empty(installedMods);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindMods_ModInstalledInWrongGameModsDirectoryShouldBeSkipped(GameType type)
+    {
+        var oppositeGameType = type is GameType.Eaw ? GameType.Foc : GameType.Eaw;
+        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+        // Other, random platform to shuffle a bit more.
+        var otherTypeGame = FileSystem.InstallGame(new GameIdentity(oppositeGameType, GamePlatform.SteamGold), ServiceProvider);
+
+        var wrongMod = otherTypeGame.InstallMod("MyMod", false, ServiceProvider);
+
+        var installedMods = _modFinder.FindMods(game, wrongMod.Directory).ToList();
+        Assert.Empty(installedMods);
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void FindMods_NoSteamWsDirectoryExistsShouldStillFindExternalMods(GameType type)
+    {
+        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+        var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
+        var steamLocation = steamHelper.GetWorkshopsLocation(game);
+        steamLocation.Delete(true);
+
+        var modPath = FileSystem.DirectoryInfo.New("external/MyMod");
+        modPath.Create();
+
+        game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+
+        var installedMods = _modFinder.FindMods(game).ToList();
+        Assert.Empty(installedMods);
+    }
+
+    private static void AssertSingleFoundMod(IEnumerable<DetectedModReference> foundMods, IPhysicalMod expectedMod, string expectedId, IModinfo? expectedModinfo)
+    {
+        var foundMod = Assert.Single(foundMods);
+
+        Assert.Equal(expectedMod.Directory.FullName, foundMod.Directory.FullName);
+        Assert.Equal(expectedMod.Type, foundMod.ModReference.Type);
+
+        Assert.Equal<IModIdentity>(expectedModinfo, foundMod.Modinfo);
+        if (expectedModinfo is not null)
+            Assert.Equal(expectedModinfo.Name, foundMod.Modinfo!.Name);
+
+        Assert.Equal(expectedId, foundMod.ModReference.Identifier);
+    }
+
+    private static void AssertMultipleModsOfSameLocation(
+        ICollection<DetectedModReference> detectedMods,
+        int expectedCount,
+        string expectedModsPath,
+        ModType expectedModsType,
+        ICollection<string> expectedIdentifiers,
+        ICollection<string> expectedModinfoNames)
+    {
+        Assert.Equal(expectedCount, detectedMods.Count);
+
+        Assert.All(detectedMods, x =>
+        {
+            Assert.Equal(expectedModsPath, x.Directory.FullName);
+            Assert.Equal(expectedModsType, x.ModReference.Type);
+        });
+
+        Assert.Equivalent(expectedIdentifiers, detectedMods.Select(x => x.ModReference.Identifier), true);
+
+        Assert.Equivalent(expectedModinfoNames, detectedMods.Select(x => x.Modinfo?.Name), true);
     }
 }
