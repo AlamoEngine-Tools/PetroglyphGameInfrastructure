@@ -30,7 +30,7 @@ public interface IModFactory
     /// <exception cref="ModException">
     /// <paramref name="modReference"/> is not compatible to <paramref name="game"/>
     /// OR
-    /// It is not possible to create a mod instance because the information processed from <paramref name="modReference"/> are invalid.
+    /// The resolved name of the mod is null or empty.
     /// </exception>
     /// <exception cref="ModinfoException">The modinfo data in of <paramref name="modReference"/>, if present, is not valid.</exception>
     IPhysicalMod CreatePhysicalMod(IGame game, DetectedModReference modReference, CultureInfo culture);
@@ -46,17 +46,4 @@ public interface IModFactory
     /// <exception cref="ModinfoException"><paramref name="virtualModInfo"/> is not valid.</exception>
     /// <exception cref="ModException"><paramref name="virtualModInfo"/> has invalid dependency information to create a virtual mod.</exception>
     IVirtualMod CreateVirtualMod(IGame game, IModinfo virtualModInfo);
-
-    /// <summary>
-    /// Creates virtual mods for a game.
-    /// </summary>
-    /// <remarks>The created mods dot NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
-    /// <param name="game">The parent <see cref="IGame"/> instance of the mods.</param>
-    /// <param name="name">The name of the virtual mod.</param>
-    /// <param name="dependencies">The dependencies of the virtual mod.</param>
-    /// <returns>One or many virtual mods</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="game"/> or <paramref name="name"/> or <paramref name="dependencies"/> is <see langword="null"/>.</exception>
-    /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
-    /// <exception cref="ModException"><paramref name="dependencies"/> has invalid information to create a virtual mod.</exception>
-    IVirtualMod CreateVirtualMod(IGame game, string name, IModDependencyList dependencies);
 }

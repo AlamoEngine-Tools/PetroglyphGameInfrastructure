@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using EawModinfo.Model;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 
@@ -30,33 +29,6 @@ public sealed class VirtualMod : ModBase, IVirtualMod
             throw new ModException(this, "Virtual mods must be initialized with pre-defined dependencies");
 
         ModInfo = modInfoData;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="VirtualMod"/> class of the specified game and name and dependency list.
-    /// </summary>
-    /// <param name="game">The game of the mod.</param>
-    /// <param name="identifier">The identifier of the mod.</param>
-    /// <param name="name">The name of the mod.</param>
-    /// <param name="dependencies">list of dependencies.</param>
-    /// <param name="serviceProvider">The service provider.</param>
-    /// <exception cref="ModException">If the <paramref name="dependencies"/> is empty.</exception>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="name"/> or <paramref name="game"/> or <paramref name="dependencies"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
-    public VirtualMod(IGame game, string identifier, string name, IModDependencyList dependencies, IServiceProvider serviceProvider)
-        : base(game, identifier, ModType.Virtual, name, serviceProvider)
-    {
-        if (dependencies == null) 
-            throw new ArgumentNullException(nameof(dependencies));
-        if (dependencies.Count == 0)
-            throw new ModException(this, "Virtual mods must have at least one physical dependency.");
-
-        ModInfo = new ModinfoData(name)
-        {
-            Dependencies = new DependencyList(dependencies)
-        };
     }
 
     /// <inheritdoc />

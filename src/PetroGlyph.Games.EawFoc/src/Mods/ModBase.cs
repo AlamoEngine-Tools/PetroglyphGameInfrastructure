@@ -32,9 +32,10 @@ public abstract class ModBase : PlayableModContainer, IMod
     /// <inheritdoc/>
     public ModType Type { get; }
 
-    /// <summary>
-    /// Always return <see langword="null"/>, because mod instances cannot have a version range.
-    /// </summary>
+    /// <remarks>
+    /// Always returns <see langword="null"/>, because mod instances cannot have a version range.
+    /// </remarks>
+    /// <inheritdoc />
     public SemVersionRange? VersionRange => null;
 
     /// <inheritdoc cref="IModIdentity" />

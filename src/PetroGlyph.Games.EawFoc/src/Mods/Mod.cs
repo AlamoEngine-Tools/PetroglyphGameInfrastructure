@@ -17,12 +17,12 @@ public class Mod : ModBase, IPhysicalMod
     public IDirectoryInfo Directory { get; }
 
     /// <summary>
-    /// Gets the file system.
+    /// The file system.
     /// </summary>
     protected readonly IFileSystem FileSystem;
 
     /// <summary>
-    /// Creates a new instance.
+    /// Initializes a new instance of the <see cref="Mod"/> class of the specified mod information.
     /// </summary>
     /// <param name="game">The game of the mod.</param>
     /// <param name="identifier">The identifier of the mod.</param>
@@ -43,7 +43,7 @@ public class Mod : ModBase, IPhysicalMod
     }
 
     /// <summary>
-    /// Creates a new instance.
+    /// Initializes a new instance of the <see cref="Mod"/> class of the specified mod information and modinfo data.
     /// </summary>
     /// <param name="game">The game of the mod.</param>
     /// <param name="identifier">The identifier of the mod.</param>

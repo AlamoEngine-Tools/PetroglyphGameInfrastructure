@@ -35,34 +35,36 @@ internal class ModFactory(IServiceProvider serviceProvider) : IModFactory
         if (!modDir.Exists)
             throw new DirectoryNotFoundException($"Mod installation not found at '{modReference.Directory.FullName}'.");
 
-        return null!;
+        // We don't trust the modtype of the modReference.
+        if (_modGameTypeResolver.IsDefinitelyNotCompatibleToGame(modReference, game.Type))
+            throw new ModException(modReference.ModReference,
+                $"The mod '{modReference.ModReference.Identifier}' at location '{modDir}' is not compatible to game '{game}'");
 
+        var isWorkshop = modReference.ModReference.Type == ModType.Workshops;
 
-        //_modGameTypeResolver.IsDefinitelyNotCompatibleToGame(modDir, modReference.ModReference.Type, modReference.Modinfo, game.Type);
+        var modinfo = modReference.Modinfo;
 
-        //// We don't trust the modtype of the modReference.
-        //ThrowIfDefinitelyNotGameType(game.Type, modDir, modReference.ModReference.Type, modReference.Modinfo, modReference);
+        if (modinfo == null)
+        {
+            var name = GetModName(modReference.ModReference, culture);
+            return new Mod(game, modReference.ModReference.Identifier, modDir, isWorkshop, name, _serviceProvider);
+        }
 
-        //var isWorkshop = modReference.ModReference.Type == ModType.Workshops;
-
-        //if (modinfo == null)
-        //{
-        //    var name = GetModName(modReference, culture);
-        //    return new Mod(game, directory, isWorkshop, name, _serviceProvider);
-        //}
-
-        //modinfo.Validate();
-        //return new Mod(game, directory, isWorkshop, modinfo, _serviceProvider);
+        modinfo.Validate();
+        return new Mod(game, modReference.ModReference.Identifier, modDir, isWorkshop, modinfo, _serviceProvider);
     }
 
     public IVirtualMod CreateVirtualMod(IGame game, IModinfo virtualModInfo)
     {
-        throw new NotImplementedException();
-    }
+        if (game == null) 
+            throw new ArgumentNullException(nameof(game));
+        if (virtualModInfo == null) 
+            throw new ArgumentNullException(nameof(virtualModInfo));
 
-    public IVirtualMod CreateVirtualMod(IGame game, string name, IModDependencyList dependencies)
-    {
-        throw new NotImplementedException();
+        virtualModInfo.Validate();
+
+        var virtualModRef = ModReferenceBuilder.CreateVirtualModIdentifier(virtualModInfo);
+        return new VirtualMod(game, virtualModRef.Identifier, virtualModInfo, _serviceProvider);
     }
 
     private string GetModName(IModReference modReference, CultureInfo culture)

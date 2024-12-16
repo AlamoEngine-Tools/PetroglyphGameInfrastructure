@@ -27,7 +27,7 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IGamePlatformIdentifier>(sp => new GamePlatformIdentifier(sp));
         serviceCollection.AddSingleton<ISteamGameHelpers>(sp => new SteamGameHelpers(sp));
         serviceCollection.AddSingleton<IGameFactory>(sp => new GameFactory(sp));
-        //serviceCollection.AddSingleton<IModFactory>(sp => new ModFactory(sp));
+        serviceCollection.AddSingleton<IModFactory>(sp => new ModFactory(sp));
         serviceCollection.AddSingleton<IModFinder>(sp => new ModFinder(sp));
 
         serviceCollection.AddSingleton(sp => new ModDependencyResolver(sp));
