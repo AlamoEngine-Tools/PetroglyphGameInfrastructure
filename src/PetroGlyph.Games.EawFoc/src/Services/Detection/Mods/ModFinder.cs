@@ -7,6 +7,7 @@ using EawModinfo.File;
 using EawModinfo.Spec;
 using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 
@@ -17,6 +18,7 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
     private readonly ISteamGameHelpers _steamHelper = serviceProvider.GetRequiredService<ISteamGameHelpers>();
     private readonly IModGameTypeResolver _gameTypeResolver = serviceProvider.GetRequiredService<IModGameTypeResolver>();
     private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+    private readonly ILogger? _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(ModFinder));
 
     public IEnumerable<DetectedModReference> FindMods(IGame game)
     {
@@ -24,6 +26,7 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
             throw new ArgumentNullException(nameof(game));
         if (!game.Exists())
             throw new GameException("The game does not exist");
+        _logger?.LogDebug($"Searching mods for game '{game}'");
         return GetNormalMods(game).Union(GetWorkshopsMods(game));
     }
 
@@ -37,19 +40,24 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
             throw new GameException($"The game '{game}' does not exist");
 
         var modLocationKind = GetModLocationKind(game, directory);
+        _logger?.LogDebug($"Searching mods with at location '{directory.FullName}' of location kind '{modLocationKind}' for game '{game}'");
         return GetModsFromDirectory(directory, modLocationKind, game.Type);
     }
 
     private IEnumerable<DetectedModReference> GetNormalMods(IGame game)
     {
+        _logger?.LogTrace($"Searching normal mods for game '{game}'");
         return GetAllModsFromContainerPath(game.ModsLocation, ModReferenceBuilder.ModLocationKind.GameModsDirectory, game.Type);
     }
 
     private IEnumerable<DetectedModReference> GetWorkshopsMods(IGame game)
     {
-        return game.Platform != GamePlatform.SteamGold
-            ? []
-            : GetAllModsFromContainerPath(_steamHelper.GetWorkshopsLocation(game), ModReferenceBuilder.ModLocationKind.SteamWorkshops, game.Type);
+        if (game.Platform != GamePlatform.SteamGold)
+            return [];
+
+        _logger?.LogTrace($"Searching Steam Workshop mods for game '{game}'");
+        return GetAllModsFromContainerPath(_steamHelper.GetWorkshopsLocation(game),
+            ModReferenceBuilder.ModLocationKind.SteamWorkshops, game.Type);
     }
 
     private IEnumerable<DetectedModReference> GetAllModsFromContainerPath(IDirectoryInfo lookupDirectory, ModReferenceBuilder.ModLocationKind locationKind, GameType requestedGameType)
@@ -73,13 +81,18 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
         if (locationKind == ModReferenceBuilder.ModLocationKind.SteamWorkshops && !_steamHelper.ToSteamWorkshopsId(modDirectory.Name, out _))
             yield break;
 
+        _logger?.LogTrace($"Searching for mods at location '{modDirectory.FullName}'");
+
         ModinfoFinderCollection modinfoFiles;
         modinfoFiles = ModinfoFileFinder.FindModinfoFiles(modDirectory);
         
         foreach (var modRef in ModReferenceBuilder.CreateIdentifiers(modinfoFiles, locationKind))
         {
             if (_gameTypeResolver.IsDefinitelyNotCompatibleToGame(modRef, requestedGameType))
+            {
+                _logger?.LogTrace($"Skipping mod reference '{modRef.ModReference}' because it is not compatible to '{requestedGameType}'");
                 continue;
+            }
             yield return modRef;
         }
     }

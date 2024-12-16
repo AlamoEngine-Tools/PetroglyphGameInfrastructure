@@ -6,6 +6,7 @@ using AnakinRaW.CommonUtilities.Collections;
 using EawModinfo.Spec;
 using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 
@@ -23,9 +24,9 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
     private readonly ISteamWorkshopWebpageDownloader _steamWebpageDownloader = serviceProvider.GetRequiredService<ISteamWorkshopWebpageDownloader>();
 
     /// <inheritdoc />
-    public override bool TryGetGameType(DetectedModReference modInformation, out ReadOnlyFrugalList<GameType> gameTypes)
+    protected internal override bool TryGetGameTypeCore(DetectedModReference modInformation, out ReadOnlyFrugalList<GameType> gameTypes)
     {
-        if (_offlineResolver.TryGetGameType(modInformation, out gameTypes))
+        if (_offlineResolver.TryGetGameTypeCore(modInformation, out gameTypes))
             return true;
         return modInformation.ModReference.Type == ModType.Workshops && GetGameTypeFromSteamPage(modInformation.Directory.Name, out gameTypes);
     }
@@ -35,6 +36,9 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
         gameTypes = default;
         if (!_steamGameHelpers.ToSteamWorkshopsId(steamIdValue, out var steamId))
             return false;
+
+        Logger?.LogTrace($"Getting steam tags from Steam's webpage for mod '{steamId}'");
+
         var webPage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(steamId, CultureInfo.InvariantCulture)
             .GetAwaiter().GetResult();
         if (webPage is null)

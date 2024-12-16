@@ -168,14 +168,26 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
     [Fact]
     public void Directory_SteamWithInvalidDirName()
     {
+        var steamData = new SteamData(
+            new Random().Next(0, int.MaxValue).ToString(),
+            "path",
+            TestHelpers.GetRandomEnum<SteamWorkshopVisibility>(),
+            "Title",
+            ["FOC"]);
+        var modinfo = new ModinfoData("Name")
+        {
+            SteamData = steamData
+        };
+
         var game = FileSystem.InstallGame(new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), GamePlatform.SteamGold), ServiceProvider);
         
         var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var modDir = steamHelpers.GetWorkshopsLocation(game).CreateSubdirectory("notASteamId");
 
-        var steamMod = game.InstallMod(modDir, true, new ModinfoData("Name"), ServiceProvider);
+        var steamMod = game.InstallMod(modDir, true, modinfo, ServiceProvider);
 
-        var info = CreateDetectedModReference(steamMod.Directory, ModType.Workshops, null);
+        // This asserts that we do not use steam data from modinfo if the directory is not a valid steam workshops id
+        var info = CreateDetectedModReference(steamMod.Directory, ModType.Workshops, modinfo);
         var resolver = CreateResolver();
 
         Assert.False(resolver.TryGetGameType(info, out var types));
@@ -303,5 +315,34 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
 
         Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, game.Type));
         Assert.True(resolver.IsDefinitelyNotCompatibleToGame(info, game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw));
+    }
+
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void ModsNotInModsDirButSomeOtherGameBasesDir_NotDecidable(GameType gameType)
+    {
+        var steamData = new SteamData(
+            new Random().Next(0, int.MaxValue).ToString(),
+            "path",
+            TestHelpers.GetRandomEnum<SteamWorkshopVisibility>(),
+            "Title",
+            ["FOC"]);
+        var modinfo = new ModinfoData("Name")
+        {
+            SteamData = steamData
+        };
+
+        var game = FileSystem.InstallGame(new GameIdentity(gameType, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
+        var modDir = game.Directory.CreateSubdirectory("ModsOther").CreateSubdirectory("MyMod");
+        var mod = game.InstallMod(modDir, false, modinfo, ServiceProvider);
+
+        var info = CreateDetectedModReference(mod.Directory, ModType.Default, modinfo);
+        var resolver = CreateResolver();
+
+        Assert.False(resolver.TryGetGameType(info, out var types));
+        Assert.Empty(types);
+
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, game.Type));
     }
 }
