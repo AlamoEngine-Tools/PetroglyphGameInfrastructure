@@ -28,20 +28,6 @@ namespace PG.StarWarsGame.Infrastructure.Services;
 //    }
 
 //    /// <inheritdoc/>
-//    public IMod FromReference(IGame game, IModReference modReference, IModinfo? modinfo, CultureInfo culture)
-//    {
-//        if (modReference.Type == ModType.Virtual)
-//        {
-//            if (modinfo is null)
-//                throw new ModException(modReference, "modinfo cannot be null for creating virtual mods.");
-//            return CreateVirtualMod(game, modinfo);
-//        }
-
-//        var modReferenceLocation = _referenceLocationResolver.ResolveLocation(modReference, game);
-//        return CreateModFromDirectoryWithTypeCheck(game, modReference, modReferenceLocation, modinfo, culture);
-//    }
-
-//    /// <inheritdoc/>
 //    public IVirtualMod CreateVirtualMod(IGame game, IModinfo virtualModInfo)
 //    {
 //        if (virtualModInfo == null) 

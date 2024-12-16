@@ -2,7 +2,6 @@
 using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 using Testably.Abstractions.Testing;
-using Testably.Abstractions.Testing.Initializer;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
@@ -36,10 +35,9 @@ public static partial class GameInstallation
         CreateFile(fs, fs.Path.Combine(directory.FullName, "Data", "megafiles.xml"));
     }
 
-    private static void InstallSteamFiles(this MockFileSystem fs,
-        Action<IFileSystemInitializer<MockFileSystem>> initAction)
+    private static void InstallSteamFiles(this MockFileSystem fs, Action initAction)
     {
-        var initializer = fs.Initialize();
+        fs.Initialize();
         CreateFile(fs, fs.Path.Combine(SteamBasePath, "32470_install.vdf"));
         CreateFile(fs, fs.Path.Combine(SteamBasePath, "32472_install.vdf"));
         CreateFile(fs, fs.Path.Combine(SteamBasePath, "runme.dat"));
@@ -48,27 +46,25 @@ public static partial class GameInstallation
         CreateFile(fs, fs.Path.Combine(SteamBasePath, "runme2.exe"));
 
         fs.Directory.CreateDirectory(fs.Path.Combine(SteamBasePath, "..", "..", "workshop", "content", "32470"));
-
-        initAction(initializer);
+        initAction();
     }
 
-    private static void InstallGoGFiles(this MockFileSystem fs,
-        Action<IFileSystemInitializer<MockFileSystem>> initAction)
+    private static void InstallGoGFiles(this MockFileSystem fs, Action initAction)
     {
-        var initializer = fs.Initialize();
+        fs.Initialize();
         CreateFile(fs, fs.Path.Combine(GogBasePath, "goggame.sdb"));
         CreateFile(fs, fs.Path.Combine(GogBasePath, "goggame-1421404887.hashdb"));
         CreateFile(fs, fs.Path.Combine(GogBasePath, "goggame-1421404887.info"));
         CreateFile(fs, fs.Path.Combine(GogBasePath, "Language.exe"));
-        initAction(initializer);
+        initAction();
     }
 
-    private static void InstallOriginFiles(this MockFileSystem fs, Action<IFileSystemInitializer<MockFileSystem>> initAction)
+    private static void InstallOriginFiles(this MockFileSystem fs, Action initAction)
     {
-        var initializer = fs.Initialize();
+        fs.Initialize();
         fs.Directory.CreateDirectory(fs.Path.Combine(OriginBasePath, "Manuals"));
         fs.Directory.CreateDirectory(fs.Path.Combine(OriginBasePath, "__Installer"));
-        initAction(initializer);
+        initAction();
     }
 
     private static void InstallModsLocations(this MockFileSystem fileSystem, IDirectoryInfo directory)

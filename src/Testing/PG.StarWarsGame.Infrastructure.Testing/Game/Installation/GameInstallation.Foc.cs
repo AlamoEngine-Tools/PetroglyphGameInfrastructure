@@ -58,7 +58,7 @@ public static partial class GameInstallation
     {
         var basePath = fs.Path.Combine(OriginBasePath, FocOriginSubPath);
 
-        fs.InstallOriginFiles(init =>
+        fs.InstallOriginFiles(() =>
         {
             CreateFile(fs, fs.Path.Combine(basePath, "swfoc.exe"));
             CreateFile(fs, fs.Path.Combine(basePath, "EALaunchHelper.exe"));
@@ -70,7 +70,7 @@ public static partial class GameInstallation
     {
         var basePath = fs.Path.Combine(GogBasePath, FocGogSubPath);
 
-        fs.InstallGoGFiles(init =>
+        fs.InstallGoGFiles(() =>
         {
             CreateFile(fs, fs.Path.Combine(basePath, "swfoc.exe"));
         });
@@ -81,7 +81,7 @@ public static partial class GameInstallation
     {
         var basePath = fs.Path.Combine(SteamBasePath, FocSteamSubPath);
 
-        fs.InstallSteamFiles(init =>
+        fs.InstallSteamFiles(() =>
         {
             CreateFile(fs, fs.Path.Combine(basePath, "swfoc.exe"));
             CreateFile(fs, fs.Path.Combine(basePath, "StarWarsG.exe"));

@@ -13,35 +13,20 @@ namespace PG.StarWarsGame.Infrastructure.Services;
 public interface IModFactory
 {
     /// <summary>
-    /// Creates a new <see cref="IPhysicalMod"/> instance for a game from a file system path.
-    /// The mod's filesystem location will be interpreted from <see cref="IModReference.Identifier"/>.
+    /// Creates a new <see cref="IPhysicalMod"/> instance for the specified game from the specified mod reference.
     /// </summary>
-    /// <remarks>The created mods do NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
-    /// <param name="game">The parent <see cref="IGame"/> instance of the mod.</param>
-    /// <param name="modReference">The mod reference of the new mod.</param>
+    /// <remarks>
+    /// The created mod is not added to the <see cref="IModContainer.Mods"/> collection of <paramref name="game"/>.
+    /// </remarks>
+    /// <param name="game">The <see cref="IGame"/> of the mod.</param>
+    /// <param name="modReference">The mod reference to use for creating the mod instance.</param>
     /// <param name="culture">The culture that shall be used to determine the mod's name.</param>
-    /// <returns>the Mod instance</returns>
-    /// <exception cref="DirectoryNotFoundException">when <paramref name="modReference"/> could not be located as an existing location</exception>
+    /// <returns>Teh created mod instance.</returns>
+    /// <exception cref="ModNotFoundException"> The directory information of <paramref name="modReference"/> does not exist.</exception>
     /// <exception cref="ModException">
     /// <paramref name="modReference"/> or identified modinfo files had illegal information, such as empty names.
     /// </exception>
-    IMod FromReference(IGame game, DetectedModReference modReference, CultureInfo culture);
-
-    /// <summary>
-    /// Creates a new <see cref="IPhysicalMod"/> instance for a game from a file system path.
-    /// The mod's filesystem location will be interpreted from <see cref="IModReference.Identifier"/>.
-    /// </summary>
-    /// <remarks>The created mods do NOT get added to the <see cref="IModContainer.Mods"/>collection of the <paramref name="game"/>.</remarks>
-    /// <param name="game">The parent <see cref="IGame"/> instance of the mod.</param>
-    /// <param name="modReference">The mod reference of the new mod.</param>
-    /// <param name="modinfo">Optional <see cref="IModinfo"/> from which the mod will get initialized.</param>
-    /// <param name="culture">The culture that shall be used to determine the mod's name.</param>
-    /// <returns>the Mod instance</returns>
-    /// <exception cref="DirectoryNotFoundException">when <paramref name="modReference"/> could not be located as an existing location</exception>
-    /// <exception cref="ModException">
-    /// <paramref name="modReference"/> or identified modinfo files had illegal information, such as empty names.
-    /// </exception>
-    IMod FromReference(IGame game, IModReference modReference, IModinfo? modinfo, CultureInfo culture);
+    IPhysicalMod CreatePhysicalMod(IGame game, DetectedModReference modReference, CultureInfo culture);
 
     /// <summary>
     /// Creates a virtual mods from a given <see cref="IModinfo"/>.

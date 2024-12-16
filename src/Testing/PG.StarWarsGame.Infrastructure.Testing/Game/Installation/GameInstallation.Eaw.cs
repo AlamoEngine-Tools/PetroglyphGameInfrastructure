@@ -51,7 +51,7 @@ public static partial class GameInstallation
     {
         var basePath = fs.Path.Combine(OriginBasePath, EawGameDataSubPath);
 
-        fs.InstallOriginFiles(init =>
+        fs.InstallOriginFiles(() =>
         {
             CreateFile(fs, fs.Path.Combine(basePath, "sweaw.exe"));
         });
@@ -62,7 +62,7 @@ public static partial class GameInstallation
     {
         var basePath = fs.Path.Combine(GogBasePath, EawGameDataSubPath);
 
-        fs.InstallGoGFiles(init =>
+        fs.InstallGoGFiles(() =>
         {
             CreateFile(fs, fs.Path.Combine(basePath, "sweaw.exe"));
             CreateFile(fs, fs.Path.Combine(basePath, "goggame-1421404887.dll"));
@@ -74,7 +74,7 @@ public static partial class GameInstallation
     {
         var basePath = fs.Path.Combine(SteamBasePath, EawGameDataSubPath);
 
-        fs.InstallSteamFiles(init =>
+        fs.InstallSteamFiles(() =>
         {
             CreateFile(fs, fs.Path.Combine(basePath, "sweaw.exe")); 
             CreateFile(fs, fs.Path.Combine(basePath, "StarWarsG.exe"));
