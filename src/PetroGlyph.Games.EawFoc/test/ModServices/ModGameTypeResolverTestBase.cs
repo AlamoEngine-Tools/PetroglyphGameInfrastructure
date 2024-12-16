@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
+using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using EawModinfo.Spec.Steam;
+using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
@@ -17,19 +20,36 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public abstract class ModGameTypeResolverTestBase : CommonTestBase
 {
-    public abstract IModGameTypeResolver CreateResolver();
+    public abstract ModGameTypeResolver CreateResolver();
 
-    [Fact]
-    public void TryGetGameType_Modinfo_IsNull_CannotGetType()
+    protected static DetectedModReference CreateDetectedModReference(IDirectoryInfo dir, ModType type, IModinfo? modinfo)
     {
-        Assert.False(CreateResolver().TryGetGameType(null!, out _));
+        return new DetectedModReference(new ModReference("SOME_ID", type), dir, modinfo);
     }
 
     [Fact]
-    public void TryGetGameType_Modinfo_WithoutSteamData_CannotGetType()
+    public void NullArg_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => CreateResolver().TryGetGameType((DetectedModReference)null!, out _));
+        Assert.Throws<ArgumentNullException>(() => CreateResolver().IsDefinitelyNotCompatibleToGame((DetectedModReference)null!, TestHelpers.GetRandomEnum<GameType>()));
+    }
+
+    [Fact]
+    public void Modinfo_IsNull_CannotGetType()
+    {
+        var resolver = CreateResolver();
+        Assert.False(resolver.TryGetGameType((IModinfo?)null!, out _));
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame((IModinfo?)null!, TestHelpers.GetRandomEnum<GameType>()));
+    }
+
+    [Fact]
+    public void Modinfo_WithoutSteamData_CannotGetType()
     {
         var modinfo = new ModinfoData("Name");
-        Assert.False(CreateResolver().TryGetGameType(modinfo, out _));
+
+        var resolver = CreateResolver();
+        Assert.False(resolver.TryGetGameType(modinfo, out _));
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(modinfo, TestHelpers.GetRandomEnum<GameType>()));
     }
 
     [Theory]
@@ -37,7 +57,7 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
     [InlineData("tag")]
     [InlineData("tag", "notFoc")]
     [InlineData("tag", "notFoc", "notEAW")]
-    public void TryGetGameType_WithoutSteamGameTag_CannotGetType(params string[] tags)
+    public void Modinfo_WithoutSteamGameTag_CannotGetType(params string[] tags)
     {
         var steamData = new SteamData(
             new Random().Next(0, int.MaxValue).ToString(),
@@ -49,22 +69,25 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
         {
             SteamData = steamData
         };
-        Assert.False(CreateResolver().TryGetGameType(modinfo, out _));
+
+        var resolver = CreateResolver();
+        Assert.False(resolver.TryGetGameType(modinfo, out _));
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(modinfo, TestHelpers.GetRandomEnum<GameType>()));
     }
 
     public static IEnumerable<object[]> GetSteamTagsSuccessTestData()
     {
-        yield return [new List<string> { "EAW" }, new List<GameType> { GameType.Eaw }];
-        yield return [new List<string> { "eaW" }, new List<GameType> { GameType.Eaw }];
-        yield return [new List<string> { "FOC" }, new List<GameType> { GameType.Foc }];
-        yield return [new List<string> { "foc" }, new List<GameType> { GameType.Foc }];
-        yield return [new List<string> { "foc", "EAW" }, new List<GameType> { GameType.Eaw, GameType.Foc }];
-        yield return [new List<string> { "other", "foc", "EAW" }, new List<GameType> { GameType.Eaw, GameType.Foc }];
+        yield return [new List<string> { "EAW" }, new[] { GameType.Eaw }, GameType.Foc];
+        yield return [new List<string> { "eaW" }, new[] { GameType.Eaw }, GameType.Foc];
+        yield return [new List<string> { "FOC" }, new[] { GameType.Foc }, GameType.Eaw];
+        yield return [new List<string> { "foc" }, new[] { GameType.Foc }, GameType.Eaw];
+        yield return [new List<string> { "foc", "EAW" }, new[] { GameType.Eaw, GameType.Foc }, null!];
+        yield return [new List<string> { "other", "foc", "EAW" }, new[] { GameType.Eaw, GameType.Foc }, null!];
     }
 
     [Theory]
     [MemberData(nameof(GetSteamTagsSuccessTestData))]
-    public void TryGetGameType_Modinfo_WithSteamData(IList<string> tags, ICollection<GameType> expectedTypes)
+    public void Modinfo_WithSteamDataAndSteamTag_CanDetermineGameType(IList<string> tags, ICollection<GameType> expectedTypes, GameType? incompatibleWith)
     {
         var steamData = new SteamData(
             new Random().Next(0, int.MaxValue).ToString(),
@@ -76,12 +99,18 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
             SteamData = steamData
         };
 
-        Assert.True(CreateResolver().TryGetGameType(modinfo, out var types));
+        var resolver = CreateResolver();
+        Assert.True(resolver.TryGetGameType(modinfo, out var types));
         Assert.Equivalent(expectedTypes, types, true);
+
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(modinfo, TestHelpers.GetRandom(expectedTypes)));
+        if (incompatibleWith is not null)
+            Assert.True(resolver.IsDefinitelyNotCompatibleToGame(modinfo, incompatibleWith.Value));
+
     }
 
     [Fact]
-    public void TryGetGameType_Directory_WithModinfo_ModinfoIsAlwaysSuperiorForSteamTypes()
+    public void Directory_WithModinfo_ModinfoIsAlwaysSuperiorForSteamTypes()
     {
         var steamData = new SteamData(
             new Random().Next(0, int.MaxValue).ToString(),
@@ -97,16 +126,22 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
         // Installing FOC, while tags has EAW. So technically, EAW does not even exist.
         var game = FileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
         var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
-        // Using a known MODID (RaW), which is FOC, to ensure cache does not hit.
+        // Using a known MODID (RaW), which is FOC, to implicitly assert cache is not used.
         var modDir = steamHelpers.GetWorkshopsLocation(game).CreateSubdirectory("1129810972");
 
-        Assert.True(CreateResolver().TryGetGameType(modDir, ModType.Workshops, modinfo, out var types));
+        var info = CreateDetectedModReference(modDir, ModType.Workshops, modinfo);
+        var resolver = CreateResolver();
+
+        Assert.True(resolver.TryGetGameType(info, out var types));
         var type = Assert.Single(types);
         Assert.Equal(GameType.Eaw, type);
+
+        Assert.True(resolver.IsDefinitelyNotCompatibleToGame(info, GameType.Foc));
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, GameType.Eaw));
     }
 
     [Fact]
-    public void TryGetGameType_Directory_SteamWithoutModinfoCannotDecide()
+    public void Directory_SteamWithoutModinfoCannotDecide()
     {
         // No SteamData here
         var modinfo = new ModinfoData("Name");
@@ -120,13 +155,18 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
 
         var steamMod = game.InstallMod(modDir, true, modinfo, ServiceProvider);
 
+        var info = CreateDetectedModReference(steamMod.Directory, ModType.Workshops, modinfo);
+        var resolver = CreateResolver();
+
         // We cannot say for sure to which game a mod belongs if it is in WS directory.
-        Assert.False(CreateResolver().TryGetGameType(steamMod.Directory, ModType.Workshops, modinfo, out var types)); 
+        Assert.False(resolver.TryGetGameType(info, out var types)); 
         Assert.Empty(types);
+
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, TestHelpers.GetRandomEnum<GameType>()));
     }
 
     [Fact]
-    public void TryGetGameType_Directory_SteamWithInvalidDirName()
+    public void Directory_SteamWithInvalidDirName()
     {
         var game = FileSystem.InstallGame(new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), GamePlatform.SteamGold), ServiceProvider);
         
@@ -135,21 +175,32 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
 
         var steamMod = game.InstallMod(modDir, true, new ModinfoData("Name"), ServiceProvider);
 
-        Assert.False(CreateResolver().TryGetGameType(steamMod.Directory, ModType.Workshops, null, out var types));
+        var info = CreateDetectedModReference(steamMod.Directory, ModType.Workshops, null);
+        var resolver = CreateResolver();
+
+        Assert.False(resolver.TryGetGameType(info, out var types));
         Assert.Empty(types);
+
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, TestHelpers.GetRandomEnum<GameType>()));
     }
 
     public static IEnumerable<object[]> GetCachedModsTestData()
     {
         foreach (var knownMod in KnownSteamWorkshopCache.KnownMods)
         {
-            yield return [knownMod.Key.ToString(), knownMod.Value.Types];
+            GameType? incompatible;
+            if (knownMod.Value.Types.Length == 2)
+                incompatible = null;
+            else
+                incompatible = knownMod.Value.Types.First() == GameType.Foc ? GameType.Eaw : GameType.Foc;
+
+            yield return [knownMod.Key.ToString(), knownMod.Value.Types, incompatible!];
         }
     }
 
     [Theory]
     [MemberData(nameof(GetCachedModsTestData))]
-    public void TryGetGameType_Directory_SteamWithoutModinfoButKnownModID(string knownId, ICollection<GameType> expectedTypes)
+    public void Directory_SteamWithoutModinfoButKnownModID(string knownId, ICollection<GameType> expectedTypes, GameType? incompatibleWith)
     {
         // No SteamData here
         var modinfo = new ModinfoData("Name");
@@ -160,13 +211,19 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
 
         var modDir = steamHelpers.GetWorkshopsLocation(game).CreateSubdirectory(knownId);
 
-        // We cannot say for sure to which game a mod belongs if it is in WS directory.
-        Assert.True(CreateResolver().TryGetGameType(modDir, ModType.Workshops, modinfo, out var types));
+        var info = CreateDetectedModReference(modDir, ModType.Workshops, modinfo);
+        var resolver = CreateResolver();
+
+        Assert.True(resolver.TryGetGameType(info, out var types));
         Assert.Equivalent(expectedTypes, types, true);
+
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, TestHelpers.GetRandom(expectedTypes)));
+        if (incompatibleWith is not null)
+            Assert.True(resolver.IsDefinitelyNotCompatibleToGame(info, incompatibleWith.Value));
     }
 
     [Fact]
-    public void TryGetGameType_VirtualMods_VirtualModsAreAlwaysUndecidable()
+    public void VirtualMods_VirtualModsAreAlwaysUndecidable()
     {
         var steamData = new SteamData(
             new Random().Next(0, int.MaxValue).ToString(),
@@ -182,13 +239,18 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
         var game = FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
         var mod = game.InstallMod("Name", false, ServiceProvider);
 
+        var info = CreateDetectedModReference(mod.Directory, ModType.Virtual, modinfo);
+        var resolver = CreateResolver();
+
         // We have a installed mod, and modinfo, but still virtual mods shall never return a confirmed value
-        Assert.False(CreateResolver().TryGetGameType(mod.Directory, ModType.Virtual, modinfo, out var types)); 
+        Assert.False(CreateResolver().TryGetGameType(info, out var types)); 
         Assert.Empty(types);
+
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, TestHelpers.GetRandomEnum<GameType>()));
     }
 
     [Fact]
-    public void TryGetGameType_ExternalModsAreAlwaysUndecidable()
+    public void ExternalModsAreAlwaysUndecidable()
     {
         var steamData = new SteamData(
             new Random().Next(0, int.MaxValue).ToString(),
@@ -203,15 +265,20 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
 
         var modDir = FileSystem.Directory.CreateDirectory("/ExternalMod");
 
+        var info = CreateDetectedModReference(modDir, ModType.Default, modinfo);
+        var resolver = CreateResolver();
+
         // SteamData from modinfo should not be used. "External mods" are undecidable
-        Assert.False(CreateResolver().TryGetGameType(modDir, ModType.Default, modinfo, out var types));
+        Assert.False(CreateResolver().TryGetGameType(info, out var types));
         Assert.Empty(types);
+
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, TestHelpers.GetRandomEnum<GameType>()));
     }
 
     [Theory]
     [InlineData(GameType.Eaw)]
     [InlineData(GameType.Foc)]
-    public void TryGetGameType_ModsInModsDirUseGameType(GameType gameType)
+    public void ModsInModsDirUseGameType(GameType gameType)
     {
         var steamData = new SteamData(
             new Random().Next(0, int.MaxValue).ToString(),
@@ -227,8 +294,14 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
         var game = FileSystem.InstallGame(new GameIdentity(gameType, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
         var mod = game.InstallMod("Name", false, ServiceProvider);
 
-        Assert.True(CreateResolver().TryGetGameType(mod.Directory, ModType.Default, modinfo, out var types));
+        var info = CreateDetectedModReference(mod.Directory, ModType.Default, modinfo);
+        var resolver = CreateResolver();
+
+        Assert.True(resolver.TryGetGameType(info, out var types));
         var type = Assert.Single(types);
         Assert.Equal(game.Type, type);
+
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, game.Type));
+        Assert.True(resolver.IsDefinitelyNotCompatibleToGame(info, game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw));
     }
 }

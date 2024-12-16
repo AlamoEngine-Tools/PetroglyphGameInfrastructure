@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO.Abstractions;
 using System.Linq;
 using AnakinRaW.CommonUtilities.Collections;
 using EawModinfo.Spec;
+using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
@@ -17,30 +16,18 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// The online checks queries the tags specified by the mod creators. The results are cached for the runtime of the application.
 /// </summary>
 /// <param name="serviceProvider">The service provider.</param>
-public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) : IModGameTypeResolver
+public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) : ModGameTypeResolver(serviceProvider)
 {
     private readonly OfflineModGameTypeResolver _offlineResolver = new(serviceProvider);
     private readonly ISteamGameHelpers _steamGameHelpers = serviceProvider.GetRequiredService<ISteamGameHelpers>();
     private readonly ISteamWorkshopWebpageDownloader _steamWebpageDownloader = serviceProvider.GetRequiredService<ISteamWorkshopWebpageDownloader>();
 
-    private readonly ConcurrentDictionary<ulong, GameType?> _gameTypeCache = new();
-
     /// <inheritdoc />
-    public bool TryGetGameType(IDirectoryInfo modLocation, ModType modType, IModinfo? modinfo, out ReadOnlyFrugalList<GameType> gameTypes)
+    public override bool TryGetGameType(DetectedModReference modInformation, out ReadOnlyFrugalList<GameType> gameTypes)
     {
-        if (_offlineResolver.TryGetGameType(modLocation, modType, modinfo, out gameTypes))
+        if (_offlineResolver.TryGetGameType(modInformation, out gameTypes))
             return true;
-
-        if (modType != ModType.Workshops)
-            return false;
-        return GetGameTypeFromSteamPage(modLocation.Name, out gameTypes);
-    }
-
-    /// <inheritdoc />
-    public bool TryGetGameType(IModinfo? modinfo, out ReadOnlyFrugalList<GameType> gameTypes)
-    {
-        gameTypes = default;
-        return _offlineResolver.TryGetGameType(modinfo, out gameTypes);
+        return modInformation.ModReference.Type == ModType.Workshops && GetGameTypeFromSteamPage(modInformation.Directory.Name, out gameTypes);
     }
 
     private bool GetGameTypeFromSteamPage(string steamIdValue, out ReadOnlyFrugalList<GameType> gameTypes)
@@ -59,6 +46,6 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
 
         var tags = new HashSet<string>(tagNodes.Select(x => x.InnerHtml));
 
-        return OfflineModGameTypeResolver.GetGameTypesFromTags(tags, out gameTypes);
+        return GetGameTypesFromTags(tags, out gameTypes);
     }
 }

@@ -4,7 +4,7 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public class OfflineModGameTypeResolverTest : ModGameTypeResolverTestBase
 {
-    public override IModGameTypeResolver CreateResolver()
+    public override ModGameTypeResolver CreateResolver()
     {
         return new OfflineModGameTypeResolver(ServiceProvider);
     }

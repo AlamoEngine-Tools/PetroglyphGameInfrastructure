@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using EawModinfo.Spec.Steam;
@@ -14,6 +16,7 @@ using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.TestingUtilities;
+using Semver;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
@@ -418,6 +421,20 @@ public class ModFinderTest : CommonTestBase
         Assert.Empty(installedMods);
     }
 
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void FindMods_InvalidModinfoContentIsSkippedButModIsFound(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        expectedMod.InstallModinfoFile(new CustomModinfo(string.Empty));
+
+        var installedMods = _modFinder.FindMods(game);
+        var expectedId = expectedMod.Type == ModType.Workshops ? ((ulong)"MyMod".GetHashCode()).ToString() : "MyMod";
+
+        AssertSingleFoundMod(installedMods, expectedMod, expectedId, null);
+    }
+
     private static void AssertSingleFoundMod(IEnumerable<DetectedModReference> foundMods, IPhysicalMod expectedMod, string expectedId, IModinfo? expectedModinfo)
     {
         var foundMod = Assert.Single(foundMods);
@@ -451,5 +468,33 @@ public class ModFinderTest : CommonTestBase
         Assert.Equivalent(expectedIdentifiers, detectedMods.Select(x => x.ModReference.Identifier), true);
 
         Assert.Equivalent(expectedModinfoNames, detectedMods.Select(x => x.Modinfo?.Name), true);
+    }
+
+    private class CustomModinfo(string name) : IModinfo
+    {
+        public bool Equals(IModIdentity other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string Name { get; } = name;
+        public SemVersion? Version { get; }
+        public IModDependencyList Dependencies { get; }
+        public string ToJson()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ToJson(Stream stream)
+        {
+            JsonSerializer.Serialize(stream, this, JsonSerializerOptions.Default);
+        }
+
+        public string? Summary { get; }
+        public string? Icon { get; }
+        public IDictionary<string, object> Custom { get; }
+        public ISteamData? SteamData { get; }
+        public IReadOnlyCollection<ILanguageInfo> Languages { get; }
+        public bool LanguagesExplicitlySet { get; }
     }
 }

@@ -78,18 +78,10 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
         
         foreach (var modRef in ModReferenceBuilder.CreateIdentifiers(modinfoFiles, locationKind))
         {
-            if (IsDefinitelyNotGameType(requestedGameType, modDirectory, modRef.ModReference.Type, modRef.Modinfo))
+            if (_gameTypeResolver.IsDefinitelyNotCompatibleToGame(modRef, requestedGameType))
                 continue;
             yield return modRef;
         }
-    }
-
-    private bool IsDefinitelyNotGameType(GameType expected, IDirectoryInfo modDirectory, ModType modType, IModinfo? modinfo)
-    {
-        // If the type resolver was unable to find the type, we have to assume that the current mod matches to the game.
-        // Otherwise, we'd produce false negatives. Only if the resolver was able to determine a result, we use that finding.
-        return _gameTypeResolver.TryGetGameType(modDirectory, modType, modinfo, out var variantGameType) &&
-               !variantGameType.Contains(expected);
     }
 
     private ModReferenceBuilder.ModLocationKind GetModLocationKind(IGame game, IDirectoryInfo directory)
