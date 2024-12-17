@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Abstractions;
-using System.Linq;
 using AET.SteamAbstraction;
 using AnakinRaW.CommonUtilities.Registry.Windows;
 using EawModinfo.Model;

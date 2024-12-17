@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using EawModinfo.Model;
 using EawModinfo.Spec;
-using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.TestingUtilities;
