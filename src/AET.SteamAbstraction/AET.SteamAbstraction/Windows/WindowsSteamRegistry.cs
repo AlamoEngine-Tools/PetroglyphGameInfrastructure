@@ -87,7 +87,7 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
                 var ids = new HashSet<uint>();
                 foreach (var app in appNames)
                 {
-                    if (!uint.TryParse(app, NumberStyles.None, null, out var id))
+                    if (uint.TryParse(app, NumberStyles.None, null, out var id))
                         ids.Add(id);
                 }
                 return ids;
