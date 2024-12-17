@@ -27,6 +27,6 @@ public class PetroglyphGameClients
         serviceCollection.AddSingleton<IArgumentValidator>(_ => new ArgumentValidator());
         serviceCollection.AddSingleton<IArgumentCommandLineBuilder>(sp => new ArgumentCommandLineBuilder(sp));
 
-        serviceCollection.AddSingleton<IGameLanguageFinder>(sp => new SteamGameLanguageFinder(sp));
+        serviceCollection.AddSingleton<ILanguageFinder>(sp => new SteamGameLanguageFinder(sp));
     }
 }

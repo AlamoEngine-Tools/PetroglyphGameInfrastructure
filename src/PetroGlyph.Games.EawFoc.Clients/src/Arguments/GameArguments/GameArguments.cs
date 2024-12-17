@@ -248,7 +248,7 @@ public sealed class LanguageArgument : NamedArgument<ILanguageInfo>
     /// <returns></returns>
     public override string ValueToCommandLine()
     {
-        return LanguageInfoUtilities.GetEnglishName(Value).ToUpperInvariant();
+        return LanguageInfoUtilities.GetEnglishName(Value)!.ToUpperInvariant();
     }
 }
 

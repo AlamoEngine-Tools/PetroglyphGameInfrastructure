@@ -152,10 +152,10 @@ public class ModArgumentListFactoryTest
         modB.Setup(m => m.Type).Returns(ModType.Workshops);
         modB.Setup(m => m.Identifier).Returns("456");
 
-        _traverser.Setup(t => t.Traverse(It.IsAny<IMod>())).Returns(new List<ModDependencyEntry>
+        _traverser.Setup(t => t.Traverse(It.IsAny<IMod>())).Returns(new List<IMod>
         {
-            new(modA.Object),
-            new(modB.Object)
+            modA.Object,
+            modB.Object
         });
 
         var modList = _service.BuildArgumentList(modA.Object, false);
@@ -177,10 +177,10 @@ public class ModArgumentListFactoryTest
         modB.Setup(m => m.Type).Returns(ModType.Workshops);
         modB.Setup(m => m.Identifier).Returns("456");
 
-        _traverser.Setup(t => t.Traverse(It.IsAny<IMod>())).Returns(new List<ModDependencyEntry>
+        _traverser.Setup(t => t.Traverse(It.IsAny<IMod>())).Returns(new List<IMod>
         {
-            new(modA.Object),
-            new(modB.Object)
+            modA.Object,
+            modB.Object
         });
 
         var modList = _service.BuildArgumentList(modA.Object, false);

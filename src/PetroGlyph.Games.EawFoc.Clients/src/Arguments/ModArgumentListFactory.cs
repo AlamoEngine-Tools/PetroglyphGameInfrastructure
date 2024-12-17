@@ -51,7 +51,7 @@ internal class ModArgumentListFactory : IModArgumentListFactory
         if (modInstance.DependencyResolveStatus == DependencyResolveStatus.Resolved)
         {
             var traverser = _serviceProvider.GetRequiredService<IModDependencyTraverser>();
-            var dependencies = traverser.Traverse(modInstance).Select(d => d.Mod).ToList();
+            var dependencies = traverser.Traverse(modInstance).Select(d => d).ToList();
             return BuildArgumentList(dependencies, validateArgumentOnCreation);
         }
 
@@ -62,7 +62,7 @@ internal class ModArgumentListFactory : IModArgumentListFactory
             return ModArgumentList.Empty;
 
         var arg = BuildSingleModArgument(physicalMod, validateArgumentOnCreation);
-        return new ModArgumentList(new[] { arg });
+        return new ModArgumentList([arg]);
     }
 
     private ModArgument BuildSingleModArgument(IPhysicalMod mod, bool validate)

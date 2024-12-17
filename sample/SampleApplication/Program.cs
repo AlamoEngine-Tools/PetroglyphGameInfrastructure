@@ -14,7 +14,6 @@ using PG.StarWarsGame.Infrastructure.Clients.Steam;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services;
-using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Name;
 
@@ -31,10 +30,10 @@ var firstMod = mods.FirstOrDefault();
 
 Console.WriteLine($"Playing {firstMod}");
 
-client.Play((IPlayableObject)firstMod ?? game, new ArgumentCollection(new List<IGameArgument>
-{
-    new WindowedArgument()
-}));
+//client.Play((IPlayableObject)firstMod ?? game, new ArgumentCollection(new List<IGameArgument>
+//{
+//    new WindowedArgument()
+//}));
 return;
 
 
@@ -42,13 +41,13 @@ IList<IMod> FindMods()
 {
     var modList = new List<IMod>();
 
-    var modFinder = services.GetRequiredService<IModReferenceFinder>();
+    var modFinder = services.GetRequiredService<IModFinder>();
     var modRefs = modFinder.FindMods(game);
     var factory = services.GetRequiredService<IModFactory>();
 
     foreach (var modReference in modRefs)
     {
-        var mod = factory.FromReference(game, modReference, CultureInfo.CurrentCulture);
+        var mod = factory.CreatePhysicalMod(game, modReference, CultureInfo.CurrentCulture);
         modList.Add(mod);
     }
 
@@ -60,7 +59,6 @@ IList<IMod> FindMods()
         mod.ResolveDependencies();
 
     return modList;
-
 }
 
 IGame FindGame()
@@ -83,13 +81,7 @@ IServiceProvider SetupApplication()
     SteamAbstractionLayer.InitializeServices(sc);
     PetroglyphGameClients.InitializeServices(sc);
 
-    sc.AddSingleton<IModNameResolver>(sp => new CompositeModNameResolver(sp, s => new List<IModNameResolver>
-    {
-        new OfflineWorkshopNameResolver(sp),
-        new OnlineWorkshopNameResolver(sp),
-        new DirectoryModNameResolver(sp)
-    }));
-
+    sc.AddSingleton<IModNameResolver>(sp => new OnlineModNameResolver(sp));
     sc.AddSingleton<IModGameTypeResolver>(sp => new OnlineModGameTypeResolver(sp));
     
     // The game detector to use for this application. 

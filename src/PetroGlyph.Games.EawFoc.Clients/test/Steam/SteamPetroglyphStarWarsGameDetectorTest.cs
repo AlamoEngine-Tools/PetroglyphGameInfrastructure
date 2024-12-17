@@ -9,7 +9,6 @@ using Moq;
 using PG.StarWarsGame.Infrastructure.Clients.Steam;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Games.Registry;
-using PG.StarWarsGame.Infrastructure.Services.Detection;
 using Testably.Abstractions.Testing;
 using Xunit;
 
@@ -54,8 +53,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
     {
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out It.Ref<SteamAppManifest?>.IsAny))
             .Returns(false);
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = _service.Detect(options);
+        var result = _service.Detect(GameType.Foc);
         Assert.Null(result.GameLocation);
     }
 
@@ -70,8 +68,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _steamWrapper.Setup(s => s.Installed).Returns(true);
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
 
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = _service.Detect(options);
+        var result = _service.Detect(GameType.Foc);
         Assert.Null(result.GameLocation);
     }
 
@@ -86,8 +83,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
 
         _steamWrapper.Setup(s => s.Installed).Returns(true);
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = _service.Detect(options);
+        var result = _service.Detect(GameType.Foc);
         Assert.Null(result.GameLocation);
     }
 
@@ -102,8 +98,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
 
         _steamWrapper.Setup(s => s.Installed).Returns(true);
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = _service.Detect(options);
+        var result = _service.Detect(GameType.Foc);
         Assert.Null(result.GameLocation);
     }
 
@@ -118,8 +113,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
 
         _steamWrapper.Setup(s => s.Installed).Returns(true);
         _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = _service.Detect(options);
+        var result = _service.Detect(GameType.Foc);
         Assert.Null(result.GameLocation);
     }
 
@@ -140,8 +134,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
         _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
 
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = _service.Detect(options);
+        var result = _service.Detect(GameType.Foc);
         Assert.NotNull(result.GameLocation);
     }
 
@@ -162,8 +155,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
         _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
 
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = _service.Detect(options);
+        var result = _service.Detect(GameType.Foc);
         Assert.NotNull(result.GameLocation);
     }
 
@@ -184,8 +176,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _gameRegistry.Setup(r => r.Type).Returns(GameType.Eaw);
         _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
 
-        var options = new GameDetectorOptions(GameType.Eaw);
-        var result = _service.Detect(options);
+        var result = _service.Detect(GameType.Eaw);
         Assert.NotNull(result.GameLocation);
     }
 
@@ -207,9 +198,8 @@ public class SteamPetroglyphStarWarsGameDetectorTest
         _gameRegistry.Setup(r => r.Type).Returns(GameType.Eaw);
         _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
 
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = _service.Detect(options);
-        Assert.IsType<InvalidOperationException>(result.Error);
+        var result = _service.Detect(GameType.Foc);
+        Assert.IsType<InvalidOperationException>(result);
     }
 
     [Fact]
@@ -228,8 +218,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest
             .Returns(_gameRegistry.Object);
         _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
 
-        var options = new GameDetectorOptions(GameType.Foc);
-        var result = _service.Detect(options);
+        var result = _service.Detect(GameType.Foc);
         Assert.True(result.InitializationRequired);
     }
 }
