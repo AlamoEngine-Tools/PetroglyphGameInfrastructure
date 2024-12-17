@@ -17,41 +17,41 @@ internal class ModFactory(IServiceProvider serviceProvider) : IModFactory
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     private readonly IModGameTypeResolver _modGameTypeResolver = serviceProvider.GetRequiredService<IModGameTypeResolver>();
 
-    public IPhysicalMod CreatePhysicalMod(IGame game, DetectedModReference modReference, CultureInfo culture)
+    public IPhysicalMod CreatePhysicalMod(IGame game, DetectedModReference detectedMod, CultureInfo culture)
     {
         if (game == null) 
             throw new ArgumentNullException(nameof(game));
-        if (modReference == null) 
-            throw new ArgumentNullException(nameof(modReference));
+        if (detectedMod == null) 
+            throw new ArgumentNullException(nameof(detectedMod));
         if (culture == null) 
             throw new ArgumentNullException(nameof(culture));
 
-        if (modReference.ModReference.Type == ModType.Virtual)
+        if (detectedMod.ModReference.Type == ModType.Virtual)
             throw new NotSupportedException("Cannot create virtual mod.");
 
-        var modDir = modReference.Directory;
+        var modDir = detectedMod.Directory;
 
         modDir.Refresh();
         if (!modDir.Exists)
-            throw new DirectoryNotFoundException($"Mod installation not found at '{modReference.Directory.FullName}'.");
+            throw new DirectoryNotFoundException($"Mod installation not found at '{detectedMod.Directory.FullName}'.");
 
-        // We don't trust the modtype of the modReference.
-        if (_modGameTypeResolver.IsDefinitelyNotCompatibleToGame(modReference, game.Type))
-            throw new ModException(modReference.ModReference,
-                $"The mod '{modReference.ModReference.Identifier}' at location '{modDir}' is not compatible to game '{game}'");
+        // We don't trust the modtype of the detectedMod.
+        if (_modGameTypeResolver.IsDefinitelyNotCompatibleToGame(detectedMod, game.Type))
+            throw new ModException(detectedMod.ModReference,
+                $"The mod '{detectedMod.ModReference.Identifier}' at location '{modDir}' is not compatible to game '{game}'");
 
-        var isWorkshop = modReference.ModReference.Type == ModType.Workshops;
+        var isWorkshop = detectedMod.ModReference.Type == ModType.Workshops;
 
-        var modinfo = modReference.Modinfo;
+        var modinfo = detectedMod.Modinfo;
 
         if (modinfo == null)
         {
-            var name = GetModName(modReference.ModReference, culture);
-            return new Mod(game, modReference.ModReference.Identifier, modDir, isWorkshop, name, _serviceProvider);
+            var name = GetModName(detectedMod, culture);
+            return new Mod(game, detectedMod.ModReference.Identifier, modDir, isWorkshop, name, _serviceProvider);
         }
 
         modinfo.Validate();
-        return new Mod(game, modReference.ModReference.Identifier, modDir, isWorkshop, modinfo, _serviceProvider);
+        return new Mod(game, detectedMod.ModReference.Identifier, modDir, isWorkshop, modinfo, _serviceProvider);
     }
 
     public IVirtualMod CreateVirtualMod(IGame game, IModinfo virtualModInfo)
@@ -67,11 +67,11 @@ internal class ModFactory(IServiceProvider serviceProvider) : IModFactory
         return new VirtualMod(game, virtualModRef.Identifier, virtualModInfo, _serviceProvider);
     }
 
-    private string GetModName(IModReference modReference, CultureInfo culture)
+    private string GetModName(DetectedModReference detectedMod, CultureInfo culture)
     {
-        var name = _nameResolver.ResolveName(modReference, culture);
+        var name = _nameResolver.ResolveName(detectedMod, culture);
         if (string.IsNullOrEmpty(name))
-            throw new ModException(modReference, "Unable to create a mod with an empty name.");
+            throw new ModException(detectedMod.ModReference, "Unable to create a mod with an empty name.");
         return name!;
     }
 }

@@ -21,19 +21,19 @@ public interface IModFactory
     /// The created mod is not added to the <see cref="IModContainer.Mods"/> collection of <paramref name="game"/>.
     /// </remarks>
     /// <param name="game">The <see cref="IGame"/> of the mod.</param>
-    /// <param name="modReference">The mod reference to use for creating the mod instance.</param>
+    /// <param name="detectedMod">The mod reference to use for creating the mod instance.</param>
     /// <param name="culture">The culture that shall be used to determine the mod's name.</param>
     /// <returns>Teh created mod instance.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="game"/> or <paramref name="modReference"/> or <paramref name="culture"/> is <see langword="null"/>.</exception>
-    /// <exception cref="NotSupportedException"><paramref name="modReference"/> is references a virtual mod.</exception>
-    /// <exception cref="DirectoryNotFoundException"> The directory information of <paramref name="modReference"/> does not exist.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="game"/> or <paramref name="detectedMod"/> or <paramref name="culture"/> is <see langword="null"/>.</exception>
+    /// <exception cref="NotSupportedException"><paramref name="detectedMod"/> is references a virtual mod.</exception>
+    /// <exception cref="DirectoryNotFoundException"> The directory information of <paramref name="detectedMod"/> does not exist.</exception>
     /// <exception cref="ModException">
-    /// <paramref name="modReference"/> is not compatible to <paramref name="game"/>
+    /// <paramref name="detectedMod"/> is not compatible to <paramref name="game"/>
     /// OR
     /// The resolved name of the mod is null or empty.
     /// </exception>
-    /// <exception cref="ModinfoException">The modinfo data in of <paramref name="modReference"/>, if present, is not valid.</exception>
-    IPhysicalMod CreatePhysicalMod(IGame game, DetectedModReference modReference, CultureInfo culture);
+    /// <exception cref="ModinfoException">The modinfo data in of <paramref name="detectedMod"/>, if present, is not valid.</exception>
+    IPhysicalMod CreatePhysicalMod(IGame game, DetectedModReference detectedMod, CultureInfo culture);
 
     /// <summary>
     /// Creates a virtual mods from a given <see cref="IModinfo"/>.

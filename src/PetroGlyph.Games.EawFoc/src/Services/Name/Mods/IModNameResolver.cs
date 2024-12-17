@@ -1,5 +1,6 @@
-﻿using System.Globalization;
-using EawModinfo.Spec;
+﻿using System;
+using System.Globalization;
+using EawModinfo.Utilities;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Name;
 
@@ -9,10 +10,12 @@ namespace PG.StarWarsGame.Infrastructure.Services.Name;
 public interface IModNameResolver
 {
     /// <summary>
-    /// Resolves a culture invariant name of the game.
+    /// Resolves the name of the specified mod reference and culture.
     /// </summary>
-    /// <param name="modReference">The game which name shall get resolved.</param>
+    /// <param name="detectedMod">The mod which name shall get resolved.</param>
     /// <param name="culture">The culture context.</param>
-    /// <returns>The resolved name. May return <see langword="null"/> if no name for the <paramref name="culture"/> could be found.</returns>
-    string? ResolveName(IModReference modReference, CultureInfo culture);
+    /// <returns>The resolved name.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="detectedMod"/> or <paramref name="culture"/> is <see langword="null"/>.</exception>
+    /// <exception cref="NotSupportedException"><paramref name="detectedMod"/> contains a reference to a virtual mod.</exception>
+    string ResolveName(DetectedModReference detectedMod, CultureInfo culture);
 }

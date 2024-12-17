@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using EawModinfo.Spec;
+using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -12,19 +13,20 @@ namespace PG.StarWarsGame.Infrastructure.Services.Name;
 public abstract class ModNameResolverBase : IModNameResolver
 {
     /// <summary>
-    /// Instance shared Service Provider.
+    /// The Service Provider.
     /// </summary>
     protected readonly IServiceProvider ServiceProvider;
 
     /// <summary>
-    /// Instance shared Logger.
+    /// The logger.
     /// </summary>
     protected readonly ILogger? Logger;
 
     /// <summary>
-    /// Creates a new instance.
+    /// Initializes a new instance of the <see cref="ModNameResolverBase"/> class.
     /// </summary>
-    /// <param name="serviceProvider">The Service provider.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="serviceProvider"/> is <see langword="null"/>.</exception>
     protected ModNameResolverBase(IServiceProvider serviceProvider)
     {
         ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -32,38 +34,30 @@ public abstract class ModNameResolverBase : IModNameResolver
     }
 
     /// <inheritdoc/>
-    public string? ResolveName(IModReference modReference, CultureInfo culture)
+    public string ResolveName(DetectedModReference detectedMod, CultureInfo culture)
     {
-        if (modReference == null)
-            throw new ArgumentNullException(nameof(modReference));
+        if (detectedMod == null)
+            throw new ArgumentNullException(nameof(detectedMod));
         if (culture == null)
             throw new ArgumentNullException(nameof(culture));
 
-        try
-        {
-            var name = ResolveCore(modReference, culture);
-            if (string.IsNullOrEmpty(name))
-                Logger?.LogTrace($"Resolver '{this}' resolved null or empty name for '{modReference}'.");
-            return name;
-        }
-        catch (Exception ex)
-        {
-            Logger?.LogError(ex, $"Resolver '{this}' had an error while resolving the name for {modReference}: {ex.Message}");
-            throw;
-        }
-    }
+        if (detectedMod.ModReference.Type == ModType.Virtual)
+            throw new NotSupportedException("Virtual mods are not supported.");
 
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return GetType().Name;
+        Logger?.LogDebug($"Resolving name for '{detectedMod}' with culture '{culture.EnglishName}'");
+
+        var name = detectedMod.Modinfo is not null ? detectedMod.Modinfo.Name : ResolveCore(detectedMod, culture);
+        if (string.IsNullOrEmpty(name))
+            Logger?.LogWarning($"Resolved null or empty name for '{detectedMod}'");
+        
+        return name;
     }
 
     /// <summary>
-    /// Resolves an <see cref="IModReference"/>'s name with a given culture.
+    /// Resolves the name of the specified mod reference and culture.
     /// </summary>
-    /// <param name="modReference">The target <see cref="IModReference"/>.</param>
-    /// <param name="culture">The target <see cref="CultureInfo"/>.</param>
-    /// <returns>The resolved name or <see langword="null"/>.</returns>
-    protected internal abstract string? ResolveCore(IModReference modReference, CultureInfo culture);
+    /// <param name="detectedMod">The mod which name shall get resolved.</param>
+    /// <param name="culture">The culture context.</param>
+    /// <returns>The resolved name.</returns>
+    protected internal abstract string ResolveCore(DetectedModReference detectedMod, CultureInfo culture);
 }

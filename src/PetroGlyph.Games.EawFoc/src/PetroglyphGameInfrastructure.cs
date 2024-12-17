@@ -40,7 +40,7 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<ISteamWorkshopCache>(_ => new KnownSteamWorkshopCache());
         serviceCollection.AddSingleton<ISteamWorkshopWebpageDownloader>(_ => new SteamWorkshopWebpageDownloader());
 
-        serviceCollection.AddSingleton<IModNameResolver>(sp => new DirectoryModNameResolver(sp));
+        serviceCollection.AddSingleton<IModNameResolver>(sp => new OfflineModNameResolver(sp));
         serviceCollection.AddSingleton<IGameNameResolver>(_ => new EnglishGameNameResolver());
 
         serviceCollection.AddSingleton<IModGameTypeResolver>(sp => new OfflineModGameTypeResolver(sp));
