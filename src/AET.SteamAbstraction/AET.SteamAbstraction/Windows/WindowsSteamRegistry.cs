@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System;
-using System.Linq;
+using System.Globalization;
 using AET.SteamAbstraction.Registry;
 using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +30,7 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
         get
         {
             ThrowIfDisposed();
-            return _registryKey!.GetKey(SteamProcessNode);
+            return _registryKey!.OpenSubKey(SteamProcessNode);
         }
     }
 
@@ -38,14 +38,14 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
     {
         get
         {
-            ThrowIfDisposed();
-            return !_registryKey!.GetValue(SteamActiveUserKey, SteamProcessNode, out int? userId) ? null : userId;
+            return ReadFromSubKey(SteamProcessNode, key => key.GetValue<int?>(SteamActiveUserKey));
         }
         set
         {
-            ThrowIfDisposed();
-            value ??= 0;
-            _registryKey!.WriteValue(SteamActiveUserKey, SteamProcessNode, value);
+            WriteToSubKey(SteamProcessNode, key =>
+            {
+                key.SetValue(SteamActiveUserKey, value ?? 0);
+            });
         }
     }
 
@@ -53,8 +53,7 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
     {
         get
         {
-            ThrowIfDisposed();
-            return !_registryKey!.GetValue(SteamProcessIdKey, SteamProcessNode, out int? pid) ? null : pid;
+            return ReadFromSubKey(SteamProcessNode, key => key.GetValue<int?>(SteamProcessIdKey));
         }
     }
 
@@ -63,9 +62,8 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
         get
         {
             ThrowIfDisposed();
-            return !_registryKey!.GetValue(SteamExeKey, out string? filePath)
-                ? null
-                : _fileSystem.FileInfo.New(filePath!);
+            var path = _registryKey!.GetValue<string?>(SteamExeKey);
+            return path == null ? null : _fileSystem.FileInfo.New(path);
         }
     }
 
@@ -74,9 +72,8 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
         get
         {
             ThrowIfDisposed();
-            return !_registryKey!.GetValue(SteamPathKey, out string? path)
-                ? null
-                : _fileSystem.DirectoryInfo.New(path!);
+            var path = _registryKey!.GetValue<string?>(SteamPathKey);
+            return path == null ? null : _fileSystem.DirectoryInfo.New(path);
         }
     }
 
@@ -84,22 +81,39 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
     {
         get
         {
-            ThrowIfDisposed();
-            var keyNames = _registryKey!.GetSubKeyNames(SteamAppsNode);
-            if (keyNames is null)
-                return null;
-            var ids = keyNames
-                .Select(n => !uint.TryParse(n, out var id) ? (uint?)0 : id)
-                .OfType<uint>();
-            return new HashSet<uint>(ids);
+            return ReadFromSubKey(SteamAppsNode, key =>
+            {
+                var appNames = key.GetSubKeyNames();
+                var ids = new HashSet<uint>();
+                foreach (var app in appNames)
+                {
+                    if (!uint.TryParse(app, NumberStyles.None, null, out var id))
+                        ids.Add(id);
+                }
+                return ids;
+            });
         }
     }
-
-
+    
     protected override void DisposeManagedResources()
     {
-        base.DisposeManagedResources();
         _registryKey?.Dispose();
         _registryKey = null;
+        base.DisposeManagedResources();
+    }
+
+    private T? ReadFromSubKey<T>(string subKeyName, Func<IRegistryKey, T> keyAction)
+    {
+        ThrowIfDisposed();
+        using var subKey = _registryKey?.OpenSubKey(subKeyName);
+        return subKey is null ? default : keyAction(subKey);
+    }
+
+    private void WriteToSubKey(string subKeyName, Action<IRegistryKey> keyAction)
+    {
+        ThrowIfDisposed();
+        using var subKey = _registryKey?.OpenSubKey(subKeyName, true);
+        if (subKey is not null)
+            keyAction(subKey);
     }
 }

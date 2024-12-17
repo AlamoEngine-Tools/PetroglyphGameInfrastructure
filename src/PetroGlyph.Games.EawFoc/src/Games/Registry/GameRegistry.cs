@@ -34,13 +34,6 @@ internal sealed class GameRegistry : IGameRegistry
     /// <inheritdoc/>
     public Version? Version => AccessSubKey(VersionKey, _ => VersionInstance);
 
-
-    private T? AccessSubKey<T>(string subKey, Func<IRegistryKey, T> versionKeyAction)
-    {
-        using var versionKey = GetOrOpenGameKey()?.OpenSubKey(subKey);
-        return versionKey is null ? default : versionKeyAction(versionKey);
-    }
-
     /// <inheritdoc/>
     public string? CdKey => AccessSubKey(VersionKey, vKey => vKey.GetValue<string>(CDKeyProperty));
 
@@ -146,6 +139,12 @@ internal sealed class GameRegistry : IGameRegistry
             _baseKey.Dispose();
             _baseKey = null!;
         }
+    }
+
+    private T? AccessSubKey<T>(string subKey, Func<IRegistryKey, T> versionKeyAction)
+    {
+        using var versionKey = GetOrOpenGameKey()?.OpenSubKey(subKey);
+        return versionKey is null ? default : versionKeyAction(versionKey);
     }
 
     private void ThrowIfDisposed()
