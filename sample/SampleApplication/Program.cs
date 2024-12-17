@@ -5,6 +5,8 @@ using System.IO.Abstractions;
 using System.Linq;
 using AET.SteamAbstraction;
 using AnakinRaW.CommonUtilities.Registry.Windows;
+using EawModinfo.Model;
+using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure;
 using PG.StarWarsGame.Infrastructure.Clients;
@@ -23,17 +25,33 @@ var services = SetupApplication();
 var game = FindGame();
 var mods = FindMods();
 
+Console.WriteLine("Installed Mods:");
+foreach (var mod in mods)
+{
+    Console.Write($"{mod.Name}");
+    if (mod.Type == ModType.Workshops)
+        Console.Write('*');
+    Console.WriteLine();
+}
+
+var raw = game.FindMod(new ModReference("1129810972", ModType.Workshops));
+
+
 var client = services.GetRequiredService<IGameClientFactory>().CreateClient(game.Platform, services);
 
+Console.WriteLine($"Playing {raw}");
 
-var firstMod = mods.FirstOrDefault();
 
-Console.WriteLine($"Playing {firstMod}");
+var modArgumentBuilder = services.GetRequiredService<IModArgumentListFactory>();
 
-//client.Play((IPlayableObject)firstMod ?? game, new ArgumentCollection(new List<IGameArgument>
-//{
-//    new WindowedArgument()
-//}));
+var modArguments  = modArgumentBuilder.BuildArgumentList(raw, true);
+
+
+client.Play(game, new ArgumentCollection(new List<IGameArgument>
+{
+    modArguments,
+    new WindowedArgument()
+}));
 return;
 
 
@@ -49,10 +67,8 @@ IList<IMod> FindMods()
     {
         var mod = factory.CreatePhysicalMod(game, modReference, CultureInfo.CurrentCulture);
         modList.Add(mod);
-    }
-
-    foreach (var mod in modList) 
         game.AddMod(mod);
+    }
 
     // Mods need to be added to the game first, before resolving their dependencies.
     foreach(var mod in modList) 

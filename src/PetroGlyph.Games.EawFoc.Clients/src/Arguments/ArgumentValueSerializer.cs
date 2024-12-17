@@ -21,7 +21,8 @@ internal class ArgumentValueSerializer
     static ArgumentValueSerializer()
     {
         SpecialTypes = new Dictionary<string, (Type, TypeConverter?)>();
-        Type[] typeArray = { 
+        Type[] typeArray =
+        [
             typeof (byte),
             typeof (ushort),
             typeof (uint),
@@ -29,7 +30,7 @@ internal class ArgumentValueSerializer
             typeof (float),
             typeof(double),
             typeof(bool)
-        };
+        ];
         foreach (var type in typeArray) 
             SpecialTypes.Add(type.FullName!, (type, null));
     }

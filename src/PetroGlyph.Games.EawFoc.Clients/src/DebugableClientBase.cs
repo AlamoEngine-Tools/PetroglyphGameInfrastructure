@@ -29,7 +29,7 @@ public abstract class DebugableClientBase : ClientBase, IDebugableGameClient
     /// <inheritdoc/>
     public IGameProcess Debug(IPlayableObject instance)
     {
-        return StartGame(instance, GameBuildType.Debug);
+        return StartGame(instance, DefaultArguments, GameBuildType.Debug);
     }
 
     /// <inheritdoc/>

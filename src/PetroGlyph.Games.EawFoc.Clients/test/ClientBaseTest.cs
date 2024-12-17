@@ -88,34 +88,6 @@ public class ClientBaseTest
     }
 
     [Fact]
-    public void TestModDependenciesAutoAddToArgs()
-    {
-        var mod = new Mock<IMod>();
-        mod.Setup(g => g.Game).Returns(_game.Object);
-
-        var expectedModList = new ModArgumentList(new[]
-            { new ModArgument("path", false), new ModArgument("other", true) });
-        _modListFactory.Setup(f => f.BuildArgumentList(It.IsAny<IMod>(), false))
-            .Returns(expectedModList);
-
-        _game.Setup(g => g.Platform).Returns(GamePlatform.Disk);
-
-        _client.Setup(c => c.SupportedPlatforms).Returns(new HashSet<GamePlatform> { GamePlatform.Disk });
-        _client.Setup(c => c.DefaultArguments).Returns(ArgumentCollection.Empty);
-        var callbackTriggered = false;
-        _client.Setup(c => c.OnGameStarting(It.IsAny<IPlayableObject>(), It.IsAny<IArgumentCollection>(), GameBuildType.Release))
-            .Callback((IPlayableObject _, IArgumentCollection args, GameBuildType _) =>
-            {
-                callbackTriggered = true;
-                Assert.Equal(new ArgumentCollection(new List<IGameArgument> { expectedModList }), args);
-            })
-            .Returns(true);
-
-        Assert.Throws<GameStartException>(() => _client.Object.Play(mod.Object));
-        Assert.True(callbackTriggered);
-    }
-
-    [Fact]
     public void TestExeNotFound_Throws()
     { 
         _game.Setup(g => g.Game).Returns(_game.Object);

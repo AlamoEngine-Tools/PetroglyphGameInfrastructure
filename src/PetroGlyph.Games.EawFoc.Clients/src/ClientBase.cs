@@ -59,45 +59,13 @@ public abstract class ClientBase : IGameClient
     /// <inheritdoc/>
     public IGameProcess Play(IPlayableObject instance)
     {
-        return StartGame(instance, GameBuildType.Release);
+        return StartGame(instance, DefaultArguments, GameBuildType.Release);
     }
 
     /// <inheritdoc/>
     public IGameProcess Play(IPlayableObject instance, IArgumentCollection arguments)
     {
         return StartGame(instance, arguments, GameBuildType.Release);
-    }
-
-    /// <summary>
-    /// Plays the given <paramref name="instance"/> with <see cref="DefaultArguments"/>.
-    /// <para>
-    /// If <paramref name="instance"/> in an <see cref="IMod"/> the arguments passed
-    /// will be <see cref="DefaultArguments"/> merged with the dependency chain of the given mod.
-    /// </para>
-    /// </summary>
-    /// <param name="instance">The game or mod to start.</param>
-    /// <param name="buildType">The requested build type to start.</param>
-    /// <returns>The process of the started game.</returns>
-    /// <exception cref="GameStartException">
-    /// The game's platform is not supported by this client.
-    /// OR
-    /// Starting the game was cancelled by one <see cref="GameStarting"/> handler.
-    /// OR
-    /// The executable file of the game was not found.
-    /// OR
-    /// An internal error occurred.
-    /// </exception>
-    protected IGameProcess StartGame(IPlayableObject instance, GameBuildType buildType)
-    {
-        var arguments = DefaultArguments;
-        if (instance is IMod mod)
-        {
-            var modArgFactory = ServiceProvider.GetRequiredService<IModArgumentListFactory>();
-            var modArgs = modArgFactory.BuildArgumentList(mod, false);
-            var builder = new UniqueArgumentCollectionBuilder();
-            arguments = builder.AddAll(DefaultArguments).Add(modArgs).Build();
-        }
-        return StartGame(instance, arguments, buildType);
     }
 
     /// <summary>

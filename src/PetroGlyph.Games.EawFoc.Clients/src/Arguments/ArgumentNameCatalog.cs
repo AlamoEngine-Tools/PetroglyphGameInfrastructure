@@ -75,7 +75,7 @@ internal static class ArgumentNameCatalog
     public static IReadOnlyCollection<string> AllSupportedArgumentNames =
         SupportedFlagArgumentNames.Union(SupportedKeyValueArgumentNames).Union(SyntheticArgumentNames).ToList();
 
-    internal static IReadOnlyCollection<string> SyntheticArgumentNames => new[] { ModListArg };
+    internal static IReadOnlyCollection<string> SyntheticArgumentNames => [ModListArg];
 
     internal static IReadOnlyCollection<string> SupportedFlagArgumentNames => new HashSet<string>
     {

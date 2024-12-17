@@ -36,7 +36,7 @@ public class VirtualModTest : ModBaseTest
         var modinfo = new ModinfoData(name)
         {
             Icon = iconPath,
-            Languages = languages?.ToList() ?? new List<ILanguageInfo>(),
+            Languages = languages?.ToList() ?? [],
             Dependencies = depList
         };
 
