@@ -427,7 +427,7 @@ public class ModFinderTest : CommonTestBase
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
         var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
-        expectedMod.InstallModinfoFile(new CustomModinfo(string.Empty));
+        expectedMod.InstallModinfoFile(new CustomModinfo(string.Empty)); // string.Empty is not valid
 
         var installedMods = _modFinder.FindMods(game);
         var expectedId = expectedMod.Type == ModType.Workshops ? ((ulong)"MyMod".GetHashCode()).ToString() : "MyMod";
@@ -472,17 +472,17 @@ public class ModFinderTest : CommonTestBase
 
     private class CustomModinfo(string name) : IModinfo
     {
-        public bool Equals(IModIdentity other)
+        public bool Equals(IModIdentity? other)
         {
             throw new NotImplementedException();
         }
 
         public string Name { get; } = name;
         public SemVersion? Version { get; }
-        public IModDependencyList Dependencies { get; }
+        public IModDependencyList Dependencies { get; init; } = DependencyList.EmptyDependencyList;
         public string ToJson()
         {
-            throw new NotImplementedException();
+            return JsonSerializer.Serialize(this, JsonSerializerOptions.Default);
         }
 
         public void ToJson(Stream stream)
@@ -492,9 +492,9 @@ public class ModFinderTest : CommonTestBase
 
         public string? Summary { get; }
         public string? Icon { get; }
-        public IDictionary<string, object> Custom { get; }
+        public IDictionary<string, object> Custom { get; } = new Dictionary<string, object>();
         public ISteamData? SteamData { get; }
-        public IReadOnlyCollection<ILanguageInfo> Languages { get; }
+        public IReadOnlyCollection<ILanguageInfo> Languages { get; } = new List<ILanguageInfo>();
         public bool LanguagesExplicitlySet { get; }
     }
 }

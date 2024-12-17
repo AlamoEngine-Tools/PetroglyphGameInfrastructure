@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
+using System.Linq;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,12 @@ public abstract class CommonTestBase
         sc.AddSingleton<IFileSystem>(FileSystem);
         PetroglyphGameInfrastructure.InitializeServices(sc);
     }
-    
+
+    public static IEnumerable<object[]> RealPlatforms()
+    {
+        return GITestUtilities.RealPlatforms.Select(platform => (object[])[platform]);
+    }
+
     public static IEnumerable<object[]> RealGameIdentities()
     {
         foreach (var platform in GITestUtilities.RealPlatforms)

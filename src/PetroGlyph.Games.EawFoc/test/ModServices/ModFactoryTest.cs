@@ -1,235 +1,316 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO.Abstractions;
+using System.IO;
+using System.Text.Json;
+using EawModinfo;
 using EawModinfo.Model;
 using EawModinfo.Spec;
+using EawModinfo.Spec.Steam;
+using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services;
-using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Name;
-using Testably.Abstractions.Testing;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.TestingUtilities;
+using Semver;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-//public class ModFactoryTest
-//{
-//    private readonly ModFactory _service;
-//    private readonly Mock<IModNameResolver> _nameResolver;
-//    private readonly Mock<IModReferenceLocationResolver> _locationResolver;
-//    private readonly Mock<IModGameTypeResolver> _gameTypeResolver;
-//    private readonly MockFileSystem _fileSystem;
+public class ModFactoryTest : CommonTestBase
+{
+    private const string DefaultModName = "Default Mod Name";
+    private const string SteamModName = "Steam Mod Name";
 
-    //public ModFactoryTest()
-    //{
-    //    var sc = new ServiceCollection();
-    //    _nameResolver = new Mock<IModNameResolver>();
-    //    _locationResolver = new Mock<IModReferenceLocationResolver>();
-    //    _gameTypeResolver = new Mock<IModGameTypeResolver>();
-    //    _fileSystem = new MockFileSystem();
+    private readonly ModFactory _factory;
+    private readonly CustomModNameResolver _nameResolver = new();
 
-    //    sc.AddSingleton(_ => _nameResolver.Object);
-    //    sc.AddSingleton(_ => _locationResolver.Object);
-    //    sc.AddSingleton(_ => _gameTypeResolver.Object);
-    //    sc.AddSingleton<IFileSystem>(_ => _fileSystem);
+    public ModFactoryTest()
+    {
+        _factory = new ModFactory(ServiceProvider);
+    }
 
-    //    _service = new ModFactory(sc.BuildServiceProvider(), _ => _modInfoFinder.Object);
-    //}
+    protected override void SetupServiceProvider(IServiceCollection sc)
+    {
+        base.SetupServiceProvider(sc);
+        sc.AddSingleton<IModNameResolver>(_ => _nameResolver);
+    }
 
+    #region CreatePhysicalMod
 
-    //[Fact]
-    //public void NullCtor_Throws()
-    //{
-    //    Assert.Throws<ArgumentNullException>(() => new ModFactory(null));
-    //}
+    [Fact]
+    public void CreatePhysicalMod_NullArgs_Throws()
+    {
+        var game = FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
+        var modData = CreateDetectedModReference(game, "path", null, null);
 
-    //[Fact]
-    //public void TestModInfoSpecCreation_NoModinfoFiles()
-    //{
-    //    _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-    //    var game = new Mock<IGame>();
-    //    var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-    //    _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
-    //        .Returns(modLoc);
+        Assert.Throws<ArgumentNullException>(() => _factory.CreatePhysicalMod(null!, modData, CultureInfo.CurrentCulture));
+        Assert.Throws<ArgumentNullException>(() => _factory.CreatePhysicalMod(game, null!, CultureInfo.CurrentCulture));
+        Assert.Throws<ArgumentNullException>(() => _factory.CreatePhysicalMod(game, modData, null!));
+    }
 
-    //    _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
+    [Fact]
+    public void CreatePhysicalMod_VirtualMod_Throws()
+    {
+        var game = FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
+        var modDir = FileSystem.DirectoryInfo.New("path");
+        modDir.Create();
+        var modData = new DetectedModReference(new ModReference("SOME_ID", ModType.Virtual), modDir, null);
+        Assert.Throws<NotSupportedException>(() => _factory.CreatePhysicalMod(game, modData, CultureInfo.CurrentCulture));
+    }
 
-    //    _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-    //        .Returns(new ModinfoFinderCollection(modLoc));
+    [Fact]
+    public void CreatePhysicalMod_ModDirectoryNotFound_Throws()
+    {
+        var game = FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
+        var modData = CreateDetectedModReference(game, "path", null, null);
+        modData.Directory.Delete(true);
+        Assert.Throws<DirectoryNotFoundException>(() => _factory.CreatePhysicalMod(game, modData, CultureInfo.CurrentCulture));
+    }
 
-    //    var modRef = new Mod("Mods/Name", ModType.Default);
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void CreatePhysicalMod_FromModsDir_WithoutModinfo(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var modDir = game.GetModDirectory("Mod_Name", false, ServiceProvider);
 
-    //    var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
-    //    Assert.Single(mods);
+        var modData = CreateDetectedModReference(game, modDir, false, null);
+        var mod = _factory.CreatePhysicalMod(game, modData, CultureInfo.CurrentCulture);
 
-    //    GameType result;
-    //    _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), It.IsAny<ModType>(), null, out result), Times.Once);
-    //}
+        Assert.Null(mod.ModInfo);
+        Assert.Equal(modData.ModReference.Identifier, mod.Identifier);
+        Assert.Equal(modData.ModReference.Type, mod.Type);
+        Assert.Equal(DefaultModName, mod.Name);
+    }
 
-    //[Fact]
-    //public void TestModInfoSpecCreation_MainModinfoFiles()
-    //{
-    //    _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-    //    var game = new Mock<IGame>();
-    //    var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-    //    _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
-    //        .Returns(modLoc);
-    //    var modinfo = new Mock<IModinfo>();
-    //    modinfo.Setup(m => m.Name).Returns("MyName");
-    //    modinfo.Setup(m => m.Dependencies)
-    //        .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-    //    modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-    //    var mainFile = new Mock<IModinfoFile>();
-    //    mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
-    //    mainFile.Setup(m => m.TryGetModinfo()).Returns(modinfo.Object);
-    //    _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-    //        .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void CreatePhysicalMod_FromModsDir_WithModinfo(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var modDir = game.GetModDirectory("Mod_Name", false, ServiceProvider);
 
-    //    var modRef = new Mod("Mods/Name", ModType.Default);
+        var modinfo = new ModinfoData("MyMod");
 
-    //    var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
-    //    Assert.Single(mods);
-    //}
+        var modData = CreateDetectedModReference(game, modDir, false, modinfo);
+        var mod = _factory.CreatePhysicalMod(game, modData, CultureInfo.CurrentCulture);
 
-    //[Fact]
-    //public void TestModInfoSpecCreation_MainModinfoFiles_InvalidTypeThrows()
-    //{
-    //    _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-    //    var game = new Mock<IGame>();
-    //    game.SetupGet(g => g.Type).Returns(GameType.Eaw);
-    //    var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-    //    _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
-    //        .Returns(modLoc);
-    //    var modinfo = new Mock<IModinfo>();
-    //    modinfo.Setup(m => m.Name).Returns("MyName");
-    //    modinfo.Setup(m => m.Dependencies)
-    //        .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-    //    modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-    //    var mainFile = new Mock<IModinfoFile>();
-    //    mainFile.Setup(m => m.FileKind).Returns(ModinfoFileKind.MainFile);
-    //    mainFile.Setup(m => m.TryGetModinfo()).Returns(modinfo.Object);
-    //    _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-    //        .Returns(new ModinfoFinderCollection(modLoc, mainFile.Object));
+        Assert.Same(modinfo, mod.ModInfo);
+        Assert.Equal(modData.ModReference.Identifier, mod.Identifier);
+        Assert.Equal(modData.ModReference.Type, mod.Type);
+        Assert.Equal("MyMod", mod.Name);
+    }
 
-    //    var resolveResult = GameType.Foc;
-    //    _gameTypeResolver.Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, modinfo.Object, out resolveResult))
-    //        .Returns(true);
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void CreatePhysicalMod_Steam_WithoutModinfo(GameType gameType)
+    {
+        var game = FileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.SteamGold), ServiceProvider);
+        var modDir = game.GetModDirectory("Mod_Name", true, ServiceProvider);
 
-    //    var modRef = new Mod("Mods/Name", ModType.Default);
+        var modinfo = new ModinfoData("MyMod");
 
-    //    Assert.Throws<ModException>(() => _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture));
-    //}
+        var modRef = CreateDetectedModReference(game, modDir, true, modinfo);
+        var mod = _factory.CreatePhysicalMod(game, modRef, CultureInfo.CurrentCulture);
 
-    //[Fact]
-    //public void TestModInfoSpecCreation_VariantsOnly()
-    //{
-    //    _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-    //    var game = new Mock<IGame>();
-    //    var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-    //    _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
-    //        .Returns(modLoc);
+        Assert.Same(modinfo, mod.ModInfo);
+        Assert.Equal(modRef.ModReference.Identifier, mod.Identifier);
+        Assert.Equal(modRef.ModReference.Type, mod.Type);
+        Assert.Equal(modinfo.Name, mod.Name);
+    }
 
-    //    var variantA = new Mock<IModinfo>();
-    //    variantA.Setup(m => m.Name).Returns("MyNameA");
-    //    variantA.Setup(m => m.Dependencies)
-    //        .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-    //    variantA.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-    //    var variantFileA = new Mock<IModinfoFile>();
-    //    variantFileA.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-    //    variantFileA.Setup(m => m.TryGetModinfo()).Returns(variantA.Object);
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void CreatePhysicalMod_Steam_WithModinfo(GameType gameType)
+    {
+        var game = FileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.SteamGold), ServiceProvider);
+        var modDir = game.GetModDirectory("Mod_Name", true, ServiceProvider);
 
-    //    var variantB = new Mock<IModinfo>();
-    //    variantB.Setup(m => m.Name).Returns("MyNameB");
-    //    variantB.Setup(m => m.Dependencies)
-    //        .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-    //    variantB.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-    //    var variantFileB = new Mock<IModinfoFile>();
-    //    variantFileB.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-    //    variantFileB.Setup(m => m.TryGetModinfo()).Returns(variantB.Object);
+        var modRef = CreateDetectedModReference(game, modDir, true, null);
+        var mod = _factory.CreatePhysicalMod(game, modRef, CultureInfo.CurrentCulture);
 
-    //    _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-    //        .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object }));
+        Assert.Null(mod.ModInfo);
+        Assert.Equal(modRef.ModReference.Identifier, mod.Identifier);
+        Assert.Equal(modRef.ModReference.Type, mod.Type);
+        Assert.Equal(SteamModName, mod.Name);
+    }
 
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void CreatePhysicalMod_WithInvalidModinfo(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-    //    var modRef = new Mod("Mods/Name", ModType.Default);
+        var ws = GITestUtilities.GetRandomWorkshopFlag(game);
+        var modDir = game.GetModDirectory("Mod_Name", ws, ServiceProvider);
 
-    //    var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
-    //    Assert.Equal(2, mods.Count());
-    //}
+        var invalidModinfo = new CustomModInfo(string.Empty); // string.Empty is not valid
+        var modData = CreateDetectedModReference(game, modDir, ws, invalidModinfo);
 
-    //[Fact]
-    //public void TestModInfoSpecCreation_SkipVariantsOfInvalidType()
-    //{
-    //    _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-    //    var game = new Mock<IGame>();
-    //    game.SetupGet(g => g.Type).Returns(GameType.Foc);
-    //    var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
-    //    _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
-    //        .Returns(modLoc);
+        Assert.Throws<ModinfoException>(() => _factory.CreatePhysicalMod(game, modData, CultureInfo.CurrentCulture));
+    }
 
-    //    var variantA = new Mock<IModinfo>();
-    //    variantA.Setup(m => m.Name).Returns("MyNameA");
-    //    variantA.Setup(m => m.Dependencies)
-    //        .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-    //    variantA.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-    //    var variantFileA = new Mock<IModinfoFile>();
-    //    variantFileA.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-    //    variantFileA.Setup(m => m.TryGetModinfo()).Returns(variantA.Object);
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void CreatePhysicalMod_InvalidNameResolved_Throws(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-    //    var variantB = new Mock<IModinfo>();
-    //    variantB.Setup(m => m.Name).Returns("MyNameB");
-    //    variantB.Setup(m => m.Dependencies)
-    //        .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-    //    variantB.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
-    //    var variantFileB = new Mock<IModinfoFile>();
-    //    variantFileB.Setup(m => m.FileKind).Returns(ModinfoFileKind.VariantFile);
-    //    variantFileB.Setup(m => m.TryGetModinfo()).Returns(variantB.Object);
+        var ws = GITestUtilities.GetRandomWorkshopFlag(game);
+        var modDir = game.GetModDirectory("Mod_Name", ws, ServiceProvider);
+        var modData = CreateDetectedModReference(game, modDir, ws, null);
 
-    //    _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-    //        .Returns(new ModinfoFinderCollection(modLoc, new[] { variantFileA.Object, variantFileB.Object }));
+        _nameResolver.ReturnCorrectName = false;
+        Assert.Throws<ModException>(() => _factory.CreatePhysicalMod(game, modData, CultureInfo.CurrentCulture));
+    }
 
-    //    var resolveResult = GameType.Eaw;
-    //    _gameTypeResolver.Setup(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, variantB.Object, out resolveResult))
-    //        .Returns(true);
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void CreatePhysicalMod_ModNotCompatible_Throws(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-    //    var modRef = new Mod("Mods/Name", ModType.Default);
+        var oppositeGameType = gameIdentity.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw;
+        var otherGame = FileSystem.InstallGame(
+            new GameIdentity(oppositeGameType, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
 
-    //    var mods = _service.FromReference(game.Object, modRef, CultureInfo.CurrentCulture);
-    //    Assert.Single(mods);
+        var modDir = otherGame.GetModDirectory("Mod_Name", false, ServiceProvider);
+        var modData = CreateDetectedModReference(otherGame, modDir, false, null);
 
-    //    _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, It.IsAny<IModinfo>(), out resolveResult), Times.Exactly(2));
-    //}
+        Assert.Throws<ModException>(() => _factory.CreatePhysicalMod(game, modData, CultureInfo.CurrentCulture));
+    }
 
-    //[Fact]
-    //public void TestModCreation_WithModinfo()
-    //{
-    //    _fileSystem.Initialize().WithSubdirectory("Mods/Name");
-    //    var game = new Mock<IGame>();
-    //    var modLoc = _fileSystem.DirectoryInfo.New("Mods/Name");
+    #endregion
 
-    //    _locationResolver.Setup(r => r.ResolveLocation(It.IsAny<IModReference>(), It.IsAny<IGame>()))
-    //        .Returns(modLoc);
-    //    _nameResolver.Setup(r => r.ResolveName(It.IsAny<IModReference>(), CultureInfo.CurrentCulture)).Returns("Name");
+    #region CreateVirtualMod
 
-    //    var modinfo = new Mock<IModinfo>();
-    //    modinfo.Setup(m => m.Name).Returns("MyName");
-    //    modinfo.Setup(m => m.Dependencies)
-    //        .Returns(new DependencyList(new List<IModReference>(), DependencyResolveLayout.FullResolved));
-    //    modinfo.Setup(m => m.Languages).Returns(new List<ILanguageInfo>());
+    [Fact]
+    public void CreateVirtualMod_NullArgs_Throws()
+    {
+        var game = FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
+        var dep = game.InstallMod("dep", false, ServiceProvider);
 
-    //    _modInfoFinder.Setup(f => f.Find(It.IsAny<FindOptions>()))
-    //        .Returns(new ModinfoFinderCollection(modLoc));
+        Assert.Throws<ArgumentNullException>(() => _factory.CreateVirtualMod(null!, new ModinfoData("Name")
+        {
+            Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)
+        }));
+        Assert.Throws<ArgumentNullException>(() => _factory.CreateVirtualMod(game, null!));
+    }
 
-    //    var modRef = new Mod("Mods/Name", ModType.Default);
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void CreateVirtualMod_WithInvalidModinfo(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var dep = game.InstallMod("dep", false, ServiceProvider);
 
-    //    var mod = _service.FromReference(game.Object, modRef, modinfo.Object, CultureInfo.CurrentCulture);
-    //    Assert.NotNull(mod);
-    //    Assert.Equal("MyName", mod.Name);
+        var invalidModinfo = new CustomModInfo(string.Empty)
+        {
+            Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)
+        }; // string.Empty is not valid
 
-    //    GameType result;
-    //    _gameTypeResolver.Verify(r => r.TryGetGameType(It.IsAny<IDirectoryInfo>(), ModType.Default, modinfo.Object, out result), Times.Once);
-    //}
-//}
+        Assert.Throws<ModinfoException>(() => _factory.CreateVirtualMod(game, invalidModinfo));
+    }
+
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void CreateVirtualMod_WithInvalidModinfo_NoDependencies(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+
+        var invalidModinfo = new CustomModInfo("MyVirtualMod")
+        {
+            Dependencies = new DependencyList([], DependencyResolveLayout.FullResolved)
+        };
+
+        Assert.Throws<ModException>(() => _factory.CreateVirtualMod(game, invalidModinfo));
+    }
+
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void CreateVirtualMod(GameIdentity gameIdentity)
+    {
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var dep = game.InstallMod("dep", false, ServiceProvider);
+
+        var modinfo = new CustomModInfo("VirtualModName")
+        {
+            Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)
+        }; // string.Empty is not valid
+
+        var mod = _factory.CreateVirtualMod(game, modinfo);
+
+        Assert.Same(modinfo, mod.ModInfo);
+        Assert.Equal("VirtualModName", mod.Name);
+        Assert.Equal(ModReferenceBuilder.CreateVirtualModIdentifier(modinfo).Identifier, mod.Identifier);
+        Assert.Equal(ModType.Virtual, mod.Type);
+        Assert.Single(((IModIdentity)mod).Dependencies);
+    }
+
+    #endregion
+
+    protected DetectedModReference CreateDetectedModReference(IGame game, string path, bool? isWorkshop, IModinfo? modinfo)
+    {
+        var mod = game.InstallMod(FileSystem.DirectoryInfo.New(path), isWorkshop ?? GITestUtilities.GetRandomWorkshopFlag(game),
+            new ModinfoData("MyMod"), ServiceProvider);
+        return new DetectedModReference(new ModReference(mod), mod.Directory, modinfo);
+    }
+
+    private class CustomModNameResolver : IModNameResolver
+    {
+        public bool ReturnCorrectName { get; set; } = true;
+
+        public string ResolveName(DetectedModReference detectedMod, CultureInfo culture)
+        {
+            if (!ReturnCorrectName)
+            {
+                if (new Random().Next() % 2 == 0)
+                    return string.Empty;
+                return null!;
+            }
+            return detectedMod.ModReference.Type switch
+            {
+                ModType.Default => DefaultModName,
+                ModType.Workshops => SteamModName,
+                _ => "VirtualModName"
+            };
+        }
+    }
+
+    private class CustomModInfo(string name) : IModinfo
+    {
+        public bool Equals(IModIdentity? other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string Name { get; } = name;
+        public SemVersion? Version { get; }
+        public IModDependencyList Dependencies { get; init; } = DependencyList.EmptyDependencyList;
+        public string ToJson()
+        {
+            return JsonSerializer.Serialize(this, JsonSerializerOptions.Default);
+        }
+
+        public void ToJson(Stream stream)
+        {
+            JsonSerializer.Serialize(stream, this, JsonSerializerOptions.Default);
+        }
+
+        public string? Summary { get; }
+        public string? Icon { get; }
+        public IDictionary<string, object> Custom { get; } = new Dictionary<string, object>();
+        public ISteamData? SteamData { get; }
+        public IReadOnlyCollection<ILanguageInfo> Languages { get; } = new List<ILanguageInfo>();
+        public bool LanguagesExplicitlySet { get; }
+    }
+}
+

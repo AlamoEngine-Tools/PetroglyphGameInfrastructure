@@ -1,11 +1,15 @@
 ﻿using System;
-using Castle.Core;
 using EawModinfo.Model;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Xunit;
+#if NET5_0_OR_GREATER
+using System.Collections.Generic;
+#else
+using PG.TestingUtilities;
+#endif
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
@@ -47,22 +51,22 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
         Assert.Contains(mod, container.Mods);
         Assert.Contains(mod, container);
         Assert.Contains(mod, container.Game.Mods);
-        Assert.Contains(mod, container.Mods, ReferenceEqualityComparer<IMod>.Instance);
-        Assert.Contains(mod, container, ReferenceEqualityComparer<IMod>.Instance);
-        Assert.Contains(mod, container.Game.Mods, ReferenceEqualityComparer<IMod>.Instance);
+        Assert.Contains(mod, container.Mods, ReferenceEqualityComparer.Instance);
+        Assert.Contains(mod, container, ReferenceEqualityComparer.Instance);
+        Assert.Contains(mod, container.Game.Mods, ReferenceEqualityComparer.Instance);
 
         Assert.False(container.AddMod(mod));
         Assert.Contains(mod, container.Mods);
         Assert.Contains(mod, container);
         Assert.Contains(mod, container.Game.Mods);
-        Assert.Contains(mod, container.Mods, ReferenceEqualityComparer<IMod>.Instance);
-        Assert.Contains(mod, container, ReferenceEqualityComparer<IMod>.Instance);
-        Assert.Contains(mod, container.Game.Mods, ReferenceEqualityComparer<IMod>.Instance);
+        Assert.Contains(mod, container.Mods, ReferenceEqualityComparer.Instance);
+        Assert.Contains(mod, container, ReferenceEqualityComparer.Instance);
+        Assert.Contains(mod, container.Game.Mods, ReferenceEqualityComparer.Instance);
 
         Assert.False(container.AddMod(modSame));
-        Assert.DoesNotContain(modSame, container.Mods, ReferenceEqualityComparer<IMod>.Instance);
-        Assert.DoesNotContain(modSame, container, ReferenceEqualityComparer<IMod>.Instance);
-        Assert.DoesNotContain(modSame, container.Game.Mods, ReferenceEqualityComparer<IMod>.Instance);
+        Assert.DoesNotContain(modSame, container.Mods, ReferenceEqualityComparer.Instance);
+        Assert.DoesNotContain(modSame, container, ReferenceEqualityComparer.Instance);
+        Assert.DoesNotContain(modSame, container.Game.Mods, ReferenceEqualityComparer.Instance);
 
         Assert.True(container.RemoveMod(modSame));
         Assert.DoesNotContain(mod, container.Mods);
