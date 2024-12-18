@@ -5,5 +5,4 @@
 
 [assembly: InternalsVisibleTo("PG.StarWarsGame.Infrastructure.Test")]
 [assembly: InternalsVisibleTo("PG.StarWarsGame.Infrastructure.TestingUtilities")]
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
