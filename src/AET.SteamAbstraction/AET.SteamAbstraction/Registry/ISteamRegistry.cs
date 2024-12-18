@@ -9,17 +9,17 @@ namespace AET.SteamAbstraction.Registry;
 internal interface ISteamRegistry : IDisposable
 {
     /// <summary>
-    /// Id of the logged-in user.
+    /// Gets the ID of the logged-in user.
     /// </summary>
     int? ActiveUserId { get; set; }
 
     /// <summary>
-    /// The executable of the Steam client.
+    /// Gets the executable of the Steam client.
     /// </summary>
     IFileInfo? ExecutableFile { get; }
 
     /// <summary>
-    /// The installation directory of the Steam client
+    /// Gets the installation directory of the Steam client
     /// </summary>
     IDirectoryInfo? InstallationDirectory { get; }
 }

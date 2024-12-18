@@ -11,27 +11,27 @@ namespace AET.SteamAbstraction.Library;
 public interface ISteamLibrary : IEquatable<ISteamLibrary>
 {
     /// <summary>
-    /// Physical location of the library.
+    /// Gets the location of the library.
     /// </summary>
     IDirectoryInfo LibraryLocation { get; }
 
     /// <summary>
-    /// The 'steamapps' directory.
+    /// Gets the 'steamapps' directory.
     /// </summary>
     IDirectoryInfo SteamAppsLocation { get; }
 
     /// <summary>
-    /// The 'common' directory of the <see cref="SteamAppsLocation"/>
+    /// Gets the 'common' directory of the <see cref="SteamAppsLocation"/>
     /// </summary>
     IDirectoryInfo CommonLocation { get; }
 
     /// <summary>
-    /// The 'workshop' directory of the <see cref="SteamAppsLocation"/>
+    /// Gets the 'workshop' directory of the <see cref="SteamAppsLocation"/>
     /// </summary>
     IDirectoryInfo WorkshopsLocation { get; }
 
     /// <summary>
-    /// The installed game manifests of this library.
+    /// Gets the installed game manifests of this library.
     /// </summary>
     /// <returns>Collection of game manifests.</returns>
     IEnumerable<SteamAppManifest> GetApps();
