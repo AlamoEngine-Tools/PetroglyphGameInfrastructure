@@ -52,7 +52,8 @@ public static partial class ModInstallations
     private static Mod CreateMod(IGame game, IDirectoryInfo directory, Func<IDirectoryInfo, Mod> modFactory)
     {
         Assert.True(game.ModsLocation.Exists);
-        var mod = modFactory(directory);
+        var mod = modFactory(directory); 
+        mod.Directory.Create();
         mod.DataDirectory().Create();
         return mod;
     }
