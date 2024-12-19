@@ -2,11 +2,11 @@
 using System.Linq;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
-using Gameloop.Vdf;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Testably.Abstractions.Testing;
 using Xunit;
+using VdfException = AET.SteamAbstraction.Vdf.VdfException;
 
 namespace AET.SteamAbstraction.Test;
 

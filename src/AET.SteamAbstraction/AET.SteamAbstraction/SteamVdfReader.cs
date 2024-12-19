@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
+using AET.SteamAbstraction.Vdf;
+using AET.SteamAbstraction.Vdf.Linq;
 using AnakinRaW.CommonUtilities.FileSystem;
-using Gameloop.Vdf;
-using Gameloop.Vdf.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;
@@ -21,7 +21,6 @@ internal class SteamVdfReader : ISteamVdfReader
 
         _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
     }
-
 
     public SteamAppManifest ReadManifest(IFileInfo manifestFile, ISteamLibrary library)
     {
@@ -103,14 +102,14 @@ internal class SteamVdfReader : ISteamVdfReader
                 continue;
 
             if (prop.Value is VValue pathValue)
-                yield return _fileSystem.DirectoryInfo.New(pathValue.Value<string>());
+                yield return _fileSystem.DirectoryInfo.New(pathValue.Value<string>()!);
             else if (prop.Value is VObject obj)
             {
                 foreach (var childProperty in obj.Children<VProperty>())
                 {
                     if (!childProperty.Key.Equals("path") || childProperty.Value is not VValue value)
                         continue;
-                    yield return _fileSystem.DirectoryInfo.New(value.Value<string>());
+                    yield return _fileSystem.DirectoryInfo.New(value.Value<string>()!);
                 }
             }
         }
@@ -174,11 +173,12 @@ internal class SteamVdfReader : ISteamVdfReader
     {
         try
         {
-            return VdfConvert.Deserialize(file.OpenText());
+            using var textReader = file.OpenText();
+            return VdfConvert.Deserialize(textReader);
         }
         catch (VdfException e)
         {
-            throw new VdfException($"Failed reading {file.FullName}: {e.Message}");
+            throw new VdfException($"Failed reading {file.FullName}: {e.Message}", e);
         }
     }
 }
