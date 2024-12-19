@@ -5,6 +5,7 @@ using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Vdf;
 using AET.SteamAbstraction.Vdf.Linq;
+using AET.SteamAbstraction.Vdf.Utilities;
 using AnakinRaW.CommonUtilities.FileSystem;
 using Microsoft.Extensions.DependencyInjection;
 

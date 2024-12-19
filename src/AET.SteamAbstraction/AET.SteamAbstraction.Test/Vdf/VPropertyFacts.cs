@@ -3,6 +3,8 @@ using Xunit;
 
 namespace AET.SteamAbstraction.Test.Vdf;
 
+// Taken from https://github.com/shravan2x/Gameloop.Vdf
+
 public class VPropertyFacts
 {
     [Fact]
