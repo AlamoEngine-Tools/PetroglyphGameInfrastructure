@@ -13,6 +13,6 @@ internal class SteamRegistryFactory(IServiceProvider serviceProvider) : ISteamRe
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             return new LinuxSteamRegistry(serviceProvider);
 
-        throw new PlatformNotSupportedException($"The current platform is not supported.");
+        throw new PlatformNotSupportedException("The current platform is not supported.");
     }
 }

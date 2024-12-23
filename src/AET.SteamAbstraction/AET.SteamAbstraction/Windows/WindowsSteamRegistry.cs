@@ -34,7 +34,7 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
         }
     }
 
-    int? ISteamRegistry.ActiveUserId
+    public int? ActiveUserId
     {
         get
         {
@@ -77,7 +77,7 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
         }
     }
 
-    public ISet<uint>? InstalledApps
+    public ISet<uint> InstalledApps
     {
         get
         {
@@ -90,8 +90,9 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
                     if (uint.TryParse(app, NumberStyles.None, null, out var id))
                         ids.Add(id);
                 }
+
                 return ids;
-            });
+            }) ?? [];
         }
     }
     
@@ -112,7 +113,7 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
     private void WriteToSubKey(string subKeyName, Action<IRegistryKey> keyAction)
     {
         ThrowIfDisposed();
-        using var subKey = _registryKey?.OpenSubKey(subKeyName, true);
+        using var subKey = _registryKey?.CreateSubKey(subKeyName);
         if (subKey is not null)
             keyAction(subKey);
     }

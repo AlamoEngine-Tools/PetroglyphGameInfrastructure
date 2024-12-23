@@ -10,7 +10,7 @@ using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace AET.SteamAbstraction.Test;
+namespace AET.SteamAbstraction.Test.Windows;
 
 public class WindowsSteamWrapperTest
 {

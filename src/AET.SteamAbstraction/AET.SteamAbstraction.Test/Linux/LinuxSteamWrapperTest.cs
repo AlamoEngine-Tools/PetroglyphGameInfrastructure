@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Testably.Abstractions.Testing;
 
-namespace AET.SteamAbstraction.Test;
+namespace AET.SteamAbstraction.Test.Linux;
 
 public class LinuxSteamWrapperTest
 {

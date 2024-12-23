@@ -9,11 +9,6 @@ namespace AET.SteamAbstraction.Registry;
 internal interface ISteamRegistry : IDisposable
 {
     /// <summary>
-    /// Gets the ID of the logged-in user.
-    /// </summary>
-    int? ActiveUserId { get; set; }
-
-    /// <summary>
     /// Gets the executable of the Steam client.
     /// </summary>
     IFileInfo? ExecutableFile { get; }
@@ -22,4 +17,9 @@ internal interface ISteamRegistry : IDisposable
     /// Gets the installation directory of the Steam client
     /// </summary>
     IDirectoryInfo? InstallationDirectory { get; }
+
+    /// <summary>
+    /// The PID of the current Steam Process. 0 or <see langword="null"/> if Steam is not running.
+    /// </summary>
+    int? ProcessId { get; }
 }

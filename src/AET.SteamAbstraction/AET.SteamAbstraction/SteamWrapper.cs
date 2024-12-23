@@ -57,7 +57,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         {
             if (!IsRunning)
                 return false;
-            return Registry.ActiveUserId is not (null or 0);
+            return GetCurrentUserId() is not (null or 0);
         }
     }
 
@@ -91,8 +91,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         ThrowIfSteamNotInstalled();
         if (!IsRunning)
         {
-            // Required because an external kill (e.g. by taskmgr) does not reset this value, so we have to do this manually
-            Registry.ActiveUserId = 0;
+            ResetCurrentUser();
             if (startIfNotRunning)
             {
                 StartSteam();
@@ -114,10 +113,14 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         else
         {
             await WaitSteamUserLoggedInAsync(cancellation).ConfigureAwait(false);
-            if (Registry.ActiveUserId == 0)
+            if (GetCurrentUserId() == 0)
                 throw new SteamException("Login was not completed.");
         }
     }
+
+    protected abstract void ResetCurrentUser();
+
+    protected abstract int? GetCurrentUserId();
 
     protected abstract Task WaitSteamOfflineRunning(CancellationToken token);
 

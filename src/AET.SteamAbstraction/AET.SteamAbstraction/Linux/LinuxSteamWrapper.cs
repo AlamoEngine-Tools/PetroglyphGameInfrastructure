@@ -9,6 +9,16 @@ internal class LinuxSteamWrapper(ISteamRegistry registry, IServiceProvider servi
 {
     public override bool IsRunning => throw new NotImplementedException();
 
+    protected override void ResetCurrentUser()
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override int? GetCurrentUserId()
+    {
+        throw new NotImplementedException();
+    }
+
     protected override Task WaitSteamOfflineRunning(CancellationToken token)
     {
         throw new NotImplementedException();

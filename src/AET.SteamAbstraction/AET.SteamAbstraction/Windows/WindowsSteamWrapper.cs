@@ -90,6 +90,16 @@ internal class WindowsSteamWrapper : SteamWrapper
         }
     }
 
+    protected override void ResetCurrentUser()
+    {
+        _windowsRegistry.ActiveUserId = 0;
+    }
+
+    protected override int? GetCurrentUserId()
+    {
+        return _windowsRegistry.ActiveUserId;
+    }
+
     protected override async Task WaitSteamOfflineRunning(CancellationToken token)
     {
         var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token);

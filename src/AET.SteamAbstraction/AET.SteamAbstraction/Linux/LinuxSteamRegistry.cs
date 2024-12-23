@@ -9,9 +9,9 @@ internal class LinuxSteamRegistry(IServiceProvider serviceProvider) : Disposable
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
-    public int? ActiveUserId { get; set; }
-
     public IFileInfo? ExecutableFile { get; }
 
     public IDirectoryInfo? InstallationDirectory { get; }
+
+    public int? ProcessId { get; }
 }

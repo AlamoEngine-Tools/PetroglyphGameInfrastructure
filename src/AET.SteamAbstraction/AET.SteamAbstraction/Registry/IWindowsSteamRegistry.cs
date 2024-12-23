@@ -7,7 +7,7 @@ internal interface IWindowsSteamRegistry : ISteamRegistry
 {
     IRegistryKey? ActiveProcessKey { get; }
     
-    int? ProcessId { get; }
-    
     ISet<uint>? InstalledApps { get; }
+
+    int? ActiveUserId { get; set; }
 }
