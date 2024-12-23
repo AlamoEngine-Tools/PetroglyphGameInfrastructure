@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
@@ -11,17 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;
 
-internal class SteamVdfReader : ISteamVdfReader
+internal class SteamVdfReader(IServiceProvider serviceProvider) : ISteamVdfReader
 {
-    private readonly IFileSystem _fileSystem;
-
-    public SteamVdfReader(IServiceProvider serviceProvider)
-    {
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
-
-        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-    }
+    private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
 
     public SteamAppManifest ReadManifest(IFileInfo manifestFile, ISteamLibrary library)
     {
@@ -30,9 +23,9 @@ internal class SteamVdfReader : ISteamVdfReader
         if (library == null) 
             throw new ArgumentNullException(nameof(library));
 
-        var directory = manifestFile.Directory;
-        if (directory is null || !_fileSystem.Path.IsChildOf(library.LibraryLocation.FullName, directory.FullName))
+        if (manifestFile.Directory is null || !_fileSystem.Path.AreEqual(library.SteamAppsLocation.FullName, manifestFile.Directory.FullName))
             throw new SteamException("The game's manifest is not part of the given library");
+
         var manifestData = ReadFileAsJson(manifestFile);
 
         if (manifestData.Key != "AppState")
@@ -48,7 +41,8 @@ internal class SteamVdfReader : ISteamVdfReader
             switch (child.Key.ToLower())
             {
                 case "appid":
-                    id = uint.Parse(child.Value.ToString());
+                    if (uint.TryParse(child.Value.ToString(), NumberStyles.None, null, out var parsedId)) 
+                        id = parsedId;
                     break;
                 case "name":
                     name = child.Value.ToString();
@@ -99,7 +93,7 @@ internal class SteamVdfReader : ISteamVdfReader
         foreach (var prop in vLibs.Children<VProperty>())
         {
             // Skipping everyChild which is not a number
-            if (!int.TryParse(prop.Key, out _))
+            if (!int.TryParse(prop.Key, NumberStyles.None, null, out _))
                 continue;
 
             if (prop.Value is VValue pathValue)

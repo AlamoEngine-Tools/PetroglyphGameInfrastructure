@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Linq;
+using System.Runtime.InteropServices;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
+using AET.SteamAbstraction.Test.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 
@@ -15,130 +14,104 @@ namespace AET.SteamAbstraction.Test;
 public class SteamLibraryTest
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly MockFileSystem _fileSystem;
-    private readonly Mock<ISteamVdfReader> _reader;
+    private readonly MockFileSystem _fileSystem = new();
 
     public SteamLibraryTest()
     {
         var sc = new ServiceCollection();
-        _fileSystem = new MockFileSystem();
-        sc.AddTransient<IFileSystem>(_ => _fileSystem);
-        _reader = new Mock<ISteamVdfReader>();
-        sc.AddTransient(_ => _reader.Object);
+        sc.AddSingleton<IFileSystem>(_ => _fileSystem);
+        SteamAbstractionLayer.InitializeServices(sc);
         _serviceProvider = sc.BuildServiceProvider();
     }
 
     [Fact]
-    public void TestProperties()
+    public void Ctor_NullArgs_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => new SteamLibrary(null!, _serviceProvider));
+        Assert.Throws<ArgumentNullException>(() => new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), null!));
+    }
+
+    [Theory]
+    [InlineData("Library", true, true)]
+    [InlineData("./Library", true, true)]
+    [InlineData("/Library", true, true)]
+    [InlineData("library", true, false)]
+    [InlineData("other", false, false)]
+    public void TestEquality(string path, bool equalWindows, bool equalLinux)
     {
         var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
-        Assert.NotNull(lib.CommonLocation);
-        Assert.NotNull(lib.SteamAppsLocation);
-        Assert.NotNull(lib.WorkshopsLocation);
+        var other = new SteamLibrary(_fileSystem.DirectoryInfo.New(path), _serviceProvider);
+
+        var equal = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? equalWindows : equalLinux;
+
+        Assert.Equal(equal, lib.Equals(other));
+        Assert.Equal(equal, lib.GetHashCode().Equals(other.GetHashCode()));
     }
 
     [Fact]
-    public void TestEquality()
+    public void Locations()
     {
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
-        var other = new Mock<ISteamLibrary>();
-        other.Setup(o => o.LibraryLocation)
-            .Returns(_fileSystem.DirectoryInfo.New("OtherLib"));
-        Assert.NotEqual(lib, other.Object);
-        other.Setup(o => o.LibraryLocation)
-            .Returns(_fileSystem.DirectoryInfo.New("Library"));
-        Assert.Equal(lib, other.Object);
+        var libDirBasePath = _fileSystem.DirectoryInfo.New("Library");
+        var expectedSteamApps = _fileSystem.Path.Combine(libDirBasePath.FullName, "steamapps");
+        var expectedCommon = _fileSystem.Path.Combine(expectedSteamApps, "common");
+        var expectedWorkshop = _fileSystem.Path.Combine(expectedSteamApps, "workshop");
 
-        var otherInst = new SteamLibrary(_fileSystem.DirectoryInfo.New("./Library"), _serviceProvider);
-        Assert.Equal(lib, otherInst);
-        Assert.Equal(lib.GetHashCode(), otherInst.GetHashCode());
+        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
+        Assert.Equal(expectedSteamApps, lib.SteamAppsLocation.FullName);
+        Assert.Equal(expectedCommon, lib.CommonLocation.FullName);
+        Assert.Equal(expectedWorkshop, lib.WorkshopsLocation.FullName);
     }
 
     [Fact]
-    public void TestNoApps1()
+    public void GetApps_NoAppsInstalled_Empty()
     {
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
-
-        var app = new SteamAppManifest(lib, _fileSystem.FileInfo.New("file"), 123, "name",
-            _fileSystem.DirectoryInfo.New("game"), SteamAppState.StateFullyInstalled,
-            new HashSet<uint>());
-
-        _reader.Setup(r => r.ReadManifest(It.IsAny<IFileInfo>(), lib))
-            .Returns(app);
-
-        var apps = lib.GetApps();
-
+        var library = _fileSystem.InstallSteamLibrary("Library", _serviceProvider);
+        
+        var apps = library.GetApps();
+        
         Assert.Empty(apps);
     }
 
     [Fact]
-    public void TestNoApps2()
+    public void GetApps_NoSteamAppsDirectoryDoesNotExists_Empty()
     {
-        _fileSystem.Initialize().WithSubdirectory("Library/steamapps");
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
+        var library = _fileSystem.InstallSteamLibrary("Library", _serviceProvider);
+        library.SteamAppsLocation.Delete(true);
 
-        var app = new SteamAppManifest(lib, _fileSystem.FileInfo.New("file"), 123, "name",
-            _fileSystem.DirectoryInfo.New("game"), SteamAppState.StateFullyInstalled,
-            new HashSet<uint>());
+        var apps = library.GetApps();
+        
+        Assert.Empty(apps);
+    }
 
-        _reader.Setup(r => r.ReadManifest(It.IsAny<IFileInfo>(), lib))
-            .Returns(app);
-
-        var apps = lib.GetApps();
-
+    [Fact]
+    public void GetApps_InvalidAcfFile_Skipped()
+    {
+        var library = _fileSystem.InstallSteamLibrary("Library", _serviceProvider);
+        library.InstallCorruptApp(_fileSystem);
+        
+        var apps = library.GetApps();
+        
         Assert.Empty(apps);
     }
 
     [Fact]
     public void TestApps()
     {
-        _fileSystem.Initialize().WithFile("Library/steamapps/test.acf");
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
+        var library = _fileSystem.InstallSteamLibrary("Library", _serviceProvider);
+        
+        library.InstallCorruptApp(_fileSystem);
+        library.InstallGame(123, "Game1", "manifest1.acf");
+        var expectedGame2 = library.InstallGame(456, "Game2");
+        library.InstallGame(123, "NotGame1", "manifest2.acf");
+        library.InstallGame(789, "Ignore", "ignore.vdf");
 
-        var app = new SteamAppManifest(lib, _fileSystem.FileInfo.New("file"), 123, "name",
-            _fileSystem.DirectoryInfo.New("game"), SteamAppState.StateFullyInstalled,
-            new HashSet<uint>());
+        var apps = library.GetApps().ToList();
 
-        _reader.Setup(r => r.ReadManifest(It.IsAny<IFileInfo>(), lib))
-            .Returns(app);
+        // Corrupt app should be ignored, duplicate id should be ignored, only *.acf files are used
+        Assert.Equal(2, apps.Count);
+        Assert.Contains(apps, x => x.Equals(expectedGame2));
 
-        var apps = lib.GetApps();
-        var result = Assert.Single((IEnumerable)apps);
-        Assert.Same(app, result);
-    }
-
-    [Fact]
-    public void TestNoDuplicatesApps()
-    {
-        _fileSystem.Initialize()
-            .WithFile("Library/steamapps/test1.acf")
-            .WithFile("Library/steamapps/test2.acf");
-
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
-
-        var app = new SteamAppManifest(lib, _fileSystem.FileInfo.New("file"), 123, "name",
-            _fileSystem.DirectoryInfo.New("game"), SteamAppState.StateFullyInstalled,
-            new HashSet<uint>());
-
-        _reader.Setup(r => r.ReadManifest(It.IsAny<IFileInfo>(), lib))
-            .Returns(app);
-
-        var apps = lib.GetApps();
-        var result = Assert.Single((IEnumerable)apps);
-        Assert.Same(app, result);
-    }
-
-    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
-    public void TestLocations_Windows()
-    {
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
-        Assert.Equal("C:\\Library\\steamapps\\common", lib.CommonLocation.FullName);
-    }
-
-    [PlatformSpecificFact(TestPlatformIdentifier.Linux)]
-    public void TestLocations_Linux()
-    {
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
-        Assert.Equal("/Library/steamapps/common", lib.CommonLocation.FullName);
+        // Cannot assert on game's name, because we cannot know which game will be picked first by file enumeration.
+        Assert.Contains(apps, x => x.Id == 123 && x.Library.Equals(library));
     }
 }

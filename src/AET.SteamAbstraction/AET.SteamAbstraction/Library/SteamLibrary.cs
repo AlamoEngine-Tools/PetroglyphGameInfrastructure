@@ -1,17 +1,26 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace AET.SteamAbstraction.Library;
 
 internal class SteamLibrary : ISteamLibrary
 {
+    private static readonly PathNormalizeOptions SteamLibraryPathNormalizeOptions = new()
+    {
+        UnifyCase = UnifyCasingKind.UpperCase,
+        TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
+    };
+
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger? _logger;
     private readonly ConcurrentDictionary<KnownLibraryLocations, IDirectoryInfo> _locations = new();
 
     private readonly Dictionary<KnownLibraryLocations, string[]> _locationsNames = new()
@@ -38,11 +47,8 @@ internal class SteamLibrary : ISteamLibrary
             throw new ArgumentNullException(nameof(libraryLocation));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-        _normalizedLocation = PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(libraryLocation.FullName), new PathNormalizeOptions
-        {
-            UnifyCase = UnifyCasingKind.UpperCase,
-            TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
-        });
+        _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
+        _normalizedLocation = PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(libraryLocation.FullName), SteamLibraryPathNormalizeOptions);
         LibraryLocation = libraryLocation;
     }
 
@@ -53,7 +59,17 @@ internal class SteamLibrary : ISteamLibrary
         var apps = new HashSet<SteamAppManifest>();
         var manifestReader = _serviceProvider.GetRequiredService<ISteamVdfReader>();
         foreach (var manifestFile in SteamAppsLocation.EnumerateFiles("*.acf", SearchOption.TopDirectoryOnly))
-            apps.Add(manifestReader.ReadManifest(manifestFile, this));
+        {
+            try
+            {
+                var manifest = manifestReader.ReadManifest(manifestFile, this);
+                apps.Add(manifest);
+            }
+            catch (SteamException e)
+            {
+                _logger?.LogWarning(e, $"Could not read game manifest file '{manifestFile}': {e.Message}");
+            }
+        }
         return apps;
     }
 
@@ -76,19 +92,14 @@ internal class SteamLibrary : ISteamLibrary
         if (ReferenceEquals(this, other))
             return true;
 
-        var normalizedOtherPath = PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(other.LibraryLocation.FullName),
-            new PathNormalizeOptions
-            {
-                UnifyCase = UnifyCasingKind.UpperCase,
-                TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
-            });
-
+        var normalizedOtherPath = PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(other.LibraryLocation.FullName), SteamLibraryPathNormalizeOptions);
         return _normalizedLocation.Equals(normalizedOtherPath);
     }
 
+    [ExcludeFromCodeCoverage]
     public override string ToString()
     {
-        return $"SteamLibrary:'{LibraryLocation.FullName}'";
+        return $"SteamLibrary: '{LibraryLocation.FullName}'";
     }
 
     private IDirectoryInfo GetKnownLibraryLocation(KnownLibraryLocations location)

@@ -13,6 +13,13 @@ public static class TestHelpers
         return Random.Next() % 2 == 0;
     }
 
+    public static long RandomLong()
+    {
+        var buf = new byte[8];
+        Random.NextBytes(buf);
+        return BitConverter.ToInt64(buf, 0);
+    }
+
     public static T GetRandomEnum<T>() where T : struct, Enum
     {
         var values = Enum.GetValues(typeof(T));
