@@ -1,5 +1,4 @@
-﻿using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Library;
+﻿using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Utilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +20,6 @@ public static class SteamAbstractionLayer
         serviceCollection.AddSingleton<ISteamWrapperFactory>(sp => new SteamWrapperFactory(sp));
         serviceCollection.AddSingleton<ISteamRegistryFactory>(sp => new SteamRegistryFactory(sp));
         serviceCollection.AddSingleton<IProcessHelper>(sp => new ProcessHelper());
-
         serviceCollection.AddSingleton<ISteamLibraryFinder>(sp => new SteamLibraryFinder(sp));
-        serviceCollection.AddSingleton<ISteamGameFinder>(sp => new SteamGameFinder(sp));
     }
 }

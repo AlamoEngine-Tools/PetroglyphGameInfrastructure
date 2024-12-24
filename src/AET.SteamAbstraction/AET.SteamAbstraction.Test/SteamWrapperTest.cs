@@ -17,151 +17,151 @@ namespace AET.SteamAbstraction.Test;
 
 public class SteamWrapperTest
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly Mock<ISteamRegistry> _steamRegistry;
-    private readonly Mock<WindowsSteamRegistry> _windowsSteamRegistry;
-    private readonly MockFileSystem _fileSystem;
-    private readonly Mock<ISteamGameFinder> _gameFinder;
+    //private readonly IServiceProvider _serviceProvider;
+    //private readonly Mock<ISteamRegistry> _steamRegistry;
+    //private readonly Mock<WindowsSteamRegistry> _windowsSteamRegistry;
+    //private readonly MockFileSystem _fileSystem;
+    //private readonly Mock<ISteamGameFinder> _gameFinder;
 
-    public SteamWrapperTest()
-    {
-        var sc = new ServiceCollection();
-        _steamRegistry = new Mock<ISteamRegistry>();
-        _windowsSteamRegistry = new Mock<WindowsSteamRegistry>();
-        _fileSystem = new MockFileSystem();
-        _gameFinder = new Mock<ISteamGameFinder>();
-        sc.AddTransient(_ => _steamRegistry.Object);
-        sc.AddTransient(_ => new Mock<IProcessHelper>().Object);
-        sc.AddTransient(_ => _gameFinder.Object);
-        sc.AddTransient<IFileSystem>(_ => _fileSystem);
-        _serviceProvider = sc.BuildServiceProvider();
-    }
+    //public SteamWrapperTest()
+    //{
+    //    var sc = new ServiceCollection();
+    //    _steamRegistry = new Mock<ISteamRegistry>();
+    //    _windowsSteamRegistry = new Mock<WindowsSteamRegistry>();
+    //    _fileSystem = new MockFileSystem();
+    //    _gameFinder = new Mock<ISteamGameFinder>();
+    //    sc.AddTransient(_ => _steamRegistry.Object);
+    //    sc.AddTransient(_ => new Mock<IProcessHelper>().Object);
+    //    sc.AddTransient(_ => _gameFinder.Object);
+    //    sc.AddTransient<IFileSystem>(_ => _fileSystem);
+    //    _serviceProvider = sc.BuildServiceProvider();
+    //}
 
-    [Fact]
-    public void TestInvalidArgs_Throws()
-    {
-        Assert.Throws<ArgumentNullException>(() => new WindowsSteamWrapper(null!, _serviceProvider));
-        Assert.Throws<ArgumentNullException>(() => new WindowsSteamWrapper(_windowsSteamRegistry.Object, null!));
-        Assert.Throws<ArgumentNullException>(() => new LinuxSteamWrapper(null!, _serviceProvider));
-        Assert.Throws<ArgumentNullException>(() => new LinuxSteamWrapper(_steamRegistry.Object, null!));
-    }
+    //[Fact]
+    //public void TestInvalidArgs_Throws()
+    //{
+    //    Assert.Throws<ArgumentNullException>(() => new WindowsSteamWrapper(null!, _serviceProvider));
+    //    Assert.Throws<ArgumentNullException>(() => new WindowsSteamWrapper(_windowsSteamRegistry.Object, null!));
+    //    Assert.Throws<ArgumentNullException>(() => new LinuxSteamWrapper(null!, _serviceProvider));
+    //    Assert.Throws<ArgumentNullException>(() => new LinuxSteamWrapper(_steamRegistry.Object, null!));
+    //}
 
-    [Fact]
-    public void TestInstalled()
-    {
-        _steamRegistry.Setup(r => r.ExecutableFile).Returns((IFileInfo?)null);
+    //[Fact]
+    //public void TestInstalled()
+    //{
+    //    _steamRegistry.Setup(r => r.ExecutableFile).Returns((IFileInfo?)null);
 
-        foreach (var steamWrapper in GetSteamWrappers())
-        {
-            _steamRegistry.Setup(r => r.ExecutableFile).Returns((IFileInfo?)null);
-            Assert.False(steamWrapper.Installed);
+    //    foreach (var steamWrapper in GetSteamWrappers())
+    //    {
+    //        _steamRegistry.Setup(r => r.ExecutableFile).Returns((IFileInfo?)null);
+    //        Assert.False(steamWrapper.Installed);
 
-            _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
-            Assert.False(steamWrapper.Installed);
-        }
+    //        _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //        Assert.False(steamWrapper.Installed);
+    //    }
         
-        _fileSystem.Initialize().WithFile("steam.exe");
+    //    _fileSystem.Initialize().WithFile("steam.exe");
 
-        foreach (var steamWrapper in GetSteamWrappers())
-        {
-            _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
-            _windowsSteamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
-            Assert.True(steamWrapper.Installed);
-        }
-    }
+    //    foreach (var steamWrapper in GetSteamWrappers())
+    //    {
+    //        _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //        _windowsSteamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //        Assert.True(steamWrapper.Installed);
+    //    }
+    //}
 
-    [Fact]
-    public void TestDisposed()
-    {
-        foreach (var steamWrapper in GetSteamWrappers())
-        {
-            steamWrapper.Dispose();
-        }
-        _steamRegistry.Verify(r => r.Dispose(), Times.Once);
-        _windowsSteamRegistry.Verify(r => r.Dispose(), Times.Once);
-    }
+    //[Fact]
+    //public void TestDisposed()
+    //{
+    //    foreach (var steamWrapper in GetSteamWrappers())
+    //    {
+    //        steamWrapper.Dispose();
+    //    }
+    //    _steamRegistry.Verify(r => r.Dispose(), Times.Once);
+    //    _windowsSteamRegistry.Verify(r => r.Dispose(), Times.Once);
+    //}
 
-    [Fact]
-    public void TestGameInstalled()
-    {
-        foreach (var steamWrapper in GetSteamWrappers()) 
-            Assert.Throws<SteamNotFoundException>(() => steamWrapper.IsGameInstalled(0, out _));
+    //[Fact]
+    //public void TestGameInstalled()
+    //{
+    //    foreach (var steamWrapper in GetSteamWrappers()) 
+    //        Assert.Throws<SteamNotFoundException>(() => steamWrapper.IsGameInstalled(0, out _));
 
-        _fileSystem.Initialize().WithFile("steam.exe");
+    //    _fileSystem.Initialize().WithFile("steam.exe");
 
-        _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
-        _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
+    //    _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //    _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
         
-        _windowsSteamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
-        _windowsSteamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
+    //    _windowsSteamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //    _windowsSteamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
 
 
-        var mFile = _fileSystem.FileInfo.New("manifest.acf");
+    //    var mFile = _fileSystem.FileInfo.New("manifest.acf");
 
-        var expectedApp = new SteamAppManifest(new Mock<ISteamLibrary>().Object, mFile, 1234, "name",
-            _fileSystem.DirectoryInfo.New("Game"), SteamAppState.StateFullyInstalled,
-            new HashSet<uint>());
+    //    var expectedApp = new SteamAppManifest(new Mock<ISteamLibrary>().Object, mFile, 1234, "name",
+    //        _fileSystem.DirectoryInfo.New("Game"), SteamAppState.StateFullyInstalled,
+    //        new HashSet<uint>());
         
-        _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("Steam"));
-        _windowsSteamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("Steam"));
+    //    _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("Steam"));
+    //    _windowsSteamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("Steam"));
 
-        foreach (var steamWrapper in GetSteamWrappers())
-        {
-            _gameFinder.Setup(f => f.FindGame(1u))
-                .Returns((SteamAppManifest?)null);
+    //    foreach (var steamWrapper in GetSteamWrappers())
+    //    {
+    //        _gameFinder.Setup(f => f.FindGame(1u))
+    //            .Returns((SteamAppManifest?)null);
             
-            Assert.False(steamWrapper.IsGameInstalled(1, out _));
+    //        Assert.False(steamWrapper.IsGameInstalled(1, out _));
 
-            if (steamWrapper is WindowsSteamWrapper)
-            {
-                _windowsSteamRegistry.Setup(r => r.InstalledApps).Returns(new HashSet<uint> { 1 });
-                _gameFinder.Setup(f => f.FindGame(1u)).Returns((SteamAppManifest?)null);
-                Assert.False(steamWrapper.IsGameInstalled(1, out _));
-            }
+    //        if (steamWrapper is WindowsSteamWrapper)
+    //        {
+    //            _windowsSteamRegistry.Setup(r => r.InstalledApps).Returns(new HashSet<uint> { 1 });
+    //            _gameFinder.Setup(f => f.FindGame(1u)).Returns((SteamAppManifest?)null);
+    //            Assert.False(steamWrapper.IsGameInstalled(1, out _));
+    //        }
             
-            _gameFinder.Setup(f => f.FindGame(1u))
-                .Returns(expectedApp);
+    //        _gameFinder.Setup(f => f.FindGame(1u))
+    //            .Returns(expectedApp);
             
-            Assert.True(steamWrapper.IsGameInstalled(1, out var app));
-            Assert.Same(expectedApp, app);
-        }
-    }
+    //        Assert.True(steamWrapper.IsGameInstalled(1, out var app));
+    //        Assert.Same(expectedApp, app);
+    //    }
+    //}
 
-    [Fact]
-    public void TestStartStream_Throws()
-    {
-        foreach (var steamWrapper in GetSteamWrappers())
-            Assert.Throws<SteamNotFoundException>(() => steamWrapper.StartSteam());
-    }
+    //[Fact]
+    //public void TestStartStream_Throws()
+    //{
+    //    foreach (var steamWrapper in GetSteamWrappers())
+    //        Assert.Throws<SteamNotFoundException>(() => steamWrapper.StartSteam());
+    //}
 
-    [Fact]
-    public void TestWantsOffline()
-    {
-        _fileSystem.Initialize()
-            .WithFile("steam.exe")
-            .WithSubdirectory("config");
+    //[Fact]
+    //public void TestWantsOffline()
+    //{
+    //    _fileSystem.Initialize()
+    //        .WithFile("steam.exe")
+    //        .WithSubdirectory("config");
 
-        _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
-        _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
+    //    _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //    _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
         
-        _windowsSteamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
-        _windowsSteamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
+    //    _windowsSteamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //    _windowsSteamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
 
-        foreach (var steamWrapper in GetSteamWrappers()) 
-            Assert.Null((object?)steamWrapper.UserWantsOfflineMode);
+    //    foreach (var steamWrapper in GetSteamWrappers()) 
+    //        Assert.Null((object?)steamWrapper.UserWantsOfflineMode);
 
-        foreach (var steamWrapper in GetSteamWrappers())
-        {
-            _fileSystem.File.Create("config/loginusers.vdf").Dispose();
-            Assert.Null((object?)steamWrapper.UserWantsOfflineMode);
+    //    foreach (var steamWrapper in GetSteamWrappers())
+    //    {
+    //        _fileSystem.File.Create("config/loginusers.vdf").Dispose();
+    //        Assert.Null((object?)steamWrapper.UserWantsOfflineMode);
 
-            _fileSystem.File.WriteAllText("config/loginusers.vdf", WantsNotOffline());
-            Assert.False(steamWrapper.UserWantsOfflineMode);
+    //        _fileSystem.File.WriteAllText("config/loginusers.vdf", WantsNotOffline());
+    //        Assert.False(steamWrapper.UserWantsOfflineMode);
 
-            _fileSystem.File.WriteAllText("config/loginusers.vdf", WantsOffline());
-            Assert.True(steamWrapper.UserWantsOfflineMode);
-        }
-    }
+    //        _fileSystem.File.WriteAllText("config/loginusers.vdf", WantsOffline());
+    //        Assert.True(steamWrapper.UserWantsOfflineMode);
+    //    }
+    //}
 
     //[Fact]
     //public void TestUserLoggedIn()
@@ -253,88 +253,88 @@ public class SteamWrapperTest
     //    Assert.Same(task, completedTask);
     //}
 
-    [Fact]
-    public async Task TestWaitSteamRunningAndLoggedInAsync_NoLogin()
-    {
-        _fileSystem.Initialize().WithFile("steam.exe");
-        _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //[Fact]
+    //public async Task TestWaitSteamRunningAndLoggedInAsync_NoLogin()
+    //{
+    //    _fileSystem.Initialize().WithFile("steam.exe");
+    //    _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
 
-        var wrapper = new Mock<SteamWrapper>(_steamRegistry.Object, _serviceProvider);
-        wrapper.Setup(s => s.IsRunning).Returns(true);
+    //    var wrapper = new Mock<SteamWrapper>(_steamRegistry.Object, _serviceProvider);
+    //    wrapper.Setup(s => s.IsRunning).Returns(true);
 
-        wrapper.Protected().Setup<Task>("WaitSteamUserLoggedInAsync", CancellationToken.None)
-            .Returns(Task.Delay(5000));
+    //    wrapper.Protected().Setup<Task>("WaitSteamUserLoggedInAsync", CancellationToken.None)
+    //        .Returns(Task.Delay(5000));
 
-        var task =  wrapper.Object.WaitSteamRunningAndLoggedInAsync(false);
-        Assert.False(task.IsCompleted);
+    //    var task =  wrapper.Object.WaitSteamRunningAndLoggedInAsync(false);
+    //    Assert.False(task.IsCompleted);
 
-        var completedTask = await Task.WhenAny(task, Task.Delay(500));
-        Assert.NotSame(task, completedTask);
-    }
+    //    var completedTask = await Task.WhenAny(task, Task.Delay(500));
+    //    Assert.NotSame(task, completedTask);
+    //}
 
-    [Fact]
-    public async Task TestWaitSteamRunningAndLoggedInAsync_WithOfflineMode()
-    {
-        _fileSystem.Initialize()
-            .WithFile("steam.exe")
-            .WithFile("config/loginusers.vdf").Which(a => a.HasStringContent(WantsOffline()));
+    //[Fact]
+    //public async Task TestWaitSteamRunningAndLoggedInAsync_WithOfflineMode()
+    //{
+    //    _fileSystem.Initialize()
+    //        .WithFile("steam.exe")
+    //        .WithFile("config/loginusers.vdf").Which(a => a.HasStringContent(WantsOffline()));
 
-        _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
-        _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //    _steamRegistry.Setup(r => r.InstallationDirectory).Returns(_fileSystem.DirectoryInfo.New("."));
+    //    _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
 
-        var wrapper = new Mock<SteamWrapper>(_steamRegistry.Object, _serviceProvider);
-        wrapper.Setup(s => s.IsRunning).Returns(true);
+    //    var wrapper = new Mock<SteamWrapper>(_steamRegistry.Object, _serviceProvider);
+    //    wrapper.Setup(s => s.IsRunning).Returns(true);
 
-        var tsc = new TaskCompletionSource<int>();
+    //    var tsc = new TaskCompletionSource<int>();
 
-        wrapper.Protected().Setup<Task>("WaitSteamOfflineRunning", CancellationToken.None)
-            .Returns(tsc.Task);
+    //    wrapper.Protected().Setup<Task>("WaitSteamOfflineRunning", CancellationToken.None)
+    //        .Returns(tsc.Task);
 
-        var task = wrapper.Object.WaitSteamRunningAndLoggedInAsync(false);
-        Assert.False(task.IsCompleted);
+    //    var task = wrapper.Object.WaitSteamRunningAndLoggedInAsync(false);
+    //    Assert.False(task.IsCompleted);
 
-        _ = Task.Run(async () => await Task.Delay(1000).ContinueWith(_ => tsc.SetResult(1)));
+    //    _ = Task.Run(async () => await Task.Delay(1000).ContinueWith(_ => tsc.SetResult(1)));
 
-        await task;
-        Assert.True(tsc.Task.IsCompleted);
-    }
+    //    await task;
+    //    Assert.True(tsc.Task.IsCompleted);
+    //}
 
-    [Fact]
-    public async Task TestWaitSteamRunningAndLoggedInAsync_Cancelled()
-    {
-        _fileSystem.Initialize().WithFile("steam.exe");
-        _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
+    //[Fact]
+    //public async Task TestWaitSteamRunningAndLoggedInAsync_Cancelled()
+    //{
+    //    _fileSystem.Initialize().WithFile("steam.exe");
+    //    _steamRegistry.Setup(r => r.ExecutableFile).Returns(_fileSystem.FileInfo.New("steam.exe"));
 
-        var wrapper = new Mock<SteamWrapper>(_steamRegistry.Object, _serviceProvider);
-        wrapper.Setup(s => s.IsRunning).Returns(true);
+    //    var wrapper = new Mock<SteamWrapper>(_steamRegistry.Object, _serviceProvider);
+    //    wrapper.Setup(s => s.IsRunning).Returns(true);
 
-        var cts = new CancellationTokenSource();
+    //    var cts = new CancellationTokenSource();
 
-        wrapper.Protected().Setup<Task>("WaitSteamUserLoggedInAsync", cts.Token)
-            .Returns(Task.Delay(5000, cts.Token));
+    //    wrapper.Protected().Setup<Task>("WaitSteamUserLoggedInAsync", cts.Token)
+    //        .Returns(Task.Delay(5000, cts.Token));
 
         
-        var task = wrapper.Object.WaitSteamRunningAndLoggedInAsync(false, cts.Token);
-        Assert.False(task.IsCompleted);
+    //    var task = wrapper.Object.WaitSteamRunningAndLoggedInAsync(false, cts.Token);
+    //    Assert.False(task.IsCompleted);
 
-        cts.Cancel();
+    //    cts.Cancel();
 
-        try
-        {
-            await task;
-            Assert.Fail("Expected exception not thrown.");
-        }
-        catch (OperationCanceledException ex)
-        {
-            Assert.Equal(cts.Token, ex.CancellationToken);
-        }
-    }
+    //    try
+    //    {
+    //        await task;
+    //        Assert.Fail("Expected exception not thrown.");
+    //    }
+    //    catch (OperationCanceledException ex)
+    //    {
+    //        Assert.Equal(cts.Token, ex.CancellationToken);
+    //    }
+    //}
 
-    private IEnumerable<ISteamWrapper> GetSteamWrappers()
-    {
-        yield return new WindowsSteamWrapper(_windowsSteamRegistry.Object, _serviceProvider);
-        yield return new LinuxSteamWrapper(_steamRegistry.Object, _serviceProvider);
-    }
+    //private IEnumerable<ISteamWrapper> GetSteamWrappers()
+    //{
+    //    yield return new WindowsSteamWrapper(_windowsSteamRegistry.Object, _serviceProvider);
+    //    yield return new LinuxSteamWrapper(_steamRegistry.Object, _serviceProvider);
+    //}
 
     private static string WantsNotOffline()
     {

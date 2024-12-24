@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Games;
+using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Registry;
 using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,13 +16,13 @@ namespace AET.SteamAbstraction;
 
 internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider serviceProvider) : DisposableObject, ISteamWrapper
 {
-    protected ISteamRegistry Registry { get; } = registry ?? throw new ArgumentNullException(nameof(registry));
+    protected readonly ISteamRegistry Registry = registry ?? throw new ArgumentNullException(nameof(registry));
+    protected readonly IServiceProvider ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    protected readonly IFileSystem FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+    protected readonly ISteamLibraryFinder LibraryFinder = serviceProvider.GetRequiredService<ISteamLibraryFinder>();
 
-    protected IServiceProvider ServiceProvider { get; } = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-
-    protected IFileSystem FileSystem { get; } = serviceProvider.GetRequiredService<IFileSystem>();
-
-    public bool Installed => Registry.ExecutableFile?.Exists ?? false;
+    // We are checking both, Exe path and install dir, because they might be on different locations
+    public bool Installed => Registry.ExecutableFile?.Exists == true && Registry.InstallationDirectory?.Exists == true;
 
     public abstract bool IsRunning { get; }
 
@@ -48,6 +50,8 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         }
     }
 
+    public IEnumerable<ISteamLibrary> Libraries => LibraryFinder.FindLibraries();
+
     public bool IsUserLoggedIn
     {
         get
@@ -61,8 +65,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
     public virtual bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest? game)
     {
         ThrowIfSteamNotInstalled();
-        var gameFinder = ServiceProvider.GetRequiredService<ISteamGameFinder>();
-        game = gameFinder.FindGame(gameId);
+        game = Libraries.SelectMany(library => library.GetApps()).FirstOrDefault(manifest => manifest.Id == gameId);
         return game is not null;
     }
 

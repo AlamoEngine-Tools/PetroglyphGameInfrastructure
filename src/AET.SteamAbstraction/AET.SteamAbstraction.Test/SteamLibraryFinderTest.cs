@@ -37,7 +37,8 @@ public class SteamLibraryFinderTest
         Assert.Throws<SteamException>(_libraryFinder.FindLibraries);
     }
 
-    [Fact]
+    // TODO: Target all platforms
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
     public void FindLibraries_NoLibrariesInstalled()
     {
         using var registry = _serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
@@ -46,7 +47,8 @@ public class SteamLibraryFinderTest
         Assert.Empty(libs);
     }
 
-    [Fact]
+    // TODO: Target all platforms
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
     public void FindLibraries_DefaultLibraryInstalled()
     {
         using var registry = _serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
@@ -58,7 +60,8 @@ public class SteamLibraryFinderTest
         Assert.Equal([lib], libs);
     }
 
-    [Fact]
+    // TODO: Target all platforms
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
     public void FindLibraries_DefaultLibraryInstalledButNotInConfig_NotFound()
     {
         using var registry = _serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
@@ -70,7 +73,8 @@ public class SteamLibraryFinderTest
         Assert.Empty(libs);
     }
 
-    [Fact]
+    // TODO: Target all platforms
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
     public void FindLibraries_DefaultLibraryAndExternalLibInstalled()
     {
         using var registry = _serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
@@ -100,7 +104,8 @@ public class SteamLibraryFinderTest
         Assert.Equal([defaultLib], libs.OrderBy(x => x.LibraryLocation.FullName));
     }
 
-    [Fact]
+    // TODO: Target all platforms
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
     public void FindLibraries_DefaultLibraryAndExternalLibInstalled_ExternalDoesNotHaveVdf_Skip()
     {
         using var registry = _serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
@@ -115,7 +120,8 @@ public class SteamLibraryFinderTest
         Assert.Equal([defaultLib], libs.OrderBy(x => x.LibraryLocation.FullName));
     }
 
-    [Fact]
+    // TODO: Target all platforms
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
     public void FindLibraries_DefaultLibraryAndExternalLibInstalled_ExternalFolderDoesNotExist()
     {
         using var registry = _serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();

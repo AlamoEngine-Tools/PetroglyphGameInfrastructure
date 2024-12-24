@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Games;
+using AET.SteamAbstraction.Library;
 
 namespace AET.SteamAbstraction;
 
@@ -31,6 +33,11 @@ public interface ISteamWrapper : IDisposable
     /// <see langword="null"/> if Steam is not installed or the status could not be retrieved.
     /// </summary>
     bool? UserWantsOfflineMode { get; }
+
+    /// <summary>
+    /// Gets an enumerable collection of Steam game libraries.
+    /// </summary>
+    IEnumerable<ISteamLibrary> Libraries { get; }
 
     /// <summary>
     /// Checks whether the specified game is installed.
