@@ -14,7 +14,6 @@ namespace AET.SteamAbstraction.Test;
 public class SteamVdfReaderTest
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly SteamVdfReader _vdfReader;
     private readonly MockFileSystem _fileSystem = new();
 
     public SteamVdfReaderTest()
@@ -22,7 +21,6 @@ public class SteamVdfReaderTest
         var sc = new ServiceCollection();
         sc.AddSingleton<IFileSystem>(_ => _fileSystem);
         _serviceProvider = sc.BuildServiceProvider();
-        _vdfReader = new SteamVdfReader(_serviceProvider);
     }
 
     #region ReadLibraryLocationsFromConfig
@@ -32,11 +30,11 @@ public class SteamVdfReaderTest
     {
         _fileSystem.Initialize().WithFile("input.vdf");
         var input = _fileSystem.FileInfo.New("input.vdf");
-        Assert.Throws<VdfException>(() => _vdfReader.ReadLibraryLocationsFromConfig(input).ToList());
+        Assert.Throws<VdfException>(() => SteamVdfReader.ReadLibraryLocationsFromConfig(input).ToList());
     }
 
     [Fact]
-    public void ReadLibraryLocationsFromConfig_InvalidRootNode_Throws()
+    public void ReadLibraryLocationsFromConfig_InvalidRootNodeName_Throws()
     {
         var data = @"""invalidData""
 {
@@ -46,7 +44,17 @@ public class SteamVdfReaderTest
         _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
         var input = _fileSystem.FileInfo.New("input.vdf");
-        Assert.Throws<VdfException>(() => _vdfReader.ReadLibraryLocationsFromConfig(input).ToList());
+        Assert.Throws<VdfException>(() => SteamVdfReader.ReadLibraryLocationsFromConfig(input).ToList());
+    }
+
+    [Fact]
+    public void ReadLibraryLocationsFromConfig_InvalidRootNodeKind_Throws()
+    {
+        var data = @"""libraryfolders"" ""someData""";
+        _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
+
+        var input = _fileSystem.FileInfo.New("input.vdf");
+        Assert.Throws<VdfException>(() => SteamVdfReader.ReadLibraryLocationsFromConfig(input).ToList());
     }
 
     [Fact]
@@ -83,7 +91,7 @@ public class SteamVdfReaderTest
         _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
         var input = _fileSystem.FileInfo.New("input.vdf");
-        var locations = _vdfReader.ReadLibraryLocationsFromConfig(input).Select(l => l.FullName).ToList();
+        var locations = SteamVdfReader.ReadLibraryLocationsFromConfig(input).Select(l => l.FullName).ToList();
 
         Assert.Contains(expected1, locations);
         Assert.Contains(expected2, locations);
@@ -103,7 +111,7 @@ public class SteamVdfReaderTest
         _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
         var input = _fileSystem.FileInfo.New("input.vdf");
-        var libs = _vdfReader.ReadLibraryLocationsFromConfig(input);
+        var libs = SteamVdfReader.ReadLibraryLocationsFromConfig(input);
         Assert.Empty(libs);
     }
 
@@ -117,7 +125,7 @@ public class SteamVdfReaderTest
         _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
         var input = _fileSystem.FileInfo.New("input.vdf");
-        var libs = _vdfReader.ReadLibraryLocationsFromConfig(input);
+        var libs = SteamVdfReader.ReadLibraryLocationsFromConfig(input);
         Assert.Empty(libs);
     }
 
@@ -128,15 +136,15 @@ public class SteamVdfReaderTest
     [Fact]
     public void ReadManifest_NullArgs_Throws()
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider);
-        Assert.Throws<ArgumentNullException>(() => _vdfReader.ReadManifest(null!, lib));
-        Assert.Throws<ArgumentNullException>(() => _vdfReader.ReadManifest(_fileSystem.FileInfo.New("path"), null!));
+        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
+        Assert.Throws<ArgumentNullException>(() => SteamVdfReader.ReadManifest(null!, lib));
+        Assert.Throws<ArgumentNullException>(() => SteamVdfReader.ReadManifest(_fileSystem.FileInfo.New("path"), null!));
     }
 
     [Fact]
     public void ReadManifest_CorrectManifest()
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider);
+        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
 
         var expectedManifest = lib.InstallGame(
             1230,
@@ -144,7 +152,7 @@ public class SteamVdfReaderTest
             3,
             SteamAppState.StateFullyInstalled | SteamAppState.StateUpdatePaused);
 
-        var app = _vdfReader.ReadManifest(expectedManifest.ManifestFile, lib);
+        var app = SteamVdfReader.ReadManifest(expectedManifest.ManifestFile, lib);
 
         Assert.Equal(1230u, app.Id);
         Assert.Equal("MyGame", app.Name);
@@ -286,23 +294,23 @@ public class SteamVdfReaderTest
     [MemberData(nameof(GetInvalidAppManifestContent))]
     public void ReadManifest_InvalidAppManifest_Throws(string content)
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider);
+        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
 
         var manifestFile = _fileSystem.Path.Combine(lib.SteamAppsLocation.FullName, "manifest.acf");
         _fileSystem.File.WriteAllText(manifestFile, content);
 
-        Assert.ThrowsAny<SteamException>(() => _vdfReader.ReadManifest(_fileSystem.FileInfo.New(manifestFile), lib));
+        Assert.ThrowsAny<SteamException>(() => SteamVdfReader.ReadManifest(_fileSystem.FileInfo.New(manifestFile), lib));
     }
 
     [Fact]
     public void ReadManifest_ManifestNotPartOfLibrary_Throws()
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider);
-        var otherLib = _fileSystem.InstallSteamLibrary("otherLib", _serviceProvider);
+        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
+        var otherLib = _fileSystem.InstallSteamLibrary("otherLib", _serviceProvider, false);
 
         var manifestFile = otherLib.InstallGame(1230, "MyGame").ManifestFile;
 
-        Assert.Throws<SteamException>(() => _vdfReader.ReadManifest(manifestFile, lib));
+        Assert.Throws<SteamException>(() => SteamVdfReader.ReadManifest(manifestFile, lib));
     }
 
     #endregion

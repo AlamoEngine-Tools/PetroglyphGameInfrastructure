@@ -8,25 +8,24 @@ using AET.SteamAbstraction.Vdf;
 using AET.SteamAbstraction.Vdf.Linq;
 using AET.SteamAbstraction.Vdf.Utilities;
 using AnakinRaW.CommonUtilities.FileSystem;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;
 
-internal class SteamVdfReader(IServiceProvider serviceProvider) : ISteamVdfReader
+internal static class SteamVdfReader
 {
-    private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-
-    public SteamAppManifest ReadManifest(IFileInfo manifestFile, ISteamLibrary library)
+    public static SteamAppManifest ReadManifest(IFileInfo manifestFile, ISteamLibrary library)
     {
         if (manifestFile == null) 
             throw new ArgumentNullException(nameof(manifestFile));
         if (library == null) 
             throw new ArgumentNullException(nameof(library));
 
-        if (manifestFile.Directory is null || !_fileSystem.Path.AreEqual(library.SteamAppsLocation.FullName, manifestFile.Directory.FullName))
+        var fs = manifestFile.FileSystem;
+
+        if (manifestFile.Directory is null || !fs.Path.AreEqual(library.SteamAppsLocation.FullName, manifestFile.Directory.FullName))
             throw new SteamException("The game's manifest is not part of the given library");
 
-        var manifestData = ReadFileAsJson(manifestFile);
+        var manifestData = ParseFile(manifestFile);
 
         if (manifestData.Key != "AppState")
             throw new VdfException("Invalid Data: Expected 'AppState' as root.");
@@ -73,15 +72,17 @@ internal class SteamVdfReader(IServiceProvider serviceProvider) : ISteamVdfReade
             depots is null)
             throw new SteamException($"Invalid App Manifest at file {manifestFile.FullName}");
 
-        var installLocation = _fileSystem.DirectoryInfo.New(
-            _fileSystem.Path.Combine(library.CommonLocation.FullName, installDir!));
+        var installLocation = fs.DirectoryInfo.New(
+            fs.Path.Combine(library.CommonLocation.FullName, installDir!));
 
         return new SteamAppManifest(library, manifestFile, id.Value, name!, installLocation, state.Value, new HashSet<uint>(depots));
     }
 
-    public IEnumerable<IDirectoryInfo> ReadLibraryLocationsFromConfig(IFileInfo configFile)
+    public static IEnumerable<IDirectoryInfo> ReadLibraryLocationsFromConfig(IFileInfo configFile)
     {
-        var libraryData = ReadFileAsJson(configFile);
+        var fs = configFile.FileSystem;
+
+        var libraryData = ParseFile(configFile);
 
         if (libraryData.Key != "libraryfolders")
             throw new VdfException("Invalid Data: Expected 'libraryfolders' as root.");
@@ -97,24 +98,24 @@ internal class SteamVdfReader(IServiceProvider serviceProvider) : ISteamVdfReade
                 continue;
 
             if (prop.Value is VValue pathValue)
-                yield return _fileSystem.DirectoryInfo.New(pathValue.Value<string>()!);
+                yield return fs.DirectoryInfo.New(pathValue.Value<string>()!);
             else if (prop.Value is VObject obj)
             {
                 foreach (var childProperty in obj.Children<VProperty>())
                 {
                     if (!childProperty.Key.Equals("path") || childProperty.Value is not VValue value)
                         continue;
-                    yield return _fileSystem.DirectoryInfo.New(value.Value<string>()!);
+                    yield return fs.DirectoryInfo.New(value.Value<string>()!);
                 }
             }
         }
     }
 
-    public LoginUsers ReadLoginUsers(IFileInfo configFile)
+    public static LoginUsers ReadLoginUsers(IFileInfo configFile)
     {
         if (configFile == null)
             throw new ArgumentNullException(nameof(configFile));
-        var loginData = ReadFileAsJson(configFile);
+        var loginData = ParseFile(configFile);
 
         
         if (loginData.Key != "users")
@@ -164,7 +165,7 @@ internal class SteamVdfReader(IServiceProvider serviceProvider) : ISteamVdfReade
         };
     }
 
-    private static VProperty ReadFileAsJson(IFileInfo file)
+    private static VProperty ParseFile(IFileInfo file)
     {
         try
         {

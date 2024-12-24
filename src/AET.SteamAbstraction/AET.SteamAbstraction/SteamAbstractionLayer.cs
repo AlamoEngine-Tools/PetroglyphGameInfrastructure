@@ -22,8 +22,6 @@ public static class SteamAbstractionLayer
         serviceCollection.AddSingleton<ISteamRegistryFactory>(sp => new SteamRegistryFactory(sp));
         serviceCollection.AddSingleton<IProcessHelper>(sp => new ProcessHelper());
 
-        serviceCollection.AddSingleton<ISteamVdfReader>(sp => new SteamVdfReader(sp));
-
         serviceCollection.AddSingleton<ISteamLibraryFinder>(sp => new SteamLibraryFinder(sp));
         serviceCollection.AddSingleton<ISteamGameFinder>(sp => new SteamGameFinder(sp));
     }

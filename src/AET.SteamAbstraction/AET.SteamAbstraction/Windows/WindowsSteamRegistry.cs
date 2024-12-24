@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction;
 
-internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : DisposableObject, IWindowsSteamRegistry
+internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : DisposableObject, ISteamRegistry
 {
     private const string SteamExeKey = "SteamExe";
     private const string SteamPathKey = "SteamPath";
@@ -116,5 +116,11 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
         using var subKey = _registryKey?.CreateSubKey(subKeyName);
         if (subKey is not null)
             keyAction(subKey);
+    }
+
+    internal IRegistryKey GetSteamRegistryKey()
+    {
+        ThrowIfDisposed();
+        return _registryKey!.OpenSubKey(string.Empty, true)!;
     }
 }

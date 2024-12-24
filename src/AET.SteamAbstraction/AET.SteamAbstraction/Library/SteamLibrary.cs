@@ -19,7 +19,6 @@ internal class SteamLibrary : ISteamLibrary
         TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
     };
 
-    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger? _logger;
     private readonly ConcurrentDictionary<KnownLibraryLocations, IDirectoryInfo> _locations = new();
 
@@ -45,7 +44,8 @@ internal class SteamLibrary : ISteamLibrary
     {
         if (libraryLocation == null) 
             throw new ArgumentNullException(nameof(libraryLocation));
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        if (serviceProvider == null) 
+            throw new ArgumentNullException(nameof(serviceProvider));
         _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
         _normalizedLocation = PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(libraryLocation.FullName), SteamLibraryPathNormalizeOptions);
@@ -57,12 +57,11 @@ internal class SteamLibrary : ISteamLibrary
         if (!SteamAppsLocation.Exists)
             return Array.Empty<SteamAppManifest>();
         var apps = new HashSet<SteamAppManifest>();
-        var manifestReader = _serviceProvider.GetRequiredService<ISteamVdfReader>();
         foreach (var manifestFile in SteamAppsLocation.EnumerateFiles("*.acf", SearchOption.TopDirectoryOnly))
         {
             try
             {
-                var manifest = manifestReader.ReadManifest(manifestFile, this);
+                var manifest = SteamVdfReader.ReadManifest(manifestFile, this);
                 apps.Add(manifest);
             }
             catch (SteamException e)

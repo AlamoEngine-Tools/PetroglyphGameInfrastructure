@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using AET.SteamAbstraction.Registry;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +15,8 @@ internal class SteamWrapperFactory(IServiceProvider serviceProvider) : ISteamWra
         var registry = _registryFactory.CreateRegistry();
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            if (registry is not IWindowsSteamRegistry windowsRegistry)
-                throw new InvalidOperationException("Expected Windows Registry on Windows systems.");
-            return new WindowsSteamWrapper(windowsRegistry, serviceProvider);
+            Debug.Assert(registry is WindowsSteamRegistry);
+            return new WindowsSteamWrapper((WindowsSteamRegistry)registry, serviceProvider);
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -24,6 +24,6 @@ internal class SteamWrapperFactory(IServiceProvider serviceProvider) : ISteamWra
             throw new NotImplementedException("Steam wrapper for Linux is not yet implemented.");
         }
 
-        throw new PlatformNotSupportedException($"The current platform is not supported.");
+        throw new PlatformNotSupportedException("The current platform is not supported.");
     }
 }

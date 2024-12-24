@@ -50,8 +50,8 @@ public abstract class SteamRegistryTestBase
     {
         var registry = CreateRegistry();
 
-        Assert.Equal(FileSystem.FileInfo.New(SteamExePath).FullName, registry.ExecutableFile.FullName);
-        Assert.Equal(FileSystem.DirectoryInfo.New(SteamInstallPath).FullName, registry.InstallationDirectory.FullName);
+        Assert.Equal(FileSystem.FileInfo.New(SteamExePath).FullName, registry.ExecutableFile!.FullName);
+        Assert.Equal(FileSystem.DirectoryInfo.New(SteamInstallPath).FullName, registry.InstallationDirectory!.FullName);
         Assert.True(registry.ProcessId is null or 0);
     }
 
@@ -60,8 +60,8 @@ public abstract class SteamRegistryTestBase
     {
         var registry = CreateRegistry();
 
-        Assert.Equal(FileSystem.FileInfo.New(SteamExePath).FullName, registry.ExecutableFile.FullName);
-        Assert.Equal(FileSystem.DirectoryInfo.New(SteamInstallPath).FullName, registry.InstallationDirectory.FullName);
+        Assert.Equal(FileSystem.FileInfo.New(SteamExePath).FullName, registry.ExecutableFile!.FullName);
+        Assert.Equal(FileSystem.DirectoryInfo.New(SteamInstallPath).FullName, registry.InstallationDirectory!.FullName);
 
         SetSteamPid(1234);
 

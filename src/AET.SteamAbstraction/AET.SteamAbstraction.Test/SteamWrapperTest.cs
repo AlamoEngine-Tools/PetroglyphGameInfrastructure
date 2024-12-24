@@ -19,7 +19,7 @@ public class SteamWrapperTest
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly Mock<ISteamRegistry> _steamRegistry;
-    private readonly Mock<IWindowsSteamRegistry> _windowsSteamRegistry;
+    private readonly Mock<WindowsSteamRegistry> _windowsSteamRegistry;
     private readonly MockFileSystem _fileSystem;
     private readonly Mock<ISteamGameFinder> _gameFinder;
 
@@ -27,14 +27,13 @@ public class SteamWrapperTest
     {
         var sc = new ServiceCollection();
         _steamRegistry = new Mock<ISteamRegistry>();
-        _windowsSteamRegistry = new Mock<IWindowsSteamRegistry>();
+        _windowsSteamRegistry = new Mock<WindowsSteamRegistry>();
         _fileSystem = new MockFileSystem();
         _gameFinder = new Mock<ISteamGameFinder>();
         sc.AddTransient(_ => _steamRegistry.Object);
         sc.AddTransient(_ => new Mock<IProcessHelper>().Object);
         sc.AddTransient(_ => _gameFinder.Object);
         sc.AddTransient<IFileSystem>(_ => _fileSystem);
-        sc.AddSingleton<ISteamVdfReader>(sp => new SteamVdfReader(sp));
         _serviceProvider = sc.BuildServiceProvider();
     }
 

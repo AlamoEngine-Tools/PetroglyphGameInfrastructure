@@ -38,10 +38,7 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
 
             try
             {
-
-                var reader = serviceProvider.GetRequiredService<ISteamVdfReader>();
-                var config = reader.ReadLoginUsers(FileSystem.FileInfo.New(configFile));
-
+                var config = SteamVdfReader.ReadLoginUsers(FileSystem.FileInfo.New(configFile));
                 return config.Users.Any(user => user.MostRecent && user.UserWantsOffline);
             }
             catch

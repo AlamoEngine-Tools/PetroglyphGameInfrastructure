@@ -2,7 +2,6 @@
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
-using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Test.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +21,8 @@ public class SteamLibraryTest
         sc.AddSingleton<IFileSystem>(_ => _fileSystem);
         SteamAbstractionLayer.InitializeServices(sc);
         _serviceProvider = sc.BuildServiceProvider();
+
+        _fileSystem.InstallSteamFiles();
     }
 
     [Fact]
@@ -46,6 +47,18 @@ public class SteamLibraryTest
 
         Assert.Equal(equal, lib.Equals(other));
         Assert.Equal(equal, lib.GetHashCode().Equals(other.GetHashCode()));
+    }
+
+    [Fact]
+    public void TestEquality_NullAndSame()
+    {
+        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
+
+        Assert.False(lib.Equals((object)null!));
+        Assert.False(lib.Equals(null));
+
+        Assert.True(lib.Equals(lib));
+        Assert.True(lib.Equals((object)lib));
     }
 
     [Fact]

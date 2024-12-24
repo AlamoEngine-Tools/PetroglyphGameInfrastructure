@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -15,7 +14,7 @@ namespace AET.SteamAbstraction.Test.Windows;
 public class WindowsSteamWrapperTest
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly Mock<IWindowsSteamRegistry> _steamRegistry;
+    private readonly Mock<WindowsSteamRegistry> _steamRegistry;
     private readonly MockFileSystem _fileSystem;
     private readonly Mock<IProcessHelper> _processHelper;
     private readonly Mock<ISteamGameFinder> _gameFinder;
@@ -25,7 +24,7 @@ public class WindowsSteamWrapperTest
     public WindowsSteamWrapperTest()
     {
         var sc = new ServiceCollection();
-        _steamRegistry = new Mock<IWindowsSteamRegistry>();
+        _steamRegistry = new Mock<WindowsSteamRegistry>();
         _fileSystem = new MockFileSystem();
         _gameFinder = new Mock<ISteamGameFinder>();
         _processHelper = new Mock<IProcessHelper>();

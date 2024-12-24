@@ -29,7 +29,7 @@ public class SteamAppManifestTest
         Assert.Throws<ArgumentNullException>(() => new SteamAppManifest(null!, _fileSystem.FileInfo.New("file.acf"), 0, "name", _fileSystem.DirectoryInfo.New("path"),
             SteamAppState.StateFullyInstalled, new HashSet<uint>()));
 
-        var lib = _fileSystem.InstallSteamLibrary("path", _serviceProvider);
+        var lib = _fileSystem.InstallSteamLibrary("path", _serviceProvider, false);
         Assert.Throws<ArgumentNullException>(() => new SteamAppManifest(lib, null!, 0, "name", _fileSystem.DirectoryInfo.New("path"),
             SteamAppState.StateFullyInstalled, new HashSet<uint>()));
 
@@ -49,7 +49,7 @@ public class SteamAppManifestTest
     [Fact]
     public void Ctor_SetsProperties()
     {
-        var lib = _fileSystem.InstallSteamLibrary("path", _serviceProvider);
+        var lib = _fileSystem.InstallSteamLibrary("path", _serviceProvider, false);
         var appManifest = new SteamAppManifest(lib, _fileSystem.FileInfo.New("file.acf"), 123, "name",
             _fileSystem.DirectoryInfo.New("path"),
             SteamAppState.StateFullyInstalled, new HashSet<uint> {987, 654});
@@ -66,8 +66,8 @@ public class SteamAppManifestTest
     [Fact]
     public void Equality()
     {
-        var lib = _fileSystem.InstallSteamLibrary("path", _serviceProvider);
-        var otherLib = _fileSystem.InstallSteamLibrary("other", _serviceProvider);
+        var lib = _fileSystem.InstallSteamLibrary("path", _serviceProvider, false);
+        var otherLib = _fileSystem.InstallSteamLibrary("other", _serviceProvider, false);
 
         const uint aId = 123;
         const uint bId = 456;
