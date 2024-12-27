@@ -118,6 +118,9 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
                 StartSteam();
                 await WaitSteamRunningAsync(cancellation).ConfigureAwait(false);
             }
+
+            if (!IsRunning)
+                throw new SteamException("Steam is not running.");
         }
 
         if (IsUserLoggedIn)

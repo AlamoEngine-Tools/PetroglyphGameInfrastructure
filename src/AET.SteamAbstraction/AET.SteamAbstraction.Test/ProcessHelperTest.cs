@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using AET.SteamAbstraction.Utilities;
+using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -32,7 +34,7 @@ public class ProcessHelperTest
     }
 
     [Fact]
-    public void StartProcess()
+    public async Task StartProcess()
     {
         var processName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash";
         var expectedExitCode = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? -1 : 128 + 9; // https://stackoverflow.com/a/1041309
@@ -43,7 +45,9 @@ public class ProcessHelperTest
         });
 
         Assert.NotNull(process);
+        var exitTask = process.WaitForExitAsync();
         process.Kill();
+        await exitTask;
         Assert.Equal(expectedExitCode, process.ExitCode);
     }
 }

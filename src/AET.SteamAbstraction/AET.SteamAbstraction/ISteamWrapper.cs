@@ -76,5 +76,6 @@ public interface ISteamWrapper : IDisposable
     /// </returns>
     /// <exception cref="SteamNotFoundException">Steam is not installed.</exception>
     /// <exception cref="ObjectDisposedException">This instance is disposed.</exception>
+    /// <exception cref="SteamException">Steam is not running.</exception>
     Task WaitSteamRunningAndLoggedInAsync(bool startIfNotRunning, CancellationToken cancellation = default);
 }
