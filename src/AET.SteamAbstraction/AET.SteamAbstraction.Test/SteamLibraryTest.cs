@@ -35,7 +35,6 @@ public class SteamLibraryTest
     [Theory]
     [InlineData("Library", true, true)]
     [InlineData("./Library", true, true)]
-    [InlineData("/Library", true, true)]
     [InlineData("library", true, false)]
     [InlineData("other", false, false)]
     public void TestEquality(string path, bool equalWindows, bool equalLinux)

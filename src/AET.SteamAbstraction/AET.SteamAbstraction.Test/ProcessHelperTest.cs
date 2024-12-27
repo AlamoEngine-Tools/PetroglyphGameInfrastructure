@@ -41,12 +41,20 @@ public class ProcessHelperTest
 
         var process = _processHelper.StartProcess(new ProcessStartInfo(processName)
         {
-            UseShellExecute = false
+            UseShellExecute = false,
         });
 
         Assert.NotNull(process);
         var exitTask = process.WaitForExitAsync();
-        process.Kill();
+
+        try
+        {
+            process.Kill();
+        }
+        catch (InvalidOperationException)
+        {
+        }
+
         await exitTask;
         Assert.Equal(expectedExitCode, process.ExitCode);
     }
