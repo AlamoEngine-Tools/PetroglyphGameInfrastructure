@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using AET.SteamAbstraction.Games;
@@ -311,6 +312,195 @@ public class SteamVdfReaderTest
         var manifestFile = otherLib.InstallGame(1230, "MyGame").ManifestFile;
 
         Assert.Throws<SteamException>(() => SteamVdfReader.ReadManifest(manifestFile, lib));
+    }
+
+    #endregion
+
+    #region ReadLoginUsers
+
+    [Fact]
+    public void ReadLoginUsers_NullFile_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => SteamVdfReader.ReadLoginUsers(null!));
+    }
+
+    [Fact]
+    public void ReadLoginUsers_FileNotExists_Throws()
+    {
+        var e = Assert.ThrowsAny<SteamException>(() => SteamVdfReader.ReadLoginUsers(_fileSystem.FileInfo.New("NotExists.vdf")));
+        Assert.IsType<FileNotFoundException>(e.InnerException);
+    }
+
+    public static IEnumerable<object[]> GetInvalidLoginUserContent()
+    {
+        yield return [string.Empty];
+        yield return ["\0"];
+        yield return [@"""users"" ""value"""];
+        yield return [@"
+""notUsers""
+{
+	""123456789""
+	{
+		""AccountName""		""some_user""
+		""PersonaName""		""someUser""
+		""RememberPassword""		""1""
+		""WantsOfflineMode""		""0""
+		""SkipOfflineModeWarning""		""0""
+		""AllowAutoLogin""		""1""
+		""MostRecent""		""1""
+		""Timestamp""		""000000000""
+	}
+}"];
+        yield return [@"
+""users""
+{
+	""123456789""
+	{
+		""AccountName""		""some_user""
+		""PersonaName""		""someUser""
+		""RememberPassword""		""1""
+		""WantsOfflineMode""		""notABoolean""
+		""SkipOfflineModeWarning""		""0""
+		""AllowAutoLogin""		""1""
+		""MostRecent""		""1""
+		""Timestamp""		""000000000""
+	}
+}"];
+        yield return [@"
+""users""
+{
+	""123456789""
+	{
+		""AccountName""		""some_user""
+		""PersonaName""		""someUser""
+		""RememberPassword""		""1""
+		""WantsOfflineMode""		""0""
+		""SkipOfflineModeWarning""		""0""
+		""AllowAutoLogin""		""1""
+		""MostRecent""		""-9999""
+		""Timestamp""		""000000000""
+	}
+}"];
+        yield return [@"
+""users""
+{
+	""123456789"" ""value""
+}"];
+    }
+
+    [Theory]
+    [MemberData(nameof(GetInvalidLoginUserContent))]
+    public void ReadLoginUsers_FileWithInvalidContent(string content)
+    {
+        _fileSystem.File.WriteAllText("loginusers.vdf", content);
+        var file = _fileSystem.FileInfo.New("loginusers.vdf");
+        
+        Assert.ThrowsAny<SteamException>(() => SteamVdfReader.ReadLoginUsers(file));
+    }
+
+    [Fact]
+    public void ReadLoginUsers_FileWithNotParsableUserIdIsSkipped()
+    {
+        var content = @"
+""users""
+{
+	""18446744073709551615""
+	{
+		""AccountName""		""some_user""
+		""PersonaName""		""some user""
+		""RememberPassword""		""1""
+		""WantsOfflineMode""		""0""
+		""SkipOfflineModeWarning""		""0""
+		""AllowAutoLogin""		""1""
+		""MostRecent""		""1""
+		""Timestamp""		""00000000""
+	}
+    ""InvalidUser""
+    {
+	    ""AccountName""		""InvalidUser""
+	    ""PersonaName""		""Invalid User""
+	    ""RememberPassword""		""1""
+	    ""WantsOfflineMode""		""0""
+	    ""SkipOfflineModeWarning""		""0""
+	    ""AllowAutoLogin""		""1""
+	    ""MostRecent""		""1""
+	    ""Timestamp""		""00000000""
+    }
+}";
+        _fileSystem.File.WriteAllText("loginusers.vdf", content);
+        var file = _fileSystem.FileInfo.New("loginusers.vdf");
+
+        var user = Assert.Single(SteamVdfReader.ReadLoginUsers(file).Users);
+        Assert.Equal(18446744073709551615u, user.UserId);
+        Assert.False(user.UserWantsOffline);
+        Assert.True(user.MostRecent);
+    }
+
+    [Fact]
+    public void ReadLoginUsers_UseDefaults()
+    {
+        var content = @"
+""users""
+{
+	""123456789""
+	{
+	}
+}
+";
+        _fileSystem.File.WriteAllText("loginusers.vdf", content);
+        var file = _fileSystem.FileInfo.New("loginusers.vdf");
+
+        var user = Assert.Single(SteamVdfReader.ReadLoginUsers(file).Users);
+        Assert.Equal(123456789u, user.UserId);
+        Assert.False(user.UserWantsOffline);
+        Assert.False(user.MostRecent);
+    }
+
+    [Fact]
+    public void ReadLoginUsers_EmptyFile()
+    {
+        var content = @"
+""users""
+{
+}
+";
+        _fileSystem.File.WriteAllText("loginusers.vdf", content);
+        var file = _fileSystem.FileInfo.New("loginusers.vdf");
+
+        Assert.Empty(SteamVdfReader.ReadLoginUsers(file).Users);
+    }
+
+    [Fact]
+    public void ReadLoginUsers()
+    {
+        _fileSystem.InstallSteamFiles();
+
+        var expectedUsers = new List<SteamUserLoginMetadata>
+        {
+            new(1, true, false),
+            new(2, false, false),
+            new(3, false, true),
+            new(4, true, true),
+        };
+
+        var file = _fileSystem.WriteLoginUsers(expectedUsers);
+
+        var users = SteamVdfReader.ReadLoginUsers(file);
+
+        Assert.Equal(expectedUsers, users.Users.OrderBy(x => x.UserId).ToList(), new SteamUserLoginMetadataEqualityComparer());
+    }
+
+    private class SteamUserLoginMetadataEqualityComparer : IEqualityComparer<SteamUserLoginMetadata>
+    {
+        public bool Equals(SteamUserLoginMetadata x, SteamUserLoginMetadata y)
+        {
+            return x.UserId == y.UserId && x.MostRecent == y.MostRecent && x.UserWantsOffline == y.UserWantsOffline;
+        }
+
+        public int GetHashCode(SteamUserLoginMetadata obj)
+        {
+            return HashCode.Combine(obj.UserId, obj.MostRecent, obj.UserWantsOffline);
+        }
     }
 
     #endregion

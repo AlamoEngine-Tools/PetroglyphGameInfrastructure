@@ -1,6 +1,5 @@
 ﻿#if Windows
 
-using System.Collections.Generic;
 using AET.SteamAbstraction.Registry;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,7 +55,6 @@ public class WindowsSteamRegistryTest : SteamRegistryTestBase
 
         Assert.Null(registry.ActiveUserId);
         Assert.Null(registry.ActiveProcessKey);
-        Assert.Empty(registry.InstalledApps);
 
         InternalRegistry.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
             .CreateSubKey("Software\\Valve\\Steam\\ActiveProcess");
@@ -73,24 +71,7 @@ public class WindowsSteamRegistryTest : SteamRegistryTestBase
         var actualValue = InternalRegistry.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
             .OpenSubKey("Software\\Valve\\Steam\\ActiveProcess")?.GetValue("ActiveUser");
 
-        Assert.Equal(123, actualValue);
-    }
-
-    [Fact]
-    public void GetSteamApps()
-    {
-        var registry = CreateWindowsRegistry();
-
-        using var _ = InternalRegistry.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
-            .CreateSubKey("Software\\Valve\\Steam\\Apps\\123", false);
-        using var __ = InternalRegistry.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
-            .CreateSubKey("Software\\Valve\\Steam\\Apps\\456", false);
-        using var ___ = InternalRegistry.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
-            .CreateSubKey("Software\\Valve\\Steam\\Apps\\789", false);
-
-        var apps = registry.InstalledApps;
-
-        Assert.Equivalent(new HashSet<uint>{123, 456, 789}, apps, true);
+        Assert.Equal(123u, actualValue);
     }
 }
 

@@ -1,8 +1,6 @@
 ﻿using AnakinRaW.CommonUtilities.Registry;
-using System.Collections.Generic;
 using System.IO.Abstractions;
 using System;
-using System.Globalization;
 using AET.SteamAbstraction.Registry;
 using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +15,6 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
     private const string SteamActiveUserKey = "ActiveUser";
 
     private const string SteamProcessNode = "ActiveProcess";
-    private const string SteamAppsNode = "Apps";
 
     private IRegistryKey? _registryKey = serviceProvider.GetRequiredService<IRegistry>()
         .OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
@@ -34,11 +31,11 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
         }
     }
 
-    public int? ActiveUserId
+    public uint? ActiveUserId
     {
         get
         {
-            return ReadFromSubKey(SteamProcessNode, key => key.GetValue<int?>(SteamActiveUserKey));
+            return ReadFromSubKey(SteamProcessNode, key => key.GetValue<uint?>(SteamActiveUserKey));
         }
         set
         {
@@ -74,25 +71,6 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
             ThrowIfDisposed();
             var path = _registryKey!.GetValue<string?>(SteamPathKey);
             return path == null ? null : _fileSystem.DirectoryInfo.New(path);
-        }
-    }
-
-    public ISet<uint> InstalledApps
-    {
-        get
-        {
-            return ReadFromSubKey(SteamAppsNode, key =>
-            {
-                var appNames = key.GetSubKeyNames();
-                var ids = new HashSet<uint>();
-                foreach (var app in appNames)
-                {
-                    if (uint.TryParse(app, NumberStyles.None, null, out var id))
-                        ids.Add(id);
-                }
-
-                return ids;
-            }) ?? [];
         }
     }
     

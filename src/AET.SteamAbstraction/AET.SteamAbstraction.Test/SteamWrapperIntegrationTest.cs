@@ -21,8 +21,6 @@ public class SteamWrapperIntegrationTest
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             sc.AddSingleton<IRegistry>(new WindowsRegistry());
-        else
-            sc.AddSingleton<IRegistry>(new InMemoryRegistry());
 
         _service = sc.BuildServiceProvider().GetRequiredService<ISteamWrapperFactory>().CreateWrapper();
     }
@@ -44,6 +42,6 @@ public class SteamWrapperIntegrationTest
     //[Fact]
     public async Task WaitRunning()
     {
-        await _service.WaitSteamRunningAndLoggedInAsync(false);
+        await _service.WaitSteamRunningAndLoggedInAsync(true);
     }
 }

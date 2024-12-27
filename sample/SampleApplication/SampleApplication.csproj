@@ -9,7 +9,7 @@
 	<ItemGroup>
 	  <PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
 	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
-	  <PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="12.0.39-beta" />
+	  <PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="12.0.54-beta" />
 	</ItemGroup>
 
 	<ItemGroup>

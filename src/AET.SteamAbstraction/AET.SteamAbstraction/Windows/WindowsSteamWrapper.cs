@@ -1,105 +1,71 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.NativeMethods;
-using AET.SteamAbstraction.Utilities;
-using AnakinRaW.CommonUtilities.Registry.Windows;
-using Microsoft.Extensions.DependencyInjection;
+using AnakinRaW.CommonUtilities.Registry.Extensions;
 
 namespace AET.SteamAbstraction;
 
-internal class WindowsSteamWrapper : SteamWrapper
+internal class WindowsSteamWrapper(WindowsSteamRegistry registry, IServiceProvider serviceProvider)
+    : SteamWrapper(registry, serviceProvider)
 {
-    private readonly WindowsSteamRegistry _windowsRegistry;
-    private readonly IProcessHelper _processHelper;
-
     public override bool IsRunning
     {
         get
         {
-            var pid = _windowsRegistry.ProcessId;
-            if (pid is null or 0)
-                return false;
-            return _processHelper.GetProcessByPid(pid.Value) != null;
+            var pid = registry.ProcessId;
+            return pid is not (null or 0) && ProcessHelper.IsProcessRunning(pid.Value);
         }
     }
 
-    public WindowsSteamWrapper(WindowsSteamRegistry registry, IServiceProvider serviceProvider) : base(registry, serviceProvider)
+    private async Task WaitUntil(Func<bool> returnCondition, CancellationToken token)
     {
-        _windowsRegistry = registry;
-        _processHelper = serviceProvider.GetRequiredService<IProcessHelper>();
-    }
-
-    public override bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest? game)
-    {
-        ThrowIfSteamNotInstalled();
-        
-        game = null;
-        var apps = _windowsRegistry.InstalledApps;
-        if (apps is null || !apps.Contains(gameId))
-            return false;
-        
-        return base.IsGameInstalled(gameId, out game);
-    }
-
-    protected override async Task WaitSteamUserLoggedInAsync(CancellationToken token)
-    {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            throw new PlatformNotSupportedException();
         token.ThrowIfCancellationRequested();
-        if (IsUserLoggedIn)
+        if (returnCondition())
             return;
 
-        while (!IsUserLoggedIn)
+        var processKey = registry.ActiveProcessKey;
+        try
         {
-            token.ThrowIfCancellationRequested();
-            var processKey = _windowsRegistry.ActiveProcessKey;
-            if (processKey is null)
-                return;
-            if (processKey is not WindowsRegistryKey windowsRegistryKey)
-                throw new InvalidOperationException("Expected Windows registry Key");
 
-
-            await windowsRegistryKey.WindowsKey.WaitForChangeAsync(false, RegistryChangeNotificationFilters.Value, token);
+            while (!returnCondition())
+            {
+                token.ThrowIfCancellationRequested();
+                processKey ??= registry.ActiveProcessKey;
+                if (processKey is null)
+                    continue;
+                await processKey.WaitForChangeAsync(false, RegistryChangeNotificationFilters.Value, token);
+            }
+        }
+        finally
+        {
+            processKey?.Dispose();
         }
     }
 
-    protected override async Task WaitSteamRunningAsync(CancellationToken token)
+    protected internal override async Task WaitSteamUserLoggedInAsync(CancellationToken token)
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            throw new PlatformNotSupportedException();
-        token.ThrowIfCancellationRequested();
-        if (IsRunning)
-            return;
+        await WaitUntil(() => IsUserLoggedIn, token);
+    }
 
-        while (!IsRunning)
-        {
-            token.ThrowIfCancellationRequested();
-            var processKey = _windowsRegistry.ActiveProcessKey;
-            if (processKey is null)
-                return;
-            if (processKey is not WindowsRegistryKey windowsRegistryKey)
-                throw new InvalidOperationException("Expected Windows registry Key");
-            await windowsRegistryKey.WindowsKey.WaitForChangeAsync(false, RegistryChangeNotificationFilters.Value, token);
-        }
+    protected internal override async Task WaitSteamRunningAsync(CancellationToken token)
+    {
+        await WaitUntil(() => IsRunning, token);
     }
 
     protected override void ResetCurrentUser()
     {
-        _windowsRegistry.ActiveUserId = 0;
+        registry.ActiveUserId = 0;
     }
 
-    protected override int? GetCurrentUserId()
+    protected internal override uint GetCurrentUserId()
     {
-        return _windowsRegistry.ActiveUserId;
+        return registry.ActiveUserId ?? 0;
     }
 
-    protected override async Task WaitSteamOfflineRunning(CancellationToken token)
+    protected internal override async Task WaitSteamOfflineRunning(CancellationToken token)
     {
         var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token);
         var linkedToken = linkedCts.Token;
@@ -125,21 +91,24 @@ internal class WindowsSteamWrapper : SteamWrapper
             if (mainWindowHasChildren)
                 return;
             // Just some arbitrary waiting 
-            await Task.Delay(750, token);
+            await Task.Delay(750, token).ConfigureAwait(false);
         }
 
+        return;
 
         // If anybody knows a smarter way, let me know!
         static bool GetSteamMainWindowHandle()
         {
-            var p = Process.GetProcessesByName("steam").FirstOrDefault();
+            var processes = Process.GetProcessesByName("steamwebhelper");
+            var p = processes.FirstOrDefault(x => x.MainWindowHandle != IntPtr.Zero);
             try
             {
-                var handle = p?.MainWindowHandle;
-                if (handle is null)
+                if (p is null)
                     return false;
-                var c = new WindowHandleInfo(handle.Value).GetAllChildHandles();
-                var text = User32.GetWindowTitle(handle.Value);
+                
+                var handle = p.MainWindowHandle;
+                var c = new WindowHandleInfo(handle).GetAllChildHandles();
+                var text = User32.GetWindowTitle(handle);
 
                 // Empty string typically is the Installer/Updater dialog.
                 // We don't want to early-exit on this one!
@@ -151,7 +120,8 @@ internal class WindowsSteamWrapper : SteamWrapper
             }
             finally
             {
-                p?.Dispose();
+                foreach (var toDispose in processes) 
+                    toDispose?.Dispose();
             }
         }
     }

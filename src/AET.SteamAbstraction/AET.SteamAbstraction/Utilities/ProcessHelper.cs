@@ -1,24 +1,24 @@
 ﻿using System.Diagnostics;
-using System.Linq;
 
 namespace AET.SteamAbstraction.Utilities;
 
 internal class ProcessHelper : IProcessHelper
 {
-    public Process? GetProcessByPid(int pid)
+    public bool IsProcessRunning(int pid)
     {
         try
         {
-            return Process.GetProcessById(pid);
+            Process.GetProcessById(pid);
+            return true;
         }
         catch
         {
-            return null;
+            return false;
         }
     }
 
-    public Process? FindProcess(string name)
+    public Process? StartProcess(ProcessStartInfo startInfo)
     {
-        return Process.GetProcessesByName(name).FirstOrDefault();
+        return Process.Start(startInfo);
     }
 }

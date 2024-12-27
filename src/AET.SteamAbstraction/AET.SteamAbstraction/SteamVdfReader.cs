@@ -115,9 +115,9 @@ internal static class SteamVdfReader
     {
         if (configFile == null)
             throw new ArgumentNullException(nameof(configFile));
+       
         var loginData = ParseFile(configFile);
 
-        
         if (loginData.Key != "users")
             throw new VdfException("Invalid Data: Expected 'users' as root.");
 
@@ -131,6 +131,8 @@ internal static class SteamVdfReader
             if (user.Value is not VObject userProps)
                 throw new VdfException("Invalid Data: Expected user data to contain an object.");
 
+            if (!ulong.TryParse(user.Key, NumberStyles.None, null, out var userId))
+                continue;
             var wantsOffline = false;
             var mostRecent = false;
             foreach (var property in userProps.Children<VProperty>())
@@ -146,7 +148,7 @@ internal static class SteamVdfReader
                 }
             }
 
-            users.Add(new SteamUserLoginMetadata(mostRecent, wantsOffline));
+            users.Add(new SteamUserLoginMetadata(userId, mostRecent, wantsOffline));
         }
 
         return new LoginUsers(users);
@@ -156,12 +158,12 @@ internal static class SteamVdfReader
     {
         var value = ((VValue)property.Value).Value<string>();
         if (!int.TryParse(value, out var numValue))
-            throw new VdfException($"Expected number string for property {property.Key}");
+            throw new VdfException($"Expected number string for property {property.Key} but got '{value}'.");
         return numValue switch
         {
             0 => false,
             1 => true,
-            _ => throw new VdfException($"Expected number string for property {property.Key}")
+            _ => throw new VdfException($"Expected values [0, 1] but got {numValue}.")
         };
     }
 
@@ -172,7 +174,11 @@ internal static class SteamVdfReader
             using var textReader = file.OpenText();
             return VdfConvert.Deserialize(textReader);
         }
-        catch (VdfException e)
+        catch (VdfException)
+        {
+            throw;
+        }
+        catch (Exception e)
         {
             throw new VdfException($"Failed reading {file.FullName}: {e.Message}", e);
         }

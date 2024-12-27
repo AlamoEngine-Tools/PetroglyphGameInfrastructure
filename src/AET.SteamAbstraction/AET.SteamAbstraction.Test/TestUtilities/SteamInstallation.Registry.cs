@@ -12,17 +12,20 @@ internal static partial class SteamInstallation
         else if (registry is LinuxSteamRegistry linuxRegistry)
             InstallLinuxRegistry(linuxRegistry, fs);
     }
+    
 
-    private static void InstallLinuxRegistry(LinuxSteamRegistry registry, IFileSystem fs)
+    public static void SetPid(this ISteamRegistry registry, int? pid)
     {
-        // TODO
+        if (registry is WindowsSteamRegistry windowsRegistry)
+            SetPidWindowsRegistry(windowsRegistry, pid);
+        else if (registry is LinuxSteamRegistry linuxRegistry)
+            SetPidLinuxRegistry(linuxRegistry, pid);
     }
 
-    private static void InstallWindowsRegistry(WindowsSteamRegistry registry, IFileSystem fs)
+    public static void SetUserId(this ISteamRegistry registry, uint userId)
     {
-        using var key = registry.GetSteamRegistryKey();
-
-        key.SetValue("SteamExe", fs.Path.GetFullPath(SteamExePath));
-        key.SetValue("SteamPath", fs.Path.GetFullPath(SteamInstallPath));
+        if (registry is WindowsSteamRegistry windowsRegistry)
+            SetUserIdWindowsRegistry(windowsRegistry, userId);
+        // Does not exist for Linux
     }
 }

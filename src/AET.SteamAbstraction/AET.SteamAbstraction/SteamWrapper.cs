@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Registry;
+using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,9 +21,17 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
     protected readonly IServiceProvider ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     protected readonly IFileSystem FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
     protected readonly ISteamLibraryFinder LibraryFinder = serviceProvider.GetRequiredService<ISteamLibraryFinder>();
+    protected readonly IProcessHelper ProcessHelper = serviceProvider.GetRequiredService<IProcessHelper>();
 
     // We are checking both, Exe path and install dir, because they might be on different locations
-    public bool Installed => Registry.ExecutableFile?.Exists == true && Registry.InstallationDirectory?.Exists == true;
+    public bool Installed
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return Registry.ExecutableFile?.Exists == true && Registry.InstallationDirectory?.Exists == true;
+        }
+    }
 
     public abstract bool IsRunning { get; }
 
@@ -30,11 +39,12 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
     {
         get
         {
+            ThrowIfDisposed();
             var steamDirectory = Registry.InstallationDirectory;
             if (steamDirectory is null || !steamDirectory.Exists)
                 return null;
 
-            var configFile = FileSystem.Path.Combine(steamDirectory.FullName, "config/loginusers.vdf");
+            var configFile = FileSystem.Path.Combine(steamDirectory.FullName, "config", "loginusers.vdf");
             if (!FileSystem.File.Exists(configFile))
                 return null;
 
@@ -43,27 +53,36 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
                 var config = SteamVdfReader.ReadLoginUsers(FileSystem.FileInfo.New(configFile));
                 return config.Users.Any(user => user.MostRecent && user.UserWantsOffline);
             }
-            catch
+            catch (SteamException)
             {
                 return null;
             }
         }
     }
 
-    public IEnumerable<ISteamLibrary> Libraries => LibraryFinder.FindLibraries();
+    public IEnumerable<ISteamLibrary> Libraries
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return LibraryFinder.FindLibraries();
+        }
+    }
 
     public bool IsUserLoggedIn
     {
         get
         {
+            ThrowIfDisposed();
             if (!IsRunning)
                 return false;
-            return GetCurrentUserId() is not (null or 0);
+            return GetCurrentUserId() is not 0;
         }
     }
 
-    public virtual bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest? game)
+    public bool IsGameInstalled(uint gameId, [NotNullWhen(true)] out SteamAppManifest? game)
     {
+        ThrowIfDisposed();
         ThrowIfSteamNotInstalled();
         game = Libraries.SelectMany(library => library.GetApps()).FirstOrDefault(manifest => manifest.Id == gameId);
         return game is not null;
@@ -71,35 +90,34 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
 
     public void StartSteam()
     {
+        ThrowIfDisposed();
         ThrowIfSteamNotInstalled();
         if (IsRunning)
             return;
-        var process = new Process
+        ProcessHelper.StartProcess(new ProcessStartInfo
         {
-            StartInfo =
-            {
-                FileName = Registry.ExecutableFile!.FullName,
-                UseShellExecute = false
-            }
-        };
-        process.Start();
+            FileName = Registry.ExecutableFile!.FullName,
+            UseShellExecute = false
+        });
     }
 
     public async Task WaitSteamRunningAndLoggedInAsync(bool startIfNotRunning,
         CancellationToken cancellation = default)
     {
+        ThrowIfDisposed();
         ThrowIfSteamNotInstalled();
         if (!IsRunning)
         {
+            // This is required, because if Steam was closed or killed,
+            // there might be no chance to tell when exactly a user is logged in. 
+            // In other words, if we don't reset the value, it might be possible,
+            // that this method returns, when in fact the login has not yet completed.
             ResetCurrentUser();
             if (startIfNotRunning)
             {
                 StartSteam();
                 await WaitSteamRunningAsync(cancellation).ConfigureAwait(false);
             }
-
-            if (!IsRunning)
-                throw new SteamException("Steam is not running anymore.");
         }
 
         if (IsUserLoggedIn)
@@ -113,20 +131,18 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         else
         {
             await WaitSteamUserLoggedInAsync(cancellation).ConfigureAwait(false);
-            if (GetCurrentUserId() == 0)
-                throw new SteamException("Login was not completed.");
         }
     }
 
     protected abstract void ResetCurrentUser();
 
-    protected abstract int? GetCurrentUserId();
+    protected internal abstract uint GetCurrentUserId();
 
-    protected abstract Task WaitSteamOfflineRunning(CancellationToken token);
+    protected internal abstract Task WaitSteamOfflineRunning(CancellationToken token);
 
-    protected abstract Task WaitSteamUserLoggedInAsync(CancellationToken token);
+    protected internal abstract Task WaitSteamUserLoggedInAsync(CancellationToken token);
 
-    protected abstract Task WaitSteamRunningAsync(CancellationToken token);
+    protected internal abstract Task WaitSteamRunningAsync(CancellationToken token);
 
     protected void ThrowIfSteamNotInstalled()
     {

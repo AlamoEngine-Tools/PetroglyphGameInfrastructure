@@ -21,7 +21,7 @@ internal sealed class SteamLibraryFinder(IServiceProvider serviceProvider) : ISt
         _logger?.LogTrace("Searching for Steam libraries on system");
         var libraryLocationsFile = GetLibraryLocationsFile();
 
-        if (!libraryLocationsFile.Exists)
+        if (libraryLocationsFile is null || !libraryLocationsFile.Exists)
         {
             _logger?.LogWarning("Config file with Steam libraries not found. No Steam libraries are created.");
             return Array.Empty<ISteamLibrary>();
@@ -69,15 +69,14 @@ internal sealed class SteamLibraryFinder(IServiceProvider serviceProvider) : ISt
         return true;
     }
 
-    private IFileInfo GetLibraryLocationsFile()
+    private IFileInfo? GetLibraryLocationsFile()
     {
         using var registry = _registryFactory.CreateRegistry();
         var steamInstallLocation = registry.InstallationDirectory;
         if (steamInstallLocation is null)
         {
-            var e = new SteamException("Unable to find an installation of Steam.");
-            _logger?.LogError(e, "Unable to find Steam installation from registry");
-            throw e;
+            _logger?.LogWarning("Unable to find Steam installation from registry");
+            return null;
         }
 
         return _fileSystem.FileInfo.New(_fileSystem.Path.Combine(steamInstallLocation.FullName, "config", "libraryfolders.vdf"));

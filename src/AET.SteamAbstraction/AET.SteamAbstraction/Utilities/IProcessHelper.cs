@@ -4,7 +4,7 @@ namespace AET.SteamAbstraction.Utilities;
 
 internal interface IProcessHelper
 {
-    Process? GetProcessByPid(int pid);
+    bool IsProcessRunning(int pid);
 
-    Process? FindProcess(string name);
+    Process? StartProcess(ProcessStartInfo startInfo);
 }

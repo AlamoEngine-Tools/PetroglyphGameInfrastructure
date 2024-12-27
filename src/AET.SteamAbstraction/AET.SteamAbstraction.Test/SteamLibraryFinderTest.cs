@@ -32,9 +32,9 @@ public class SteamLibraryFinderTest
     }
 
     [Fact]
-    public void FindLibraries_SteamNotFound_Throws()
+    public void FindLibraries_SteamNotFound_ReturnsEmpty()
     {
-        Assert.Throws<SteamException>(_libraryFinder.FindLibraries);
+        Assert.Empty(_libraryFinder.FindLibraries());
     }
 
     // TODO: Target all platforms
