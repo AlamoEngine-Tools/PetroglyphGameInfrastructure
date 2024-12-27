@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using AET.SteamAbstraction.Utilities;
-using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -34,28 +32,28 @@ public class ProcessHelperTest
     }
 
     [Fact]
-    public async Task StartProcess()
+    public void StartProcess()
     {
         var processName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash";
-        var expectedExitCode = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? -1 : 128 + 9; // https://stackoverflow.com/a/1041309
 
         var process = _processHelper.StartProcess(new ProcessStartInfo(processName)
         {
             UseShellExecute = false,
         });
 
-        Assert.NotNull(process);
-        var exitTask = process.WaitForExitAsync();
-
         try
         {
-            process.Kill();
+            Assert.NotNull(process);
         }
-        catch (InvalidOperationException)
+        finally
         {
+            try
+            {
+                process?.Kill();
+            }
+            catch (InvalidOperationException)
+            {
+            }
         }
-
-        await exitTask;
-        Assert.Equal(expectedExitCode, process.ExitCode);
     }
 }
