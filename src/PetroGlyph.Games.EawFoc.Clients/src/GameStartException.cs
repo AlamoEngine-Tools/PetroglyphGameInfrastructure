@@ -1,4 +1,5 @@
 ﻿using System;
+using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Clients;
 
@@ -8,38 +9,38 @@ namespace PG.StarWarsGame.Infrastructure.Clients;
 public sealed class GameStartException : ClientException
 {
     /// <summary>
-    /// The instance that was requested to start.
+    /// Gets the game which could not be started.
     /// </summary>
-    public IPlayableObject Instance { get; }
+    public IGame Game { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="GameStartException"/> class with a specified error message
+    /// Initializes a new game of the <see cref="GameStartException"/> class with a specified error message
     /// and a reference to the inner exception that is the cause of this exception.
     /// </summary>
-    /// <param name="instance">The instance that was requested to start.</param>
+    /// <param name="game">The game which could not be started.</param>
     /// <param name="message">The error message that explains the reason for the exception.</param>
     /// <param name="inner">The exception that is the cause of the current exception.</param>
-    public GameStartException(IPlayableObject instance, string message, Exception inner) : base(message, inner)
+    public GameStartException(IGame game, string message, Exception inner) : base(message, inner)
     {
-        Instance = instance;
+        Game = game;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="GameStartException"/> class with a specified error message.
+    /// Initializes a new game of the <see cref="GameStartException"/> class with a specified error message.
     /// </summary>
-    /// <param name="instance">The instance that was requested to start.</param>
+    /// <param name="game">The game which could not be started.</param>
     /// <param name="message">The error message that explains the reason for the exception.</param>
-    public GameStartException(IPlayableObject instance, string message) : base(message)
+    public GameStartException(IGame game, string message) : base(message)
     {
-        Instance = instance;
+        Game = game;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="GameStartException"/> class.
+    /// Initializes a new game of the <see cref="GameStartException"/> class.
     /// </summary>
-    /// <param name="instance">The instance that was requested to start.</param>
-    public GameStartException(IPlayableObject instance)
+    /// <param name="game">The game which could not be started.</param>
+    public GameStartException(IGame game)
     {
-        Instance = instance;
+        Game = game;
     }
 }

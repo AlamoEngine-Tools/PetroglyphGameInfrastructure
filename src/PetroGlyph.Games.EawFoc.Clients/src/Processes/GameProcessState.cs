@@ -1,7 +1,7 @@
 ﻿namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 /// <summary>
-/// The sate of a game process.
+/// The state of a game process.
 /// </summary>
 public enum GameProcessState
 {

@@ -8,7 +8,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients;
 public class ClientException : Exception
 {
     /// <summary>
-    /// The instance that was requested to start.
+    /// Initializes a new instance of the <see cref="ClientException"/> class.
     /// </summary>
     public ClientException()
     {

@@ -10,7 +10,7 @@ internal class DefaultGameProcessLauncher(IServiceProvider serviceProvider) : IG
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
-    public IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo)
+    public virtual IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo)
     {
         try
         {
@@ -19,7 +19,7 @@ internal class DefaultGameProcessLauncher(IServiceProvider serviceProvider) : IG
             var processStartInfo = new ProcessStartInfo(executable.FullName)
             {
                 Arguments = arguments,
-                WorkingDirectory = processInfo.PlayedInstance.Game.Directory.FullName,
+                WorkingDirectory = processInfo.Game.Directory.FullName,
                 UseShellExecute = false
             };
             var process = new Process
@@ -31,11 +31,11 @@ internal class DefaultGameProcessLauncher(IServiceProvider serviceProvider) : IG
         }
         catch (GameArgumentException e)
         {
-            throw new GameStartException(processInfo.PlayedInstance, "Illegal argument(s) passed.", e);
+            throw new GameStartException(processInfo.Game, "Illegal argument(s) passed.", e);
         }
         catch (Exception e)
         {
-            throw new GameStartException(processInfo.PlayedInstance, "Unable to start the game", e);
+            throw new GameStartException(processInfo.Game, "Unable to start the game", e);
         }
     }
 }

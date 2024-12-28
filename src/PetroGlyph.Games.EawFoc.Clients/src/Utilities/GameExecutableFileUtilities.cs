@@ -1,15 +1,36 @@
 ﻿using System;
+using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
 using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PG.StarWarsGame.Infrastructure.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients.Utilities;
 
-internal sealed class GameExecutableNameBuilder : IGameExecutableNameBuilder
+internal class GameExecutableFileUtilities
 {
     private const string SteamFileNameBase = "StarWars";
     private const string SteamReleaseSuffix = "G";
     private const string SteamDebugSuffix = "I";
 
-    public string GetExecutableFileName(IGame game, GameBuildType buildType)
+    public static IFileInfo? GetExecutableForGame(IGame game, GameBuildType buildType)
+    {
+        var exeFileName = GetExecutableFileName(game, buildType);
+        if (string.IsNullOrEmpty(exeFileName))
+            return null;
+
+#if NETSTANDARD2_1_OR_GREATER || NET
+        return game.Directory
+            .EnumerateFiles(exeFileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })
+            .FirstOrDefault();
+#else
+        return game.Directory
+            .EnumerateFiles(exeFileName, SearchOption.TopDirectoryOnly)
+            .FirstOrDefault();
+#endif
+
+    }
+
+    public static string GetExecutableFileName(IGame game, GameBuildType buildType)
     {
         if (game.Platform == GamePlatform.SteamGold)
             return GetSteamFileName(buildType);

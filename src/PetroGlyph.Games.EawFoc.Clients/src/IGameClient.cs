@@ -8,73 +8,77 @@ using PG.StarWarsGame.Infrastructure.Mods;
 namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
-/// A <see cref="IGameClient"/> is responsible for starting a Petroglyph Star Wars game,
+/// A game client is responsible for starting a Petroglyph Star Wars game,
 /// as well as keeping track which game instances, started by this client, are currently running.
 /// </summary>
 public interface IGameClient
 {
     /// <summary>
-    /// Event gets raised when a game process was started.
+    /// Raised when a game process was started.
     /// </summary>
     event EventHandler<IGameProcess> GameStarted;
 
     /// <summary>
-    /// Event gets raised when a game was requested to start. The starting operation is cancellable.
+    /// Raised when a game was requested to start. The starting operation is cancellable.
     /// </summary>
     event EventHandler<GameStartingEventArgs> GameStarting;
 
     /// <summary>
-    /// Event gets raised when a game, started by this client instance, was terminated.
+    /// Gets the game instance that is associated to the client.
     /// </summary>
-    event EventHandler<IGameProcess> GameClosed;
+    public IGame Game { get; }
 
     /// <summary>
-    /// Set of arguments which shall be passed when no custom arguments are specified.
+    /// Gets a value indicating whether the client supports debugging the game.
     /// </summary>
-    IArgumentCollection DefaultArguments { get; }
+    public bool SupportsDebug { get; }
 
     /// <summary>
-    /// Collection which holds the currently running game instances.
+    /// Checks whether the debug executables of the game are present.
     /// </summary>
-    IReadOnlyCollection<IGameProcess> RunningInstances { get; }
+    /// <returns><see langword="true"/> if the debug executable are available; otherwise, <see langword="false"/>.</returns>
+    bool IsDebugAvailable();
 
     /// <summary>
-    /// Set of <see cref="GamePlatform"/> supported by this client.
+    /// Starts a new game process with no game arguments.
     /// </summary>
-    ISet<GamePlatform> SupportedPlatforms { get; }
-
-    /// <summary>
-    /// Plays the given <paramref name="instance"/> with <see cref="DefaultArguments"/>.
-    /// <para>
-    /// If <paramref name="instance"/> in an <see cref="IMod"/> the arguments passed
-    /// will be <see cref="DefaultArguments"/> merged with the dependency chain of the given mod.
-    /// </para>
-    /// </summary>
-    /// <param name="instance">The game or mod to start.</param>
     /// <returns>The process of the started game.</returns>
     /// <exception cref="GameStartException">
-    /// The game's platform is not supported by this client.
-    /// OR
     /// Starting the game was cancelled by one <see cref="GameStarting"/> handler.
     /// OR
-    /// The executable file of the game was not found.
+    /// The game is not installed.
     /// OR
     /// An internal error occurred.
     /// </exception>
-    IGameProcess Play(IPlayableObject instance);
+    IGameProcess Play();
 
     /// <summary>
-    /// Plays the given <paramref name="instance"/> with given <paramref name="arguments"/>.
-    /// <para>
-    /// If <paramref name="instance"/> in an <see cref="IMod"/> the arguments passed,
-    /// are required to have all required mod related arguments set..
-    /// </para>
+    /// Starts a new game process with the specified Mod and no other game arguments.
     /// </summary>
-    /// <param name="instance">The game or mod to start.</param>
+    /// <remarks>
+    /// The method does use the mod's dependency information. Use <see cref="Play(IArgumentCollection)"/> for more complex cases.
+    /// </remarks>
+    /// <returns>The process of the started game.</returns>
+    /// <exception cref="GameStartException">
+    /// <paramref name="mod"/> has a different game instance than the game instance associated to the client.
+    /// OR
+    /// <paramref name="mod"/> has an invalid path (such as containing space ' ' characters).
+    /// OR
+    /// Starting the game was cancelled by one <see cref="GameStarting"/> handler.
+    /// OR
+    /// The game is not installed.
+    /// OR
+    /// An internal error occurred.
+    /// </exception>
+    IGameProcess Play(IMod mod);
+
+    /// <summary>
+    /// Starts a new game process with the specified game arguments.
+    /// </summary>
     /// <param name="arguments">The arguments for starting the game.</param>
     /// <returns>The process of the started game.</returns>
     /// <exception cref="GameStartException">
-    /// The game's platform is not supported by this client.
+    /// One or more argument of <paramref name="arguments"/> is invalid.
     /// OR
     /// Starting the game was cancelled by one <see cref="GameStarting"/> handler.
     /// OR
@@ -82,5 +86,23 @@ public interface IGameClient
     /// OR
     /// An internal error occurred.
     /// </exception>
-    IGameProcess Play(IPlayableObject instance, IArgumentCollection arguments);
+    IGameProcess Play(IArgumentCollection arguments);
+
+    /// <summary>
+    /// Starts a new game process using the debug executable with the specified game arguments.
+    /// </summary>
+    /// <param name="arguments">The arguments for starting the game.</param>
+    /// <param name="fallbackToPlay">When set to <see langword="true"/> the game will start in release mode, if the debug build was not found.</param>
+    /// <returns>The process of the started game.</returns>
+    /// <exception cref="GameStartException">
+    /// One or more argument of <paramref name="arguments"/> is invalid.
+    /// OR
+    /// Starting the game was cancelled by one <see cref="IGameClient.GameStarting"/> handler.
+    /// OR
+    /// The executable file of the game was not found.
+    /// OR
+    /// An internal error occurred.
+    /// </exception>
+    /// <exception cref="NotSupportedException">The client does not support debugging the game.</exception>
+    IGameProcess Debug(IArgumentCollection arguments, bool fallbackToPlay);
 }

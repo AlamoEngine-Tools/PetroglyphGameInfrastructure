@@ -4,16 +4,15 @@ using PG.StarWarsGame.Infrastructure.Games;
 namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
-/// Factory that allows the creation of different <see cref="IGameClient"/>s
-/// based on the actual <see cref="GamePlatform"/> of a game.
+/// Factory that creates client instances for <see cref="IGame"/>.
 /// </summary>
 public interface IGameClientFactory
 {
     /// <summary>
-    /// Gets an instance of an <see cref="IGameClient"/> for the given <paramref name="gamePlatform"/>.
+    /// Creates a new client for the specified <paramref name="game"/>.
     /// </summary>
-    /// <param name="gamePlatform">The requested <see cref="GamePlatform"/>.</param>
-    /// <param name="serviceProvider">The service provider used to create new <see cref="IGameClient"/> instances.</param>
-    /// <returns></returns>
-    IGameClient CreateClient(GamePlatform gamePlatform, IServiceProvider serviceProvider);
+    /// <param name="game">The game to create a client for.</param>
+    /// <returns>The <see cref="IGameClient"/> for <paramref name="game"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="game"/> is <see langword="null"/>.</exception>
+    IGameClient CreateClient(IGame game);
 }

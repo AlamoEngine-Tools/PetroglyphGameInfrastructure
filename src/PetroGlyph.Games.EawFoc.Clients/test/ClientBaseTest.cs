@@ -31,7 +31,7 @@ public class ClientBaseTest
         sc.AddSingleton(_ => _exeService.Object);
         sc.AddSingleton(_ => _launcher.Object);
         _client = new Mock<ClientBase>(sc.BuildServiceProvider());
-        _client.Setup(c => c.GetGameLauncherService()).Returns(_launcher.Object);
+        _client.Setup(c => c.CreateGameLauncher()).Returns(_launcher.Object);
         _game = new Mock<IGame>();
     }
 

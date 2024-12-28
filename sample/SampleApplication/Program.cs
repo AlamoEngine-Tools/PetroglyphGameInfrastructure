@@ -36,7 +36,7 @@ foreach (var mod in mods)
 var raw = game.FindMod(new ModReference("1129810972", ModType.Workshops));
 
 
-var client = services.GetRequiredService<IGameClientFactory>().CreateClient(game.Platform, services);
+var client = services.GetRequiredService<IGameClientFactory>().CreateClient(game);
 
 Console.WriteLine($"Playing {raw}");
 
@@ -46,7 +46,7 @@ var modArgumentBuilder = services.GetRequiredService<IModArgumentListFactory>();
 var modArguments  = modArgumentBuilder.BuildArgumentList(raw, true);
 
 
-client.Play(game, new ArgumentCollection(new List<IGameArgument>
+client.Play(new ArgumentCollection(new List<IGameArgument>
 {
     modArguments,
     new WindowedArgument()

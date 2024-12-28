@@ -1,38 +1,32 @@
 ﻿using System;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 /// <summary>
-/// Metadata for an <see cref="IGameProcess"/>.
-/// Also holds  the set of values that are used when the game is started.
+/// Specifies a set of values that are used when starting a game process.
 /// </summary>
-public class GameProcessInfo
+public sealed class GameProcessInfo
 {
     /// <summary>
-    /// The requested <see cref="GameBuildType"/>.
+    /// Gets the requested build type of the game.
     /// </summary>
     public GameBuildType BuildType { get; }
 
     /// <summary>
-    /// The played instance.
+    /// Gets the game.
     /// </summary>
-    public IPlayableObject PlayedInstance { get; }
+    public IGame Game { get; }
 
     /// <summary>
-    /// The arguments of the game process.
+    /// Gets the set of command-line arguments to use when starting the game.
     /// </summary>
     public IArgumentCollection Arguments { get; }
 
-    /// <summary>
-    /// Initializes a new instance.
-    /// </summary>
-    /// <param name="playedInstance">The played instance.</param>
-    /// <param name="buildType">The requested <see cref="GameBuildType"/>.</param>
-    /// <param name="arguments">The arguments of the game process.</param>
-    public GameProcessInfo(IPlayableObject playedInstance, GameBuildType buildType, IArgumentCollection arguments)
+    internal GameProcessInfo(IGame game, GameBuildType buildType, IArgumentCollection arguments)
     {
-        PlayedInstance = playedInstance ?? throw new ArgumentNullException(nameof(playedInstance));
+        Game = game ?? throw new ArgumentNullException(nameof(game));
         BuildType = buildType;
         Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
     }

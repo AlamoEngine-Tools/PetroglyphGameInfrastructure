@@ -18,9 +18,7 @@ public class PetroglyphGameClients
     /// <param name="serviceCollection">The service collection to be filled.</param>
     public static void InitializeServices(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IGameProcessLauncher>(sp => new DefaultGameProcessLauncher(sp));
-        serviceCollection.AddSingleton<IGameExecutableFileService>(sp => new GameExecutableFileService(sp));
-        serviceCollection.AddSingleton<IGameExecutableNameBuilder>(_ => new GameExecutableNameBuilder());
+        serviceCollection.AddSingleton<IGameProcessLauncherFactory>(sp => new GameProcessLauncherFactory(sp));
 
         serviceCollection.AddSingleton<IGameClientFactory>(sp => new GameClientFactory(sp));
         serviceCollection.AddSingleton<IModArgumentListFactory>(sp => new ModArgumentListFactory(sp));

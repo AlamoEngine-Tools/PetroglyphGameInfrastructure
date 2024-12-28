@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Clients;
 
@@ -11,7 +12,7 @@ public sealed class GameStartingEventArgs : CancelEventArgs
     /// <summary>
     /// The instance requested to start.
     /// </summary>
-    public IPlayableObject PlayableObject { get; }
+    public IGame Game { get; }
 
     /// <summary>
     /// The requested game arguments 
@@ -29,9 +30,9 @@ public sealed class GameStartingEventArgs : CancelEventArgs
     /// <param name="game">The instance requested to start.</param>
     /// <param name="arguments">The requested game arguments </param>
     /// <param name="buildType">The requested <see cref="GameBuildType"/> of the game.</param>
-    public GameStartingEventArgs(IPlayableObject game, IArgumentCollection arguments, GameBuildType buildType)
+    public GameStartingEventArgs(IGame game, IArgumentCollection arguments, GameBuildType buildType)
     {
-        PlayableObject = game;
+        Game = game;
         GameArguments = arguments;
         BuildType = buildType;
     }

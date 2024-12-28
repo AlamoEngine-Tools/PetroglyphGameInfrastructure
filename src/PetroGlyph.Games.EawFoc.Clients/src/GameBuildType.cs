@@ -1,7 +1,7 @@
 ﻿namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
-/// The game's build type identifier.
+/// The game's build identifier.
 /// </summary>
 public enum GameBuildType
 {
