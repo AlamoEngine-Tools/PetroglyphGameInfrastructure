@@ -6,7 +6,6 @@ using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Utilities;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Testably.Abstractions.Testing;
 
 namespace AET.SteamAbstraction.Test.Linux;
