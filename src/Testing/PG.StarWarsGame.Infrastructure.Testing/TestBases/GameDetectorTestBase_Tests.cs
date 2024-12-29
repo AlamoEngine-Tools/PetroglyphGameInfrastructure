@@ -1,8 +1,7 @@
 ﻿using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
+namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
 public partial class GameDetectorTestBase<T>
 {
@@ -11,7 +10,9 @@ public partial class GameDetectorTestBase<T>
         TestDetectorCore(
             identity,
             null,
-            info => GameDetectionResult.FromInstalled(identity, info.GameDirectory!),
+            info => SupportedPlatforms.Contains(identity.Platform)
+                ? GameDetectionResult.FromInstalled(identity, info.GameDirectory!)
+                : GameDetectionResult.NotInstalled(identity.Type),
             queryPlatforms);
     }
 
@@ -95,11 +96,15 @@ public partial class GameDetectorTestBase<T>
         if (!SupportInitialization)
             return;
 
-        var expected = GameDetectionResult.RequiresInitialization(identity.Type);
+        if (!CanDisableInitRequest)
+            return;
+
         TestDetectorCore(
             identity,
             SetupForRequiredInitialization,
-            _ => expected,
+            _ => SupportedPlatforms.Contains(identity.Platform)
+                ? GameDetectionResult.RequiresInitialization(identity.Type)
+                : GameDetectionResult.NotInstalled(identity.Type),
             queryPlatforms: []);
     }
 
@@ -110,12 +115,13 @@ public partial class GameDetectorTestBase<T>
         if (!SupportInitialization)
             return;
 
-        var expected = GameDetectionResult.RequiresInitialization(identity.Type);
         TestDetectorCore(
             identity,
             true,
             SetupForRequiredInitialization,
-            _ => expected,
+            _ => SupportedPlatforms.Contains(identity.Platform)
+                ? GameDetectionResult.RequiresInitialization(identity.Type)
+                : GameDetectionResult.NotInstalled(identity.Type),
             _ => false,
             queryPlatforms: []);
     }
@@ -137,7 +143,9 @@ public partial class GameDetectorTestBase<T>
                 gameInfo = result;
                 return result;
             },
-            i => GameDetectionResult.FromInstalled(identity, i.GameDirectory!),
+            i => SupportedPlatforms.Contains(identity.Platform)
+                ? GameDetectionResult.FromInstalled(identity, i.GameDirectory!)
+                : GameDetectionResult.NotInstalled(identity.Type),
             _ =>
             {
                 HandleInitialization(true, gameInfo);
@@ -153,8 +161,6 @@ public partial class GameDetectorTestBase<T>
         if (!SupportInitialization)
             return;
 
-        var expected = GameDetectionResult.RequiresInitialization(identity.Type);
-
         GameDetectorTestInfo<T> gameInfo = null!;
         TestDetectorCore(
             identity,
@@ -165,7 +171,9 @@ public partial class GameDetectorTestBase<T>
                 gameInfo = result;
                 return result;
             },
-            _ => expected,
+            _ => SupportedPlatforms.Contains(identity.Platform)
+                ? GameDetectionResult.RequiresInitialization(identity.Type)
+                : GameDetectionResult.NotInstalled(identity.Type),
             _ =>
             {
                 HandleInitialization(false, gameInfo);

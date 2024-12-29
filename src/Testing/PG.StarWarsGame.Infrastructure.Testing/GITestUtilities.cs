@@ -12,10 +12,10 @@ public static class GITestUtilities
 
     public static void AssertEqual(this GameDetectionResult expected, GameDetectionResult actual)
     {
+        Assert.Equal(expected.Installed, actual.Installed);
         Assert.Equal(expected.GameIdentity, actual.GameIdentity);
         Assert.Equal(expected.GameLocation?.FullName, actual.GameLocation?.FullName);
         Assert.Equal(expected.InitializationRequired, actual.InitializationRequired);
-        Assert.Equal(expected.Installed, actual.Installed);
     }
 
     public static bool GetRandomWorkshopFlag(IGame game)

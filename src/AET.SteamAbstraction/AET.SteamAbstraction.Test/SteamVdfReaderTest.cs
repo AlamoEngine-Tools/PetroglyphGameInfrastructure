@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Test.TestUtilities;
+using AET.SteamAbstraction.Testing.Installation;
 using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions.Testing;
 using Xunit;
@@ -150,7 +150,7 @@ public class SteamVdfReaderTest
         var expectedManifest = lib.InstallGame(
             1230,
             "MyGame",
-            3,
+            [1231, 1232, 1233],
             SteamAppState.StateFullyInstalled | SteamAppState.StateUpdatePaused);
 
         var app = SteamVdfReader.ReadManifest(expectedManifest.ManifestFile, lib);

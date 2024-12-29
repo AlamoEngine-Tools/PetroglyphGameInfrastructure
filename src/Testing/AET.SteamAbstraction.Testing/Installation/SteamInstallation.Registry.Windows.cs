@@ -1,6 +1,6 @@
 ﻿using System.IO.Abstractions;
 
-namespace AET.SteamAbstraction.Test.TestUtilities;
+namespace AET.SteamAbstraction.Testing.Installation;
 
 internal static partial class SteamInstallation
 {

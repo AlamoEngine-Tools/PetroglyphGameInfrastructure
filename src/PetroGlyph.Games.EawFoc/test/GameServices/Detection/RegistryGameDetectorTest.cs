@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Games.Registry;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
@@ -21,6 +24,8 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
 
     protected override bool SupportInitialization => true;
+    protected override bool CanDisableInitRequest => true;
+    protected override ICollection<GamePlatform> SupportedPlatforms => GITestUtilities.RealPlatforms;
 
     protected override void SetupServiceProvider(IServiceCollection sc)
     {
@@ -45,18 +50,20 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
     protected override GameDetectorTestInfo<GameRegistryContainer> SetupGame(GameIdentity gameIdentity)
     {
         var game = InstallGame(gameIdentity);
-        return SetupRegistry(game, TestGameRegistrySetupData.Installed(game.Type, game.Directory));
+        var registryContainer = SetupRegistry(game.Type, TestGameRegistrySetupData.Installed(game.Type, game.Directory));
+        return new GameDetectorTestInfo<GameRegistryContainer>(game.Type, game.Directory, registryContainer);
     }
 
-    protected override GameDetectorTestInfo<GameRegistryContainer> SetupForRequiredInitialization(GameIdentity identity)
+    protected override GameDetectorTestInfo<GameRegistryContainer> SetupForRequiredInitialization(GameIdentity gameIdentity)
     {
-        var game = InstallGame(identity);
-        return SetupRegistry(game, TestGameRegistrySetupData.Uninitialized(identity.Type));
+        var game = InstallGame(gameIdentity);
+        var registryContainer = SetupRegistry(game.Type, TestGameRegistrySetupData.Uninitialized(gameIdentity.Type));
+        return new GameDetectorTestInfo<GameRegistryContainer>(game.Type, game.Directory, registryContainer);
     }
 
-    private GameDetectorTestInfo<GameRegistryContainer> SetupRegistry(IGame game, TestGameRegistrySetupData registrySetup)
+    private GameRegistryContainer SetupRegistry(GameType gameType, TestGameRegistrySetupData registrySetup)
     {
-        var otherGameType = game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw;
+        var otherGameType = gameType == GameType.Eaw ? GameType.Foc : GameType.Eaw;
 
         var gameRegistry = registrySetup.Create(ServiceProvider);
         var defaultRegistry = otherGameType.CreateNonExistingRegistry(ServiceProvider);
@@ -64,7 +71,7 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
         IGameRegistry eawRegistry;
         IGameRegistry focRegistry;
 
-        if (game.Type == GameType.Eaw)
+        if (gameType == GameType.Eaw)
         {
             eawRegistry = gameRegistry;
             focRegistry = defaultRegistry;
@@ -75,7 +82,7 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
             focRegistry = gameRegistry;
         }
 
-        return new(game.Type, game.Directory, new GameRegistryContainer(eawRegistry, focRegistry));
+        return new GameRegistryContainer(eawRegistry, focRegistry);
     }
 
     protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<GameRegistryContainer> info)

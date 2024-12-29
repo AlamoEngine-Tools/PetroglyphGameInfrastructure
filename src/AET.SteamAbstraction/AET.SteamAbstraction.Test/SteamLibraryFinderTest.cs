@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Registry;
-using AET.SteamAbstraction.Test.TestUtilities;
+using AET.SteamAbstraction.Testing.Installation;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using PG.TestingUtilities;

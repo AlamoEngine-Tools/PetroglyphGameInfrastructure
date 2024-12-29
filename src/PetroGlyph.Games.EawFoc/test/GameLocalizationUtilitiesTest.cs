@@ -4,7 +4,7 @@ using EawModinfo.Model;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Language;
-using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;

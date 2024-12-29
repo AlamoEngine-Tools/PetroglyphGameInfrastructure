@@ -3,10 +3,11 @@ using System.IO.Abstractions;
 using System.Text;
 using AET.SteamAbstraction.Registry;
 
-namespace AET.SteamAbstraction.Test.TestUtilities;
+namespace AET.SteamAbstraction.Testing.Installation;
 
 internal static partial class SteamInstallation
 {
+    // Ensure starts on path 'steam'. See GameInstallation.cs
     private const string SteamInstallPath = "steam";
     private const string SteamExePath = "steam/steam.exe";
 

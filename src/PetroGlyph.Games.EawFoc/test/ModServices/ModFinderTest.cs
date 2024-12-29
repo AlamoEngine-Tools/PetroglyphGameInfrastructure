@@ -15,6 +15,7 @@ using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using PG.TestingUtilities;
 using Semver;
 using Xunit;

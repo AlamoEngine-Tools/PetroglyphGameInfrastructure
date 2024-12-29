@@ -2,8 +2,8 @@
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
-using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using PG.TestingUtilities;
 using Xunit;
 

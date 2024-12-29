@@ -1,21 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.StarWarsGame.Infrastructure.Testing;
-using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
+namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
 public abstract partial class GameDetectorTestBase<T> : CommonTestBase
 {
     protected abstract bool SupportInitialization { get; }
 
+    protected abstract ICollection<GamePlatform> SupportedPlatforms { get; }
+
+    protected abstract bool CanDisableInitRequest { get; }
+
     protected abstract IGameDetector CreateDetector(GameDetectorTestInfo<T> gameInfo, bool shallHandleInitialization);
 
     protected abstract GameDetectorTestInfo<T> SetupGame(GameIdentity gameIdentity);
 
-    protected abstract GameDetectorTestInfo<T> SetupForRequiredInitialization(GameIdentity identity);
+    protected abstract GameDetectorTestInfo<T> SetupForRequiredInitialization(GameIdentity gameIdentity);
 
     protected abstract void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<T> info);
 
@@ -47,7 +50,7 @@ public abstract partial class GameDetectorTestBase<T> : CommonTestBase
 
         var detector = CreateDetector(gameInfo, shallHandleInitialization);
 
-        var shouldTriggerInitEvent = SupportInitialization && shallHandleInitialization;
+        var shouldTriggerInitEvent = SupportInitialization && SupportedPlatforms.Contains(identity.Platform) && shallHandleInitialization;
         var eventTriggered = false;
 
         detector.InitializationRequested += (s, e) =>

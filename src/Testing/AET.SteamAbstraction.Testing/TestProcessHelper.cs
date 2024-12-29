@@ -4,13 +4,14 @@ using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Registry;
+using AET.SteamAbstraction.Testing.Installation;
 using AET.SteamAbstraction.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace AET.SteamAbstraction.Test.TestUtilities;
 
-internal class TestProcessHelper(IServiceProvider sp) : IProcessHelper
+public class TestProcessHelper(IServiceProvider sp) : IProcessHelper
 {
     private readonly ISteamRegistryFactory _registryFactory = sp.GetRequiredService<ISteamRegistryFactory>();
     private readonly IFileSystem _fileSystem = sp.GetRequiredService<IFileSystem>();

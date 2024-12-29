@@ -4,7 +4,7 @@ using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PG.StarWarsGame.Infrastructure.Testing;
+namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
 public abstract class CommonTestBaseWithRandomGame : CommonTestBase
 {
@@ -16,8 +16,8 @@ public abstract class CommonTestBaseWithRandomGame : CommonTestBase
     }
 
     protected IMod CreateAndAddMod(
-        string name, 
-        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
+        string name,
+        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
         params IList<IModReference> deps)
     {
         return CreateAndAddMod(Game, GITestUtilities.GetRandomWorkshopFlag(Game), name, new DependencyList(deps, layout));

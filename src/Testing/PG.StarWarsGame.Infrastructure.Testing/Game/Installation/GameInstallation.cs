@@ -7,7 +7,8 @@ namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
 public static partial class GameInstallation
 {
-    private const string SteamBasePath = "steam/apps/common/SteamSW";
+    // Ensure starts on path 'steam'. See SteamInstallation.cs
+    private const string SteamBasePath = "steam/steamapps/common/Star Wars Empire at War";
     private const string GogBasePath = "games/gog";
     private const string OriginBasePath = "games/origin";
 
@@ -27,6 +28,15 @@ public static partial class GameInstallation
         var game = new PetroglyphStarWarsGame(gameIdentity, gameDir, gameIdentity.ToString(), sp);
         Assert.True(game.Exists());
         return game;
+    }
+
+    public static void InstallDebug(this IGame game)
+    {
+        if (game.Platform is not GamePlatform.SteamGold)
+            Assert.Fail($"Cannot install Debug files for non-Steam game '{game}'");
+
+        var fs = game.Directory.FileSystem;
+        CreateFile(fs, fs.Path.Combine(game.Directory.FullName, "StarWarsI.exe"));
     }
 
     private static void InstallDataAndMegaFilesXml(this MockFileSystem fs, IDirectoryInfo directory)
@@ -72,7 +82,7 @@ public static partial class GameInstallation
         fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(directory.FullName, "Mods"));
     }
     
-    private static void CreateFile(MockFileSystem fs, string path)
+    private static void CreateFile(IFileSystem fs, string path)
     {
         var dir = fs.Path.GetDirectoryName(path);
         fs.Directory.CreateDirectory(dir);

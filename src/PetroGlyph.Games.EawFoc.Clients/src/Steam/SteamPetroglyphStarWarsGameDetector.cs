@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using AET.SteamAbstraction;
 using AET.SteamAbstraction.Games;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,7 +45,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
         if (!steam.IsGameInstalled(EaWGameId, out var game))
             return GameLocationData.NotInstalled;
 
-        if (!game!.State.HasFlag(SteamAppState.StateFullyInstalled))
+        if (!game.State.HasFlag(SteamAppState.StateFullyInstalled))
             return GameLocationData.NotInstalled;
 
         if (gameType == GameType.Foc && !game.Depots.Contains(FocDepotId))
@@ -61,18 +62,17 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
         };
 
         var installLocation = FileSystem.DirectoryInfo.New(fullGamePath);
+        if (!GameExeExists(installLocation, gameType))
+            return GameLocationData.NotInstalled;
 
         using var registry = _registryFactory.CreateRegistry(gameType);
-        if (registry.Type != gameType)
-            throw new InvalidOperationException("Incompatible registry");
+        Debug.Assert(registry.Type == gameType);
         if (registry.Version is null)
         {
             Logger?.LogDebug("Registry-Key found, but games are not initialized.");
             return GameLocationData.RequiresInitialization;
         }
-
-        return !GameExeExists(installLocation, gameType)
-            ? GameLocationData.NotInstalled
-            : new GameLocationData(installLocation);
+        
+        return new GameLocationData(installLocation);
     }
 }

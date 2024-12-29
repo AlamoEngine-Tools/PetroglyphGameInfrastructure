@@ -13,7 +13,7 @@ using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 
-namespace PG.StarWarsGame.Infrastructure.Testing;
+namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
 public abstract class CommonTestBase
 {
@@ -58,7 +58,7 @@ public abstract class CommonTestBase
         return FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
     }
 
-    private static readonly string[] PossibleLanguages = ["en", "de", "es", "it"]; 
+    private static readonly string[] PossibleLanguages = ["en", "de", "es", "it"];
 
     protected static ICollection<ILanguageInfo> GetRandomLanguages()
     {

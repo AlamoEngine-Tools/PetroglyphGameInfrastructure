@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Test.TestUtilities;
+using AET.SteamAbstraction.Testing.Installation;
 using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;

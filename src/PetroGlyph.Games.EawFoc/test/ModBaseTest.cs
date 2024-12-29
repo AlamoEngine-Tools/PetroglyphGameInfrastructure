@@ -11,6 +11,7 @@ using Xunit;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
 using Semver;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 

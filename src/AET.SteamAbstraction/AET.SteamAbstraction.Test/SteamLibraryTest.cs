@@ -3,7 +3,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
 using AET.SteamAbstraction.Library;
-using AET.SteamAbstraction.Test.TestUtilities;
+using AET.SteamAbstraction.Testing.Installation;
 using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions.Testing;
 using Xunit;

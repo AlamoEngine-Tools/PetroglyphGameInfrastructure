@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Test.TestUtilities;
+using AET.SteamAbstraction.Testing.Installation;
 using Microsoft.Extensions.DependencyInjection;
 using PG.TestingUtilities;
 using Testably.Abstractions.Testing;

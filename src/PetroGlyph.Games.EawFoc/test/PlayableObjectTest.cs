@@ -2,7 +2,7 @@
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Services.Language;
-using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;

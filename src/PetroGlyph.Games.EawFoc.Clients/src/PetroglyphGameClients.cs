@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
-using PG.StarWarsGame.Infrastructure.Clients.Steam;
-using PG.StarWarsGame.Infrastructure.Services.Language;
 
 namespace PG.StarWarsGame.Infrastructure.Clients;
 
@@ -24,7 +22,5 @@ public class PetroglyphGameClients
         serviceCollection.AddSingleton<IModArgumentListFactory>(sp => new ModArgumentListFactory(sp));
         serviceCollection.AddSingleton<IArgumentValidator>(_ => new ArgumentValidator());
         serviceCollection.AddSingleton<IArgumentCommandLineBuilder>(sp => new ArgumentCommandLineBuilder(sp));
-
-        serviceCollection.AddSingleton<ILanguageFinder>(sp => new SteamGameLanguageFinder(sp));
     }
 }

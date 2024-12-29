@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
@@ -12,6 +15,8 @@ namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 public class DirectoryGameDetectorTest : GameDetectorTestBase<EmptyStruct>
 {
     protected override bool SupportInitialization => false;
+    protected override ICollection<GamePlatform> SupportedPlatforms => GITestUtilities.RealPlatforms;
+    protected override bool CanDisableInitRequest => false;
 
     protected override IGameDetector CreateDetector(GameDetectorTestInfo<EmptyStruct> gameInfo, bool shallHandleInitialization)
     {
@@ -85,7 +90,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<EmptyStruct>
             queryPlatforms: []);
     }
 
-    protected override GameDetectorTestInfo<EmptyStruct> SetupForRequiredInitialization(GameIdentity identity)
+    protected override GameDetectorTestInfo<EmptyStruct> SetupForRequiredInitialization(GameIdentity gameIdentity)
         => throw new NotSupportedException();
 
     protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<EmptyStruct> info)

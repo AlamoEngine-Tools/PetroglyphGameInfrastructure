@@ -9,7 +9,7 @@ using AnakinRaW.CommonUtilities.FileSystem;
 using PG.TestingUtilities;
 using Xunit;
 
-namespace AET.SteamAbstraction.Test.TestUtilities;
+namespace AET.SteamAbstraction.Testing.Installation;
 
 internal static partial class SteamInstallation
 {

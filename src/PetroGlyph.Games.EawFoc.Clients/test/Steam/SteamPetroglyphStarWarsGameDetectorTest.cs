@@ -1,225 +1,152 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Abstractions;
 using AET.SteamAbstraction;
 using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Library;
+using AET.SteamAbstraction.Registry;
+using AET.SteamAbstraction.Testing.Installation;
+using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using PG.StarWarsGame.Infrastructure.Clients.Steam;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Games.Registry;
-using Testably.Abstractions.Testing;
+using PG.StarWarsGame.Infrastructure.Services.Detection;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Steam;
 
-public class SteamPetroglyphStarWarsGameDetectorTest
+public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<EmptyStruct>
 {
-    private readonly SteamPetroglyphStarWarsGameDetector _service;
-    private readonly MockFileSystem _fileSystem;
-    private readonly Mock<ISteamWrapper> _steamWrapper;
-    private readonly Mock<IGameRegistryFactory> _gameRegistryFactory;
-    private readonly Mock<IGameRegistry> _gameRegistry;
-    private readonly Mock<ISteamLibrary> _gameLib;
+    private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
 
-    public SteamPetroglyphStarWarsGameDetectorTest()
+    protected override bool SupportInitialization => true;
+    protected override ICollection<GamePlatform> SupportedPlatforms => [GamePlatform.SteamGold];
+    protected override bool CanDisableInitRequest => false;
+
+    protected override void SetupServiceProvider(IServiceCollection sc)
     {
-        var sc = new ServiceCollection();
-        PetroglyphGameInfrastructure.InitializeServices(sc);
-        _fileSystem = new MockFileSystem();
-        _steamWrapper = new Mock<ISteamWrapper>();
+        base.SetupServiceProvider(sc);
+        sc.AddSingleton(_registry);
+        SteamAbstractionLayer.InitializeServices(sc);
+        PetroglyphGameClients.InitializeServices(sc);
+    }
 
-        var steamFactory = new Mock<ISteamWrapperFactory>();
-        steamFactory.Setup(f => f.CreateWrapper()).Returns(_steamWrapper.Object);
-        sc.AddSingleton(steamFactory.Object);
+    protected override IGameDetector CreateDetector(GameDetectorTestInfo<EmptyStruct> gameInfo, bool shallHandleInitialization)
+    {
+        return new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
+    }
 
-        _gameRegistryFactory = new Mock<IGameRegistryFactory>();
-        _gameRegistry = new Mock<IGameRegistry>();
-        sc.AddTransient<IFileSystem>(_ => _fileSystem);
-        sc.AddTransient(_ => _steamWrapper.Object);
-        sc.AddTransient(_ => _gameRegistryFactory.Object);
-        _service = new SteamPetroglyphStarWarsGameDetector(sc.BuildServiceProvider());
-        _gameLib = new Mock<ISteamLibrary>();
+    protected override GameDetectorTestInfo<EmptyStruct> SetupGame(GameIdentity gameIdentity)
+    {
+        return SetupGame(gameIdentity, (game, otherGameType) =>
+        {
+            TestGameRegistrySetupData.Installed(game.Type, game.Directory).Create(ServiceProvider);
+            otherGameType.CreateNonExistingRegistry(ServiceProvider);
+        });
+    }
+
+    protected override GameDetectorTestInfo<EmptyStruct> SetupForRequiredInitialization(GameIdentity gameIdentity)
+    {
+        return SetupGame(gameIdentity, (game, otherGameType) =>
+        {
+            TestGameRegistrySetupData.Uninitialized(game.Type).Create(ServiceProvider);
+            otherGameType.CreateNonExistingRegistry(ServiceProvider);
+        });
+    }
+
+    protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<EmptyStruct> info)
+    {
+        if (!shallInitSuccessfully)
+            return;
+        var registrySetupData = TestGameRegistrySetupData.Installed(info.GameType, info.GameDirectory!);
+        registrySetupData.Create(ServiceProvider);
     }
 
     [Fact]
-    public void TestInvalidCtor_Throws()
+    public void TestInvalidArgs_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameDetector(null!));
     }
 
-    [Fact]
-    public void TestNoGame1()
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void Detect_SteamNotInstalled_ShouldReturnNotInstalled(GameType gameType)
     {
-        _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out It.Ref<SteamAppManifest?>.IsAny))
-            .Returns(false);
-        var result = _service.Detect(GameType.Foc);
-        Assert.Null(result.GameLocation);
+        var gameId = new GameIdentity(gameType, GamePlatform.SteamGold);
+        var expected = GameDetectionResult.NotInstalled(gameId.Type);
+
+        FileSystem.InstallGame(gameId, ServiceProvider);
+
+        var detector = new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
+        var result = detector.Detect(gameType, GamePlatform.SteamGold);
+
+        expected.AssertEqual(result);
     }
 
-    [Fact]
-    public void TestNoGame2()
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void Detect_SteamInstalledButGameNotRegisteredToSteam_ShouldReturnNotInstalled(GameType gameType)
     {
-        var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        var mFile = _fileSystem.FileInfo.New("manifest.acf");
-        var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateInvalid,
-            new HashSet<uint> { 32472 });
+        var gameId = new GameIdentity(gameType, GamePlatform.SteamGold);
+        var expected = GameDetectionResult.NotInstalled(gameId.Type);
 
-        _steamWrapper.Setup(s => s.Installed).Returns(true);
-        _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
+        FileSystem.InstallGame(gameId, ServiceProvider);
 
-        var result = _service.Detect(GameType.Foc);
-        Assert.Null(result.GameLocation);
+        var detector = new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
+        var result = detector.Detect(gameType, GamePlatform.SteamGold);
+
+        expected.AssertEqual(result);
     }
 
-    [Fact]
-    public void TestNoGame3()
+    [Theory]
+    [InlineData(GameType.Eaw)]
+    [InlineData(GameType.Foc)]
+    public void Detect_SteamInstalledButGameNotFullyInstalled_ShouldReturnNotInstalled(GameType gameType)
     {
-        var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.Initialize().WithFile("Game/swfoc.exe");
-        var mFile = _fileSystem.FileInfo.New("manifest.acf");
-        var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateInvalid,
-            new HashSet<uint> { 32472 });
+        var gameId = new GameIdentity(gameType, GamePlatform.SteamGold);
+        var expected = GameDetectionResult.NotInstalled(gameId.Type);
 
-        _steamWrapper.Setup(s => s.Installed).Returns(true);
-        _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-        var result = _service.Detect(GameType.Foc);
-        Assert.Null(result.GameLocation);
+        var info = SetupGame(gameId, (game, otherGameType) =>
+        {
+            TestGameRegistrySetupData.Installed(game.Type, game.Directory).Create(ServiceProvider);
+            otherGameType.CreateNonExistingRegistry(ServiceProvider);
+        }, SteamAppState.StateUpdateRequired);
+
+        var detector = CreateDetector(info, true);
+        var result = detector.Detect(gameType, GamePlatform.SteamGold);
+
+        expected.AssertEqual(result);
     }
 
-    [Fact]
-    public void TestNoGame4()
+    private GameDetectorTestInfo<EmptyStruct> SetupGame(
+        GameIdentity gameIdentity, 
+        Action<IGame, GameType> registrySetup, 
+        SteamAppState appState = SteamAppState.StateFullyInstalled)
     {
-        var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.Initialize().WithFile("Game/swfoc.exe");
-        var mFile = _fileSystem.FileInfo.New("manifest.acf");
-        var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateInvalid,
-            new HashSet<uint>());
+        // Install Steam (regardless whether the identity is supported)
+        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
+        FileSystem.InstallSteam(registry);
 
-        _steamWrapper.Setup(s => s.Installed).Returns(true);
-        _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-        var result = _service.Detect(GameType.Foc);
-        Assert.Null(result.GameLocation);
-    }
+        if (gameIdentity.Platform != GamePlatform.SteamGold)
+            return new GameDetectorTestInfo<EmptyStruct>(gameIdentity.Type, null, default);
 
-    //[Fact]
-    //public void TestNoGame5()
-    //{
-    //    var installLocation = _fileSystem.DirectoryInfo.New("Game");
-    //    _fileSystem.Initialize().WithFile("Game/swfoc.exe");
-    //    var mFile = _fileSystem.FileInfo.New("manifest.acf");
-    //    var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
-    //        new HashSet<uint> { 32472 });
+        // Install Game
+        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-    //    _steamWrapper.Setup(s => s.Installed).Returns(true);
-    //    _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-    //    var result = _service.Detect(GameType.Foc);
-    //    Assert.Null(result.GameLocation);
-    //}
+        // Register Game to Steam
+        var lib = FileSystem.InstallDefaultLibrary(ServiceProvider);
+        IList<uint> depots = gameIdentity.Type == GameType.Foc ? [32472] : [];
+        lib.InstallGame(32470, "Star Wars Empire at War", depots, appState);
 
-    //[Fact]
-    //public void TestGameExists1()
-    //{
-    //    var installLocation = _fileSystem.DirectoryInfo.New("Game");
-    //    _fileSystem.Initialize().WithFile("Game/corruption/swfoc.exe");
-    //    var mFile = _fileSystem.FileInfo.New("manifest.acf");
-    //    var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
-    //        new HashSet<uint> { 32472 });
+        // To Registry
+        var otherGameType = gameIdentity.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw;
+        registrySetup(game, otherGameType);
 
-    //    _steamWrapper.Setup(s => s.Installed).Returns(true);
-    //    _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-
-    //    _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc))
-    //        .Returns(_gameRegistry.Object);
-    //    _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
-    //    _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
-
-    //    var result = _service.Detect(GameType.Foc);
-    //    Assert.NotNull(result.GameLocation);
-    //}
-
-    //[Fact]
-    //public void TestGameExists3()
-    //{
-    //    var installLocation = _fileSystem.DirectoryInfo.New("Game");
-    //    _fileSystem.Initialize().WithFile("Game/corruption/swfoc.exe");
-    //    var mFile = _fileSystem.FileInfo.New("manifest.acf");
-    //    var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation,
-    //        SteamAppState.StateFullyInstalled | SteamAppState.StateAppRunning, new HashSet<uint> { 32472 });
-
-    //    _steamWrapper.Setup(s => s.Installed).Returns(true);
-    //    _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-
-    //    _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc))
-    //        .Returns(_gameRegistry.Object);
-    //    _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
-    //    _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
-
-    //    var result = _service.Detect(GameType.Foc);
-    //    Assert.NotNull(result.GameLocation);
-    //}
-
-    //[Fact]
-    //public void TestGameExists4()
-    //{
-    //    var installLocation = _fileSystem.DirectoryInfo.New("Game");
-    //    _fileSystem.Initialize().WithFile("Game/GameData/sweaw.exe");
-    //    var mFile = _fileSystem.FileInfo.New("manifest.acf");
-    //    var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
-    //        new HashSet<uint> { 32472 });
-
-    //    _steamWrapper.Setup(s => s.Installed).Returns(true);
-    //    _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-
-    //    _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Eaw))
-    //        .Returns(_gameRegistry.Object);
-    //    _gameRegistry.Setup(r => r.Type).Returns(GameType.Eaw);
-    //    _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
-
-    //    var result = _service.Detect(GameType.Eaw);
-    //    Assert.NotNull(result.GameLocation);
-    //}
-
-    //[Fact]
-    //public void TestInvalidRegistry()
-    //{
-    //    var installLocation = _fileSystem.DirectoryInfo.New("Game");
-    //    _fileSystem.Initialize().WithFile("Game/swfoc.exe");
-    //    var mFile = _fileSystem.FileInfo.New("manifest.acf");
-    //    var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
-    //        new HashSet<uint> { 32472 });
-
-
-    //    _steamWrapper.Setup(s => s.Installed).Returns(true);
-    //    _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-
-    //    _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc))
-    //        .Returns(_gameRegistry.Object);
-    //    _gameRegistry.Setup(r => r.Type).Returns(GameType.Eaw);
-    //    _gameRegistry.Setup(r => r.Version).Returns(new Version(1, 0, 0, 0));
-
-    //    var result = _service.Detect(GameType.Foc);
-    //    Assert.IsType<InvalidOperationException>(result);
-    //}
-
-    [Fact]
-    public void TestGameRequiresInit()
-    {
-        var installLocation = _fileSystem.DirectoryInfo.New("Game");
-        _fileSystem.Initialize().WithFile("Game/swfoc.exe");
-        var mFile = _fileSystem.FileInfo.New("manifest.acf");
-        var app = new SteamAppManifest(_gameLib.Object, mFile, 1234, "name", installLocation, SteamAppState.StateFullyInstalled,
-            new HashSet<uint> { 32472 });
-
-        _steamWrapper.Setup(s => s.Installed).Returns(true);
-        _steamWrapper.Setup(s => s.IsGameInstalled(It.IsAny<uint>(), out app)).Returns(true);
-
-        _gameRegistryFactory.Setup(f => f.CreateRegistry(GameType.Foc))
-            .Returns(_gameRegistry.Object);
-        _gameRegistry.Setup(r => r.Type).Returns(GameType.Foc);
-
-        var result = _service.Detect(GameType.Foc);
-        Assert.True(result.InitializationRequired);
+        return new GameDetectorTestInfo<EmptyStruct>(gameIdentity.Type, game.Directory, default);
     }
 }

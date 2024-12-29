@@ -8,6 +8,7 @@ using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Services;
@@ -21,10 +22,19 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
         _languageFinder = new InstalledLanguageFinder(ServiceProvider);
     }
 
+    private void InstallGameLanguage(LanguageInfo language) => Game.InstallLanguage(language);
+    private void InstallModLanguage(IPhysicalMod mod, LanguageInfo language) => mod.InstallLanguage(language);
+
     [Fact]
-    public void NullArgTest_Throws()
+    public void Ctor_NullArgTest_Throws()
     {
-        Assert.ThrowsAny<Exception>(() => _languageFinder.FindLanguages(null!));
+        Assert.Throws<ArgumentNullException>(() => new InstalledLanguageFinder(null!));
+    }
+
+    [Fact]
+    public void FindLanguages_NullArgTest_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => new InstalledLanguageFinder(null!));
     }
 
     [Fact]
@@ -37,8 +47,8 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     [Fact]
     public void FindLanguages_Game_WithLanguages_En_De()
     {
-        Game.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
-        Game.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
+        InstallGameLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallGameLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
         var langs = _languageFinder.FindLanguages(Game);
 
         Assert.Equivalent(new List<ILanguageInfo>
@@ -51,11 +61,11 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     [Fact]
     public void FindLanguages_Mod_WithNoLanguages_UsesGame()
     {
-        Game.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallGameLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
         var mod = Game.InstallMod("myMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
         var langs = _languageFinder.FindLanguages(mod);
 
-        Assert.Equivalent(new List<ILanguageInfo>{ new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
+        Assert.Equivalent(new List<ILanguageInfo> { new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
     }
 
     [Fact]
@@ -63,8 +73,8 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     {
         var game = FileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
         var mod = game.InstallMod("myMod", true, ServiceProvider);
-        mod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
-        mod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
+        InstallModLanguage(mod, new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallModLanguage(mod, new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
         var langs = _languageFinder.FindLanguages(mod);
 
@@ -79,8 +89,8 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     public void FindLanguages_Mod_InheritLanguage_TargetModDoesNotHaveLanguages()
     {
         var baseMod = Game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
-        baseMod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
+        InstallModLanguage(baseMod, new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallModLanguage(baseMod, new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
         var modInfo = new ModinfoData("myMod")
         {
@@ -105,7 +115,7 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     public void FindLanguages_Mod_InheritLanguage_TargetAndDependencyModDoNotHaveLanguages()
     {
         var baseMod = Game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        
+
         var modInfo = new ModinfoData("myMod")
         {
             Dependencies = new DependencyList(new List<IModReference>
@@ -145,8 +155,8 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     public void FindLanguages_Mod_TargetModDoesHaveDefaultLanguageInstalled()
     {
         var baseMod = Game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
-        baseMod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
+        InstallModLanguage(baseMod, new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallModLanguage(baseMod, new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
         var modInfo = new ModinfoData("myMod")
         {
@@ -159,12 +169,12 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
         mod.ResolveDependencies();
 
         // Only english is installed
-        mod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
+        InstallModLanguage(mod, new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
         var langs = _languageFinder.FindLanguages(mod);
 
         // We should not have the languages from base, because only english was detected as physically installed.
-        Assert.Equivalent(new List<ILanguageInfo>{new LanguageInfo("en", LanguageSupportLevel.FullLocalized)}, langs, true);
+        Assert.Equivalent(new List<ILanguageInfo> { new LanguageInfo("en", LanguageSupportLevel.FullLocalized) }, langs, true);
     }
 
     [Fact]
@@ -172,8 +182,8 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     {
 
         var baseMod = Game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
-        baseMod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
+        InstallModLanguage(baseMod, new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallModLanguage(baseMod, new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
         var modInfo = new ModinfoData("myMod")
         {
@@ -191,7 +201,7 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
         mod.ResolveDependencies();
 
         // Should not be considered
-        mod.InstallLanguage(new LanguageInfo("it", LanguageSupportLevel.FullLocalized));
+        InstallModLanguage(mod, new LanguageInfo("it", LanguageSupportLevel.FullLocalized));
 
         var langs = _languageFinder.FindLanguages(mod);
 
@@ -208,8 +218,8 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     public void FindLanguages_Mod_TargetModDoesHaveModinfoWithDefaultLanguagesExplicitlySet()
     {
         var baseMod = Game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
-        baseMod.InstallLanguage(new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
+        InstallModLanguage(baseMod, new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallModLanguage(baseMod, new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 
         var modInfo = new ModinfoData("myMod")
         {
@@ -224,7 +234,7 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
         mod.ResolveDependencies();
 
         // Should not be considered
-        mod.InstallLanguage(new LanguageInfo("it", LanguageSupportLevel.FullLocalized));
+        InstallModLanguage(mod, new LanguageInfo("it", LanguageSupportLevel.FullLocalized));
 
         var langs = _languageFinder.FindLanguages(mod);
 
@@ -238,7 +248,7 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     [Fact]
     public void FindLanguages_Mod_TargetModDoesNotHaveLanguagesAndDependencyAlsoDoesNotHaveLanguages_UsesGameFallback()
     {
-        Game.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallGameLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
         var baseMod = Game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
         var modInfo = new ModinfoData("myMod")
         {
@@ -259,7 +269,7 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
     public void FindLanguages_Mod_TargetModDoesNotHaveLanguagesAndTransitiveDependencyHasLanguages()
     {
         var baseMod = Game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallModLanguage(baseMod, new LanguageInfo("de", LanguageSupportLevel.SFX));
         var middleModInfo = new ModinfoData("middleMod")
         {
             Dependencies = new DependencyList(new List<IModReference>
@@ -280,14 +290,14 @@ public class LanguageFinderTest : CommonTestBaseWithRandomGame
 
         var langs = _languageFinder.FindLanguages(mod);
 
-        Assert.Equivalent(new List<ILanguageInfo>{ new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
+        Assert.Equivalent(new List<ILanguageInfo> { new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
     }
 
     [Fact]
     public void FindLanguages_VirtualMod_TargetModDoesNotHaveLanguagesAndSecondDependencyHasLanguages()
     {
         var baseMod = Game.InstallAndAddMod("baseMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        baseMod.InstallLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
+        InstallModLanguage(baseMod, new LanguageInfo("de", LanguageSupportLevel.SFX));
         var middleMod = Game.InstallAndAddMod("middleMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
         var modInfo = new ModinfoData("myMod")
         {

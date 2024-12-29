@@ -15,25 +15,20 @@ internal class GameExecutableFileUtilities
     public static IFileInfo? GetExecutableForGame(IGame game, GameBuildType buildType)
     {
         var exeFileName = GetExecutableFileName(game, buildType);
-        if (string.IsNullOrEmpty(exeFileName))
-            return null;
 
-#if NETSTANDARD2_1_OR_GREATER || NET
-        return game.Directory
-            .EnumerateFiles(exeFileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })
-            .FirstOrDefault();
-#else
         return game.Directory
             .EnumerateFiles(exeFileName, SearchOption.TopDirectoryOnly)
             .FirstOrDefault();
-#endif
-
     }
 
-    public static string GetExecutableFileName(IGame game, GameBuildType buildType)
+    private static string GetExecutableFileName(IGame game, GameBuildType buildType)
     {
         if (game.Platform == GamePlatform.SteamGold)
             return GetSteamFileName(buildType);
+
+        if (buildType is GameBuildType.Debug)
+            throw new InvalidOperationException("Cannot get Debug executable for non-Steam games.");
+
         return game.Type switch
         {
             GameType.Eaw => PetroglyphStarWarsGameConstants.EmpireAtWarExeFileName,
@@ -44,12 +39,9 @@ internal class GameExecutableFileUtilities
 
     private static string GetSteamFileName(GameBuildType buildType)
     {
-        var suffix = buildType switch
-        {
-            GameBuildType.Release => SteamReleaseSuffix,
-            GameBuildType.Debug => SteamDebugSuffix,
-            _ => throw new ArgumentOutOfRangeException(nameof(buildType), buildType, null)
-        };
+        var suffix = SteamReleaseSuffix;
+        if (buildType == GameBuildType.Debug)
+            suffix = SteamDebugSuffix;
         return $"{SteamFileNameBase}{suffix}.exe";
     }
 }

@@ -15,10 +15,10 @@ using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
-using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Semver;
 using Xunit;
 
