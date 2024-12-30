@@ -17,7 +17,7 @@ public sealed class GameStartingEventArgs : CancelEventArgs
     /// <summary>
     /// Gets the requested game arguments 
     /// </summary>
-    public IArgumentCollection GameArguments { get; }
+    public ArgumentCollection GameArguments { get; }
 
     /// <summary>
     /// Gets the requested build type of the game.
@@ -30,7 +30,7 @@ public sealed class GameStartingEventArgs : CancelEventArgs
     /// <param name="game">The game instance requested to start.</param>
     /// <param name="arguments">The requested game arguments.</param>
     /// <param name="buildType">The requested build type of the game.</param>
-    public GameStartingEventArgs(IGame game, IArgumentCollection arguments, GameBuildType buildType)
+    public GameStartingEventArgs(IGame game, ArgumentCollection arguments, GameBuildType buildType)
     {
         Game = game;
         GameArguments = arguments;

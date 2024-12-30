@@ -2,22 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 
-internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
+internal static class ArgumentCommandLineBuilder
 {
-    private readonly IArgumentValidator _validator;
-
-    public ArgumentCommandLineBuilder(IServiceProvider serviceProvider)
-    {
-        if (serviceProvider == null) 
-            throw new ArgumentNullException(nameof(serviceProvider));
-        _validator = serviceProvider.GetRequiredService<IArgumentValidator>();
-    }
-
     /// <summary>
     /// Converts this collection into a string which can be used as argument sequence for a Petroglyph Star Wars game.
     /// </summary>
@@ -25,7 +15,7 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
     /// <returns>Strings representation of arguments</returns>
     /// <exception cref="GameArgumentException"> This collection contained invalid arguments.
     /// </exception>
-    public string BuildCommandLine(IArgumentCollection arguments)
+    public static string BuildCommandLine(ArgumentCollection arguments)
     {
         if (!arguments.Any())
             return string.Empty;
@@ -34,7 +24,7 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
 
         foreach (var gameArgument in arguments)
         {
-            var validity = _validator.CheckArgument(gameArgument, out var argName, out var argValue);
+            var validity = ArgumentValidator.CheckArgument(gameArgument, out var argName, out var argValue);
             if (validity != ArgumentValidityStatus.Valid)
                 throw new GameArgumentException(gameArgument, $"Argument is not valid. Reason: {validity}");
             var argumentText = ToCommandLine(gameArgument, argName, argValue);
@@ -45,7 +35,7 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
         return argumentBuilder.ToString().TrimEnd();
     }
 
-    internal string ToCommandLine(IGameArgument argument, string name, string value)
+    internal static string ToCommandLine(IGameArgument argument, string name, string value)
     {
         switch (argument.Kind)
         {
@@ -79,14 +69,14 @@ internal class ArgumentCommandLineBuilder : IArgumentCommandLineBuilder
         return $"{key}={value}";
     }
 
-    private string BuildModListString(IGameArgument<IReadOnlyList<ModArgument>> modList)
+    private static string BuildModListString(IGameArgument<IReadOnlyList<ModArgument>> modList)
     {
         var sb = new StringBuilder();
         foreach (var modArg in modList.Value)
         {
             if (modArg.Kind != ArgumentKind.KeyValue)
                 throw new GameArgumentException(modArg, "Mod argument must be a key/value argument.");
-            var validity = _validator.CheckArgument(modArg, out var key, out var modPath);
+            var validity = ArgumentValidator.CheckArgument(modArg, out var key, out var modPath);
             if (validity != ArgumentValidityStatus.Valid)
                 throw new GameArgumentException(modArg, $"Mod argument is not valid. Reason: {validity}");
             var argumentText = BuildKeyValueArgument(key, modPath);

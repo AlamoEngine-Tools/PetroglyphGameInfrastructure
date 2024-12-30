@@ -251,12 +251,12 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
         _processLauncher.Dispose();
     }
 
-    private delegate void OnGameStartingDelegate(IArgumentCollection arguments, GameBuildType type);
+    private delegate void OnGameStartingDelegate(ArgumentCollection arguments, GameBuildType type);
 
     private class MyTestClient(OnGameStartingDelegate action, IGame game, IServiceProvider serviceProvider)
         : PetroglyphStarWarsGameClient(game, serviceProvider)
     {
-        protected override void OnGameStarting(IArgumentCollection arguments, GameBuildType type)
+        protected override void OnGameStarting(ArgumentCollection arguments, GameBuildType type)
         {
             action(arguments, type);
             base.OnGameStarting(arguments, type);

@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 /// </summary>
 /// <remarks>
 /// The value must not contain any space characters, as the game cannot handle them,
-/// even when escaped or encapsulated with ' or "
+/// even when escaped or encapsulated with single or double quotes ('', "")
 /// </remarks>
 /// <typeparam name="T">Type of the Value.</typeparam>
 public abstract class NamedArgument<T> : GameArgument<T> where T : notnull
@@ -28,6 +28,8 @@ public abstract class NamedArgument<T> : GameArgument<T> where T : notnull
     /// <param name="isDebug">Indicates whether this argument is available in debug mode only.</param>
     protected NamedArgument(string name, T value, bool isDebug) : base(value, isDebug)
     {
+        if (value == null)
+            throw new ArgumentNullException(nameof(value));
         Name = name;
     }
 

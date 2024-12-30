@@ -5,9 +5,9 @@ using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities.FileSystem;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 
-internal class ArgumentValueSerializer
+internal static class ArgumentValueSerializer
 {
     private static readonly PathNormalizeOptions NormalizeOptions = new()
     {
@@ -31,11 +31,11 @@ internal class ArgumentValueSerializer
             typeof(double),
             typeof(bool)
         ];
-        foreach (var type in typeArray) 
+        foreach (var type in typeArray)
             SpecialTypes.Add(type.FullName!, (type, null));
     }
 
-    public string Serialize(object value)
+    public static string Serialize(object value)
     {
         if (value is string stringValue)
             return stringValue;
@@ -54,7 +54,7 @@ internal class ArgumentValueSerializer
         return converter.ConvertToInvariantString(value) ?? string.Empty;
     }
 
-    public string ShortenPath(IFileSystemInfo target, IDirectoryInfo gameDir)
+    public static string ShortenPath(IFileSystemInfo target, IDirectoryInfo gameDir)
     {
         var fileSystem = target.FileSystem;
 

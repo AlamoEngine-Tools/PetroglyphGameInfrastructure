@@ -5,25 +5,17 @@ using System.Linq;
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-/// Service to build an <see cref="IArgumentCollection"/> which uses the argument's name as unique identifier. Arguments with the same name will be replaced.
+/// Service to build an <see cref="ArgumentCollection"/> which uses the argument's name as unique identifier. Arguments with the same name will be replaced.
 /// </summary>
-public class UniqueArgumentCollectionBuilder
+public class GameArgumentsBuilder
 {
     private readonly Dictionary<string, IGameArgument> _argumentDict = new();
 
     /// <summary>
-    /// Initializes an <see cref="UniqueArgumentCollectionBuilder"/> with no arguments.
+    /// Initializes an <see cref="GameArgumentsBuilder"/> with no arguments.
     /// </summary>
-    public UniqueArgumentCollectionBuilder()
+    public GameArgumentsBuilder()
     {
-    }
-
-    /// <summary>
-    /// Initializes an <see cref="UniqueArgumentCollectionBuilder"/> with a given <paramref name="argumentCollection"/>.
-    /// </summary>
-    public UniqueArgumentCollectionBuilder(IArgumentCollection argumentCollection)
-    {
-        AddAll(argumentCollection);
     }
 
     /// <summary>
@@ -32,7 +24,7 @@ public class UniqueArgumentCollectionBuilder
     /// <param name="argument">The argument to add or update.</param>
     /// <returns>This instance.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="argument"/> is <see langword="null"/>.</exception>
-    public UniqueArgumentCollectionBuilder Add(IGameArgument argument)
+    public GameArgumentsBuilder Add(IGameArgument argument)
     {
         if (argument == null) 
             throw new ArgumentNullException(nameof(argument));
@@ -47,7 +39,7 @@ public class UniqueArgumentCollectionBuilder
     /// <param name="argument">The argument to remove.</param>
     /// <returns>This instance.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="argument"/> is <see langword="null"/>.</exception>
-    public UniqueArgumentCollectionBuilder Remove(IGameArgument argument)
+    public GameArgumentsBuilder Remove(IGameArgument argument)
     {
         if (argument == null)
             throw new ArgumentNullException(nameof(argument));
@@ -62,7 +54,7 @@ public class UniqueArgumentCollectionBuilder
     /// <returns>This instance.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
-    public UniqueArgumentCollectionBuilder Remove(string name)
+    public GameArgumentsBuilder Remove(string name)
     {
         AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
         _argumentDict.Remove(name);
@@ -74,7 +66,7 @@ public class UniqueArgumentCollectionBuilder
     /// </summary>
     /// <param name="argumentCollection">The arguments to add or update.</param>
     /// <returns>This instance.</returns>
-    public UniqueArgumentCollectionBuilder AddAll(IArgumentCollection argumentCollection)
+    public GameArgumentsBuilder AddAll(ArgumentCollection argumentCollection)
     {
         foreach (var arg in argumentCollection)
             Add(arg);
@@ -82,10 +74,10 @@ public class UniqueArgumentCollectionBuilder
     }
 
     /// <summary>
-    /// Creates an <see cref="IArgumentCollection"/> from this instance.
+    /// Creates an <see cref="ArgumentCollection"/> from this instance.
     /// </summary>
-    /// <returns>The created <see cref="IArgumentCollection"/>.</returns>
-    public IArgumentCollection Build()
+    /// <returns>The created <see cref="ArgumentCollection"/>.</returns>
+    public ArgumentCollection Build()
     {
         return new ArgumentCollection(_argumentDict.Values.ToList());
     }

@@ -26,7 +26,7 @@ public sealed class ModArgumentList : GameArgument<IReadOnlyList<ModArgument>>
     /// Creates a new argument from a given list of 
     /// </summary>
     /// <param name="mods">The mod arguments of this list.</param>
-    public ModArgumentList(IReadOnlyList<ModArgument> mods) : base(mods)
+    internal ModArgumentList(IReadOnlyList<ModArgument> mods) : base(mods)
     {
     }
 

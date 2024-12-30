@@ -1,73 +1,41 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
-/// <inheritdoc/>
-public sealed class ArgumentCollection : IArgumentCollection
+/// <summary>
+/// 
+/// </summary>
+public sealed class ArgumentCollection : IReadOnlyCollection<IGameArgument>
 {
     /// <summary>
-    /// Singleton argument collection, which is always empty.
+    /// Returns an empty argument collection.
     /// </summary>
-    public static IArgumentCollection Empty = new EmptyArgumentsCollection();
+    public static readonly ArgumentCollection Empty = new();
 
-    private readonly IReadOnlyCollection<IGameArgument> _args;
+    private readonly HashSet<IGameArgument> _arguments;
 
     /// <inheritdoc/>
-    public int Count => _args.Count;
+    public int Count => _arguments.Count;
 
-    /// <summary>
-    /// Creates a new collection from a given list of <see cref="IGameArgument"/>s.
-    /// </summary>
-    /// <param name="arguments">The arguments to add to this instance.</param>
-    public ArgumentCollection(IEnumerable<IGameArgument> arguments)
+    internal ArgumentCollection(IEnumerable<IGameArgument> arguments)
     {
-        _args = new ReadOnlyCollection<IGameArgument>(arguments.ToList());
+        _arguments = [..arguments];
+    }
+
+    private ArgumentCollection()
+    {
+        _arguments = [];
     }
 
     /// <inheritdoc/>
     public IEnumerator<IGameArgument> GetEnumerator()
     {
-        return _args.GetEnumerator();
+        return _arguments.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }
-
-    /// <summary>
-    /// An always empty argument collection.
-    /// </summary>
-    private class EmptyArgumentsCollection : IArgumentCollection
-    {
-        /// <inheritdoc/>
-        public IEnumerator<IGameArgument> GetEnumerator()
-        {
-            return new Enumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        /// <inheritdoc/>
-        public int Count => 0;
-
-        private struct Enumerator : IEnumerator<IGameArgument>
-        {
-            public bool MoveNext() => false;
-
-            public void Reset() { }
-
-            public IGameArgument Current => null!;
-
-            object IEnumerator.Current => Current;
-
-            public void Dispose() { }
-        }
     }
 }

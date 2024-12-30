@@ -74,19 +74,19 @@ public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
 
         var modArgsFactory = new ModArgumentListFactory(ServiceProvider);
         var modArgs = modArgsFactory.BuildArgumentList(mod, true);
-        var argumentsBuilder = new UniqueArgumentCollectionBuilder()
+        var argumentsBuilder = new GameArgumentsBuilder()
             .Add(modArgs);
         return StartGame(argumentsBuilder.Build(), GameBuildType.Release);
     }
 
     /// <inheritdoc />
-    public IGameProcess Play(IArgumentCollection arguments)
+    public IGameProcess Play(ArgumentCollection arguments)
     {
         return StartGame(arguments, GameBuildType.Release);
     }
 
     /// <inheritdoc />
-    public IGameProcess Debug(IArgumentCollection arguments, bool fallbackToPlay)
+    public IGameProcess Debug(ArgumentCollection arguments, bool fallbackToPlay)
     {
         var buildType = GameBuildType.Debug;
         if (!IsDebugAvailable())
@@ -99,7 +99,7 @@ public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
         return StartGame(arguments, buildType);
     }
 
-    private IGameProcess StartGame(IArgumentCollection arguments, GameBuildType type)
+    private IGameProcess StartGame(ArgumentCollection arguments, GameBuildType type)
     {
         if (arguments == null)
             throw new ArgumentNullException(nameof(arguments));
@@ -122,7 +122,7 @@ public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
     /// </summary>
     /// <param name="arguments">The requested arguments.</param>
     /// <param name="type">The requested build type.</param>
-    protected virtual void OnGameStarting(IArgumentCollection arguments, GameBuildType type)
+    protected virtual void OnGameStarting(ArgumentCollection arguments, GameBuildType type)
     {
     }
 
@@ -134,7 +134,7 @@ public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
         GameStarted?.Invoke(this, gameProcess);
     }
 
-    private bool OnGameStartingInternal(IArgumentCollection arguments, GameBuildType type)
+    private bool OnGameStartingInternal(ArgumentCollection arguments, GameBuildType type)
     {
         OnGameStarting(arguments, type);
 

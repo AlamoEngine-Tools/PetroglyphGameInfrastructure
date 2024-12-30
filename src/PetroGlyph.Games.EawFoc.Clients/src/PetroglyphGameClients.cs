@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 namespace PG.StarWarsGame.Infrastructure.Clients;
@@ -20,7 +21,5 @@ public class PetroglyphGameClients
 
         serviceCollection.AddSingleton<IGameProcessLauncher>(sp => new GameProcessLauncher(sp));
         serviceCollection.AddSingleton<IModArgumentListFactory>(sp => new ModArgumentListFactory(sp));
-        serviceCollection.AddSingleton<IArgumentValidator>(_ => new ArgumentValidator());
-        serviceCollection.AddSingleton<IArgumentCommandLineBuilder>(sp => new ArgumentCommandLineBuilder(sp));
     }
 }

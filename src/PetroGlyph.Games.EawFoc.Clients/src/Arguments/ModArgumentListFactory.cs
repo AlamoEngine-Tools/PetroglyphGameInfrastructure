@@ -4,6 +4,7 @@ using System.Linq;
 using AET.SteamAbstraction;
 using EawModinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
@@ -18,8 +19,6 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 internal class ModArgumentListFactory : IModArgumentListFactory
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IArgumentValidator _validator;
-
     /// <summary>
     /// Initializes a new builder instance.
     /// </summary>
@@ -27,7 +26,6 @@ internal class ModArgumentListFactory : IModArgumentListFactory
     public ModArgumentListFactory(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _validator = serviceProvider.GetRequiredService<IArgumentValidator>();
     }
 
     /// <inheritdoc/>
@@ -73,7 +71,7 @@ internal class ModArgumentListFactory : IModArgumentListFactory
         if (!isWorkshop)
         {
             // Shortening to the relative game's path allows the game to exit on a path which has space characters.
-            var relativeOrAbsoluteModPath = new ArgumentValueSerializer().ShortenPath(mod.Directory, mod.Game.Directory);
+            var relativeOrAbsoluteModPath = ArgumentValueSerializer.ShortenPath(mod.Directory, mod.Game.Directory);
             argumentValue = relativeOrAbsoluteModPath;
         }
         else
@@ -87,7 +85,7 @@ internal class ModArgumentListFactory : IModArgumentListFactory
         var argument = new ModArgument(argumentValue, isWorkshop);
         if (validate)
         {
-            var validity = _validator.CheckArgument(argument, out _, out _);
+            var validity = ArgumentValidator.CheckArgument(argument, out _, out _);
             if (validity != ArgumentValidityStatus.Valid)
                 throw new ModException(mod, $"Created mod argument for {mod} is not valid: {validity}");
         }

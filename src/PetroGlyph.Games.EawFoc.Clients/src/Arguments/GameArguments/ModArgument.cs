@@ -12,7 +12,7 @@ public sealed class ModArgument : NamedArgument<string>
     /// </summary>
     /// <param name="value">The absolute or relative path or SteamID of the mod.</param>
     /// <param name="workshops">If <see langword="true"/> this argument will be treated as a Steam Workshops mod.</param>
-    public ModArgument(string value, bool workshops) : 
+    internal ModArgument(string value, bool workshops) : 
         base(workshops ? ArgumentNameCatalog.SteamModArg : ArgumentNameCatalog.ModPathArg, value, false)
     {
         _workshops = workshops;

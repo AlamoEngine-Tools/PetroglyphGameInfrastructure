@@ -68,16 +68,7 @@ internal static class ArgumentNameCatalog
     internal const string ConnectPortArg = "CONNECTPORT";
     internal const string ConnectIPArg = "CONNECTIP";
 
-    /// <summary>
-    /// Collection of all supported argument names.
-    /// </summary>
-    /// <remarks>The names are in upper case.</remarks>
-    public static IReadOnlyCollection<string> AllSupportedArgumentNames =
-        SupportedFlagArgumentNames.Union(SupportedKeyValueArgumentNames).Union(SyntheticArgumentNames).ToList();
-
-    internal static IReadOnlyCollection<string> SyntheticArgumentNames => [ModListArg];
-
-    internal static IReadOnlyCollection<string> SupportedFlagArgumentNames => new HashSet<string>
+    internal static readonly IReadOnlyCollection<string> SupportedFlagArgumentNames = new HashSet<string>
     {
         WindowedArg,
         MCEArg,
@@ -106,7 +97,7 @@ internal static class ArgumentNameCatalog
         FullScreenArg
     };
 
-    internal static IReadOnlyCollection<string> SupportedKeyValueArgumentNames => new HashSet<string>
+    internal static readonly IReadOnlyCollection<string> SupportedKeyValueArgumentNames = new HashSet<string>
     {
         LocalPortArg,
         MonitorArg,
@@ -142,4 +133,11 @@ internal static class ArgumentNameCatalog
         ConnectPortArg,
         ConnectIPArg
     };
+
+    /// <summary>
+    /// Collection of all supported argument names.
+    /// </summary>
+    /// <remarks>The names are in upper case. Does not contain the synthetic MODLIST argument.</remarks>
+    public static readonly IReadOnlyCollection<string> AllSupportedArgumentNames =
+        SupportedFlagArgumentNames.Union(SupportedKeyValueArgumentNames).ToList();
 }

@@ -3,9 +3,12 @@
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-/// Argument which enables a game behavior because it exists.
+/// Argument which enables a game behavior.
 /// </summary>
-/// <remarks>This argument can be explicitly unset by setting the value to <see langword="false"/>. In this case, on the command line it will be omitted.</remarks>
+/// <remarks>
+/// This argument can be explicitly unset by setting the value to <see langword="false"/>.
+/// In this case the argument is omitted on the command line.
+/// </remarks>
 public abstract class FlagArgument : GameArgument<bool>
 {
     /// <summary>
@@ -30,25 +33,21 @@ public abstract class FlagArgument : GameArgument<bool>
     }
 
     /// <inheritdoc/>
-    public sealed override string ValueToCommandLine()
-    {
-        return new ArgumentValueSerializer().Serialize(Value);
-    }
-
-    /// <inheritdoc/>
     public override bool Equals(IGameArgument? other)
     {
         if (other is null)
             return false;
         if (ReferenceEquals(this, other))
             return true;
+        if (other is not FlagArgument)
+            return false;
         return Kind == other.Kind && Name == other.Name && Value.Equals(other.Value);
     }
 
     /// <inheritdoc/>
     public override bool Equals(object? obj)
     {
-        return obj is IGameArgument other && Equals(other);
+        return obj is FlagArgument other && Equals(other);
     }
 
     /// <inheritdoc/>

@@ -36,7 +36,7 @@ public class SteamPetroglyphStarWarsGameClient : PetroglyphStarWarsGameClient
     }
 
     /// <inheritdoc />
-    protected override void OnGameStarting(IArgumentCollection arguments, GameBuildType type)
+    protected override void OnGameStarting(ArgumentCollection arguments, GameBuildType type)
     {
         if (!SteamWrapper.IsRunning)
             throw new GameStartException(Game, $"Cannot start game {Game} because Steam Client is not running.");

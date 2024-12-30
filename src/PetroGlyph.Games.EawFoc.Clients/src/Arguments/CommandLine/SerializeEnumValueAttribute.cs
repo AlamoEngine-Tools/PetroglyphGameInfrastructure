@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 
 /// <summary>
 /// Attribute to indicate that an enum shall be serialized by its underlying value.

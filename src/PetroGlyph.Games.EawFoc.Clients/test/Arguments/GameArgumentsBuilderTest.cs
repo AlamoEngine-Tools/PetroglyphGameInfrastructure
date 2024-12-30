@@ -6,7 +6,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
-public class UniqueArgumentCollectionBuilderTest
+public class GameArgumentsBuilderTest
 {
     [Fact]
     public void TestBuilder()
@@ -18,7 +18,7 @@ public class UniqueArgumentCollectionBuilderTest
             new MonitorArgument(1)
         });
 
-        var builder = new UniqueArgumentCollectionBuilder(args);
+        var builder = new GameArgumentsBuilder(args);
         Assert.Equal(2, builder.Build().Count);
 
         builder.Remove(new WindowedArgument());

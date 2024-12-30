@@ -22,9 +22,9 @@ public sealed class GameProcessInfo
     /// <summary>
     /// Gets the set of command-line arguments to use when starting the game.
     /// </summary>
-    public IArgumentCollection Arguments { get; }
+    public ArgumentCollection Arguments { get; }
 
-    internal GameProcessInfo(IGame game, GameBuildType buildType, IArgumentCollection arguments)
+    internal GameProcessInfo(IGame game, GameBuildType buildType, ArgumentCollection arguments)
     {
         Game = game ?? throw new ArgumentNullException(nameof(game));
         BuildType = buildType;

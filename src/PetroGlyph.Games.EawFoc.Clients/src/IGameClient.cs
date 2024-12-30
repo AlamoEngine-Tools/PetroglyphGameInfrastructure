@@ -50,7 +50,7 @@ public interface IGameClient : IDisposable
     /// Starts a new game process with the specified Mod and no other game arguments.
     /// </summary>
     /// <remarks>
-    /// The method does use the mod's dependency information. Use <see cref="Play(IArgumentCollection)"/> for more complex cases.
+    /// The method does use the mod's dependency information. Use <see cref="Play(ArgumentCollection)"/> for more complex cases.
     /// </remarks>
     /// <returns>The process of the started game.</returns>
     /// <exception cref="GameStartException">
@@ -80,7 +80,7 @@ public interface IGameClient : IDisposable
     /// OR
     /// An internal error occurred.
     /// </exception>
-    IGameProcess Play(IArgumentCollection arguments);
+    IGameProcess Play(ArgumentCollection arguments);
 
     /// <summary>
     /// Starts a new game process using the debug executable with the specified game arguments.
@@ -98,5 +98,5 @@ public interface IGameClient : IDisposable
     /// An internal error occurred.
     /// </exception>
     /// <exception cref="NotSupportedException">The client does not support debugging the game.</exception>
-    IGameProcess Debug(IArgumentCollection arguments, bool fallbackToPlay);
+    IGameProcess Debug(ArgumentCollection arguments, bool fallbackToPlay);
 }

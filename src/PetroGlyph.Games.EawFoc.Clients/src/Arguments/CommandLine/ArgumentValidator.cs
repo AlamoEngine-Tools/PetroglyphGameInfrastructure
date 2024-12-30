@@ -1,15 +1,16 @@
 ﻿using System.Linq;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 
-internal sealed class ArgumentValidator : IArgumentValidator
+internal static class ArgumentValidator
 {
 
     // Based on: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/12-Testing_for_Command_Injection
     // Additionally, the game does not like quotes and spaces, so we filter these out too.
-    private static readonly char[] InvalidArgumentChars = ['\"', '\'', '#', '+', ',', '`', '<', '>', '|', ':', ';', '*', '?', '&', ' ', '!', '$', '=', '@', '%', '~'];
+    private static readonly char[] InvalidArgumentChars =
+        ['\"', '\'', '#', '+', ',', '`', '<', '>', '|', ':', ';', '*', '?', '&', ' ', '!', '$', '=', '@', '%', '~'];
 
-    public ArgumentValidityStatus CheckArgument(IGameArgument argument, out string name, out string value)
+    public static ArgumentValidityStatus CheckArgument(IGameArgument argument, out string name, out string value)
     {
         name = argument.Name.ToUpperInvariant();
         value = argument.ValueToCommandLine();
@@ -33,7 +34,7 @@ internal sealed class ArgumentValidator : IArgumentValidator
         {
             if (char.IsWhiteSpace(c))
                 return ArgumentValidityStatus.PathContainsSpaces;
-            
+
             // 0..31 are ASCII control characters
             if (c <= 31 || invalidChars.Contains(c))
                 return ArgumentValidityStatus.IllegalCharacter;

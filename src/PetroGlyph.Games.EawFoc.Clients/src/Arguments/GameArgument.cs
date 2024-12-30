@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
+using System;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
@@ -36,7 +37,10 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
     }
 
     /// <inheritdoc/>
-    public abstract string ValueToCommandLine();
+    public virtual string ValueToCommandLine()
+    {
+        return ArgumentValueSerializer.Serialize(Value);
+    }
 
     /// <summary>
     /// This method shall only perform semantic checks on the <see cref="Value"/> property.
@@ -55,15 +59,9 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
     /// <inheritdoc/>
     public bool IsValid(out ArgumentValidityStatus reason)
     {
-        return IsValid(new ArgumentValidator(), out reason);
-    }
-
-
-    internal bool IsValid(IArgumentValidator validator, out ArgumentValidityStatus reason)
-    {
         try
         {
-            reason = validator.CheckArgument(this, out _, out _);
+            reason = ArgumentValidator.CheckArgument(this, out _, out _);
             if (reason != ArgumentValidityStatus.Valid)
                 return false;
             if (IsDataValid())
