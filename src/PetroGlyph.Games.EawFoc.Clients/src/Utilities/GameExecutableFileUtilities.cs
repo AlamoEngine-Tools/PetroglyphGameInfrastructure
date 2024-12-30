@@ -16,18 +16,21 @@ internal class GameExecutableFileUtilities
     {
         var exeFileName = GetExecutableFileName(game, buildType);
 
+        if (string.IsNullOrEmpty(exeFileName))
+            return null;
+
         return game.Directory
-            .EnumerateFiles(exeFileName, SearchOption.TopDirectoryOnly)
+            .EnumerateFiles(exeFileName!, SearchOption.TopDirectoryOnly)
             .FirstOrDefault();
     }
 
-    private static string GetExecutableFileName(IGame game, GameBuildType buildType)
+    private static string? GetExecutableFileName(IGame game, GameBuildType buildType)
     {
         if (game.Platform == GamePlatform.SteamGold)
             return GetSteamFileName(buildType);
 
         if (buildType is GameBuildType.Debug)
-            throw new InvalidOperationException("Cannot get Debug executable for non-Steam games.");
+            return null;
 
         return game.Type switch
         {

@@ -2,20 +2,25 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
-internal class DefaultGameProcessLauncher(IServiceProvider serviceProvider) : IGameProcessLauncher
+internal sealed class GameProcessLauncher(IServiceProvider serviceProvider) : IGameProcessLauncher
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    private readonly ILogger? _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(GameProcessLauncher));
 
-    public virtual IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo)
+    public IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo)
     {
         try
         {
             var arguments = _serviceProvider.GetRequiredService<IArgumentCommandLineBuilder>()
                 .BuildCommandLine(processInfo.Arguments);
+
+            _logger?.LogInformation($"Starting game '{processInfo.Game}' in '{processInfo.BuildType}' configuration and with launch arguments '{arguments}'");
+
             var processStartInfo = new ProcessStartInfo(executable.FullName)
             {
                 Arguments = arguments,

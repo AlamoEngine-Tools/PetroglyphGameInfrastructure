@@ -8,18 +8,18 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Processes;
 
-public class DefaultGameProcessLauncherTest
+public class GameProcessLauncherTest
 {
-    private readonly DefaultGameProcessLauncher _service;
+    private readonly GameProcessLauncher _service;
     private readonly Mock<IArgumentCommandLineBuilder> _builder;
 
 
-    public DefaultGameProcessLauncherTest()
+    public GameProcessLauncherTest()
     {
         var sc = new ServiceCollection();
         _builder = new Mock<IArgumentCommandLineBuilder>();
         sc.AddTransient(_ => _builder.Object);
-        _service = new DefaultGameProcessLauncher(sc.BuildServiceProvider());
+        _service = new GameProcessLauncher(sc.BuildServiceProvider());
     }
 
     [Fact]

@@ -34,13 +34,4 @@ public sealed class GameStartException : ClientException
     {
         Game = game;
     }
-
-    /// <summary>
-    /// Initializes a new game of the <see cref="GameStartException"/> class.
-    /// </summary>
-    /// <param name="game">The game which could not be started.</param>
-    public GameStartException(IGame game)
-    {
-        Game = game;
-    }
 }

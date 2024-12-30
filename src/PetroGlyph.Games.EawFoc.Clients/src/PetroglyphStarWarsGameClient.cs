@@ -1,5 +1,7 @@
 ﻿using System;
+using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
 using PG.StarWarsGame.Infrastructure.Clients.Utilities;
@@ -8,31 +10,60 @@ using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Clients;
 
-internal abstract class ClientBase(IGame game, IServiceProvider serviceProvider) : IGameClient
+/// <summary>
+/// Represents a client for a Petroglyph Star Wars game which allows launching the game.
+/// </summary>
+public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
 {
+    /// <inheritdoc />
     public event EventHandler<IGameProcess>? GameStarted;
+
+    /// <inheritdoc />
     public event EventHandler<GameStartingEventArgs>? GameStarting;
 
-    private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-    private readonly IGameProcessLauncherFactory _gameProcessLauncherFactory = serviceProvider.GetRequiredService<IGameProcessLauncherFactory>();
+    private readonly IGameProcessLauncher _gameProcessLauncher;
 
-    public abstract bool SupportsDebug { get; }
+    /// <summary>
+    /// Returns the service provider of this instance.
+    /// </summary>
+    protected readonly IServiceProvider ServiceProvider;
 
-    public abstract bool IsSteamClient { get; }
+    /// <summary>
+    /// Returns the Logger of this instance or <see langword="null"/> if not logger is present.
+    /// </summary>
+    protected readonly ILogger? Logger;
 
-    public IGame Game { get; } = game ?? throw new ArgumentNullException(nameof(game));
+    /// <inheritdoc />
+    public IGame Game { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PetroglyphStarWarsGameClient"/> class with the specified game.
+    /// </summary>
+    /// <param name="game">The game of the client.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="game"/> or <paramref name="serviceProvider"/> is <see langword="null"/>.</exception>
+    public PetroglyphStarWarsGameClient(IGame game, IServiceProvider serviceProvider)
+    {
+        Game = game ?? throw new ArgumentNullException(nameof(game));
+        ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        Logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
+        _gameProcessLauncher = serviceProvider.GetRequiredService<IGameProcessLauncher>();
+    }
+
+    /// <inheritdoc />
     public bool IsDebugAvailable()
     {
         var debugExecutable = GameExecutableFileUtilities.GetExecutableForGame(Game, GameBuildType.Debug);
         return debugExecutable is not null && debugExecutable.Exists;
     }
 
+    /// <inheritdoc />
     public IGameProcess Play()
     {
         return StartGame(ArgumentCollection.Empty, GameBuildType.Release);
     }
 
+    /// <inheritdoc />
     public IGameProcess Play(IMod mod)
     {
         if (mod == null)
@@ -41,18 +72,20 @@ internal abstract class ClientBase(IGame game, IServiceProvider serviceProvider)
             throw new GameStartException(Game,
                 "The game reference of the specified mod is not the same as the game reference of this client instance.");
 
-        var modArgsFactory = new ModArgumentListFactory(_serviceProvider);
+        var modArgsFactory = new ModArgumentListFactory(ServiceProvider);
         var modArgs = modArgsFactory.BuildArgumentList(mod, true);
         var argumentsBuilder = new UniqueArgumentCollectionBuilder()
             .Add(modArgs);
         return StartGame(argumentsBuilder.Build(), GameBuildType.Release);
     }
 
+    /// <inheritdoc />
     public IGameProcess Play(IArgumentCollection arguments)
     {
         return StartGame(arguments, GameBuildType.Release);
     }
 
+    /// <inheritdoc />
     public IGameProcess Debug(IArgumentCollection arguments, bool fallbackToPlay)
     {
         var buildType = GameBuildType.Debug;
@@ -61,6 +94,7 @@ internal abstract class ClientBase(IGame game, IServiceProvider serviceProvider)
             if (!fallbackToPlay)
                 throw new GameStartException(Game, "Debug version of the game could not be found.");
             buildType = GameBuildType.Release;
+            Logger?.LogTrace($"Falling back to release configuration because debug executables of '{Game}' were not found.");
         }
         return StartGame(arguments, buildType);
     }
@@ -78,10 +112,18 @@ internal abstract class ClientBase(IGame game, IServiceProvider serviceProvider)
             throw new GameStartException(Game, $"Executable files for {Game} could not be found.");
 
         var processInfo = new GameProcessInfo(Game, type, arguments);
-        var gameLauncher = _gameProcessLauncherFactory.CreateGameProcessLauncher(IsSteamClient);
-        var gameProcess = gameLauncher.StartGameProcess(executable, processInfo);
+        var gameProcess = _gameProcessLauncher.StartGameProcess(executable, processInfo);
         OnGameStartedInternal(gameProcess);
         return gameProcess;
+    }
+
+    /// <summary>
+    /// Invoked whenever <see cref="Game"/> has been requested to start.
+    /// </summary>
+    /// <param name="arguments">The requested arguments.</param>
+    /// <param name="type">The requested build type.</param>
+    protected virtual void OnGameStarting(IArgumentCollection arguments, GameBuildType type)
+    {
     }
 
     private void OnGameStartedInternal(IGameProcess gameProcess)
@@ -94,6 +136,8 @@ internal abstract class ClientBase(IGame game, IServiceProvider serviceProvider)
 
     private bool OnGameStartingInternal(IArgumentCollection arguments, GameBuildType type)
     {
+        OnGameStarting(arguments, type);
+
         var gameStartingArgs = new GameStartingEventArgs(Game, arguments, type);
         GameStarting?.Invoke(this, gameStartingArgs);
         return !gameStartingArgs.Cancel;

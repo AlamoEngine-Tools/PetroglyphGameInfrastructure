@@ -93,7 +93,6 @@ public class GameExecutableFileUtilitiesTest : CommonTestBase
         var game = FileSystem.InstallGame(identity, ServiceProvider);
         using var _ = FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "StarWarsG.exe"));
 
-        Assert.Throws<InvalidOperationException>(() =>
-            GameExecutableFileUtilities.GetExecutableForGame(game, GameBuildType.Debug));
+        Assert.Null(GameExecutableFileUtilities.GetExecutableForGame(game, GameBuildType.Debug));
     }
 }

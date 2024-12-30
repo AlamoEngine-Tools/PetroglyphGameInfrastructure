@@ -3,7 +3,7 @@
 namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
-/// The exception that is thrown when a Client operation caused an error.
+/// The exception that is thrown when a Client operation fails.
 /// </summary>
 public class ClientException : Exception
 {

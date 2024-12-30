@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -11,7 +10,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients;
 /// A game client is responsible for starting a Petroglyph Star Wars game,
 /// as well as keeping track which game instances, started by this client, are currently running.
 /// </summary>
-public interface IGameClient
+public interface IGameClient : IDisposable
 {
     /// <summary>
     /// Raised when a game process was started.
@@ -27,11 +26,6 @@ public interface IGameClient
     /// Gets the game instance that is associated to the client.
     /// </summary>
     public IGame Game { get; }
-
-    /// <summary>
-    /// Gets a value indicating whether the client supports debugging the game.
-    /// </summary>
-    public bool SupportsDebug { get; }
 
     /// <summary>
     /// Checks whether the debug executables of the game are present.

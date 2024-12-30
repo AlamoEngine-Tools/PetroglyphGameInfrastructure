@@ -5,31 +5,31 @@ using PG.StarWarsGame.Infrastructure.Games;
 namespace PG.StarWarsGame.Infrastructure.Clients;
 
 /// <summary>
-/// Cancelable event handler when a game was requested to start.
+/// Provides data for the <see cref="IGameClient.GameStarting"/> event. 
 /// </summary>
 public sealed class GameStartingEventArgs : CancelEventArgs
 {
     /// <summary>
-    /// The instance requested to start.
+    /// Gets the game instance requested to start.
     /// </summary>
     public IGame Game { get; }
 
     /// <summary>
-    /// The requested game arguments 
+    /// Gets the requested game arguments 
     /// </summary>
     public IArgumentCollection GameArguments { get; }
 
     /// <summary>
-    /// The requested <see cref="GameBuildType"/> of the game.
+    /// Gets the requested build type of the game.
     /// </summary>
     public GameBuildType BuildType { get; }
 
     /// <summary>
-    /// Creates a new instance.
+    /// Initializes a new instance of the <see cref="GameStartingEventArgs"/> with the specified game launch information.
     /// </summary>
-    /// <param name="game">The instance requested to start.</param>
-    /// <param name="arguments">The requested game arguments </param>
-    /// <param name="buildType">The requested <see cref="GameBuildType"/> of the game.</param>
+    /// <param name="game">The game instance requested to start.</param>
+    /// <param name="arguments">The requested game arguments.</param>
+    /// <param name="buildType">The requested build type of the game.</param>
     public GameStartingEventArgs(IGame game, IArgumentCollection arguments, GameBuildType buildType)
     {
         Game = game;
