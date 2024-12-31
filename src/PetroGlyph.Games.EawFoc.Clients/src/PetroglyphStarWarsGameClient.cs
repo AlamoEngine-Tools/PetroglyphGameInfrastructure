@@ -72,11 +72,10 @@ public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
             throw new GameStartException(Game,
                 "The game reference of the specified mod is not the same as the game reference of this client instance.");
 
-        var modArgsFactory = new ModArgumentListFactory(ServiceProvider);
-        var modArgs = modArgsFactory.BuildArgumentList(mod, true);
-        var argumentsBuilder = new GameArgumentsBuilder()
-            .Add(modArgs);
-        return StartGame(argumentsBuilder.Build(), GameBuildType.Release);
+        using var argBuilder = new GameArgumentsBuilder()
+            .AddSingleMod(mod);
+
+        return StartGame(argBuilder.Build(), GameBuildType.Release);
     }
 
     /// <inheritdoc />

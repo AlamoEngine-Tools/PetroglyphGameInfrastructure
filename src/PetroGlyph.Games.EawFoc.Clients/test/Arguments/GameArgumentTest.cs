@@ -1,71 +1,95 @@
-﻿using System;
-using Moq;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
-public class GameArgumentTest
+public class GameArgumentTest : GameArgumentTestBase
 {
-    [Fact]
-    public void TestArgValid()
+    [Theory]
+    [InlineData(ArgumentKind.Flag)]
+    [InlineData(ArgumentKind.DashedFlag)]
+    [InlineData(ArgumentKind.KeyValue)]
+    [InlineData(ArgumentKind.ModList)]
+    public void TestArgValid(ArgumentKind kind)
     {
-        var validator = new Mock<IArgumentValidator>();
-        var arg = new Argument("valid");
+        var value = ValidStringValue;
+        if (kind == ArgumentKind.ModList)
+            value = string.Empty;
 
-        var valid = arg.IsValid(validator.Object, out var reason);
+        var arg = new ValidatingTestArgument(true, kind, value);
 
-        Assert.True(valid);
+        var valid = arg.IsValid(out var reason);
+
+        if (!valid) 
+            arg.IsValid(out reason);
+
+        Assert.True(valid, $"Validity is {reason} for argument '{arg.Kind}' {arg.Name}");
         Assert.Equal(ArgumentValidityStatus.Valid, reason);
     }
 
-    [Fact]
-    public void TestArgInvalid()
+    [Theory]
+    [MemberData(nameof(GetIllegalCharacterGameArgs))]
+    public void TestArgInvalid(GameArgument arg)
     {
-        var validator = new Mock<IArgumentValidator>();
-        var arg = new Argument("valid");
-
-        validator.Setup(v =>
-                v.CheckArgument(It.IsAny<IGameArgument>(), out It.Ref<string>.IsAny, out It.Ref<string>.IsAny))
-            .Returns(ArgumentValidityStatus.IllegalCharacter);
-
-        var valid = arg.IsValid(validator.Object, out var reason);
+        var valid = arg.IsValid(out var reason);
 
         Assert.False(valid);
         Assert.Equal(ArgumentValidityStatus.IllegalCharacter, reason);
     }
 
-    [Fact]
-    public void TestArgInvalidCustom()
+    [Theory]
+    [InlineData(ArgumentKind.Flag)]
+    [InlineData(ArgumentKind.DashedFlag)]
+    [InlineData(ArgumentKind.KeyValue)]
+    [InlineData(ArgumentKind.ModList)]
+    public void TestArgInvalidCustom(ArgumentKind kind)
     {
-        var validator = new Mock<IArgumentValidator>();
-        var arg = new Argument("invalid");
+        var value = ValidStringValue;
+        if (kind == ArgumentKind.ModList)
+            value = string.Empty;
 
-        var valid = arg.IsValid(validator.Object, out var reason);
+        var arg = new ValidatingTestArgument(false, kind, value);
+
+        var valid = arg.IsValid(out var reason);
 
         Assert.False(valid);
         Assert.Equal(ArgumentValidityStatus.InvalidData, reason);
     }
 
-
-    private class Argument(string value, bool isDebug = false) : GameArgument<string>(value, isDebug)
+    [Fact]
+    public void NameIsAlwaysUppercased()
     {
-        public override ArgumentKind Kind => ArgumentKind.Flag;
-        public override string Name => null!;
+        var arg = new LowerCaseNameArg();
+        Assert.Equal(arg.Name.ToUpperInvariant(), arg.Name);
+    }
 
-        protected override bool IsDataValid()
-        {
-            return Value == "valid";
-        }
+    [Fact]
+    public void ModListArgKindRequiresEmptyStringValue_InvalidTest()
+    {
+        var invalidArg = new ValidatingTestArgument(true, ArgumentKind.ModList, "notEmpty");
+        var valid = invalidArg.IsValid(out var reason);
+        Assert.False(valid);
+        Assert.Equal(ArgumentValidityStatus.InvalidData, reason);
+    }
 
-        public override string ValueToCommandLine()
-        {
-            throw new NotImplementedException();
-        }
+    [Fact]
+    public void ModListArgKindRequiresEmptyStringValue_ValidTest()
+    {
+        var invalidArg = new ValidatingTestArgument(true, ArgumentKind.ModList, string.Empty);
+        var valid = invalidArg.IsValid(out var reason);
+        Assert.True(valid, $"Validity is {reason}");
+        Assert.Equal(ArgumentValidityStatus.Valid, reason);
+    }
 
-        public override bool Equals(IGameArgument? other)
+    public class ValidatingTestArgument(bool isValid, ArgumentKind kind, string value)
+        : GameArgument(TestHelpers.GetRandom(GameArgumentNames.AllInternalSupportedArgumentNames), value)
+    {
+        public override ArgumentKind Kind => kind;
+
+        private protected override bool IsDataValid()
         {
-            throw new NotImplementedException();
+            return isValid;
         }
     }
 }

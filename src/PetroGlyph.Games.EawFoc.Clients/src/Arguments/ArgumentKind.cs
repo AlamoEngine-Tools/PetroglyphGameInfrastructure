@@ -1,7 +1,7 @@
 ﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-/// Flag indication the kindness of an <see cref="IGameArgument"/>
+/// Indicates the kindness of an <see cref="GameArgument"/>.
 /// </summary>
 public enum ArgumentKind
 {
@@ -18,7 +18,7 @@ public enum ArgumentKind
     /// </summary>
     KeyValue,
     /// <summary>
-    /// Synthetic kind, to indicate this argument contains an ordered list of mod arguments.
+    /// Synthetic argument, which contains an ordered list of mod arguments.
     /// </summary>
     ModList
 }

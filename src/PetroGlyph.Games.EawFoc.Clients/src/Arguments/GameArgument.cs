@@ -4,40 +4,44 @@ using System;
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-/// Base implementation for a typed <see cref="IGameArgument{T}"/>.
+/// Represents an argument for a Petroglyph Star Wars game.
 /// </summary>
-/// <typeparam name="T">The non-nullable type of the argument.</typeparam>
-public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
+public abstract class GameArgument
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Flag indicating how this arguments shall be handled.
+    /// </summary>
     public abstract ArgumentKind Kind { get; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Indicates this argument can only be used in debug mode if <see langword="true"/>.
+    /// </summary>
     public bool DebugArgument { get; }
 
-    /// <inheritdoc/>
-    public abstract string Name { get; }
-
-    /// <inheritdoc/>
-    public T Value { get; }
-
-    object IGameArgument.Value => Value;
+    /// <summary>
+    /// The name of the argument.
+    /// </summary>
+    public string Name { get; }
 
     /// <summary>
-    /// Initializes a new argument with a given value and the inforation if this argument is for debug mode only.
+    /// The value of the argument.
     /// </summary>
-    /// <param name="value">The argument's value.</param>
-    /// <param name="isDebug">Indicates whether this instance if for debug mode only.</param>
-    protected GameArgument(T value, bool isDebug = false)
+    public object Value { get; }
+
+    internal virtual bool HasPathValue => false;
+
+    private protected GameArgument(string name, object value, bool isDebug = false)
     {
-        if (value is null)
-            throw new ArgumentNullException(nameof(value));
-        Value = value;
+        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
+        Name = name.ToUpperInvariant();
+        Value = value ?? throw new ArgumentNullException(nameof(value));
         DebugArgument = isDebug;
     }
 
-    /// <inheritdoc/>
-    public virtual string ValueToCommandLine()
+    // Internal, because the returned value is unsafe by design.
+    // We don't want to easily enable users to build unsafe command lines on their own.
+    // Data validation is done in ArgumentCommandLineBuilder
+    internal virtual string ValueToCommandLine()
     {
         return ArgumentValueSerializer.Serialize(Value);
     }
@@ -47,35 +51,109 @@ public abstract class GameArgument<T> : IGameArgument<T> where T : notnull
     /// <para>If this method returns <see langword="false"/>, <see cref="IsValid(out ArgumentValidityStatus)"/>
     /// with return <see langword="false"/> with reason <see cref="ArgumentValidityStatus.InvalidData"/>.</para>
     /// <para>
-    /// This method gets called in the sequence of <see cref="IGameArgument.IsValid"/>. Returns <see langword="true"/> by default.
+    /// This method gets called in the sequence of <see cref="IsValid"/>. Returns <see langword="true"/> by default.
     /// </para>
     /// </summary>
     /// <returns><see langword="true"/> if the data is valid; <see langword="false"/> otherwise.</returns>
-    protected virtual bool IsDataValid()
+    private protected virtual bool IsDataValid()
     {
         return true;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Checks whether this argument has correct data. This checks the <see cref="Name"/> as well as <see cref="Value"/>.
+    /// </summary>
+    /// <param name="reason">Detailed status of the validation.</param>
+    /// <returns><see langword="true"/> when the argument is valid; <see langword="false"/> otherwise.</returns>
     public bool IsValid(out ArgumentValidityStatus reason)
     {
-        try
-        {
-            reason = ArgumentValidator.CheckArgument(this, out _, out _);
-            if (reason != ArgumentValidityStatus.Valid)
-                return false;
-            if (IsDataValid())
-                return true;
-            reason = ArgumentValidityStatus.InvalidData;
-            return false;
-        }
-        catch (Exception)
+        if (!IsDataValid())
         {
             reason = ArgumentValidityStatus.InvalidData;
             return false;
         }
+
+        reason = ArgumentValidator.CheckArgument(this);
+        if (reason != ArgumentValidityStatus.Valid)
+            return false;
+
+        reason = ArgumentValidityStatus.Valid;
+        return true;
     }
 
-    /// <inheritdoc/>
-    public abstract bool Equals(IGameArgument? other);
+    /// <summary>
+    /// Compares two <see cref="GameArgument"/> for equality.
+    /// </summary>
+    /// <param name="other">The game argument to compare with the current instance.</param>
+    /// <returns><see langword="true"/> if the two instances represent the argument; otherwise, <see langword="false"/>.</returns>
+    public bool Equals(GameArgument? other)
+    {
+        if (other is null)
+            return false;
+        if (ReferenceEquals(this, other))
+            return true;
+        if (GetType() != other.GetType())
+            return false;
+        return Kind == other.Kind && Name.Equals(other.Name) && EqualsValue(other);
+    }
+
+    /// <summary>
+    /// Compares two <see cref="GameArgument"/> for equality.
+    /// </summary>
+    /// <param name="obj">The game argument to compare with the current instance.</param>
+    /// <returns><see langword="true"/> if the two instances represent the argument; otherwise, <see langword="false"/>.</returns>
+    public sealed override bool Equals(object? obj)
+    {
+        if (obj is null)
+            return false;
+        return ReferenceEquals(this, obj) || Equals((GameArgument)obj);
+    }
+
+    /// <summary>
+    /// Gets the hash code for the game argument.
+    /// </summary>
+    /// <returns>The hash value generated for this game argument.</returns>
+    public sealed override int GetHashCode()
+    {
+        return HashCode.Combine(Kind, Name, ValueHash());
+    }
+
+    /// <summary>
+    /// Returns a textual representation of the game argument.
+    /// </summary>
+    /// <remarks>
+    /// The returned value must not be used to build a command line.
+    /// </remarks>
+    /// <returns>A textual representation of the game argument.</returns>
+    public sealed override string ToString()
+    {
+        return $"{Name}={Value} ({Kind})";
+    }
+
+    private protected virtual bool EqualsValue(GameArgument other)
+    {
+        return ValueToCommandLine().Equals(other.ValueToCommandLine());
+    }
+
+    private protected virtual int ValueHash()
+    {
+        return ValueToCommandLine().GetHashCode();
+    }
+}
+
+/// <summary>
+/// Base implementation for a typed <see cref="GameArgument{T}"/>.
+/// </summary>
+/// <typeparam name="T">The non-nullable type of the argument.</typeparam>
+public abstract class GameArgument<T> : GameArgument where T : notnull
+{
+    /// <summary>
+    /// Gets the value of game argument.
+    /// </summary>
+    public new T Value { get; }
+
+    private protected GameArgument(string name, T value, bool isDebug = false) : base(name, value, isDebug)
+    {
+        Value = value;
+    }
 }

@@ -75,6 +75,11 @@ public class SteamGameHelpersTest : CommonTestBase
 
         Assert.True(_service.ToSteamWorkshopsId(steamId.ToString(), out var result));
         Assert.Equal(steamId, result);
+
+        Assert.True(SteamGameHelpers.IstValidSteamWorkshopsDir(steamId.ToString(), out result));
+        Assert.Equal(steamId, result);
+
+        Assert.True(SteamGameHelpers.IstValidSteamWorkshopsDir(steamId.ToString()));
     }
 
     [Theory]
@@ -92,6 +97,8 @@ public class SteamGameHelpersTest : CommonTestBase
     public void ToSteamWorkshopsId_InvalidFormats(string input)
     {
         Assert.False(_service.ToSteamWorkshopsId(input, out _));
+        Assert.False(SteamGameHelpers.IstValidSteamWorkshopsDir(input, out _));
+        Assert.False(SteamGameHelpers.IstValidSteamWorkshopsDir(input));
     }
 
     [Fact]
@@ -99,5 +106,11 @@ public class SteamGameHelpersTest : CommonTestBase
     {
         Assert.Throws<ArgumentNullException>(() => _service.ToSteamWorkshopsId(null!, out _));
         Assert.Throws<ArgumentException>(() => _service.ToSteamWorkshopsId(string.Empty, out _));
+
+        Assert.Throws<ArgumentNullException>(() => SteamGameHelpers.IstValidSteamWorkshopsDir(null!, out _));
+        Assert.Throws<ArgumentException>(() => SteamGameHelpers.IstValidSteamWorkshopsDir(string.Empty, out _));
+
+        Assert.Throws<ArgumentNullException>(() => SteamGameHelpers.IstValidSteamWorkshopsDir(null!));
+        Assert.Throws<ArgumentException>(() => SteamGameHelpers.IstValidSteamWorkshopsDir(string.Empty));
     }
 }

@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 /// <summary>
 /// Special argument which holds an ordered list of arguments to represent a mod chain.
 /// </summary>
-public sealed class ModArgumentList : GameArgument<IReadOnlyList<ModArgument>>
+internal sealed class ModArgumentList : GameArgument<IReadOnlyList<ModArgument>>
 {
     /// <summary>
     /// Empty <see cref="ModArgumentList"/>.
@@ -19,47 +19,32 @@ public sealed class ModArgumentList : GameArgument<IReadOnlyList<ModArgument>>
     /// </summary>
     public override ArgumentKind Kind => ArgumentKind.ModList;
 
-    /// <inheritdoc/>
-    public override string Name => ArgumentNameCatalog.ModListArg;
-
-    /// <summary>
-    /// Creates a new argument from a given list of 
-    /// </summary>
-    /// <param name="mods">The mod arguments of this list.</param>
-    internal ModArgumentList(IReadOnlyList<ModArgument> mods) : base(mods)
+    internal ModArgumentList(IReadOnlyList<ModArgument> mods) : base(GameArgumentNames.ModListArg, mods)
     {
     }
 
     /// <inheritdoc/>
-    public override string ValueToCommandLine()
+    internal override string ValueToCommandLine()
     {
-        // A ModList argument has no "value" which can be placed to the command line.
-        // Its items need to be handled individually.
+        // The value created by the ArgumentCommandLineBuilder,
+        // thus we return just an empty string.
         return string.Empty;
     }
 
-    /// <inheritdoc/>
-    protected override bool IsDataValid()
+    private protected override bool EqualsValue(GameArgument other)
     {
-        // No other checks are done here.
-        return Value.All(m => m.Kind == ArgumentKind.KeyValue);
+        if (other is not ModArgumentList otherModList)
+            return false;
+        if (Value.Count != otherModList.Value.Count)
+            return false;
+        return Value.SequenceEqual(otherModList.Value);
     }
 
-    /// <inheritdoc/>
-    public override bool Equals(IGameArgument? other)
+    private protected override int ValueHash()
     {
-        if (other is null)
-            return false;
-        if (ReferenceEquals(this, other))
-            return true;
-        if (other is not IGameArgument<IReadOnlyList<ModArgument>> otherModList)
-            return false;
-        return Kind == other.Kind && Value.SequenceEqual(otherModList.Value);
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Kind, Name, Value);
+        var hashCode = new HashCode();
+        foreach (var mod in Value) 
+            hashCode.Add(mod);
+        return hashCode.ToHashCode();
     }
 }

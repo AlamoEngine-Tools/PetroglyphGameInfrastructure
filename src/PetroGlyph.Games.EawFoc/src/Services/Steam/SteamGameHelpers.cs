@@ -48,7 +48,18 @@ internal class SteamGameHelpers(IServiceProvider serviceProvider) : ISteamGameHe
     /// <inheritdoc/>
     public bool ToSteamWorkshopsId(string input, out ulong steamId)
     {
+        return IstValidSteamWorkshopsDir(input, out steamId);
+    }
+
+    public static bool IstValidSteamWorkshopsDir(string input, out ulong steamId)
+    {
         AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(input);
         return ulong.TryParse(input, NumberStyles.None, null, out steamId);
+    }
+
+    public static bool IstValidSteamWorkshopsDir(string input)
+    {
+        AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(input);
+        return IstValidSteamWorkshopsDir(input, out _);
     }
 }

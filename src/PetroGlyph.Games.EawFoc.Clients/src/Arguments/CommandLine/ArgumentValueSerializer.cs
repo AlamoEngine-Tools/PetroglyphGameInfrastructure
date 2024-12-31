@@ -37,6 +37,8 @@ internal static class ArgumentValueSerializer
 
     public static string Serialize(object value)
     {
+        if (value == null) 
+            throw new ArgumentNullException(nameof(value));
         if (value is string stringValue)
             return stringValue;
         var type = value.GetType();
@@ -54,14 +56,23 @@ internal static class ArgumentValueSerializer
         return converter.ConvertToInvariantString(value) ?? string.Empty;
     }
 
-    public static string ShortenPath(IFileSystemInfo target, IDirectoryInfo gameDir)
+    public static string ShortenPath(IFileSystemInfo target, IDirectoryInfo baseDir)
     {
         var fileSystem = target.FileSystem;
 
-        if (!fileSystem.Path.IsChildOf(gameDir.FullName, target.FullName))
-            return PathNormalizer.Normalize(target.FullName, NormalizeOptions);
+        var fullTarget = target.FullName;
+        var fullBase = baseDir.FullName;
 
-        return PathNormalizer.Normalize(fileSystem.Path.GetRelativePathEx(gameDir.FullName, target.FullName), NormalizeOptions);
+        if (fileSystem.Path.IsChildOf(fullBase, fullTarget))
+            return PathNormalizer.Normalize(fileSystem.Path.GetRelativePathEx(fullBase, fullTarget), NormalizeOptions);
+
+        var normalized = PathNormalizer.Normalize(fullTarget, NormalizeOptions);
+        if (ArgumentValidator.ContainsInvalidCharacters(normalized.AsSpan(), true) == ArgumentValidityStatus.Valid)
+            return normalized;
+
+        // If the full path contains spaces, we get the relative path from baseDir and return that. 
+        // Data validation will haven at a different place, so no need to throw a GameArgumentException here already.
+        return PathNormalizer.Normalize(fileSystem.Path.GetRelativePathEx(fullBase, fullTarget), NormalizeOptions);
     }
 
     private static TypeConverter? GetConverter(string typeName)

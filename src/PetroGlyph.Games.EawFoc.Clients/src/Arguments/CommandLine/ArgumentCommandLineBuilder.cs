@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
@@ -9,25 +6,21 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 internal static class ArgumentCommandLineBuilder
 {
     /// <summary>
-    /// Converts this collection into a string which can be used as argument sequence for a Petroglyph Star Wars game.
+    /// Converts this collection into a string which can be used as a sequence of arguments for a Petroglyph Star Wars game.
     /// </summary>
     /// <remarks>While this operation sanitizes bad input by throwing an exception, by design, we do not sanity check the values here.</remarks>
     /// <returns>Strings representation of arguments</returns>
-    /// <exception cref="GameArgumentException"> This collection contained invalid arguments.
-    /// </exception>
+    /// <exception cref="GameArgumentException"> <paramref name="arguments"/> has invalid arguments.</exception>
     public static string BuildCommandLine(ArgumentCollection arguments)
     {
-        if (!arguments.Any())
+        if (arguments.Count == 0)
             return string.Empty;
 
         var argumentBuilder = new StringBuilder();
 
         foreach (var gameArgument in arguments)
         {
-            var validity = ArgumentValidator.CheckArgument(gameArgument, out var argName, out var argValue);
-            if (validity != ArgumentValidityStatus.Valid)
-                throw new GameArgumentException(gameArgument, $"Argument is not valid. Reason: {validity}");
-            var argumentText = ToCommandLine(gameArgument, argName, argValue);
+            var argumentText = ToCommandLine(gameArgument);
             argumentBuilder.Append(argumentText);
             argumentBuilder.Append(' ');
         }
@@ -35,52 +28,40 @@ internal static class ArgumentCommandLineBuilder
         return argumentBuilder.ToString().TrimEnd();
     }
 
-    internal static string ToCommandLine(IGameArgument argument, string name, string value)
+    private static string ToCommandLine(GameArgument argument)
     {
-        switch (argument.Kind)
+        if (!argument.IsValid(out var reason))
+            throw new GameArgumentException(argument, $"Argument is not valid. Reason: {reason.GetInvalidArgMessage()}");
+
+        switch (argument)
         {
-            case ArgumentKind.Flag:
-                return BuildFlagArgument(name, (bool)argument.Value, false);
-            case ArgumentKind.DashedFlag:
-                return BuildFlagArgument(name, (bool)argument.Value, true);
-            case ArgumentKind.KeyValue:
-                return BuildKeyValueArgument(name, value);
-            case ArgumentKind.ModList:
-                if (argument is not IGameArgument<IReadOnlyList<ModArgument>> modList)
-                    throw new GameArgumentException(argument,
-                        "Mod List argument is expected to be of type 'IGameArgument<IReadOnlyList<ModArgument>>'");
-                return BuildModListString(modList);
+            case FlagArgument flagArgument:
+                return BuildFlagArgument(flagArgument);
+            case ModArgumentList modList:
+                return BuildModListString(modList); 
             default:
-                throw new ArgumentOutOfRangeException();
+                return BuildKeyValueArgument(argument);
         }
     }
 
-    private static string BuildFlagArgument(string flag, bool value, bool dashed)
+    private static string BuildFlagArgument(FlagArgument argument)
     {
-        if (!value)
+        if (!argument.Value)
             return string.Empty;
-        if (dashed)
-            flag = $"-{flag}";
-        return flag;
+        return argument.Kind == ArgumentKind.DashedFlag ? $"-{argument.Name}" : argument.Name;
     }
 
-    private static string BuildKeyValueArgument(string key, string value)
+    private static string BuildKeyValueArgument(GameArgument argument)
     {
-        return $"{key}={value}";
+        return $"{argument.Name}={argument.ValueToCommandLine()}";
     }
 
-    private static string BuildModListString(IGameArgument<IReadOnlyList<ModArgument>> modList)
+    private static string BuildModListString(ModArgumentList modList)
     {
         var sb = new StringBuilder();
         foreach (var modArg in modList.Value)
         {
-            if (modArg.Kind != ArgumentKind.KeyValue)
-                throw new GameArgumentException(modArg, "Mod argument must be a key/value argument.");
-            var validity = ArgumentValidator.CheckArgument(modArg, out var key, out var modPath);
-            if (validity != ArgumentValidityStatus.Valid)
-                throw new GameArgumentException(modArg, $"Mod argument is not valid. Reason: {validity}");
-            var argumentText = BuildKeyValueArgument(key, modPath);
-            sb.Append(argumentText);
+            sb.Append(ToCommandLine(modArg));
             sb.Append(' ');
         }
         return sb.ToString().TrimEnd();

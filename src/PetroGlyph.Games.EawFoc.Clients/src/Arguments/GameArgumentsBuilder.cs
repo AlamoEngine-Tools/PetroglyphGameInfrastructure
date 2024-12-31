@@ -1,84 +1,229 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using AnakinRaW.CommonUtilities;
+using EawModinfo.Spec;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-/// Service to build an <see cref="ArgumentCollection"/> which uses the argument's name as unique identifier. Arguments with the same name will be replaced.
+/// Builder service to create an <see cref="ArgumentCollection"/>. Arguments of the same name will be replaced.
 /// </summary>
-public class GameArgumentsBuilder
+public class GameArgumentsBuilder : DisposableObject
 {
-    private readonly Dictionary<string, IGameArgument> _argumentDict = new();
+    private readonly Dictionary<string, GameArgument> _argumentDict = new();
+    private List<IMod>? _mods;
 
     /// <summary>
-    /// Initializes an <see cref="GameArgumentsBuilder"/> with no arguments.
+    /// Initializes a new instance of the <see cref="GameArgumentsBuilder"/> class with no initial arguments.
     /// </summary>
     public GameArgumentsBuilder()
     {
     }
 
     /// <summary>
-    /// Adds or updates an argument to this instance. 
+    /// Adds a game argument to the <see cref="GameArgumentsBuilder"/>.
     /// </summary>
-    /// <param name="argument">The argument to add or update.</param>
-    /// <returns>This instance.</returns>
+    /// <remarks>
+    /// If the argument is already present in the <see cref="GameArgumentsBuilder"/>, the value old argument is overwritten by <paramref name="argument"/>.
+    /// </remarks>
+    /// <param name="argument">The argument to add.</param>
+    /// <returns></returns>
     /// <exception cref="ArgumentNullException"><paramref name="argument"/> is <see langword="null"/>.</exception>
-    public GameArgumentsBuilder Add(IGameArgument argument)
+    /// <exception cref="NotSupportedException"><paramref name="argument"/> is a <see cref="ModArgumentList"/> or <see cref="ModArgument"/>.</exception>
+    /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
+    public GameArgumentsBuilder Add(GameArgument argument)
     {
+        ThrowIfDisposed();
         if (argument == null) 
             throw new ArgumentNullException(nameof(argument));
+
+        if (argument is ModArgument or ModArgumentList)
+            throw new NotSupportedException(
+                $"Adding an instance of {nameof(ModArgument)} or {nameof(ModArgumentList)} directly is not supported. Use AddSingleMod() or AddMods()");
 
         _argumentDict[argument.Name] = argument;
         return this;
     }
 
     /// <summary>
-    /// Removes the argument if present from this instance.
+    /// Adds a single mod to the <see cref="GameArgumentsBuilder"/>.
+    /// </summary>
+    /// <remarks>
+    /// Previous mods added to the <see cref="GameArgumentsBuilder"/> are removed.
+    /// </remarks>
+    /// <param name="mod">The mod add.</param>
+    /// <returns>This instance.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="mod"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
+    public GameArgumentsBuilder AddSingleMod(IMod mod)
+    {
+        ThrowIfDisposed();
+        if (mod == null) 
+            throw new ArgumentNullException(nameof(mod));
+        return AddMods([mod]);
+    }
+
+    /// <summary>
+    /// Adds a list of mods to the <see cref="GameArgumentsBuilder"/>.
+    /// </summary>
+    /// <remarks>
+    /// Previous mods added to the <see cref="GameArgumentsBuilder"/> are removed.
+    /// </remarks>
+    /// <param name="mods">The list of mods to add.</param>
+    /// <returns>This instance.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="mods"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="mods"/> contains a null reference.</exception>
+    /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
+    public GameArgumentsBuilder AddMods(IList<IMod> mods)
+    {
+        ThrowIfDisposed();
+        if (mods == null) 
+            throw new ArgumentNullException(nameof(mods));
+        _mods?.Clear();
+
+        if (mods.Count == 0)
+        {
+            _mods = null;
+            return this;
+        }
+        
+        var modList = new List<IMod>(mods.Count);
+        foreach (var mod in mods)
+        {
+            if (mod is null)
+                throw new ArgumentException("The mod list contains a null reference.", nameof(mods));
+            modList.Add(mod);
+        }
+        _mods = modList;
+        return this;
+    }
+
+    /// <summary>
+    /// Removes the argument if present from the <see cref="GameArgumentsBuilder"/>.
     /// </summary>
     /// <param name="argument">The argument to remove.</param>
     /// <returns>This instance.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="argument"/> is <see langword="null"/>.</exception>
-    public GameArgumentsBuilder Remove(IGameArgument argument)
+    /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
+    public GameArgumentsBuilder Remove(GameArgument argument)
     {
+        ThrowIfDisposed();
         if (argument == null)
             throw new ArgumentNullException(nameof(argument));
-
         return Remove(argument.Name);
     }
 
     /// <summary>
-    /// Removes the argument with the given <paramref name="name"/>
+    /// Removes the argument with the specified <paramref name="name"/> from the <see cref="GameArgumentsBuilder"/>.
     /// </summary>
     /// <param name="name">The name of the argument to remove.</param>
     /// <returns>This instance.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException"><paramref name="name"/> is empty.</exception>
+    /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
     public GameArgumentsBuilder Remove(string name)
     {
+        ThrowIfDisposed();
         AnakinRaW.CommonUtilities.ThrowHelper.ThrowIfNullOrEmpty(name);
         _argumentDict.Remove(name);
         return this;
     }
 
     /// <summary>
-    /// Adds or updates all arguments from <paramref name="argumentCollection"/> to this instance.
+    /// Removes all mods from the <see cref="GameArgumentsBuilder"/>.
     /// </summary>
-    /// <param name="argumentCollection">The arguments to add or update.</param>
     /// <returns>This instance.</returns>
-    public GameArgumentsBuilder AddAll(ArgumentCollection argumentCollection)
+    /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
+    public GameArgumentsBuilder RemoveMods()
     {
-        foreach (var arg in argumentCollection)
-            Add(arg);
+        ThrowIfDisposed();
+        _mods?.Clear();
+        _mods = null;
         return this;
     }
 
     /// <summary>
-    /// Creates an <see cref="ArgumentCollection"/> from this instance.
+    /// Builds an <see cref="ArgumentCollection"/> from the <see cref="GameArgumentsBuilder"/>.
     /// </summary>
-    /// <returns>The created <see cref="ArgumentCollection"/>.</returns>
+    /// <returns>The created argument collection.</returns>
+    /// <exception cref="GameArgumentException">One or more arguments of the <see cref="GameArgumentsBuilder"/> are not valid.</exception>
+    /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
     public ArgumentCollection Build()
     {
-        return new ArgumentCollection(_argumentDict.Values.ToList());
+        ThrowIfDisposed();
+        if (_argumentDict.Keys.Count == 0 && (_mods is null || _mods.Count == 0))
+            return ArgumentCollection.Empty;
+
+        var arguments = new List<GameArgument>();
+        
+        foreach (var argumentPair in _argumentDict)
+        {
+            var argument = argumentPair.Value;
+            if (!argument.IsValid(out var reason))
+                throw new GameArgumentException(argument, $"Unable to create argument list: The argument '{argument}' is not valid: '{reason.GetInvalidArgMessage()}'");
+            arguments.Add(argument);
+        }
+
+        var modArgs = BuildModArgumentList(_mods);
+        if (modArgs.Value.Count > 0)
+            arguments.Add(modArgs);
+
+        return new ArgumentCollection(arguments);
+    }
+
+    /// <inheritdoc />
+    protected override void DisposeManagedResources()
+    {
+        base.DisposeManagedResources();
+        _mods?.Clear();
+        _mods = null;
+        _argumentDict.Clear();
+    }
+
+    private static ModArgumentList BuildModArgumentList(List<IMod>? mods)
+    {
+        if (mods is null || mods.Count == 0)
+            return ModArgumentList.Empty;
+
+        var dependencyArgs = new List<ModArgument>(mods.Count);
+        foreach (var dependency in mods)
+        {
+            // Virtual and non-physical mods are just "placeholders" we cannot add them to the argument list.
+            if (dependency.Type == ModType.Virtual || dependency is not IPhysicalMod physicalMod)
+                continue;
+            dependencyArgs.Add(BuildSingleModArgument(physicalMod));
+        }
+
+        return new ModArgumentList(dependencyArgs);
+    }
+
+    private static ModArgument BuildSingleModArgument(IPhysicalMod mod)
+    {
+        var isWorkshop = mod.Type == ModType.Workshops;
+        var argumentValue = mod.Identifier; // TODO: Cannot use Identifier!!!
+
+        if (!isWorkshop)
+        {
+            // Shortening to the relative game's path allows the game to exit on a path which has space characters.
+            var relativeOrAbsoluteModPath = ArgumentValueSerializer.ShortenPath(mod.Directory, mod.Game.Directory);
+            argumentValue = relativeOrAbsoluteModPath;
+        }
+        else
+        {
+            // Throwing here is OK because this mod clearly violates its contract. 
+            if (!SteamGameHelpers.IstValidSteamWorkshopsDir(argumentValue))
+                throw new InvalidOperationException($"Identifier '{argumentValue}' is not a valid SteamID and cannot be used as a STEAMMOD argument.");
+        }
+
+        var argument = new ModArgument(argumentValue, isWorkshop);
+       
+        if (!argument.IsValid(out var reason))
+            throw new GameArgumentException(argument, $"Unable to create argument for mod '{mod}': {reason.GetInvalidArgMessage()}");
+
+        return argument;
     }
 }

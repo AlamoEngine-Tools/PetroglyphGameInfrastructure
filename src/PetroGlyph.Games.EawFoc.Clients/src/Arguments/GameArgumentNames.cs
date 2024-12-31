@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
-/// Collections of supported Argument Names
+/// Provides a collection of supported game argument names.
 /// </summary>
-internal static class ArgumentNameCatalog
+public static class GameArgumentNames
 {
     internal const string ModListArg = "MODLIST";
     internal const string WindowedArg = "WINDOWED";
@@ -68,76 +69,83 @@ internal static class ArgumentNameCatalog
     internal const string ConnectPortArg = "CONNECTPORT";
     internal const string ConnectIPArg = "CONNECTIP";
 
-    internal static readonly IReadOnlyCollection<string> SupportedFlagArgumentNames = new HashSet<string>
-    {
-        WindowedArg,
-        MCEArg,
-        LowRamArg,
-        SafeModeArg,
-        IgnoreAssertsArg,
-        NoArtProcessArg,
-        RecordingArg,
-        MultiArg,
-        PersistAssertsArg,
-        NoTimeoutArg,
-        SuppressLogArg,
-        PreValidateAudioMessagesArg,
-        LeftLeftArg,
-        DeepSyncArg,
-        NoFowArg,
-        NoIntroArg,
-        SaveLoadDebugArg,
-        RefCountTrackingArg,
-        NoHardwareMouseArg,
-        ProcessEnglishAssetsAndExitArg,
-        ProcessAssetsAndExitArg,
-        AttractArg,
-        DebugUnitsArg,
-        NoMenuArg,
-        FullScreenArg
-    };
+    internal static readonly IReadOnlyCollection<string> SupportedFlagArgumentNames =
+        new ReadOnlyCollection<string>(
+        [
+            WindowedArg,
+            MCEArg,
+            LowRamArg,
+            SafeModeArg,
+            IgnoreAssertsArg,
+            NoArtProcessArg,
+            RecordingArg,
+            MultiArg,
+            PersistAssertsArg,
+            NoTimeoutArg,
+            SuppressLogArg,
+            PreValidateAudioMessagesArg,
+            LeftLeftArg,
+            DeepSyncArg,
+            NoFowArg,
+            NoIntroArg,
+            SaveLoadDebugArg,
+            RefCountTrackingArg,
+            NoHardwareMouseArg,
+            ProcessEnglishAssetsAndExitArg,
+            ProcessAssetsAndExitArg,
+            AttractArg,
+            DebugUnitsArg,
+            NoMenuArg,
+            FullScreenArg
+        ]);
 
-    internal static readonly IReadOnlyCollection<string> SupportedKeyValueArgumentNames = new HashSet<string>
-    {
-        LocalPortArg,
-        MonitorArg,
-        ScreenWidthArg,
-        ScreenHeightArg,
-        FPSCapArg,
-        FallbackPathArg,
-        ModPathArg,
-        SteamModArg,
-        LanguageArg,
-        OriginalAssetPathArg,
-        RandomSeedArg,
-        ExpCDKeyArg,
-        CDKeyArg,
-        MPPlaybackFileArg,
-        MPRecordFileArg,
-        MapArg,
-        RecordingArg,
-        SaveFolderArg,
-        QuickLoadRecordingArg,
-        QuickLoadArg,
-        ConfigArg,
-        ProfileArg,
-        BCast2Arg,
-        BCast3Arg,
-        BCast4Arg,
-        AILogStyleArg,
-        AILogFileArg,
-        SyncLogFilterArg,
-        RandomLogFileArg,
-        LogFileArg,
-        ConsoleCommandFileArg,
-        ConnectPortArg,
-        ConnectIPArg
-    };
+    internal static readonly IReadOnlyCollection<string> SupportedKeyValueArgumentNames =
+        new ReadOnlyCollection<string>(
+        [
+            LocalPortArg,
+            MonitorArg,
+            ScreenWidthArg,
+            ScreenHeightArg,
+            FPSCapArg,
+            FallbackPathArg,
+            ModPathArg,
+            SteamModArg,
+            LanguageArg,
+            OriginalAssetPathArg,
+            RandomSeedArg,
+            ExpCDKeyArg,
+            CDKeyArg,
+            MPPlaybackFileArg,
+            MPRecordFileArg,
+            MapArg,
+            RecordingArg,
+            SaveFolderArg,
+            QuickLoadRecordingArg,
+            QuickLoadArg,
+            ConfigArg,
+            ProfileArg,
+            BCast2Arg,
+            BCast3Arg,
+            BCast4Arg,
+            AILogStyleArg,
+            AILogFileArg,
+            SyncLogFilterArg,
+            RandomLogFileArg,
+            LogFileArg,
+            ConsoleCommandFileArg,
+            ConnectPortArg,
+            ConnectIPArg
+        ]);
 
     /// <summary>
-    /// Collection of all supported argument names.
+    /// Returns a collection of all supported argument names.
     /// </summary>
     /// <remarks>The names are in upper case. Does not contain the synthetic MODLIST argument.</remarks>
     public static readonly IReadOnlyCollection<string> AllSupportedArgumentNames =
         SupportedFlagArgumentNames.Union(SupportedKeyValueArgumentNames).ToList();
+
+
+    // Contains MODLIST. Used by Validator
+    internal static readonly IReadOnlyCollection<string> AllInternalSupportedArgumentNames =
+        AllSupportedArgumentNames.Union([ModListArg]).ToList();
 }

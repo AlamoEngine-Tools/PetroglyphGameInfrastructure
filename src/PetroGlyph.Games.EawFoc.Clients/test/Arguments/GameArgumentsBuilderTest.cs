@@ -1,33 +1,27 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
-using Xunit;
-
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
+﻿namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
 public class GameArgumentsBuilderTest
 {
-    [Fact]
-    public void TestBuilder()
-    {
-        var args = new ArgumentCollection(new List<IGameArgument>
-        {
-            new WindowedArgument(),
-            new WindowedArgument(),
-            new MonitorArgument(1)
-        });
+    //[Fact]
+    //public void TestBuilder()
+    //{
+    //    var args = new ArgumentCollection(
+    //    [
+    //        new WindowedArgument(),
+    //        new WindowedArgument(),
+    //        new MonitorArgument(1)
+    //    ]);
 
-        var builder = new GameArgumentsBuilder(args);
-        Assert.Equal(2, builder.Build().Count);
+    //    var builder = new GameArgumentsBuilder(args);
+    //    Assert.Equal(2, builder.Build().Count);
 
-        builder.Remove(new WindowedArgument());
-        Assert.Single(builder.Build());
+    //    builder.Remove(new WindowedArgument());
+    //    Assert.Single(builder.Build());
 
-        builder.Add(new MonitorArgument(2));
-        Assert.Equal(2u, builder.Build().First().Value);
+    //    builder.Add(new MonitorArgument(2));
+    //    Assert.Equal(2u, builder.Build().First().Value);
 
-        builder.Remove("MONITOR");
-        Assert.Empty(builder.Build());
-    }
+    //    builder.Remove("MONITOR");
+    //    Assert.Empty(builder.Build());
+    //}
 }

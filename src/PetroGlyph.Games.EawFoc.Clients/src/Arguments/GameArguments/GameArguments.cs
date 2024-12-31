@@ -10,30 +10,22 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 /// <summary>
 /// Sets that the game instance will be in window mode.
 /// </summary>
-public sealed class WindowedArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public WindowedArgument() : base(ArgumentNameCatalog.WindowedArg, true)
-    {
-    }
-}
+public sealed class WindowedArgument() : FlagArgument(GameArgumentNames.WindowedArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class SafeMode() : FlagArgument(ArgumentNameCatalog.SafeModeArg, true);
+internal sealed class SafeMode() : FlagArgument(GameArgumentNames.SafeModeArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class LowRamArgument() : FlagArgument(ArgumentNameCatalog.LowRamArg, true);
+internal sealed class LowRamArgument() : FlagArgument(GameArgumentNames.LowRamArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class MCEArgument() : FlagArgument(ArgumentNameCatalog.MCEArg, true, true);
+internal sealed class MCEArgument() : FlagArgument(GameArgumentNames.MCEArg, true, true);
 
 #endregion
 
@@ -42,189 +34,107 @@ internal sealed class MCEArgument() : FlagArgument(ArgumentNameCatalog.MCEArg, t
 /// <summary>
 /// The Debug build will ignore assert failures.
 /// </summary>
-public sealed class IgnoreAssertsArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public IgnoreAssertsArgument() : base(ArgumentNameCatalog.IgnoreAssertsArg, true)
-    {
-    }
-}
+public sealed class IgnoreAssertsArgument() : FlagArgument(GameArgumentNames.IgnoreAssertsArg, true);
 
 /// <summary>
 /// The Debug build will ignore assert failures.
 /// </summary>
-public sealed class NoArtProcessArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public NoArtProcessArgument() : base(ArgumentNameCatalog.NoArtProcessArg, true)
-    {
-    }
-}
+public sealed class NoArtProcessArgument() : FlagArgument(GameArgumentNames.NoArtProcessArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class RecordingArgument() : FlagArgument(ArgumentNameCatalog.RecordingArg, true);
+internal sealed class RecordingArgument() : FlagArgument(GameArgumentNames.RecordingArg, true);
 
 /// <summary>
 /// Indicates the game runs in multiple instances.
 /// </summary>
-public sealed class MultiArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public MultiArgument() : base(ArgumentNameCatalog.MultiArg, true)
-    {
-    }
-}
+public sealed class MultiArgument() : FlagArgument(GameArgumentNames.MultiArg, true);
 
 /// <summary>
 /// Saves code location of asserts into 'SavedAsserts.txt' next to the game.
 /// </summary>
-public sealed class PersistAssertsArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public PersistAssertsArgument() : base(ArgumentNameCatalog.PersistAssertsArg, true)
-    {
-    }
-}
+public sealed class PersistAssertsArgument() : FlagArgument(GameArgumentNames.PersistAssertsArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR! No Timeout when waiting for synchronization?!
 /// </summary>
-internal sealed class NoTimeoutArgument() : FlagArgument(ArgumentNameCatalog.NoTimeoutArg, true);
+internal sealed class NoTimeoutArgument() : FlagArgument(GameArgumentNames.NoTimeoutArg, true);
 
 /// <summary>
 /// Skips logging to files.
 /// </summary>
-public sealed class SuppressLogArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public SuppressLogArgument() : base(ArgumentNameCatalog.SuppressLogArg, true)
-    {
-    }
-}
+public sealed class SuppressLogArgument() : FlagArgument(GameArgumentNames.SuppressLogArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class PreValidateAudioMessagesArgument()
-    : FlagArgument(ArgumentNameCatalog.PreValidateAudioMessagesArg, true);
+internal sealed class PreValidateAudioMessagesArgument() : FlagArgument(GameArgumentNames.PreValidateAudioMessagesArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class LeftLeftArgument() : FlagArgument(ArgumentNameCatalog.LeftLeftArg, true);
+internal sealed class LeftLeftArgument() : FlagArgument(GameArgumentNames.LeftLeftArg, true);
 
 /// <summary>
 /// Game uses deep synchronization.
 /// </summary>
-public sealed class DeppSyncArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public DeppSyncArgument() : base(ArgumentNameCatalog.DeepSyncArg, true)
-    {
-    }
-}
+public sealed class DeppSyncArgument() : FlagArgument(GameArgumentNames.DeepSyncArg, true);
 
 /// <summary>
 /// No Fog of War (FOW) is used.
 /// </summary>
-public sealed class NoFowArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public NoFowArgument() : base(ArgumentNameCatalog.NoFowArg, true)
-    {
-    }
-}
+public sealed class NoFowArgument() : FlagArgument(GameArgumentNames.NoFowArg, true);
 
 /// <summary>
 /// Skips intro videos.
 /// </summary>
-public sealed class NoIntroArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public NoIntroArgument() : base(ArgumentNameCatalog.NoIntroArg, true)
-    {
-    }
-}
+public sealed class NoIntroArgument() : FlagArgument(GameArgumentNames.NoIntroArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class SaveLoadDebugArgument() : FlagArgument(ArgumentNameCatalog.SaveLoadDebugArg, true);
+internal sealed class SaveLoadDebugArgument() : FlagArgument(GameArgumentNames.SaveLoadDebugArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class RefCountTrackingArgument() : FlagArgument(ArgumentNameCatalog.RefCountTrackingArg, true);
+internal sealed class RefCountTrackingArgument() : FlagArgument(GameArgumentNames.RefCountTrackingArg, true);
 
 /// <summary>
 /// Indicates that no physical mouse device is used.
 /// </summary>
-public sealed class NoHardwareMouseArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public NoHardwareMouseArgument() : base(ArgumentNameCatalog.NoHardwareMouseArg, true)
-    {
-    }
-}
+public sealed class NoHardwareMouseArgument() : FlagArgument(GameArgumentNames.NoHardwareMouseArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class ProcessEnglishAssetsAndExitArgument()
-    : FlagArgument(ArgumentNameCatalog.ProcessEnglishAssetsAndExitArg, true);
+internal sealed class ProcessEnglishAssetsAndExitArgument() : FlagArgument(GameArgumentNames.ProcessEnglishAssetsAndExitArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class ProcessAssetsAndExitArgument() : FlagArgument(ArgumentNameCatalog.ProcessAssetsAndExitArg, true);
+internal sealed class ProcessAssetsAndExitArgument() : FlagArgument(GameArgumentNames.ProcessAssetsAndExitArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class AttractArgument() : FlagArgument(ArgumentNameCatalog.AttractArg, true);
+internal sealed class AttractArgument() : FlagArgument(GameArgumentNames.AttractArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class DebugUnitsArgument() : FlagArgument(ArgumentNameCatalog.DebugUnitsArg, true);
+internal sealed class DebugUnitsArgument() : FlagArgument(GameArgumentNames.DebugUnitsArg, true);
 
 /// <summary>
 /// Completely disables the user interface from the game.
 /// </summary>
-public sealed class NoMenuArgument : FlagArgument
-{
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    public NoMenuArgument() : base(ArgumentNameCatalog.NoMenuArg, true)
-    {
-    }
-}
+public sealed class NoMenuArgument() : FlagArgument(GameArgumentNames.NoMenuArg, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class FullScreenArgument() : FlagArgument(ArgumentNameCatalog.FullScreenArg, true);
+internal sealed class FullScreenArgument() : FlagArgument(GameArgumentNames.FullScreenArg, true);
 
 #endregion
 
@@ -233,21 +143,9 @@ internal sealed class FullScreenArgument() : FlagArgument(ArgumentNameCatalog.Fu
 /// <summary>
 /// The language which shall be applied to the game. If not present the system language will be used by the game.
 /// </summary>
-public sealed class LanguageArgument : NamedArgument<ILanguageInfo>
+public sealed class LanguageArgument(ILanguageInfo language) : NamedArgument<ILanguageInfo>(GameArgumentNames.LanguageArg, language, false)
 {
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    /// <param name="language">The language of the game.</param>
-    public LanguageArgument(ILanguageInfo language) : base(ArgumentNameCatalog.LanguageArg, language, false)
-    {
-    }
-
-    /// <summary>
-    /// Gets the english name of the language in upper-case.
-    /// </summary>
-    /// <returns></returns>
-    public override string ValueToCommandLine()
+    internal override string ValueToCommandLine()
     {
         return LanguageInfoUtilities.GetEnglishName(Value)!.ToUpperInvariant();
     }
@@ -256,39 +154,41 @@ public sealed class LanguageArgument : NamedArgument<ILanguageInfo>
 /// <summary>
 /// The local port number used by the game.
 /// </summary>
-public sealed class LocalPortArgument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.LocalPortArg, value, false);
+public sealed class LocalPortArgument(uint value) : NamedArgument<uint>(GameArgumentNames.LocalPortArg, value, false);
 
 /// <summary>
 /// The system monitor number which shall be used for the game.
 /// </summary>
-public sealed class MonitorArgument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.MonitorArg, value, false);
+public sealed class MonitorArgument(uint value) : NamedArgument<uint>(GameArgumentNames.MonitorArg, value, false);
 
 /// <summary>
 /// Game window width in pixels.
 /// </summary>
-public sealed class ScreenWidthArgument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.ScreenWidthArg, value, false);
+public sealed class ScreenWidthArgument(uint value) : NamedArgument<uint>(GameArgumentNames.ScreenWidthArg, value, false);
 
 /// <summary>
 /// Game window height in pixels.
 /// </summary>
-public sealed class ScreenHeightArgument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.ScreenHeightArg, value, false);
+public sealed class ScreenHeightArgument(uint value) : NamedArgument<uint>(GameArgumentNames.ScreenHeightArg, value, false);
 
 /// <summary>
 /// Limits the game to the given FPS ratio.
 /// </summary>
-public sealed class FPSCapArgument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.FPSCapArg, value, false);
+public sealed class FPSCapArgument(uint value) : NamedArgument<uint>(GameArgumentNames.FPSCapArg, value, false);
 
 #endregion
 
 #region Debug
 
 /// <summary>
-/// UNKNOWN BEHAVIOR!
+/// Sets a fallback path where game assets, such as .MEG files, are located.
 /// </summary>
-internal sealed class OriginalAssetPathArgument(IDirectoryInfo value, IDirectoryInfo gameDirectory)
-    : NamedArgument<IDirectoryInfo>(ArgumentNameCatalog.OriginalAssetPathArg, value, true)
+public sealed class OriginalAssetPathArgument(IDirectoryInfo assetDir, IDirectoryInfo gameDirectory)
+    : NamedArgument<IDirectoryInfo>(GameArgumentNames.OriginalAssetPathArg, assetDir, true)
 {
-    public override string ValueToCommandLine()
+    internal override bool HasPathValue => true;
+
+    internal override string ValueToCommandLine()
     {
         return ArgumentValueSerializer.ShortenPath(Value, gameDirectory);
     }
@@ -297,26 +197,27 @@ internal sealed class OriginalAssetPathArgument(IDirectoryInfo value, IDirectory
 /// <summary>
 /// The initial seed value used for random number generation (RNG).
 /// </summary>
-public sealed class RandomSeedArgument(uint value)
-    : NamedArgument<uint>(ArgumentNameCatalog.RandomSeedArg, value, true);
+public sealed class RandomSeedArgument(uint value) : NamedArgument<uint>(GameArgumentNames.RandomSeedArg, value, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class ExpCDKeyArgument(string value) : NamedArgument<string>(ArgumentNameCatalog.ExpCDKeyArg, value, true);
+internal sealed class ExpCDKeyArgument(string value) : NamedArgument<string>(GameArgumentNames.ExpCDKeyArg, value, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class CDKeyArgument(string value) : NamedArgument<string>(ArgumentNameCatalog.CDKeyArg, value, true);
+internal sealed class CDKeyArgument(string value) : NamedArgument<string>(GameArgumentNames.CDKeyArg, value, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
 internal sealed class MpPlaybackFileArgument(IFileInfo value, IDirectoryInfo gameDir)
-    : NamedArgument<IFileInfo>(ArgumentNameCatalog.MPPlaybackFileArg, value, true)
+    : NamedArgument<IFileInfo>(GameArgumentNames.MPPlaybackFileArg, value, true)
 {
-    public override string ValueToCommandLine()
+    internal override bool HasPathValue => true;
+
+    internal override string ValueToCommandLine()
     {
         return ArgumentValueSerializer.ShortenPath(Value, gameDir);
     }
@@ -325,7 +226,7 @@ internal sealed class MpPlaybackFileArgument(IFileInfo value, IDirectoryInfo gam
 /// <summary>
 /// Loads the given map immediately after the game has started. 
 /// </summary>
-public sealed class MapArgument(string value) : NamedArgument<string>(ArgumentNameCatalog.MapArg, value, true);
+public sealed class MapArgument(string value) : NamedArgument<string>(GameArgumentNames.MapArg, value, true);
 
 /// <summary>
 /// Location where save game shall be stored.
@@ -336,10 +237,11 @@ public sealed class MapArgument(string value) : NamedArgument<string>(ArgumentNa
 /// </para>
 /// </summary>
 public sealed class SaveFolderArgument(IDirectoryInfo value, IDirectoryInfo defaultRootSaveLocation) 
-    : NamedArgument<IDirectoryInfo>(ArgumentNameCatalog.MPPlaybackFileArg, value, true)
+    : NamedArgument<IDirectoryInfo>(GameArgumentNames.MPPlaybackFileArg, value, true)
 {
-    /// <inheritdoc/>
-    public override string ValueToCommandLine()
+    internal override bool HasPathValue => true;
+
+    internal override string ValueToCommandLine()
     {
         return ArgumentValueSerializer.ShortenPath(Value, defaultRootSaveLocation);
     }
@@ -348,75 +250,54 @@ public sealed class SaveFolderArgument(IDirectoryInfo value, IDirectoryInfo defa
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class QuickLoadRecordingArgument(string value) : NamedArgument<string>(ArgumentNameCatalog.QuickLoadRecordingArg, value, true);
+internal sealed class QuickLoadRecordingArgument(string value) : NamedArgument<string>(GameArgumentNames.QuickLoadRecordingArg, value, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class QuickLoadArgument(string value) : NamedArgument<string>(ArgumentNameCatalog.QuickLoadArg, value, true);
+internal sealed class QuickLoadArgument(string value) : NamedArgument<string>(GameArgumentNames.QuickLoadArg, value, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class ConfigArgument(string value) : NamedArgument<string>(ArgumentNameCatalog.ConfigArg, value, true);
+internal sealed class ConfigArgument(string value) : NamedArgument<string>(GameArgumentNames.ConfigArg, value, true);
 
 /// <summary>
 /// Specifies the profile this game shall start with.
 /// <para>
-/// Creates a new profile if the given profile does not exists.
+/// Creates a new profile if the given profile does not exist.
 /// </para>
 /// <para>On Windows profiles are persisted in the registry at HKCU\software\petroglyph\GAMETYPE\Profiles
 /// where GAMETYPE is either 'StarWars' or 'StarWars FOC'.</para>
 /// </summary>
-public sealed class ProfileArgument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.ProfileArg, value, true);
+public sealed class ProfileArgument(uint value) : NamedArgument<uint>(GameArgumentNames.ProfileArg, value, true);
 
 /// <summary>
 /// Broadcasting port to listen to messages from other game instances.
 /// </summary>
 /// <remarks>The value usually matches with <see cref="LocalPortArgument"/> from the other instance.</remarks>
-public sealed class BCast2Argument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.BCast2Arg, value, true);
+public sealed class BCast2Argument(uint value) : NamedArgument<uint>(GameArgumentNames.BCast2Arg, value, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class BCast3Argument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.BCast3Arg, value, true);
+internal sealed class BCast3Argument(uint value) : NamedArgument<uint>(GameArgumentNames.BCast3Arg, value, true);
 
 /// <summary>
 /// UNKNOWN BEHAVIOR!
 /// </summary>
-internal sealed class BCast4Argument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.BCast4Arg, value, true);
+internal sealed class BCast4Argument(uint value) : NamedArgument<uint>(GameArgumentNames.BCast4Arg, value, true);
 
 /// <summary>
 /// Specifies the level of detail for LUA logging.
 /// </summary>
 public sealed class AILogStyleArgument(AILogStyle value) 
-    : NamedArgument<AILogStyle>(ArgumentNameCatalog.AILogStyleArg, value, true)
+    : NamedArgument<AILogStyle>(GameArgumentNames.AILogStyleArg, value, true)
 {
-    /// <inheritdoc/>
-    public override string ValueToCommandLine()
+    internal override string ValueToCommandLine()
     {
         return ArgumentValueSerializer.Serialize(Value).ToUpperInvariant();
     }
-}
-
-/// <summary>
-/// Level of detail of LUA logging.
-/// </summary>
-[SerializeEnumName]
-public enum AILogStyle
-{
-    /// <summary>
-    /// LUA logging is disabled.
-    /// </summary>
-    None,
-    /// <summary>
-    /// Default LUA logging level.
-    /// </summary>
-    Normal,
-    /// <summary>
-    /// Verbose LUA logging level.
-    /// </summary>
-    Heavy
 }
 
 /// <summary>
@@ -425,10 +306,11 @@ public enum AILogStyle
 /// <remarks>
 /// The directory of the file must already exists.
 /// </remarks>
-public sealed class AILogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : NamedArgument<IFileInfo>(ArgumentNameCatalog.AILogFileArg, value, true)
+public sealed class AILogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : NamedArgument<IFileInfo>(GameArgumentNames.AILogFileArg, value, true)
 {
-    /// <inheritdoc/>
-    public override string ValueToCommandLine()
+    internal override bool HasPathValue => true;
+
+    internal override string ValueToCommandLine()
     {
         return ArgumentValueSerializer.ShortenPath(Value, gameDir);
     }
@@ -438,12 +320,13 @@ public sealed class AILogFileArgument(IFileInfo value, IDirectoryInfo gameDir) :
 /// File location where RNG logging shall be stored to.
 /// </summary>
 /// <remarks>
-/// The directory of the file must already exists.
+/// The directory of the file must already exist.
 /// </remarks>
-public sealed class RandomLogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : NamedArgument<IFileInfo>(ArgumentNameCatalog.RandomLogFileArg, value, true)
+public sealed class RandomLogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : NamedArgument<IFileInfo>(GameArgumentNames.RandomLogFileArg, value, true)
 {
-    /// <inheritdoc/>
-    public override string ValueToCommandLine()
+    internal override bool HasPathValue => true;
+
+    internal override string ValueToCommandLine()
     {
         return ArgumentValueSerializer.ShortenPath(Value, gameDir);
     }
@@ -453,12 +336,13 @@ public sealed class RandomLogFileArgument(IFileInfo value, IDirectoryInfo gameDi
 /// File location where logging shall be stored to.
 /// </summary>
 /// <remarks>
-/// The directory of the file must already exists.
+/// The directory of the file must already exist.
 /// </remarks>
-public sealed class LogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : NamedArgument<IFileInfo>(ArgumentNameCatalog.LogFileArg, value, true)
+public sealed class LogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : NamedArgument<IFileInfo>(GameArgumentNames.LogFileArg, value, true)
 {
-    /// <inheritdoc/>
-    public override string ValueToCommandLine()
+    internal override bool HasPathValue => true;
+
+    internal override string ValueToCommandLine()
     {
         return ArgumentValueSerializer.ShortenPath(Value, gameDir);
     }
@@ -468,9 +352,11 @@ public sealed class LogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : N
 /// UNKNOWN BEHAVIOR!
 /// </summary>
 internal sealed class ConsoleCommandFileArgument(IFileInfo value, IDirectoryInfo gameDir)
-    : NamedArgument<IFileInfo>(ArgumentNameCatalog.ConsoleCommandFileArg, value, true)
+    : NamedArgument<IFileInfo>(GameArgumentNames.ConsoleCommandFileArg, value, true)
 {
-    public override string ValueToCommandLine()
+    internal override bool HasPathValue => true;
+
+    internal override string ValueToCommandLine()
     {
         return ArgumentValueSerializer.ShortenPath(Value, gameDir);
     }
@@ -479,17 +365,16 @@ internal sealed class ConsoleCommandFileArgument(IFileInfo value, IDirectoryInfo
 /// <summary>
 /// Logging filter for events relevant for multiplayer synchronization. Default value is 15. 
 /// </summary>
-/// <remarks>This obviously is an enum but it's not documented, so we leave it as a plain ushort value.</remarks>
-public sealed class SyncLogFilterArgument(ushort value)
-    : NamedArgument<ushort>(ArgumentNameCatalog.SyncLogFilterArg, value, true);
+/// <remarks>This obviously is an enum, but it's not documented, so we leave it as a plain ushort value.</remarks>
+public sealed class SyncLogFilterArgument(ushort value) : NamedArgument<ushort>(GameArgumentNames.SyncLogFilterArg, value, true);
 
 /// <summary>
-/// UNKNOWN BEHAVIOR! Not sure it 'connects' to.
+/// UNKNOWN BEHAVIOR! Not sure where it 'connects' to.
 /// </summary>
-internal sealed class ConnectPortArgument(uint value) : NamedArgument<uint>(ArgumentNameCatalog.ConnectPortArg, value, true);
+internal sealed class ConnectPortArgument(uint value) : NamedArgument<uint>(GameArgumentNames.ConnectPortArg, value, true);
 
 /// <summary>
-/// UNKNOWN BEHAVIOR! Not sure it 'connects' to.
+/// UNKNOWN BEHAVIOR! Not sure where it 'connects' to.
 /// </summary>
-internal sealed class ConnectIPArgument(string value) : NamedArgument<string>(ArgumentNameCatalog.ConnectIPArg, value, true);
+internal sealed class ConnectIPArgument(string value) : NamedArgument<string>(GameArgumentNames.ConnectIPArg, value, true);
 #endregion

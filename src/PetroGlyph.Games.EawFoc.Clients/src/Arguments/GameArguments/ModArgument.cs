@@ -1,34 +1,28 @@
 ﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
 /// <summary>
-/// Dedicated argument to represent a mod
+/// Dedicated argument to represent a mod.
 /// </summary>
+/// <remarks>
+/// Use <see cref="GameArgumentsBuilder.AddSingleMod"/> or
+/// <see cref="GameArgumentsBuilder.AddMods"/> to add mods to your game arguments.</remarks>
 public sealed class ModArgument : NamedArgument<string>
 {
     private readonly bool _workshops;
 
-    /// <summary>
-    /// Creates a new argument 
-    /// </summary>
-    /// <param name="value">The absolute or relative path or SteamID of the mod.</param>
-    /// <param name="workshops">If <see langword="true"/> this argument will be treated as a Steam Workshops mod.</param>
-    internal ModArgument(string value, bool workshops) : 
-        base(workshops ? ArgumentNameCatalog.SteamModArg : ArgumentNameCatalog.ModPathArg, value, false)
+    internal override bool HasPathValue => !_workshops;
+
+    internal ModArgument(string value, bool workshops) 
+        : base(workshops ? GameArgumentNames.SteamModArg : GameArgumentNames.ModPathArg, value, false)
     {
         _workshops = workshops;
-    }
-
-    /// <inheritdoc/>
-    public override string ValueToCommandLine()
-    {
-        return Value;
     }
 
     /// <summary>
     /// Checks whether the given value is a valid SteamID.
     /// </summary>
     /// <remarks>Path checking is already completed if this method is invoked.</remarks>
-    protected override bool IsDataValid()
+    private protected override bool IsDataValid()
     {
         return !_workshops || ulong.TryParse(Value, out _);
     }

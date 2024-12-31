@@ -20,6 +20,16 @@ public static class TestHelpers
         return BitConverter.ToInt64(buf, 0);
     }
 
+    public static uint RandomUInt()
+    {
+        return (uint)Random.Next(int.MinValue, int.MaxValue);
+    }
+
+    public static ushort RandomUShort()
+    {
+        return (ushort)Random.Next(ushort.MinValue, ushort.MaxValue);
+    }
+
     public static T GetRandomEnum<T>() where T : struct, Enum
     {
         var values = Enum.GetValues(typeof(T));

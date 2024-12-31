@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
+﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Argument which enables a game behavior.
@@ -16,9 +14,6 @@ public abstract class FlagArgument : GameArgument<bool>
     /// </summary>
     public sealed override ArgumentKind Kind { get; }
 
-    /// <inheritdoc/>
-    public override string Name { get; }
-
     /// <summary>
     /// Initializes a new argument with a given value and the inforation if this argument is for debug mode only.
     /// </summary>
@@ -26,33 +21,18 @@ public abstract class FlagArgument : GameArgument<bool>
     /// <param name="value">Whether this flag is enabled or disabled.</param>
     /// <param name="dashed">When <see langword="true"/> this argument requires a dash '-' on the command line.</param>
     /// <param name="debug">Indicates whether this instance if for debug mode only.</param>
-    protected FlagArgument(string name, bool value, bool dashed = false, bool debug = false) : base(value, debug)
+    private protected FlagArgument(string name, bool value, bool dashed = false, bool debug = false) : base(name, value, debug)
     {
-        Name = name;
         Kind = dashed ? ArgumentKind.DashedFlag : ArgumentKind.Flag;
     }
 
-    /// <inheritdoc/>
-    public override bool Equals(IGameArgument? other)
+    private protected override bool EqualsValue(GameArgument other)
     {
-        if (other is null)
-            return false;
-        if (ReferenceEquals(this, other))
-            return true;
-        if (other is not FlagArgument)
-            return false;
-        return Kind == other.Kind && Name == other.Name && Value.Equals(other.Value);
+        return Value.Equals(other.Value);
     }
 
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
+    private protected override int ValueHash()
     {
-        return obj is FlagArgument other && Equals(other);
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Kind, Name, Value);
+        return Value.GetHashCode();
     }
 }

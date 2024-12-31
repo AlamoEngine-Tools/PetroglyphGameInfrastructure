@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
+﻿using System.Collections.Generic;
+using EawModinfo.Model;
+using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
@@ -9,190 +8,88 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
-public class ArgumentCommandLineBuilderTest
+public class ArgumentCommandLineBuilderTest : GameArgumentTestBase
 {
-    private readonly ArgumentCommandLineBuilder _service;
-    private readonly Mock<IArgumentValidator> _validator;
-
-    public ArgumentCommandLineBuilderTest()
-    {
-        var sc = new ServiceCollection();
-        _validator = new Mock<IArgumentValidator>();
-        sc.AddTransient(_ => _validator.Object);
-        _service = new ArgumentCommandLineBuilder(sc.BuildServiceProvider());
-    }
-
     [Fact]
     public void TestEmptyList()
     {
-        Assert.Equal(string.Empty, _service.BuildCommandLine(ArgumentCollection.Empty));
+        Assert.Equal(string.Empty, ArgumentCommandLineBuilder.BuildCommandLine(ArgumentCollection.Empty));
     }
 
-    [Fact]
-    public void TestInvalidList_Throws()
+    public static IEnumerable<object[]> GetBuildCommandLineTestData()
     {
-        _validator.SetupSequence(v =>
-                v.CheckArgument(It.IsAny<IGameArgument>(), out It.Ref<string>.IsAny, out It.Ref<string>.IsAny))
-            .Returns(ArgumentValidityStatus.Valid)
-            .Returns(ArgumentValidityStatus.InvalidData);
-        var collection = new ArgumentCollection(new List<IGameArgument>
-        {
-            new WindowedArgument(),
-            new MapArgument("test")
-        });
-        var e = Assert.Throws<GameArgumentException>(() => _service.BuildCommandLine(collection));
-        Assert.Equal(new MapArgument("test"), e.Argument);
+        var normalMod = new ModArgument("path", false);
+        var steamMod = new ModArgument("123456", true);
+
+        yield return [new GameArgument[] { }, string.Empty];
+        yield return [new GameArgument[] { new TestFlagArg(false, true) }, string.Empty];
+        yield return [new GameArgument[] { new WindowedArgument() }, "WINDOWED"];
+        yield return [new GameArgument[] { new MCEArgument() }, "-MCE"];
+        yield return [new GameArgument[] { new MapArgument("myMap") }, "MAP=myMap"];
+        yield return [new GameArgument[] { new WindowedArgument(), new MapArgument("myMap") }, "WINDOWED MAP=myMap"];
+        yield return [new GameArgument[] { new MapArgument("myMap"), new WindowedArgument() }, "MAP=myMap WINDOWED"];
+        yield return [new GameArgument[] { new ModArgumentList([normalMod]) }, "MODPATH=path"];
+        yield return [new GameArgument[] { new ModArgumentList([normalMod, steamMod]) }, "MODPATH=path STEAMMOD=123456"];
+        yield return [new GameArgument[] { new ModArgumentList([steamMod, normalMod]) }, "STEAMMOD=123456 MODPATH=path"];
+        yield return [new GameArgument[] { new ModArgumentList([normalMod, steamMod]), new WindowedArgument() }, "MODPATH=path STEAMMOD=123456 WINDOWED"];
+        yield return [new GameArgument[] { new ModArgumentList([normalMod, steamMod]), new WindowedArgument(), new MCEArgument(), new MapArgument("myMap") }, 
+            "MODPATH=path STEAMMOD=123456 WINDOWED -MCE MAP=myMap"];
+        yield return [new GameArgument[] { new LanguageArgument(new LanguageInfo("de", LanguageSupportLevel.Default)) }, "LANGUAGE=GERMAN"];
+        yield return [new GameArgument[] { new MonitorArgument(42) }, "MONITOR=42"];
+        yield return [new GameArgument[] { new AILogStyleArgument(AILogStyle.Normal) }, "AILOGSTYLE=NORMAL"];
     }
 
-    [Fact]
-    public void TestMultipleArgs()
+    [Theory]
+    [MemberData(nameof(GetBuildCommandLineTestData))]
+    public void BuildCommandLine(IList<GameArgument> args, string expectedCommandLine)
     {
-        var mapName = "MAP";
-        var mapValue = "test";
-        var windowed = "WINDOWED";
-        _validator.Setup(v =>
-            v.CheckArgument(It.IsAny<FlagArgument>(), out windowed, out It.Ref<string>.IsAny));
-        _validator.Setup(v =>
-            v.CheckArgument(It.IsAny<NamedArgument<string>>(), out mapName, out mapValue));
-
-        var collection = new ArgumentCollection(new List<IGameArgument>
-        {
-            new WindowedArgument(),
-            new MapArgument("test")
-        });
-        Assert.Equal("WINDOWED MAP=test", _service.BuildCommandLine(collection));
+        var command = ArgumentCommandLineBuilder.BuildCommandLine(new ArgumentCollection(args));
+        Assert.Equal(expectedCommandLine, command);
     }
 
-    [Fact]
-    public void TestFlagArg()
+    [Theory]
+    [MemberData(nameof(GetInvalidArgumentListTestData))]
+    public void TestInvalidList_Throws(IList<GameArgument> arguments, GameArgument failingArgument)
     {
-        var arg = new WindowedArgument();
-        var command = _service.ToCommandLine(arg, "WINDOWED", "True");
-        Assert.Equal("WINDOWED", command);
-    }
+        var collection = new ArgumentCollection(arguments);
 
-    [Fact]
-    public void TestDisabledFlagArg()
-    {
-        var arg = new DisabledFlag(false);
-        var command = _service.ToCommandLine(arg, "FLAG", "False");
-        Assert.Empty(command);
-    }
-
-    [Fact]
-    public void TestDashedFlagArg()
-    {
-        var arg = new MCEArgument();
-        var command = _service.ToCommandLine(arg, "MCE", "True");
-        Assert.Equal("-MCE", command);
+        var e = Assert.Throws<GameArgumentException>(() => ArgumentCommandLineBuilder.BuildCommandLine(collection));
+        Assert.Equal(failingArgument, e.Argument);
     }
 
     [Fact]
     public void TestDisabledDashedFlagArg()
     {
-        var arg = new DisabledFlag(true);
-        var command = _service.ToCommandLine(arg, "FLAG", "False");
+        var arg = new TestFlagArg(false, true);
+        var command = ArgumentCommandLineBuilder.BuildCommandLine(new ArgumentCollection([arg]));
         Assert.Empty(command);
-    }
-
-    [Fact]
-    public void TestKeyValueArg()
-    {
-        var arg = new MapArgument("myMap");
-        var command = _service.ToCommandLine(arg, "MAP", "myMap");
-        Assert.Equal("MAP=myMap", command);
     }
 
     [Fact]
     public void TestInvalidModList_Throws()
     {
         var arg = new InvalidModListArg();
-        Assert.Throws<GameArgumentException>(() => _service.ToCommandLine(arg, "MODLIST", string.Empty));
+        Assert.Throws<GameArgumentException>(() => ArgumentCommandLineBuilder.BuildCommandLine(new ArgumentCollection([arg])));
+    }
+
+    [Theory]
+    [MemberData(nameof(GetIllegalCharacterValues), MemberType = typeof(ArgumentValidatorTest))]
+    [InlineData("path with space")]
+    [InlineData("path&calc.exe")]
+    public void TestModListHasInvalidArg_Throws(string invalidData)
+    {
+        var modArg = new ModArgument(invalidData, false);
+        var arg = new ModArgumentList([modArg]);
+
+        Assert.Throws<GameArgumentException>(() => ArgumentCommandLineBuilder.BuildCommandLine(new ArgumentCollection([arg])));
     }
 
     [Fact]
-    public void TestModListEmpty()
+    public void TestModListHasInvalidArg_SteamNotValidId_Throws()
     {
-        var arg = new ModArgumentList(Array.Empty<ModArgument>());
-        var command = _service.ToCommandLine(arg, "MODLIST", string.Empty);
-        Assert.Empty(command);
-    }
+        var modArg = new ModArgument("notSteamId", true);
+        var arg = new ModArgumentList([modArg]);
 
-    [Fact]
-    public void TestModListHasInvalidArg_Throws()
-    {
-        var modArg = new ModArgument("path", false);
-        var arg = new ModArgumentList(new List<ModArgument>
-        {
-            modArg
-        });
-
-        _validator.Setup(v => v.CheckArgument(modArg, out It.Ref<string>.IsAny, out It.Ref<string>.IsAny))
-            .Returns(ArgumentValidityStatus.InvalidData);
-
-        Assert.Throws<GameArgumentException>(() => _service.ToCommandLine(arg, "MODLIST", string.Empty));
-    }
-
-    [Fact]
-    public void TestSingleModList()
-    {
-        var name = "MODPATH";
-        var value = "path";
-        var modArg = new ModArgument("path", false);
-        var arg = new ModArgumentList(new List<ModArgument>
-        {
-            modArg
-        });
-
-        _validator.Setup(v => v.CheckArgument(modArg, out name, out value));
-
-        var command = _service.ToCommandLine(arg, "MODLIST", string.Empty);
-        Assert.Equal("MODPATH=path", command);
-    }
-
-    [Fact]
-    public void TestMultipleModList()
-    {
-        var name1 = "MODPATH";
-        var value1 = "path";
-        var modArg1 = new ModArgument("path", false);
-        var name2 = "STEAMID";
-        var value2 = "123";
-        var modArg2 = new ModArgument("path", true);
-        var arg = new ModArgumentList(new List<ModArgument>
-        {
-            modArg1,
-            modArg2
-        });
-
-        _validator.Setup(v => v.CheckArgument(modArg1, out name1, out value1));
-        _validator.Setup(v => v.CheckArgument(modArg2, out name2, out value2));
-
-        var command = _service.ToCommandLine(arg, "MODLIST", string.Empty);
-        Assert.Equal("MODPATH=path STEAMID=123", command);
-    }
-
-    private class DisabledFlag(bool dashed) : FlagArgument("FLAG", false, dashed);
-
-    private class InvalidModListArg : IGameArgument
-    { 
-        public bool Equals(IGameArgument? other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ArgumentKind Kind => ArgumentKind.ModList;
-        public bool DebugArgument { get; } = false;
-        public string Name { get; } = null!;
-        public object Value { get; } = null!;
-        public string ValueToCommandLine()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsValid(out ArgumentValidityStatus reason)
-        {
-            throw new NotImplementedException();
-        }
+        Assert.Throws<GameArgumentException>(() => ArgumentCommandLineBuilder.BuildCommandLine(new ArgumentCollection([arg])));
     }
 }

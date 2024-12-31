@@ -38,19 +38,17 @@ var raw = game.FindMod(new ModReference("1129810972", ModType.Workshops));
 
 var client = services.GetRequiredService<IGameClientFactory>().CreateClient(game);
 
-Console.WriteLine($"Playing {raw}");
+Console.WriteLine($"Playing {raw?.ToString() ?? game.ToString()}");
 
 
-var modArgumentBuilder = services.GetRequiredService<IModArgumentListFactory>();
+using var gameArgs = new GameArgumentsBuilder()
+    .Add(new WindowedArgument());
 
-var modArguments  = modArgumentBuilder.BuildArgumentList(raw, true);
+if (raw is not null)
+    gameArgs.AddSingleMod(raw);
 
 
-client.Play(new ArgumentCollection(new List<IGameArgument>
-{
-    modArguments,
-    new WindowedArgument()
-}));
+client.Play(gameArgs.Build());
 return;
 
 
