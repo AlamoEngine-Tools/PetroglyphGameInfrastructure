@@ -127,9 +127,6 @@ public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
 
     private void OnGameStartedInternal(IGameProcess gameProcess)
     {
-        // Quit immediately if process was already terminated.
-        if (gameProcess.State == GameProcessState.Closed)
-            return;
         GameStarted?.Invoke(this, gameProcess);
     }
 
