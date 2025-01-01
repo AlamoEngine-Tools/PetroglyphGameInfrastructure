@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Abstractions;
+using System.Linq;
 using AnakinRaW.CommonUtilities.FileSystem;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 
@@ -67,7 +68,9 @@ internal static class ArgumentValueSerializer
             return PathNormalizer.Normalize(fileSystem.Path.GetRelativePathEx(fullBase, fullTarget), NormalizeOptions);
 
         var normalized = PathNormalizer.Normalize(fullTarget, NormalizeOptions);
-        if (ArgumentValidator.ContainsInvalidCharacters(normalized.AsSpan(), true) == ArgumentValidityStatus.Valid)
+        
+        // We only check for ordinary spaces. Other invalid characters are validated elsewhere
+        if (normalized.AsSpan().IndexOf(' ') == -1)
             return normalized;
 
         // If the full path contains spaces, we get the relative path from baseDir and return that. 

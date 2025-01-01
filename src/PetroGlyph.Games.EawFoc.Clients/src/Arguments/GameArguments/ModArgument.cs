@@ -1,21 +1,34 @@
-﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+﻿using System;
+using System.IO.Abstractions;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
+using PG.StarWarsGame.Infrastructure.Mods;
+
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
 /// <summary>
 /// Dedicated argument to represent a mod.
 /// </summary>
 /// <remarks>
-/// Use <see cref="GameArgumentsBuilder.AddSingleMod"/> or
-/// <see cref="GameArgumentsBuilder.AddMods"/> to add mods to your game arguments.</remarks>
-public sealed class ModArgument : NamedArgument<string>
+/// Use <see cref="GameArgumentsBuilder.AddSingleMod(IPhysicalMod)"/> and overloads or
+/// <see cref="GameArgumentsBuilder.AddMods(System.Collections.Generic.IList{IMod})"/> and overloads to add mods to your game arguments.</remarks>
+public sealed class ModArgument : NamedArgument<IDirectoryInfo>
 {
-    private readonly bool _workshops;
+    private readonly IDirectoryInfo _gameDir;
+    private readonly bool _isWorkshop;
 
-    internal override bool HasPathValue => !_workshops;
+    internal override bool HasPathValue => !_isWorkshop;
 
-    internal ModArgument(string value, bool workshops) 
-        : base(workshops ? GameArgumentNames.SteamModArg : GameArgumentNames.ModPathArg, value, false)
+    // We do not use the game property of the mod, so that users can specify any other game as base if they really like to
+    internal ModArgument(IDirectoryInfo modDir, IDirectoryInfo gameDirectory, bool isWorkshops) 
+        : base(isWorkshops ? GameArgumentNames.SteamModArg : GameArgumentNames.ModPathArg, modDir, false)
     {
-        _workshops = workshops;
+        _isWorkshop = isWorkshops;
+        _gameDir = gameDirectory ?? throw new ArgumentNullException(nameof(gameDirectory));
+    }
+
+    internal override string ValueToCommandLine()
+    {
+        return _isWorkshop ? ArgumentValueSerializer.Serialize(Value.Name) : ArgumentValueSerializer.ShortenPath(Value, _gameDir);
     }
 
     /// <summary>
@@ -24,6 +37,6 @@ public sealed class ModArgument : NamedArgument<string>
     /// <remarks>Path checking is already completed if this method is invoked.</remarks>
     private protected override bool IsDataValid()
     {
-        return !_workshops || ulong.TryParse(Value, out _);
+        return !_isWorkshop || ulong.TryParse(Value.Name, out _);
     }
 }

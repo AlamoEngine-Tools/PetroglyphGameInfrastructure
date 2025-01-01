@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
-using PG.StarWarsGame.Infrastructure.Services.Steam;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
@@ -16,6 +16,7 @@ public class GameArgumentsBuilder : DisposableObject
 {
     private readonly Dictionary<string, GameArgument> _argumentDict = new();
     private List<IMod>? _mods;
+    private IDirectoryInfo? _gameDirForMods;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GameArgumentsBuilder"/> class with no initial arguments.
@@ -59,12 +60,31 @@ public class GameArgumentsBuilder : DisposableObject
     /// <returns>This instance.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="mod"/> is <see langword="null"/>.</exception>
     /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
-    public GameArgumentsBuilder AddSingleMod(IMod mod)
+    public GameArgumentsBuilder AddSingleMod(IPhysicalMod mod)
     {
         ThrowIfDisposed();
-        if (mod == null) 
+        return AddSingleMod(mod, mod.Game.Directory);
+    }
+
+    /// <summary>
+    /// Adds a single mod to the <see cref="GameArgumentsBuilder"/> with an alternate game directory.
+    /// </summary>
+    /// <remarks>
+    /// Previous mods added to the <see cref="GameArgumentsBuilder"/> are removed.
+    /// </remarks>
+    /// <param name="mod">The mod add.</param>
+    /// <param name="gameDir">The directory of the target game.</param>
+    /// <returns>This instance.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="mod"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
+    public GameArgumentsBuilder AddSingleMod(IPhysicalMod mod, IDirectoryInfo gameDir)
+    {
+        ThrowIfDisposed();
+        if (mod == null)
             throw new ArgumentNullException(nameof(mod));
-        return AddMods([mod]);
+        if (gameDir == null) 
+            throw new ArgumentNullException(nameof(gameDir));
+        return AddMods([mod], gameDir);
     }
 
     /// <summary>
@@ -77,19 +97,60 @@ public class GameArgumentsBuilder : DisposableObject
     /// <returns>This instance.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="mods"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException"><paramref name="mods"/> contains a null reference.</exception>
+    /// <exception cref="InvalidOperationException">Unable to get game directory from mod list.</exception>
     /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
     public GameArgumentsBuilder AddMods(IList<IMod> mods)
     {
         ThrowIfDisposed();
         if (mods == null) 
             throw new ArgumentNullException(nameof(mods));
-        _mods?.Clear();
+
+        ClearMods();
 
         if (mods.Count == 0)
-        {
-            _mods = null;
             return this;
+
+        var gameDir = GetGameDirectory(mods);
+        return AddMods(mods, gameDir);
+    }
+
+    private static IDirectoryInfo GetGameDirectory(IList<IMod> mods)
+    {
+        foreach (var mod in mods)
+        {
+            if (mod is null)
+                throw new ArgumentException("The mod list contains a null reference.", nameof(mods));
+            if (mod is IPhysicalMod physicalMod)
+                return physicalMod.Game.Directory;
         }
+
+        throw new InvalidOperationException("Unable to get game directory from mod list.");
+    }
+
+    /// <summary>
+    /// Adds a list of mods to the <see cref="GameArgumentsBuilder"/> with an alternate game directory.
+    /// </summary>
+    /// <remarks>
+    /// Previous mods added to the <see cref="GameArgumentsBuilder"/> are removed.
+    /// </remarks>
+    /// <param name="mods">The list of mods to add.</param>
+    /// <param name="gameDir">The directory of the target game.</param>
+    /// <returns>This instance.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="mods"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="mods"/> contains a null reference.</exception>
+    /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
+    public GameArgumentsBuilder AddMods(IList<IMod> mods, IDirectoryInfo gameDir)
+    {
+        ThrowIfDisposed();
+        if (mods == null) 
+            throw new ArgumentNullException(nameof(mods));
+        if (gameDir == null) 
+            throw new ArgumentNullException(nameof(gameDir));
+
+        ClearMods();
+
+        if (mods.Count == 0)
+            return this;
         
         var modList = new List<IMod>(mods.Count);
         foreach (var mod in mods)
@@ -99,6 +160,8 @@ public class GameArgumentsBuilder : DisposableObject
             modList.Add(mod);
         }
         _mods = modList;
+        _gameDirForMods = gameDir;
+
         return this;
     }
 
@@ -141,8 +204,7 @@ public class GameArgumentsBuilder : DisposableObject
     public GameArgumentsBuilder RemoveMods()
     {
         ThrowIfDisposed();
-        _mods?.Clear();
-        _mods = null;
+        ClearMods();
         return this;
     }
 
@@ -179,15 +241,16 @@ public class GameArgumentsBuilder : DisposableObject
     protected override void DisposeManagedResources()
     {
         base.DisposeManagedResources();
-        _mods?.Clear();
-        _mods = null;
+        ClearMods();
         _argumentDict.Clear();
     }
 
-    private static ModArgumentList BuildModArgumentList(List<IMod>? mods)
+    private ModArgumentList BuildModArgumentList(List<IMod>? mods)
     {
         if (mods is null || mods.Count == 0)
             return ModArgumentList.Empty;
+
+        Debug.Assert(_gameDirForMods is not null);
 
         var dependencyArgs = new List<ModArgument>(mods.Count);
         foreach (var dependency in mods)
@@ -195,35 +258,17 @@ public class GameArgumentsBuilder : DisposableObject
             // Virtual and non-physical mods are just "placeholders" we cannot add them to the argument list.
             if (dependency.Type == ModType.Virtual || dependency is not IPhysicalMod physicalMod)
                 continue;
-            dependencyArgs.Add(BuildSingleModArgument(physicalMod));
+            var isWorkshop = physicalMod.Type == ModType.Workshops;
+            dependencyArgs.Add(new ModArgument(physicalMod.Directory, _gameDirForMods!, isWorkshop));
         }
 
         return new ModArgumentList(dependencyArgs);
     }
 
-    private static ModArgument BuildSingleModArgument(IPhysicalMod mod)
+    private void ClearMods()
     {
-        var isWorkshop = mod.Type == ModType.Workshops;
-        var argumentValue = mod.Identifier; // TODO: Cannot use Identifier!!!
-
-        if (!isWorkshop)
-        {
-            // Shortening to the relative game's path allows the game to exit on a path which has space characters.
-            var relativeOrAbsoluteModPath = ArgumentValueSerializer.ShortenPath(mod.Directory, mod.Game.Directory);
-            argumentValue = relativeOrAbsoluteModPath;
-        }
-        else
-        {
-            // Throwing here is OK because this mod clearly violates its contract. 
-            if (!SteamGameHelpers.IstValidSteamWorkshopsDir(argumentValue))
-                throw new InvalidOperationException($"Identifier '{argumentValue}' is not a valid SteamID and cannot be used as a STEAMMOD argument.");
-        }
-
-        var argument = new ModArgument(argumentValue, isWorkshop);
-       
-        if (!argument.IsValid(out var reason))
-            throw new GameArgumentException(argument, $"Unable to create argument for mod '{mod}': {reason.GetInvalidArgMessage()}");
-
-        return argument;
+        _mods?.Clear();
+        _mods = null;
+        _gameDirForMods = null;
     }
 }

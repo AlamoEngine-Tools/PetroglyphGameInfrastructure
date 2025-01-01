@@ -64,7 +64,7 @@ public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
     }
 
     /// <inheritdoc />
-    public IGameProcess Play(IMod mod)
+    public IGameProcess Play(IPhysicalMod mod)
     {
         if (mod == null)
             throw new ArgumentNullException(nameof(mod));

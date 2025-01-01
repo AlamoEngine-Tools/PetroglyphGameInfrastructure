@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
@@ -59,7 +60,11 @@ public class ArgumentValidatorTest : GameArgumentTestBase
     [MemberData(nameof(GetWindowsAbsoluteTestPaths))]
     public void IsValid_PathBasedArgument(string value)
     {
-        var arg = new ModArgument(value, false);
+        var fs = new MockFileSystem();
+        var gameDir = fs.DirectoryInfo.New("game");
+        var modDir = fs.DirectoryInfo.New(value);
+
+        var arg = new ModArgument(modDir, gameDir, false);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {

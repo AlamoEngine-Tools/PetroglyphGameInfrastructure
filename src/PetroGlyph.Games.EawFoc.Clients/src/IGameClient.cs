@@ -64,7 +64,7 @@ public interface IGameClient : IDisposable
     /// OR
     /// An internal error occurred.
     /// </exception>
-    IGameProcess Play(IMod mod);
+    IGameProcess Play(IPhysicalMod mod);
 
     /// <summary>
     /// Starts a new game process with the specified game arguments.

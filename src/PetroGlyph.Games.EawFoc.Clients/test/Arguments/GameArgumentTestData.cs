@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Mods;
 using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
@@ -40,9 +42,16 @@ public class GameArgumentTestBase
         yield return [new GameArgument[] { new WindowedArgument(), new MapArgument(InvalidStringValue) }, new MapArgument(InvalidStringValue)];
         yield return [new GameArgument[] { new MapArgument(InvalidStringValue), new WindowedArgument() }, new MapArgument(InvalidStringValue)];
 
-        var invalidModArg_PathWithSpace = new ModArgument(InvalidStringValue, false);
-        var invalidModArg_AbsolutePath = new ModArgument("x:/path", false);
-        var invalidModArg_InvalidSteamId = new ModArgument(ValidStringValue, true);
+
+        var fs = new MockFileSystem();
+        fs.Initialize();
+
+        var gameDir = fs.DirectoryInfo.New("game");
+
+        var invalidModArg_PathWithSpace = new ModArgument(fs.DirectoryInfo.New(InvalidStringValue), gameDir, false);
+        var invalidModArg_AbsolutePath = new ModArgument(fs.DirectoryInfo.New("x:/path"), gameDir, false);
+        var invalidModArg_InvalidSteamId = new ModArgument(fs.DirectoryInfo.New(ValidStringValue), gameDir, true);
+
         yield return
         [
             new GameArgument[] { new WindowedArgument(), new ModArgumentList([invalidModArg_PathWithSpace]) },
@@ -121,6 +130,8 @@ public class GameArgumentTestBase
 
         var gameDir = fs.DirectoryInfo.New("game");
         var modDir = fs.DirectoryInfo.New("game/mods/myMod");
+        var steamModDir = fs.DirectoryInfo.New("game/mods/123456");
+
         var gameFile = fs.FileInfo.New("game/file.txt");
 
         foreach (var value in GetValidStringValues)
@@ -191,13 +202,13 @@ public class GameArgumentTestBase
         yield return [new ConnectIPArgument(TestHelpers.GetRandom(GetValidStringValues))];
         // Mod
         yield return [new ModArgumentList([])];
-        yield return [new ModArgumentList([new ModArgument(TestHelpers.GetRandom(GetValidStringValues), false)])];
-        yield return [new ModArgumentList([new ModArgument("123456", true)])];
+        yield return [new ModArgumentList([new ModArgument(modDir, gameDir, false)])];
+        yield return [new ModArgumentList([new ModArgument(steamModDir, gameDir, true)])];
         yield return
         [
             new ModArgumentList([
-                new ModArgument(TestHelpers.GetRandom(GetValidStringValues), false),
-                new ModArgument(TestHelpers.GetRandom(GetValidStringValues), false),
+                new ModArgument(fs.DirectoryInfo.New(TestHelpers.GetRandom(GetValidStringValues)), gameDir, false),
+                new ModArgument(fs.DirectoryInfo.New(TestHelpers.GetRandom(GetValidStringValues)), gameDir, false),
             ])
         ];
     }

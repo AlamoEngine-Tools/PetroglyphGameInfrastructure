@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
@@ -10,7 +11,11 @@ public class ModArgumentListTest
     [Fact]
     public void TestProps()
     {
-        var arg = new ModArgumentList(new List<ModArgument> { new("path", false) });
+        var fs = new MockFileSystem();
+        var gameDir = fs.DirectoryInfo.New("game");
+        var modDir = fs.DirectoryInfo.New("game/mods/myMod");
+
+        var arg = new ModArgumentList(new List<ModArgument> { new(modDir, gameDir, false) });
         Assert.Equal(GameArgumentNames.ModListArg, arg.Name);
         Assert.Equal(ArgumentKind.ModList, arg.Kind);
         Assert.Empty(arg.ValueToCommandLine());
@@ -34,6 +39,10 @@ public class ModArgumentListTest
     [Fact]
     public void TestEquals()
     {
+        var fs = new MockFileSystem();
+        var gameDir = fs.DirectoryInfo.New("game");
+        var modDir = fs.DirectoryInfo.New("game/mods/myMod");
+
         var a = ModArgumentList.Empty;
         
         Assert.False(a.Equals(null));
@@ -48,17 +57,17 @@ public class ModArgumentListTest
         Assert.True(a.Equals((object)b));
         Assert.Equal(a.GetHashCode(), b.GetHashCode());
 
-        var c = new ModArgumentList(new List<ModArgument> { new("path", false) });
+        var c = new ModArgumentList(new List<ModArgument> { new(modDir, gameDir, false) });
         Assert.False(a.Equals(c));
         Assert.False(a.Equals((object)c));
         Assert.NotEqual(a.GetHashCode(), c.GetHashCode());
 
-        var d = new ModArgumentList(new List<ModArgument> { new("path", true) });
+        var d = new ModArgumentList(new List<ModArgument> { new(modDir, gameDir, true) });
         Assert.False(c.Equals(d));
         Assert.False(c.Equals((object)d));
         Assert.NotEqual(c.GetHashCode(), d.GetHashCode());
 
-        var e = new ModArgumentList(new List<ModArgument> { new("path", true) });
+        var e = new ModArgumentList(new List<ModArgument> { new(modDir, gameDir, true) });
         Assert.True(d.Equals(e));
         Assert.True(d.Equals((object)e));
         Assert.Equal(d.GetHashCode(), e.GetHashCode());
