@@ -1,11 +1,13 @@
 ﻿using System;
+using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.TestingUtilities;
+using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
-public class NamedArgumentTest
+public class NamedArgumentTest : GameArgumentTestBase
 {
     [Fact]
     public void Ctor_InvalidArgs_Throws()
@@ -13,7 +15,6 @@ public class NamedArgumentTest
         Assert.Throws<ArgumentNullException>(() => new TestNamedArg(null!, "value", false));
         Assert.Throws<ArgumentException>(() => new TestNamedArg(string.Empty, "value", false));
         Assert.Throws<ArgumentNullException>(() => new TestNamedArg("value", null!, false));
-
         Assert.Throws<ArgumentNullException>(() => new NamedArgNullable("value", null, false));
     }
 
@@ -30,6 +31,29 @@ public class NamedArgumentTest
         Assert.Equal("value", a.ValueToCommandLine());
         Assert.Equal(isDebug, a.DebugArgument);
         Assert.True(a.IsValid(out _));
+    }
+
+    [Theory]
+    [InlineData("game/mod/my", "game", "mod\\my")]
+    [InlineData("game/mod", "GAME", "mod")]
+    [InlineData("mod", "game", "mod", true)]
+    [InlineData("with space/other", "with space/game", "../other", false)]
+    public void ValueToCommandLine_ShortenPathWindows(string targetPath, string basePath, string expected, bool makeExpectedFullPath = false)
+    {
+        var fs = new MockFileSystem();
+
+        if (makeExpectedFullPath)
+            expected = fs.Path.GetFullPath(expected).ToUpperInvariant();
+
+        expected = PathNormalizer.Normalize(expected, new PathNormalizeOptions()
+        {
+            UnifyCase = UnifyCasingKind.UpperCase,
+            TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim,
+            UnifyDirectorySeparators = true
+        });
+
+        foreach (var pathArg in GetPathKeyValueArgs(targetPath, basePath, fs)) 
+            Assert.Equal(expected, pathArg.ValueToCommandLine());
     }
 
     [Fact]

@@ -17,16 +17,6 @@ public class GameArgumentTest : GameArgumentTestBase
         Assert.Equal(ArgumentValidityStatus.Valid, reason);
     }
 
-    [Theory]
-    [MemberData(nameof(GetIllegalCharacterGameArgs))]
-    public void TestArgInvalid(GameArgument arg)
-    {
-        var valid = arg.IsValid(out var reason);
-
-        Assert.False(valid);
-        Assert.Equal(ArgumentValidityStatus.IllegalCharacter, reason);
-    }
-
     [Fact]
     public void TestArgInvalidCustom()
     {
@@ -43,6 +33,22 @@ public class GameArgumentTest : GameArgumentTestBase
     {
         var arg = new LowerCaseNameArg();
         Assert.Equal(arg.Name.ToUpperInvariant(), arg.Name);
+    }
+
+    [Theory]
+    [MemberData(nameof(GetValidArguments))]
+    public void IsValid_ArgumentValid(GameArgument arg)
+    {
+        Assert.True(arg.IsValid(out var reason));
+        Assert.Equal(ArgumentValidityStatus.Valid, reason);
+    }
+
+    [Theory]
+    [MemberData(nameof(GetInvalidArguments))]
+    public void IsValid_ArgumentNotValid(GameArgument arg, ArgumentValidityStatus expectedReason)
+    {
+        Assert.False(arg.IsValid(out var reason));
+        Assert.Equal(expectedReason, reason);
     }
 
     public class ValidatingTestArgument(bool isValueValid, string value)

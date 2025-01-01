@@ -13,7 +13,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 /// <see cref="GameArgumentsBuilder.AddMods(System.Collections.Generic.IList{IMod})"/> and overloads to add mods to your game arguments.</remarks>
 public sealed class ModArgument : NamedArgument<IDirectoryInfo>
 {
-    private readonly IDirectoryInfo _gameDir;
+    internal readonly IDirectoryInfo GameDir;
     private readonly bool _isWorkshop;
 
     internal override bool HasPathValue => !_isWorkshop;
@@ -23,12 +23,12 @@ public sealed class ModArgument : NamedArgument<IDirectoryInfo>
         : base(isWorkshops ? GameArgumentNames.SteamModArg : GameArgumentNames.ModPathArg, modDir, false)
     {
         _isWorkshop = isWorkshops;
-        _gameDir = gameDirectory ?? throw new ArgumentNullException(nameof(gameDirectory));
+        GameDir = gameDirectory ?? throw new ArgumentNullException(nameof(gameDirectory));
     }
 
     internal override string ValueToCommandLine()
     {
-        return _isWorkshop ? ArgumentValueSerializer.Serialize(Value.Name) : ArgumentValueSerializer.ShortenPath(Value, _gameDir);
+        return _isWorkshop ? ArgumentValueSerializer.Serialize(Value.Name) : ArgumentValueSerializer.ShortenPath(Value, GameDir);
     }
 
     /// <summary>

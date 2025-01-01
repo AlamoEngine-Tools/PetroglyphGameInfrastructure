@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
+using System.Linq;
 using AnakinRaW.CommonUtilities;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
@@ -63,6 +64,8 @@ public class GameArgumentsBuilder : DisposableObject
     public GameArgumentsBuilder AddSingleMod(IPhysicalMod mod)
     {
         ThrowIfDisposed();
+        if (mod == null)
+            throw new ArgumentNullException(nameof(mod));
         return AddSingleMod(mod, mod.Game.Directory);
     }
 
@@ -97,7 +100,6 @@ public class GameArgumentsBuilder : DisposableObject
     /// <returns>This instance.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="mods"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException"><paramref name="mods"/> contains a null reference.</exception>
-    /// <exception cref="InvalidOperationException">Unable to get game directory from mod list.</exception>
     /// <exception cref="ObjectDisposedException">The <see cref="GameArgumentsBuilder"/> is disposed.</exception>
     public GameArgumentsBuilder AddMods(IList<IMod> mods)
     {
@@ -110,21 +112,8 @@ public class GameArgumentsBuilder : DisposableObject
         if (mods.Count == 0)
             return this;
 
-        var gameDir = GetGameDirectory(mods);
+        var gameDir = mods.First().Game.Directory;
         return AddMods(mods, gameDir);
-    }
-
-    private static IDirectoryInfo GetGameDirectory(IList<IMod> mods)
-    {
-        foreach (var mod in mods)
-        {
-            if (mod is null)
-                throw new ArgumentException("The mod list contains a null reference.", nameof(mods));
-            if (mod is IPhysicalMod physicalMod)
-                return physicalMod.Game.Directory;
-        }
-
-        throw new InvalidOperationException("Unable to get game directory from mod list.");
     }
 
     /// <summary>

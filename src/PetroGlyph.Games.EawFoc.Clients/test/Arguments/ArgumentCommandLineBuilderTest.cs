@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions;
+using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
@@ -23,9 +24,9 @@ public class ArgumentCommandLineBuilderTest : GameArgumentTestBase
     public static IEnumerable<object[]> GetBuildCommandLineTestData()
     {
         var fs = new MockFileSystem();
-        var gameDir = fs.DirectoryInfo.New("game");
+        var gameDir = fs.DirectoryInfo.New("with space/game");
 
-        var normalMod = new ModArgument(fs.DirectoryInfo.New("game/path"), gameDir, false);
+        var normalMod = new ModArgument(fs.DirectoryInfo.New("with space/game/path"), gameDir, false);
         var steamMod = new ModArgument(fs.DirectoryInfo.New("123456"), gameDir, true);
 
         yield return [new GameArgument[] { }, string.Empty];
@@ -44,6 +45,29 @@ public class ArgumentCommandLineBuilderTest : GameArgumentTestBase
         yield return [new GameArgument[] { new LanguageArgument(new LanguageInfo("de", LanguageSupportLevel.Default)) }, "LANGUAGE=GERMAN"];
         yield return [new GameArgument[] { new MonitorArgument(42) }, "MONITOR=42"];
         yield return [new GameArgument[] { new AILogStyleArgument(AILogStyle.Normal) }, "AILOGSTYLE=NORMAL"];
+
+        // Use absolute path
+        var expectedExternalModPath = PathNormalizer.Normalize(fs.DirectoryInfo.New("path").FullName,
+            new PathNormalizeOptions
+            {
+                TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim,
+                UnifyCase = UnifyCasingKind.UpperCase
+            });
+        var externalMod = new ModArgument(fs.DirectoryInfo.New("path"), gameDir, false);
+        yield return [new GameArgument[] { new ModArgumentList([externalMod]) }, $"MODPATH={expectedExternalModPath}"];
+
+
+        // Use game relative path because absolute path has spaces
+        var expectedExternalRelativeModPath = PathNormalizer.Normalize("../other",
+            new PathNormalizeOptions
+            {
+                TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim,
+                UnifyCase = UnifyCasingKind.UpperCase,
+                UnifyDirectorySeparators = true,
+                UnifySeparatorKind = DirectorySeparatorKind.System
+            });
+        var externalModShouldUseRelative = new ModArgument(fs.DirectoryInfo.New("with space/other"), gameDir, false);
+        yield return [new GameArgument[] { new ModArgumentList([externalModShouldUseRelative]) }, $"MODPATH={expectedExternalRelativeModPath}"];
     }
 
     [Theory]

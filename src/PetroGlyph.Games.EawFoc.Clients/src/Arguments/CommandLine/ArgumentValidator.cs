@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -35,8 +36,11 @@ internal static class ArgumentValidator
         var isEmpty = string.IsNullOrEmpty(value);
 
         if (argument is ModArgumentList)
-            return isEmpty ? ArgumentValidityStatus.Valid : ArgumentValidityStatus.InvalidData;
-
+        {
+            Debug.Assert(isEmpty);
+            return ArgumentValidityStatus.Valid;
+        }
+        
         return isEmpty ? ArgumentValidityStatus.EmptyData : ContainsInvalidCharacters(value.AsSpan(), argument.HasPathValue);
     }
 
