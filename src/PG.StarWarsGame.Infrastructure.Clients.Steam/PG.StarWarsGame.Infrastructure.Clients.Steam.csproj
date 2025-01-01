@@ -6,7 +6,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<Title>PG.StarWarsGame.Infrastructure.Clients.Steam</Title>
-		<Description>Provides tools for launching Petroglyph Star Wars games on various clients, such as Steam or Disk release.</Description>
+		<Description>Provides augmented, but optional Steam support for Petroglyph Star Wars games.</Description>
 		<PackageId>AlamoEngineTools.PG.StarWarsGame.Infrastructure.Clients</PackageId>
 		<PackageTags>alamo,petroglyph,glyphx</PackageTags>
 		<NeutralLanguage>en</NeutralLanguage>
@@ -18,10 +18,6 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<InheritDocEnabled>true</InheritDocEnabled>
 	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
-		<PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
 	  <ProjectReference Include="..\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj" />
