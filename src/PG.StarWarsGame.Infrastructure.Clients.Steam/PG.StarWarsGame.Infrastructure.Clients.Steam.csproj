@@ -23,7 +23,7 @@
 		<PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\AET.SteamAbstraction\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
-		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj" />
+	  <ProjectReference Include="..\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
+	  <ProjectReference Include="..\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj" />
 	</ItemGroup>
 </Project>

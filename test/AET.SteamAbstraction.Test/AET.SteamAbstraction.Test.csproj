@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AssemblyName>PG.StarWarsGame.Infrastructure.Test</AssemblyName>
+		<AssemblyName>AET.SteamAbstraction.Test</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -13,13 +13,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="GitHubActionsTestLogger" Version="2.4.1">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-		<PackageReference Include="QuikGraph" Version="2.5.0" />
 		<PackageReference Include="Testably.Abstractions.Testing" Version="3.2.4" />
 		<PackageReference Include="xunit" Version="2.9.2" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
@@ -33,9 +31,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Testing\PG.StarWarsGame.Infrastructure.Testing\PG.StarWarsGame.Infrastructure.Testing.csproj" />
-		<ProjectReference Include="..\..\Testing\PG.TestingUtilities\PG.TestingUtilities.csproj" />
-		<ProjectReference Include="..\src\PG.StarWarsGame.Infrastructure.csproj" />
+	  <ProjectReference Include="..\..\src\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
+	  <ProjectReference Include="..\AET.SteamAbstraction.Testing\AET.SteamAbstraction.Testing.csproj" />
 	</ItemGroup>
+
+	<PropertyGroup>
+		<IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
+		<IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' != 'true'">true</IsLinux>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(IsWindows)'=='true'">
+		<DefineConstants>Windows</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(IsLinux)'=='true'">
+		<DefineConstants>Linux</DefineConstants>
+	</PropertyGroup>
 
 </Project>

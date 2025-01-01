@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AssemblyName>AET.SteamAbstraction.TestingUtilities</AssemblyName>
+		<AssemblyName>PG.StarWarsGame.Infrastructure.TestingUtilities</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -22,8 +22,8 @@
 		</PackageReference>
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
 		<PackageReference Include="Required" Version="1.0.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -40,12 +40,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Installation\" />
+	  <ProjectReference Include="..\..\src\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj" />
+	  <ProjectReference Include="..\PG.TestingUtilities\PG.TestingUtilities.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\AET.SteamAbstraction\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
-	  <ProjectReference Include="..\PG.TestingUtilities\PG.TestingUtilities.csproj" />
+		<Using Include="Xunit" />
 	</ItemGroup>
 
 </Project>

@@ -33,11 +33,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\PetroGlyph.Games.EawFoc\src\PG.StarWarsGame.Infrastructure.csproj" />
-		<ProjectReference Include="..\..\Testing\AET.SteamAbstraction.Testing\AET.SteamAbstraction.Testing.csproj" />
-		<ProjectReference Include="..\..\Testing\PG.StarWarsGame.Infrastructure.Testing\PG.StarWarsGame.Infrastructure.Testing.csproj" />
-		<ProjectReference Include="..\..\Testing\PG.TestingUtilities\PG.TestingUtilities.csproj" />
-		<ProjectReference Include="..\src\PG.StarWarsGame.Infrastructure.Clients.csproj" />
+	  <ProjectReference Include="..\..\src\PG.StarWarsGame.Infrastructure.Clients.Steam\PG.StarWarsGame.Infrastructure.Clients.Steam.csproj" />
+	  <ProjectReference Include="..\AET.SteamAbstraction.Testing\AET.SteamAbstraction.Testing.csproj" />
+	  <ProjectReference Include="..\PG.StarWarsGame.Infrastructure.Testing\PG.StarWarsGame.Infrastructure.Testing.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup>

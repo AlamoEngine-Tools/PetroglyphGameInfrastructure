@@ -33,7 +33,7 @@ foreach (var mod in mods)
     Console.WriteLine();
 }
 
-var raw = game.FindMod(new ModReference("1129810972", ModType.Workshops));
+var raw = game.FindMod(new ModReference("1129810972", ModType.Workshops)) as IPhysicalMod;
 
 
 var client = services.GetRequiredService<IGameClientFactory>().CreateClient(game);
