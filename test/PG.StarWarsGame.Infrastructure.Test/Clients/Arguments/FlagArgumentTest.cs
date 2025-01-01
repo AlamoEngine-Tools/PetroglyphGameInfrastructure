@@ -1,9 +1,9 @@
-﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
-using System;
+﻿using System;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.TestingUtilities;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
 public class FlagArgumentTest
 {

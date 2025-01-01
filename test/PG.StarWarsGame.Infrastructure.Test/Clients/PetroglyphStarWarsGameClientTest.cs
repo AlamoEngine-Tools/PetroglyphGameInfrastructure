@@ -1,59 +1,29 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO.Abstractions;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
 using PG.StarWarsGame.Infrastructure.Clients.Utilities;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Clients;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test;
-
-public class TestGameProcessLauncher : IGameProcessLauncher, IDisposable
-{
-    private Process? _process;
-
-    public IFileInfo ExpectedExecutable { get; set; }
-
-    public GameProcessInfo ExpectedProcessInfo { get; set; }
-
-    public IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo)
-    {
-        Assert.Equal(ExpectedExecutable.FullName, executable.FullName);
-        Assert.Same(ExpectedProcessInfo.Game, processInfo.Game);
-        Assert.Equal(ExpectedProcessInfo.BuildType, processInfo.BuildType);
-        Assert.Equal(ExpectedProcessInfo.Arguments, processInfo.Arguments);
-
-        var processName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash";
-        var process = new Process();
-        process.StartInfo.FileName = processName;
-        process.StartInfo.CreateNoWindow = true;
-        process.Start();
-        _process = process;
-        return new GameProcess(process, processInfo);
-    }
-
-    public void Dispose()
-    {
-        try
-        {
-            _process?.Kill();
-            _process?.Dispose();
-        }
-        catch
-        {
-        }
-    }
-}
+namespace PG.StarWarsGame.Infrastructure.Test.Clients;
 
 public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
 {
     private readonly IGameClientFactory _clientFactory;
     private readonly TestGameProcessLauncher _processLauncher = new();
+
+    protected virtual ICollection<GamePlatform> SupportedPlatforms => GITestUtilities.RealPlatforms;
+
+    protected virtual void BeforePlay()
+    {
+    }
 
     public PetroglyphStarWarsGameClientTest()
     {
@@ -63,7 +33,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     protected override void SetupServiceProvider(IServiceCollection sc)
     {
         base.SetupServiceProvider(sc);
-        PetroglyphGameClients.InitializeServices(sc);
+        PetroglyphGameInfrastructure.InitializeServices(sc);
         sc.AddSingleton<IGameProcessLauncher>(_processLauncher);
     }
 
@@ -107,6 +77,9 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     [MemberData(nameof(RealGameIdentities))]
     public void Play(GameIdentity gameIdentity)
     {
+        if (!SupportedPlatforms.Contains(gameIdentity.Platform))
+            return;
+
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
@@ -132,6 +105,9 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     [MemberData(nameof(RealGameIdentities))]
     public void Debug_FallbackToRelease(GameIdentity gameIdentity)
     {
+        if (!SupportedPlatforms.Contains(gameIdentity.Platform))
+            return;
+
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
@@ -145,6 +121,9 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     [MemberData(nameof(RealGameIdentities))]
     public void Debug_DoNotFallbackToRelease_Throws(GameIdentity gameIdentity)
     {
+        if (!SupportedPlatforms.Contains(gameIdentity.Platform))
+            return;
+
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
@@ -159,6 +138,9 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     [MemberData(nameof(RealGameIdentities))]
     public void PlayDebug_GameExecutablesNotAvailable_Throws(GameIdentity gameIdentity)
     {
+        if (!SupportedPlatforms.Contains(gameIdentity.Platform))
+            return;
+
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
@@ -182,6 +164,9 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     [MemberData(nameof(RealGameIdentities))]
     public void PlayDebug_Derived_OnGameStarting_ThrowsCustom(GameIdentity gameIdentity)
     {
+        if (!SupportedPlatforms.Contains(gameIdentity.Platform))
+            return;
+
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
         var derivedClient = new MyTestClient((arguments, type) =>
@@ -198,7 +183,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
         Assert.Equal("Message", e.Message);
     }
 
-    private void TestPlay(
+    protected void TestPlay(
         IGame game, 
         GameProcessInfo expectedProcessInfo, 
         Func<IGameClient, IGameProcess> startGameAction, 
@@ -232,6 +217,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
         }
         else
         {
+            BeforePlay();
             var process = startGameAction(client);
             Assert.Same(process, processFromEvent);
             Assert.True(startingEvent);
@@ -246,7 +232,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
         Assert.Equal(expected.Arguments, actual.Arguments);
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         _processLauncher.Dispose();
     }

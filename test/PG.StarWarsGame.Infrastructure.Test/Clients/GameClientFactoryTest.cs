@@ -1,16 +1,17 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test;
+namespace PG.StarWarsGame.Infrastructure.Test.Clients;
 
 public class GameClientFactoryTest : CommonTestBase
 {
     protected override void SetupServiceProvider(IServiceCollection sc)
     {
         base.SetupServiceProvider(sc);
-        PetroglyphGameClients.InitializeServices(sc);
+        PetroglyphGameInfrastructure.InitializeServices(sc);
     }
 
     [Fact]

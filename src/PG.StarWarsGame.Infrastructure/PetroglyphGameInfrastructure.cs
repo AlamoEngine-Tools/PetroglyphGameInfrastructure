@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PG.StarWarsGame.Infrastructure.Clients.Processes;
+using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Games.Registry;
 using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
@@ -44,5 +46,8 @@ public static class PetroglyphGameInfrastructure
         serviceCollection.AddSingleton<IGameNameResolver>(_ => new EnglishGameNameResolver());
 
         serviceCollection.AddSingleton<IModGameTypeResolver>(sp => new OfflineModGameTypeResolver(sp));
+
+        serviceCollection.AddSingleton<IGameClientFactory>(sp => new GameClientFactory(sp));
+        serviceCollection.AddSingleton<IGameProcessLauncher>(sp => new GameProcessLauncher(sp));
     }
 }

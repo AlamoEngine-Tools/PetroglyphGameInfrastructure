@@ -1,12 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments;
-using PG.StarWarsGame.Infrastructure.Clients.Processes;
-using PG.StarWarsGame.Infrastructure.Games;
-using Testably.Abstractions.Testing;
-using Xunit;
-
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Processes;
+﻿namespace PG.StarWarsGame.Infrastructure.Test.Clients.Processes;
 
 //public class GameProcessLauncherTest
 //{

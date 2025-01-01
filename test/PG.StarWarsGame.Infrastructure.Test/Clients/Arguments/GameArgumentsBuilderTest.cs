@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
@@ -12,7 +12,7 @@ using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Testably.Abstractions.Testing;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
 public class GameArgumentsBuilderTest : CommonTestBase
 {

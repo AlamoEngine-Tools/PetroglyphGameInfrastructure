@@ -9,7 +9,7 @@ using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
 public class GameArgumentTestBase
 {

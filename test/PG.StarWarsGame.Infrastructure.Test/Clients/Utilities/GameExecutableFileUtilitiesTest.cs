@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Clients.Utilities;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
@@ -7,7 +7,7 @@ using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Utilities;
+namespace PG.StarWarsGame.Infrastructure.Test.Clients.Utilities;
 
 public class GameExecutableFileUtilitiesTest : CommonTestBase
 {

@@ -2,7 +2,7 @@
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.TestingUtilities;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
 public class TestNamedArg(string name, string value, bool isDebug) : NamedArgument<string>(name, value, isDebug)
 {

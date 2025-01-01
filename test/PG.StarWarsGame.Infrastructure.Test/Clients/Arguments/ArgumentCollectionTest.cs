@@ -4,7 +4,7 @@ using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
 public class ArgumentCollectionTest
 {

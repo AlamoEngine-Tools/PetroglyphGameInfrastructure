@@ -6,7 +6,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<Title>PG.StarWarsGame.Infrastructure</Title>
-		<Description>Core implementation for the Petroglyph Game infrastructire, providing classes and services to detect and initialize PG Star Wars games (EaW, FoC) and their mods.</Description>
+		<Description>Game infrastructire implementation, providing classes and services to detect and launch Petroglyph Star Wars games (EaW, FoC) and mods.</Description>
 		<PackageId>AlamoEngineTools.PG.StarWarsGame.Infrastructure</PackageId>
 		<PackageTags>alamo,petroglyph,glyphx</PackageTags>
 		<NeutralLanguage>en</NeutralLanguage>

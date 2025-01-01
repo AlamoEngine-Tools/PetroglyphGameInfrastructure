@@ -92,7 +92,7 @@ IServiceProvider SetupApplication()
 
     PetroglyphGameInfrastructure.InitializeServices(sc);
     SteamAbstractionLayer.InitializeServices(sc);
-    PetroglyphGameClients.InitializeServices(sc);
+    SteamPetroglyphStarWarsGameClients.InitializeServices(sc);
 
     sc.AddSingleton<IModNameResolver>(sp => new OnlineModNameResolver(sp));
     sc.AddSingleton<IModGameTypeResolver>(sp => new OnlineModGameTypeResolver(sp));

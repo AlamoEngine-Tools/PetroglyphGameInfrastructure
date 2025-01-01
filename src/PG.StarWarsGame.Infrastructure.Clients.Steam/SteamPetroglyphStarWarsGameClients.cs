@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PG.StarWarsGame.Infrastructure.Clients.Processes;
 
-namespace PG.StarWarsGame.Infrastructure.Clients;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
 /// Provides initialization routines for this library.
 /// </summary>
-public class PetroglyphGameClients
+public class SteamPetroglyphStarWarsGameClients
 {
     /// <summary>
     /// Adds services provided by this library to the specified <paramref name="serviceCollection"/>
@@ -15,7 +14,6 @@ public class PetroglyphGameClients
     /// <param name="serviceCollection">The service collection to be filled.</param>
     public static void InitializeServices(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IGameClientFactory>(sp => new GameClientFactory(sp));
-        serviceCollection.AddSingleton<IGameProcessLauncher>(sp => new GameProcessLauncher(sp));
+        serviceCollection.AddSingleton<IGameClientFactory>(sp => new SteamGameClientsFactory(sp));
     }
 }

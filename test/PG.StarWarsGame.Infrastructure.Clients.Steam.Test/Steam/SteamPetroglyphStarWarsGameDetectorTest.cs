@@ -1,4 +1,4 @@
-﻿#if Windows
+﻿#if Windows // TODO: Enable for linux
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,6 @@ using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Testing.Installation;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using PG.StarWarsGame.Infrastructure.Clients.Steam;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
@@ -18,7 +17,7 @@ using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using PG.TestingUtilities;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test.Steam;
 
 public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<EmptyStruct>
 {
@@ -33,7 +32,8 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         base.SetupServiceProvider(sc);
         sc.AddSingleton(_registry);
         SteamAbstractionLayer.InitializeServices(sc);
-        PetroglyphGameClients.InitializeServices(sc);
+        PetroglyphGameInfrastructure.InitializeServices(sc);
+        SteamPetroglyphStarWarsGameClients.InitializeServices(sc);
     }
 
     protected override IGameDetector CreateDetector(GameDetectorTestInfo<EmptyStruct> gameInfo, bool shallHandleInitialization)

@@ -1,7 +1,7 @@
 ﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
+namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
 public class GameArgumentNamesTest
 {

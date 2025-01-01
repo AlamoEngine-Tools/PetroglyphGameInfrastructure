@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-		<RootNamespace>PG.StarWarsGame.Infrastructure.Clients</RootNamespace>
-		<AssemblyName>PG.StarWarsGame.Infrastructure.Clients</AssemblyName>
+		<RootNamespace>PG.StarWarsGame.Infrastructure.Clients.Steam</RootNamespace>
+		<AssemblyName>PG.StarWarsGame.Infrastructure.Clients.Steam</AssemblyName>
 	</PropertyGroup>
 	<PropertyGroup>
-		<Title>PG.StarWarsGame.Infrastructure.Clients</Title>
+		<Title>PG.StarWarsGame.Infrastructure.Clients.Steam</Title>
 		<Description>Provides tools for launching Petroglyph Star Wars games on various clients, such as Steam or Disk release.</Description>
 		<PackageId>AlamoEngineTools.PG.StarWarsGame.Infrastructure.Clients</PackageId>
 		<PackageTags>alamo,petroglyph,glyphx</PackageTags>
