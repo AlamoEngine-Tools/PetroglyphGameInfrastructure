@@ -1,4 +1,6 @@
-﻿namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
+﻿using System;
+
+namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 
 /// <summary>
 /// Argument which enables a game behavior.
@@ -10,9 +12,9 @@
 public abstract class FlagArgument : GameArgument<bool>
 {
     /// <summary>
-    /// Can either be <see cref="ArgumentKind.Flag"/> or <see cref="ArgumentKind.DashedFlag"/>.
+    /// Gets a value indicating whether the flag argument is used with a prepended dash ('-') character
     /// </summary>
-    public sealed override ArgumentKind Kind { get; }
+    public bool Dashed { get; }
 
     /// <summary>
     /// Initializes a new argument with a given value and the inforation if this argument is for debug mode only.
@@ -23,16 +25,18 @@ public abstract class FlagArgument : GameArgument<bool>
     /// <param name="debug">Indicates whether this instance if for debug mode only.</param>
     private protected FlagArgument(string name, bool value, bool dashed = false, bool debug = false) : base(name, value, debug)
     {
-        Kind = dashed ? ArgumentKind.DashedFlag : ArgumentKind.Flag;
+        Dashed = dashed;
     }
 
     private protected override bool EqualsValue(GameArgument other)
     {
-        return Value.Equals(other.Value);
+        if (other is not FlagArgument otherFlag)
+            return false;
+        return Value.Equals(other.Value) && Dashed == otherFlag.Dashed;
     }
 
     private protected override int ValueHash()
     {
-        return Value.GetHashCode();
+        return HashCode.Combine(Value, Dashed);
     }
 }

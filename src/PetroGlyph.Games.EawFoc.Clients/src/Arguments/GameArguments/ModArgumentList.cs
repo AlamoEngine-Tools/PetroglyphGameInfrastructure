@@ -14,11 +14,6 @@ internal sealed class ModArgumentList : GameArgument<IReadOnlyList<ModArgument>>
     /// </summary>
     public static ModArgumentList Empty = new(new List<ModArgument>(0));
 
-    /// <summary>
-    /// This is always <see cref="ArgumentKind.ModList"/>.
-    /// </summary>
-    public override ArgumentKind Kind => ArgumentKind.ModList;
-
     internal ModArgumentList(IReadOnlyList<ModArgument> mods) : base(GameArgumentNames.ModListArg, mods)
     {
     }

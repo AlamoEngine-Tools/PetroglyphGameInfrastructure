@@ -6,25 +6,14 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 
 public class GameArgumentTest : GameArgumentTestBase
 {
-    [Theory]
-    [InlineData(ArgumentKind.Flag)]
-    [InlineData(ArgumentKind.DashedFlag)]
-    [InlineData(ArgumentKind.KeyValue)]
-    [InlineData(ArgumentKind.ModList)]
-    public void TestArgValid(ArgumentKind kind)
+    [Fact]
+    public void TestArgValid()
     {
-        var value = ValidStringValue;
-        if (kind == ArgumentKind.ModList)
-            value = string.Empty;
-
-        var arg = new ValidatingTestArgument(true, kind, value);
+        var arg = new ValidatingTestArgument(true, ValidStringValue);
 
         var valid = arg.IsValid(out var reason);
 
-        if (!valid) 
-            arg.IsValid(out reason);
-
-        Assert.True(valid, $"Validity is {reason} for argument '{arg.Kind}' {arg.Name}");
+        Assert.True(valid, $"Validity is {reason} for argument {arg}");
         Assert.Equal(ArgumentValidityStatus.Valid, reason);
     }
 
@@ -38,18 +27,10 @@ public class GameArgumentTest : GameArgumentTestBase
         Assert.Equal(ArgumentValidityStatus.IllegalCharacter, reason);
     }
 
-    [Theory]
-    [InlineData(ArgumentKind.Flag)]
-    [InlineData(ArgumentKind.DashedFlag)]
-    [InlineData(ArgumentKind.KeyValue)]
-    [InlineData(ArgumentKind.ModList)]
-    public void TestArgInvalidCustom(ArgumentKind kind)
+    [Fact]
+    public void TestArgInvalidCustom()
     {
-        var value = ValidStringValue;
-        if (kind == ArgumentKind.ModList)
-            value = string.Empty;
-
-        var arg = new ValidatingTestArgument(false, kind, value);
+        var arg = new ValidatingTestArgument(false, ValidStringValue);
 
         var valid = arg.IsValid(out var reason);
 
@@ -64,32 +45,12 @@ public class GameArgumentTest : GameArgumentTestBase
         Assert.Equal(arg.Name.ToUpperInvariant(), arg.Name);
     }
 
-    [Fact]
-    public void ModListArgKindRequiresEmptyStringValue_InvalidTest()
-    {
-        var invalidArg = new ValidatingTestArgument(true, ArgumentKind.ModList, "notEmpty");
-        var valid = invalidArg.IsValid(out var reason);
-        Assert.False(valid);
-        Assert.Equal(ArgumentValidityStatus.InvalidData, reason);
-    }
-
-    [Fact]
-    public void ModListArgKindRequiresEmptyStringValue_ValidTest()
-    {
-        var invalidArg = new ValidatingTestArgument(true, ArgumentKind.ModList, string.Empty);
-        var valid = invalidArg.IsValid(out var reason);
-        Assert.True(valid, $"Validity is {reason}");
-        Assert.Equal(ArgumentValidityStatus.Valid, reason);
-    }
-
-    public class ValidatingTestArgument(bool isValid, ArgumentKind kind, string value)
+    public class ValidatingTestArgument(bool isValueValid, string value)
         : GameArgument(TestHelpers.GetRandom(GameArgumentNames.AllInternalSupportedArgumentNames), value)
     {
-        public override ArgumentKind Kind => kind;
-
         private protected override bool IsDataValid()
         {
-            return isValid;
+            return isValueValid;
         }
     }
 }

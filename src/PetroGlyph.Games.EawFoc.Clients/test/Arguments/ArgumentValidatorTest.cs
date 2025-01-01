@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
@@ -14,7 +13,7 @@ public class ArgumentValidatorTest : GameArgumentTestBase
     [MemberData(nameof(GetIllegalCharacterGameArgs))]
     public void CheckArgument_TestHasIllegalChar(GameArgument arg)
     {
-        var reason = ArgumentValidator.CheckArgument(arg);
+        var reason = ArgumentValidator.Validate(arg);
         Assert.Equal(ArgumentValidityStatus.IllegalCharacter, reason);
     }
 
@@ -22,30 +21,41 @@ public class ArgumentValidatorTest : GameArgumentTestBase
     public void CheckArgument_HasEmptyData()
     {
         var arg = TestNamedArg.FromValue(string.Empty);
-        var reason = ArgumentValidator.CheckArgument(arg);
+        var reason = ArgumentValidator.Validate(arg);
         Assert.Equal(ArgumentValidityStatus.EmptyData, reason);
     }
 
     [Fact]
     public void NameIsNotSupported_IsInvalid()
     {
-        Assert.Equal(ArgumentValidityStatus.InvalidName, ArgumentValidator.CheckArgument(new TestNamedArg("NOTSUPPORTED")));
-        Assert.Equal(ArgumentValidityStatus.InvalidName, ArgumentValidator.CheckArgument(new TestFlagArg("NOTSUPPORTED")));
+        Assert.Equal(ArgumentValidityStatus.InvalidName, ArgumentValidator.Validate(new TestNamedArg("NOTSUPPORTED")));
+        Assert.Equal(ArgumentValidityStatus.InvalidName, ArgumentValidator.Validate(new TestFlagArg("NOTSUPPORTED")));
     }
 
     [Theory]
     [MemberData(nameof(GetGameArgsWithSpaceValue))]
     public void CheckArgument_HasSpaces(GameArgument arg)
     {
-        var reason = ArgumentValidator.CheckArgument(arg);
+        var reason = ArgumentValidator.Validate(arg);
         Assert.Equal(ArgumentValidityStatus.PathContainsSpaces, reason);
     }
 
     [Fact]
     public void CheckArgument_ModListCorrectType()
     {
-        Assert.Equal(ArgumentValidityStatus.InvalidData, ArgumentValidator.CheckArgument(new InvalidModListArg()));
-        Assert.Equal(ArgumentValidityStatus.Valid, ArgumentValidator.CheckArgument(new ModArgumentList(Array.Empty<ModArgument>())));
+        var fs = new MockFileSystem();
+        var gameDir = fs.DirectoryInfo.New("game");
+        var modDir = fs.DirectoryInfo.New("game/mods/mod");
+        var externalMod = fs.DirectoryInfo.New("mod");
+        var steamMod = fs.DirectoryInfo.New("123456");
+
+        Assert.Equal(ArgumentValidityStatus.Valid, ArgumentValidator.Validate(ModArgumentList.Empty));
+        Assert.Equal(ArgumentValidityStatus.Valid, ArgumentValidator.Validate(new ModArgumentList(
+        [
+            new ModArgument(modDir, gameDir, false),
+            new ModArgument(externalMod, gameDir, false),
+            new ModArgument(steamMod, gameDir, true),
+        ])));
     }
 
     [Theory]

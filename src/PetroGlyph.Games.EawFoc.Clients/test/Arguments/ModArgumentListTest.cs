@@ -17,7 +17,6 @@ public class ModArgumentListTest
 
         var arg = new ModArgumentList(new List<ModArgument> { new(modDir, gameDir, false) });
         Assert.Equal(GameArgumentNames.ModListArg, arg.Name);
-        Assert.Equal(ArgumentKind.ModList, arg.Kind);
         Assert.Empty(arg.ValueToCommandLine());
         Assert.Single(arg.Value);
         var v = Assert.IsAssignableFrom<IReadOnlyList<ModArgument>>(((GameArgument)arg).Value);
@@ -71,9 +70,5 @@ public class ModArgumentListTest
         Assert.True(d.Equals(e));
         Assert.True(d.Equals((object)e));
         Assert.Equal(d.GetHashCode(), e.GetHashCode());
-
-        var i = new InvalidModListArg();
-        Assert.False(a.Equals(i));
-        Assert.False(a.Equals((object)i));
     }
 }

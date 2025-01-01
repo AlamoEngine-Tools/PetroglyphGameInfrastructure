@@ -203,7 +203,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
 //        modA.Setup(m => m.Game).Returns(game.Object); 
 //        modA.Setup(m => m.Directory).Returns(fs.DirectoryInfo.New("d:\\path to mod\\a"));
 
-//        _validator.Setup(v => v.CheckArgument(It.IsAny<IGameArgument>(), out It.Ref<string>.IsAny, out It.Ref<string>.IsAny))
+//        _validator.Setup(v => v.Validate(It.IsAny<IGameArgument>(), out It.Ref<string>.IsAny, out It.Ref<string>.IsAny))
 //            .Returns(ArgumentValidityStatus.InvalidData);
 
 //        Assert.Throws<ModException>(() => _service.BuildArgumentList(modA.Object, true));

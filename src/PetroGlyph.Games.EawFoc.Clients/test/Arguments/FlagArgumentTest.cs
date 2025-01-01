@@ -34,9 +34,9 @@ public class FlagArgumentTest
     public void Ctor_TestIsDashed()
     {
         var flag = new TestFlagArg("Name", true);
-        Assert.Equal(ArgumentKind.Flag, flag.Kind);
+        Assert.False(flag.Dashed);
         var dashed = new TestFlagArg("Name", true, true);
-        Assert.Equal(ArgumentKind.DashedFlag, dashed.Kind);
+        Assert.True(dashed.Dashed);
     }
 
     [Fact]

@@ -2,6 +2,7 @@
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 #if NETSTANDARD2_0
 using AnakinRaW.CommonUtilities.FileSystem;
 #endif
@@ -23,7 +24,7 @@ internal static class ArgumentValidator
     private static readonly char[] InvalidArgumentChars =
         ['\"', '\'', '#', '+', ',', '`', '<', '>', '|', ';', '*', '?', '&', ' ', '!', '$', '=', '@', '%', '~'];
 
-    public static ArgumentValidityStatus CheckArgument(GameArgument argument)
+    public static ArgumentValidityStatus Validate(GameArgument argument)
     { 
         // We do not support custom arguments
         if (!GameArgumentNames.AllInternalSupportedArgumentNames.Contains(argument.Name))
@@ -31,14 +32,12 @@ internal static class ArgumentValidator
 
         var value = argument.ValueToCommandLine();
 
-        return argument.Kind switch
-        {
-            ArgumentKind.ModList => string.IsNullOrEmpty(value)
-                ? ArgumentValidityStatus.Valid
-                : ArgumentValidityStatus.InvalidData,
-            ArgumentKind.KeyValue when string.IsNullOrEmpty(value) => ArgumentValidityStatus.EmptyData,
-            _ => ContainsInvalidCharacters(value.AsSpan(), argument.HasPathValue)
-        };
+        var isEmpty = string.IsNullOrEmpty(value);
+
+        if (argument is ModArgumentList)
+            return isEmpty ? ArgumentValidityStatus.Valid : ArgumentValidityStatus.InvalidData;
+
+        return isEmpty ? ArgumentValidityStatus.EmptyData : ContainsInvalidCharacters(value.AsSpan(), argument.HasPathValue);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

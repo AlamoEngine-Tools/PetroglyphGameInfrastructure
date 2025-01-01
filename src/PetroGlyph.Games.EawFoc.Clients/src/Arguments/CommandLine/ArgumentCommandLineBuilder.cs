@@ -48,7 +48,7 @@ internal static class ArgumentCommandLineBuilder
     {
         if (!argument.Value)
             return string.Empty;
-        return argument.Kind == ArgumentKind.DashedFlag ? $"-{argument.Name}" : argument.Name;
+        return argument.Dashed ? $"-{argument.Name}" : argument.Name;
     }
 
     private static string BuildKeyValueArgument(GameArgument argument)

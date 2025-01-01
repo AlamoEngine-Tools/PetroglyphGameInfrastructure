@@ -72,13 +72,6 @@ public class ArgumentCommandLineBuilderTest : GameArgumentTestBase
         Assert.Empty(command);
     }
 
-    [Fact]
-    public void TestInvalidModList_Throws()
-    {
-        var arg = new InvalidModListArg();
-        Assert.Throws<GameArgumentException>(() => ArgumentCommandLineBuilder.BuildCommandLine(new ArgumentCollection([arg])));
-    }
-
     [Theory]
     [InlineData("path with space")]
     [InlineData("path&calc.exe")]

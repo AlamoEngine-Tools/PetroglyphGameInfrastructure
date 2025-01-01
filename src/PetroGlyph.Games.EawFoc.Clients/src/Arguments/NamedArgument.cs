@@ -10,11 +10,6 @@
 /// <typeparam name="T">Type of the Value.</typeparam>
 public abstract class NamedArgument<T> : GameArgument<T> where T : notnull
 {
-    /// <summary>
-    /// Identifies this instance as <see cref="ArgumentKind.KeyValue"/>.
-    /// </summary>
-    public override ArgumentKind Kind => ArgumentKind.KeyValue;
-    
     private protected NamedArgument(string name, T value, bool isDebug) : base(name, value, isDebug)
     {
     }

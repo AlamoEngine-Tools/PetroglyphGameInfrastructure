@@ -7,8 +7,6 @@ using System.Runtime.InteropServices;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
-using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Mods;
 using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Test.Arguments;
@@ -242,15 +240,6 @@ public class TestFlagArg(string name, bool value, bool dashed = false, bool debu
 
 public class LowerCaseNameArg()
     : FlagArgument(TestHelpers.GetRandom(GameArgumentNames.AllInternalSupportedArgumentNames).ToLowerInvariant(), true);
-
-public class InvalidModListArg : GameArgument
-{
-    public override ArgumentKind Kind => ArgumentKind.ModList;
-
-    internal InvalidModListArg() : base(GameArgumentNames.ModListArg, GameArgumentTestBase.ValidStringValue)
-    {
-    }
-}
 
 
 [SerializeEnumValue]

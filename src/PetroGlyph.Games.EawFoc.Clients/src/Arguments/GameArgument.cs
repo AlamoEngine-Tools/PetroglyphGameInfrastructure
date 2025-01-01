@@ -9,22 +9,17 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 public abstract class GameArgument
 {
     /// <summary>
-    /// Flag indicating how this arguments shall be handled.
-    /// </summary>
-    public abstract ArgumentKind Kind { get; }
-
-    /// <summary>
-    /// Indicates this argument can only be used in debug mode if <see langword="true"/>.
+    /// Gets a value indicating whether this argument can be used in debug mode only.
     /// </summary>
     public bool DebugArgument { get; }
 
     /// <summary>
-    /// The name of the argument.
+    /// Gets the name of the argument.
     /// </summary>
     public string Name { get; }
 
     /// <summary>
-    /// The value of the argument.
+    /// Gets the value of the argument.
     /// </summary>
     public object Value { get; }
 
@@ -73,7 +68,7 @@ public abstract class GameArgument
             return false;
         }
 
-        reason = ArgumentValidator.CheckArgument(this);
+        reason = ArgumentValidator.Validate(this);
         if (reason != ArgumentValidityStatus.Valid)
             return false;
 
@@ -94,7 +89,7 @@ public abstract class GameArgument
             return true;
         if (GetType() != other.GetType())
             return false;
-        return Kind == other.Kind && Name.Equals(other.Name) && EqualsValue(other);
+        return Name.Equals(other.Name) && EqualsValue(other);
     }
 
     /// <summary>
@@ -115,7 +110,7 @@ public abstract class GameArgument
     /// <returns>The hash value generated for this game argument.</returns>
     public sealed override int GetHashCode()
     {
-        return HashCode.Combine(Kind, Name, ValueHash());
+        return HashCode.Combine(GetType().FullName, Name, ValueHash());
     }
 
     /// <summary>
@@ -127,7 +122,7 @@ public abstract class GameArgument
     /// <returns>A textual representation of the game argument.</returns>
     public sealed override string ToString()
     {
-        return $"{Name}={Value} ({Kind})";
+        return $"{Name}:{Value}";
     }
 
     private protected virtual bool EqualsValue(GameArgument other)
