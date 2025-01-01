@@ -111,9 +111,9 @@ public class PetroglyphStarWarsGame : PlayableModContainer, IGame
         return _normalizedPath.Equals(normalizedDirectory, StringComparison.Ordinal);
     }
 
-    bool IEquatable<IGameIdentity>.Equals(IGameIdentity other)
+    bool IEquatable<IGameIdentity>.Equals(IGameIdentity? other)
     {
-        return Type == other.Type && Platform == other.Platform;
+        return Type == other?.Type && Platform == other.Platform;
     }
 
     /// <inheritdoc/>

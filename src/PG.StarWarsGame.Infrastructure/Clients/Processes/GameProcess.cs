@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ using AnakinRaW.CommonUtilities;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
-internal sealed class GameProcess : IGameProcess
+internal sealed class GameProcess : DisposableObject, IGameProcess
 {
     private volatile bool _closed;
 
@@ -43,28 +44,34 @@ internal sealed class GameProcess : IGameProcess
 
     public void Exit()
     {
+        if (IsDisposed)
+            throw new InvalidOperationException("No process is associated with this object."); // Replicate .NET behavior
         if (State == GameProcessState.Closed)
             return;
-        Process.Kill();
+        try
+        {
+            Process.Kill();
+        }
+        catch (Exception e) when (e is InvalidOperationException or Win32Exception)
+        {
+        }
     }
 
     public Task WaitForExitAsync(CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
         return State == GameProcessState.Closed ? Task.CompletedTask : Process.WaitForExitAsync(cancellationToken);
+    }
+
+    protected override void DisposeManagedResources()
+    {
+        base.DisposeManagedResources();
+        Process.Dispose();
     }
 
     private void RegisterExitEvent(Process process)
     {
-        try
-        {
-            Process.EnableRaisingEvents = true;
-        }
-        catch (InvalidOperationException)
-        {
-            if (process.HasExited)
-                _closed = true;
-            throw;
-        }
+        Process.EnableRaisingEvents = true;
         Process.Exited += OnClosed;
         if (process.HasExited)
         {

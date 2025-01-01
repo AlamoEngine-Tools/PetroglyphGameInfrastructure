@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 /// <summary>
 /// High-Level representation of a game process.
 /// </summary>
-public interface IGameProcess
+public interface IGameProcess : IDisposable
 {
     /// <summary>
     /// Events gets raised if the game was terminated.
