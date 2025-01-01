@@ -28,6 +28,10 @@ public class ArgumentCommandLineBuilderTest : GameArgumentTestBase
 
         var normalMod = new ModArgument(fs.DirectoryInfo.New("with space/game/path"), gameDir, false);
         var steamMod = new ModArgument(fs.DirectoryInfo.New("123456"), gameDir, true);
+        var expectedNormalModPath = PathNormalizer.Normalize("path", new()
+        {
+            UnifyCase = UnifyCasingKind.UpperCase,
+        });
 
         yield return [new GameArgument[] { }, string.Empty];
         yield return [new GameArgument[] { new TestFlagArg(false, true) }, string.Empty];
@@ -36,12 +40,12 @@ public class ArgumentCommandLineBuilderTest : GameArgumentTestBase
         yield return [new GameArgument[] { new MapArgument("myMap") }, "MAP=myMap"];
         yield return [new GameArgument[] { new WindowedArgument(), new MapArgument("myMap") }, "WINDOWED MAP=myMap"];
         yield return [new GameArgument[] { new MapArgument("myMap"), new WindowedArgument() }, "MAP=myMap WINDOWED"];
-        yield return [new GameArgument[] { new ModArgumentList([normalMod]) }, "MODPATH=PATH"];
-        yield return [new GameArgument[] { new ModArgumentList([normalMod, steamMod]) }, "MODPATH=PATH STEAMMOD=123456"];
-        yield return [new GameArgument[] { new ModArgumentList([steamMod, normalMod]) }, "STEAMMOD=123456 MODPATH=PATH"];
-        yield return [new GameArgument[] { new ModArgumentList([normalMod, steamMod]), new WindowedArgument() }, "MODPATH=PATH STEAMMOD=123456 WINDOWED"];
+        yield return [new GameArgument[] { new ModArgumentList([normalMod]) }, $"MODPATH={expectedNormalModPath}"];
+        yield return [new GameArgument[] { new ModArgumentList([normalMod, steamMod]) }, $"MODPATH={expectedNormalModPath} STEAMMOD=123456"];
+        yield return [new GameArgument[] { new ModArgumentList([steamMod, normalMod]) }, $"STEAMMOD=123456 MODPATH={expectedNormalModPath}"];
+        yield return [new GameArgument[] { new ModArgumentList([normalMod, steamMod]), new WindowedArgument() }, $"MODPATH={expectedNormalModPath} STEAMMOD=123456 WINDOWED"];
         yield return [new GameArgument[] { new ModArgumentList([normalMod, steamMod]), new WindowedArgument(), new MCEArgument(), new MapArgument("myMap") },
-            "MODPATH=PATH STEAMMOD=123456 WINDOWED -MCE MAP=myMap"];
+            $"MODPATH={expectedNormalModPath} STEAMMOD=123456 WINDOWED -MCE MAP=myMap"];
         yield return [new GameArgument[] { new LanguageArgument(new LanguageInfo("de", LanguageSupportLevel.Default)) }, "LANGUAGE=GERMAN"];
         yield return [new GameArgument[] { new MonitorArgument(42) }, "MONITOR=42"];
         yield return [new GameArgument[] { new AILogStyleArgument(AILogStyle.Normal) }, "AILOGSTYLE=NORMAL"];

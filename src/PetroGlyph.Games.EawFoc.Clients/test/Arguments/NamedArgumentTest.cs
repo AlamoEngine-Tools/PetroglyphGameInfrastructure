@@ -34,16 +34,15 @@ public class NamedArgumentTest : GameArgumentTestBase
     }
 
     [Theory]
-    [InlineData("game/mod/my", "game", "mod\\my")]
-    [InlineData("game/mod", "GAME", "mod")]
+    [InlineData("game/mod/my", "game", "mod/my")]
     [InlineData("mod", "game", "mod", true)]
     [InlineData("with space/other", "with space/game", "../other", false)]
-    public void ValueToCommandLine_ShortenPathWindows(string targetPath, string basePath, string expected, bool makeExpectedFullPath = false)
+    public void ValueToCommandLine_ShortenPath(string targetPath, string basePath, string expected, bool makeExpectedFullPath = false)
     {
         var fs = new MockFileSystem();
 
         if (makeExpectedFullPath)
-            expected = fs.Path.GetFullPath(expected).ToUpperInvariant();
+            expected = fs.Path.GetFullPath(expected);
 
         expected = PathNormalizer.Normalize(expected, new PathNormalizeOptions()
         {

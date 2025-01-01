@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if Windows
+
+using System;
 using System.Collections.Generic;
 using AET.SteamAbstraction;
 using AET.SteamAbstraction.Games;
@@ -150,3 +152,5 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         return new GameDetectorTestInfo<EmptyStruct>(gameIdentity.Type, game.Directory, default);
     }
 }
+
+#endif

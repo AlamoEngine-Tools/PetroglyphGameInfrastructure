@@ -73,7 +73,7 @@ public class ArgumentValueSerializerTest
     }
 
     [PlatformSpecificTheory(TestPlatformIdentifier.Linux)]
-    [InlineData("game/mod/my", "game", "mod\\my")]
+    [InlineData("game/mod/my", "game", "mod/my")]
     [InlineData("game/mod", "game", "mod")]
     [InlineData("game/mod", "GAME", "game/mod", true)]
     [InlineData("mod", "game", "mod", true)]
