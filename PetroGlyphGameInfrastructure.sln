@@ -6,8 +6,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DDF4836A-125
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{91EC3980-0C87-484F-91E5-0FE684C1D2E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApplication", "sample\SampleApplication\SampleApplication.csproj", "{8F295344-3D7B-4983-88FD-D0E5C692CBAB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AET.SteamAbstraction", "src\AET.SteamAbstraction\AET.SteamAbstraction.csproj", "{8C4EA230-C426-150D-D7B3-EA1E855E255B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PG.StarWarsGame.Infrastructure", "src\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj", "{B9F11D14-D989-BDCA-9269-454382B01C53}"
@@ -26,16 +24,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AET.SteamAbstraction.Test",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AET.SteamAbstraction.Testing", "test\AET.SteamAbstraction.Testing\AET.SteamAbstraction.Testing.csproj", "{C5BACDAD-F846-F75F-12DE-1EF1A8319549}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApplication", "sampleApp\SampleApplication.csproj", "{19F0E685-5B50-C6D7-C50F-A04941FD9663}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8F295344-3D7B-4983-88FD-D0E5C692CBAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F295344-3D7B-4983-88FD-D0E5C692CBAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F295344-3D7B-4983-88FD-D0E5C692CBAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F295344-3D7B-4983-88FD-D0E5C692CBAB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C4EA230-C426-150D-D7B3-EA1E855E255B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8C4EA230-C426-150D-D7B3-EA1E855E255B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C4EA230-C426-150D-D7B3-EA1E855E255B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -72,6 +68,10 @@ Global
 		{C5BACDAD-F846-F75F-12DE-1EF1A8319549}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5BACDAD-F846-F75F-12DE-1EF1A8319549}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5BACDAD-F846-F75F-12DE-1EF1A8319549}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19F0E685-5B50-C6D7-C50F-A04941FD9663}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19F0E685-5B50-C6D7-C50F-A04941FD9663}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19F0E685-5B50-C6D7-C50F-A04941FD9663}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19F0E685-5B50-C6D7-C50F-A04941FD9663}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

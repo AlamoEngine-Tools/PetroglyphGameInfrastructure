@@ -18,7 +18,6 @@ using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Name;
 
-
 var services = SetupApplication();
 
 var game = FindGame();
