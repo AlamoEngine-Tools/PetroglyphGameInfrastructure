@@ -65,7 +65,9 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
         get
         {
             ThrowIfDisposed();
-            return LibraryFinder.FindLibraries();
+            if (!Installed)
+                return [];
+            return LibraryFinder.FindLibraries(Registry.InstallationDirectory!);
         }
     }
 

@@ -16,11 +16,25 @@ internal static partial class SteamInstallation
     public static ISteamLibrary InstallDefaultLibrary(this IFileSystem fs, IServiceProvider serviceProvider, bool addToConfig = true)
     {
         var steamPath = fs.Path.GetFullPath(SteamInstallPath);
-        return InstallSteamLibrary(fs, steamPath, serviceProvider, addToConfig);
+        return InstallSteamLibrary(fs, steamPath, true, serviceProvider, addToConfig);
 
     }
 
-    public static ISteamLibrary InstallSteamLibrary(this IFileSystem fs, string path, IServiceProvider serviceProvider, bool addToConfig = true)
+    public static ISteamLibrary InstallSteamLibrary(
+        this IFileSystem fs, 
+        string path, 
+        IServiceProvider serviceProvider, 
+        bool addToConfig = true)
+    {
+        return InstallSteamLibrary(fs, path, false, serviceProvider, addToConfig);
+    }
+
+    private static ISteamLibrary InstallSteamLibrary(
+        this IFileSystem fs,
+        string path,
+        bool isDefault,
+        IServiceProvider serviceProvider,
+        bool addToConfig = true)
     {
         var commonPath = fs.Path.Combine(path, "steamapps", "common");
         var workshopPath = fs.Path.Combine(path, "steamapps", "workshop");
@@ -40,7 +54,15 @@ internal static partial class SteamInstallation
 }}
 ";
 
-        fs.File.WriteAllText(fs.Path.Combine(libDir.FullName, "libraryfolder.vdf"), libraryVdf);
+        var libraryVdfName = "libraryfolder.vdf";
+        var libraryVdfSubPath = string.Empty;
+        if (isDefault)
+        {
+            libraryVdfName = "libraryfolders.vdf";
+            libraryVdfSubPath = "steamapps";
+        }
+
+        fs.File.WriteAllText(fs.Path.Combine(libDir.FullName, libraryVdfSubPath, libraryVdfName), libraryVdf);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {

@@ -34,7 +34,7 @@ public class SteamLibraryFinderTest
     [Fact]
     public void FindLibraries_SteamNotFound_ReturnsEmpty()
     {
-        Assert.Empty(_libraryFinder.FindLibraries());
+        Assert.Empty(_libraryFinder.FindLibraries(_fileSystem.DirectoryInfo.New("does not exist")));
     }
 
     // TODO: Target all platforms
@@ -43,7 +43,7 @@ public class SteamLibraryFinderTest
     {
         using var registry = _serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
         _fileSystem.InstallSteam(registry);
-        var libs = _libraryFinder.FindLibraries();
+        var libs = _libraryFinder.FindLibraries(registry.InstallationDirectory!);
         Assert.Empty(libs);
     }
 
@@ -55,7 +55,7 @@ public class SteamLibraryFinderTest
         _fileSystem.InstallSteam(registry);
         var lib = _fileSystem.InstallDefaultLibrary(_serviceProvider, addToConfig: true);
 
-        var libs = _libraryFinder.FindLibraries();
+        var libs = _libraryFinder.FindLibraries(registry.InstallationDirectory!);
 
         Assert.Equal([lib], libs);
     }
@@ -68,7 +68,7 @@ public class SteamLibraryFinderTest
         _fileSystem.InstallSteam(registry);
         _fileSystem.InstallDefaultLibrary(_serviceProvider, addToConfig: false);
 
-        var libs = _libraryFinder.FindLibraries();
+        var libs = _libraryFinder.FindLibraries(registry.InstallationDirectory!);
 
         Assert.Empty(libs);
     }
@@ -82,7 +82,7 @@ public class SteamLibraryFinderTest
         var defaultLib = _fileSystem.InstallDefaultLibrary(_serviceProvider, addToConfig: true);
         var externalLib = _fileSystem.InstallSteamLibrary("externalLib", _serviceProvider);
 
-        var libs = _libraryFinder.FindLibraries();
+        var libs = _libraryFinder.FindLibraries(registry.InstallationDirectory!);
 
         Assert.Equal(
             new List<ISteamLibrary> { defaultLib, externalLib }.OrderBy(x => x.LibraryLocation.FullName),
@@ -99,7 +99,7 @@ public class SteamLibraryFinderTest
         
         _fileSystem.File.Delete(_fileSystem.Path.Combine(externalLib.LibraryLocation.FullName, "steam.dll"));
 
-        var libs = _libraryFinder.FindLibraries();
+        var libs = _libraryFinder.FindLibraries(registry.InstallationDirectory!);
 
         Assert.Equal([defaultLib], libs.OrderBy(x => x.LibraryLocation.FullName));
     }
@@ -115,7 +115,7 @@ public class SteamLibraryFinderTest
 
         _fileSystem.File.Delete(_fileSystem.Path.Combine(externalLib.LibraryLocation.FullName, "libraryfolder.vdf"));
 
-        var libs = _libraryFinder.FindLibraries();
+        var libs = _libraryFinder.FindLibraries(registry.InstallationDirectory!);
 
         Assert.Equal([defaultLib], libs.OrderBy(x => x.LibraryLocation.FullName));
     }
@@ -131,7 +131,7 @@ public class SteamLibraryFinderTest
 
         _fileSystem.Directory.Delete(externalLib.LibraryLocation.FullName, true);
 
-        var libs = _libraryFinder.FindLibraries();
+        var libs = _libraryFinder.FindLibraries(registry.InstallationDirectory!);
 
         Assert.Equal([defaultLib], libs.OrderBy(x => x.LibraryLocation.FullName));
     }
