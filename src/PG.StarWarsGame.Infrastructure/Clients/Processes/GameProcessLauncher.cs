@@ -23,7 +23,7 @@ internal sealed class GameProcessLauncher(IServiceProvider serviceProvider) : IG
             var processStartInfo = new ProcessStartInfo(executable.FullName)
             {
                 Arguments = arguments,
-                WorkingDirectory = processInfo.Game.Directory.FullName,
+                WorkingDirectory = executable.Directory!.FullName,
                 UseShellExecute = false
             };
             var process = new Process

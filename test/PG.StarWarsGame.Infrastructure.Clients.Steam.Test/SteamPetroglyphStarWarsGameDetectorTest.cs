@@ -17,7 +17,7 @@ using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using PG.TestingUtilities;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
 public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<EmptyStruct>
 {
@@ -126,8 +126,8 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
     }
 
     private GameDetectorTestInfo<EmptyStruct> SetupGame(
-        GameIdentity gameIdentity, 
-        Action<IGame, GameType> registrySetup, 
+        GameIdentity gameIdentity,
+        Action<IGame, GameType> registrySetup,
         SteamAppState appState = SteamAppState.StateFullyInstalled)
     {
         // Install Steam (regardless whether the identity is supported)

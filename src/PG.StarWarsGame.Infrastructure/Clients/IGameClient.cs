@@ -54,8 +54,6 @@ public interface IGameClient : IDisposable
     /// </remarks>
     /// <returns>The process of the started game.</returns>
     /// <exception cref="GameStartException">
-    /// <paramref name="mod"/> has a different game instance than the game instance associated to the client.
-    /// OR
     /// <paramref name="mod"/> has an invalid path (such as containing space ' ' characters).
     /// OR
     /// Starting the game was cancelled by one <see cref="GameStarting"/> handler.

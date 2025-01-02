@@ -8,7 +8,7 @@ using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
 public class IGameClientFactoryTest : CommonTestBase
 {

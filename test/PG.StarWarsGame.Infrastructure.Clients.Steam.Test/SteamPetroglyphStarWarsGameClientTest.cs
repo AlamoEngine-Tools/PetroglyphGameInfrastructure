@@ -16,14 +16,14 @@ using PG.StarWarsGame.Infrastructure.Test.Clients;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test.Steam;
+namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
 public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClientTest
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
     private readonly PetroglyphStarWarsGame _game;
     private TestProcessHelper? _processHelper;
-    
+
     protected override ICollection<GamePlatform> SupportedPlatforms { get; } = [GamePlatform.SteamGold];
 
     protected override void BeforePlay()
@@ -89,7 +89,7 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
 
         var expected = new GameProcessInfo(_game, GameBuildType.Release, ArgumentCollection.Empty);
 
-        TestPlay(_game, expected, gameClient => gameClient.Play(), true);
+        TestPlay(_game, expected, gameClient => gameClient.Play(), shallThrowGameStartException: true);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
 
         var expected = new GameProcessInfo(_game, GameBuildType.Release, ArgumentCollection.Empty);
 
-        TestPlay(_game, expected, gameClient => gameClient.Play(), true);
+        TestPlay(_game, expected, gameClient => gameClient.Play(), shallThrowGameStartException: true);
     }
 
 

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
+using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Clients;
@@ -9,6 +10,8 @@ namespace PG.StarWarsGame.Infrastructure.Testing.Clients;
 public class TestGameProcessLauncher : IGameProcessLauncher, IDisposable
 {
     private Process? _process;
+
+    public bool ThrowsGameStartException { get; set; }
 
     public IFileInfo ExpectedExecutable { get; set; }
 
@@ -20,6 +23,9 @@ public class TestGameProcessLauncher : IGameProcessLauncher, IDisposable
         Assert.Same(ExpectedProcessInfo.Game, processInfo.Game);
         Assert.Equal(ExpectedProcessInfo.BuildType, processInfo.BuildType);
         Assert.Equal(ExpectedProcessInfo.Arguments, processInfo.Arguments);
+
+        if (ThrowsGameStartException)
+            throw new GameStartException(processInfo.Game, "Some exception");
 
         var processName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash";
         var process = new Process();

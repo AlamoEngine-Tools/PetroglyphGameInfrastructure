@@ -68,9 +68,6 @@ public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
     {
         if (mod == null)
             throw new ArgumentNullException(nameof(mod));
-        if (!ReferenceEquals(mod.Game, Game))
-            throw new GameStartException(Game,
-                "The game reference of the specified mod is not the same as the game reference of this client instance.");
 
         using var argBuilder = new GameArgumentsBuilder()
             .AddSingleMod(mod);
