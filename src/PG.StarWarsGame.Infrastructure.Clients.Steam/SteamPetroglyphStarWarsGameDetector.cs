@@ -11,11 +11,8 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
-/// A <see cref="IGameDetector"/> that is able to find game installations from Steam.
+/// A game detector with extended Steam support which supports game initialization requests.
 /// </summary>
-/// <remarks>
-/// This detector supports game initialization requests.
-/// </remarks>
 public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
 {
     private const uint EaWGameId = 32470;
@@ -25,7 +22,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
     private readonly IGameRegistryFactory _registryFactory;
 
     /// <summary>
-    /// Creates a new instance.
+    /// Initializes a new instance of the <see cref="SteamPetroglyphStarWarsGameDetector"/> class.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
     public SteamPetroglyphStarWarsGameDetector(IServiceProvider serviceProvider) : base(serviceProvider, true)

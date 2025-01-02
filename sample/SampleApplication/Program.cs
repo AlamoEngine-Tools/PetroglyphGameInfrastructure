@@ -40,7 +40,6 @@ var client = services.GetRequiredService<IGameClientFactory>().CreateClient(game
 
 Console.WriteLine($"Playing {raw?.ToString() ?? game.ToString()}");
 
-
 using var gameArgs = new GameArgumentsBuilder()
     .Add(new WindowedArgument());
 
