@@ -7,7 +7,7 @@ using PG.StarWarsGame.Infrastructure.Games;
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
-/// Represents a client for a Petroglyph Star Wars game which allows launching the game.
+/// Represents a client for a Petroglyph Star Wars for Steam.
 /// </summary>
 public class SteamPetroglyphStarWarsGameClient : PetroglyphStarWarsGameClient
 {
@@ -30,7 +30,9 @@ public class SteamPetroglyphStarWarsGameClient : PetroglyphStarWarsGameClient
         SteamWrapper = serviceProvider.GetRequiredService<ISteamWrapperFactory>().CreateWrapper();
     }
 
+
     /// <inheritdoc />
+    /// <exception cref="GameStartException">Steam is not running.</exception>
     protected override void OnGameStarting(ArgumentCollection arguments, GameBuildType type)
     {
         if (!SteamWrapper.IsRunning)

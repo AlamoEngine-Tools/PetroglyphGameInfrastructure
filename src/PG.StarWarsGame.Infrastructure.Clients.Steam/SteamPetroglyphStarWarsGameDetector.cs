@@ -11,7 +11,7 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam;
 
 /// <summary>
-/// A game detector with extended Steam support which supports game initialization requests.
+/// A game detector with extended Steam support that supports game initialization requests.
 /// </summary>
 public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
 {
