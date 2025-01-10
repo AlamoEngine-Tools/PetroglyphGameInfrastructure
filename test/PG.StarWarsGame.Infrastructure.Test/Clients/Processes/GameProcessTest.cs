@@ -185,7 +185,7 @@ public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
     }
 
     [Fact]
-    public async Task ClosedEvent_IsRaisedWhenProcessExits()
+    public void ClosedEvent_IsRaisedWhenProcessExits()
     {
         var process = StartStableTestProcess();
         var processInfo = new GameProcessInfo(Game, GameBuildType.Release, ArgumentCollection.Empty);

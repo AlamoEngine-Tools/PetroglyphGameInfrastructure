@@ -84,7 +84,7 @@ public static partial class GameInstallation
     
     private static void CreateFile(IFileSystem fs, string path)
     {
-        var dir = fs.Path.GetDirectoryName(path);
+        var dir = fs.Path.GetDirectoryName(path)!;
         fs.Directory.CreateDirectory(dir);
         using var file = fs.File.Create(path);
     }

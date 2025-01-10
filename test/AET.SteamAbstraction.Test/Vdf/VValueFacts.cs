@@ -13,9 +13,9 @@ public class VValueFacts
         var original = new VValue("value1");
 
         var clone = original.DeepClone() as VValue;
-        clone.Value = "value2";
+        clone!.Value = "value2";
 
-        Assert.True(original.Value.Equals("value1"));
+        Assert.True(original.Value!.Equals("value1"));
     }
 
     [Fact]

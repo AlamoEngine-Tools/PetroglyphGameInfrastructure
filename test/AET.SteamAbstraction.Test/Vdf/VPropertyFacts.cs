@@ -16,7 +16,7 @@ public class VPropertyFacts
         });
 
         var clone = original.DeepClone() as VProperty;
-        clone.Value = new VValue("value3");
+        clone!.Value = new VValue("value3");
 
         Assert.True(original.Value is VObject);
     }

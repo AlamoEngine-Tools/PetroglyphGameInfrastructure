@@ -23,7 +23,7 @@ public class WindowsSteamRegistryTest : SteamRegistryTestBase
         if (steamExists)
         {
             using var hkcu = InternalRegistry.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
-            using var steamKey = hkcu.CreateSubKey("Software\\Valve\\Steam");
+            using var steamKey = hkcu.CreateSubKey("Software\\Valve\\Steam")!;
 
             steamKey.SetValue("SteamExe", FileSystem.Path.GetFullPath(SteamExePath));
             steamKey.SetValue("SteamPath", FileSystem.Path.GetFullPath(SteamInstallPath));
@@ -40,7 +40,7 @@ public class WindowsSteamRegistryTest : SteamRegistryTestBase
     protected override void SetSteamPid(int pid)
     {
         using var hkcu = InternalRegistry.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
-        using var steamKey = hkcu.CreateSubKey("Software\\Valve\\Steam\\ActiveProcess");
+        using var steamKey = hkcu.CreateSubKey("Software\\Valve\\Steam\\ActiveProcess")!;
         steamKey.SetValue("pid", pid);
     }
 

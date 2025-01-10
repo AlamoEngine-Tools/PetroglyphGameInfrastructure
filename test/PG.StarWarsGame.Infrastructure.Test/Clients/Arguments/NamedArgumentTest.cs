@@ -95,6 +95,8 @@ public class NamedArgumentTest : GameArgumentTestBase
 
     private class NamedArgB(string name, string value, bool isDebug) : NamedArgument<string>(name, value, isDebug);
     private class NamedArgC(string name, uint value, bool isDebug) : NamedArgument<uint>(name, value, isDebug);
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     private class NamedArgNullable(string name, uint? value, bool isDebug) : NamedArgument<uint?>(name, value, isDebug);
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
 }

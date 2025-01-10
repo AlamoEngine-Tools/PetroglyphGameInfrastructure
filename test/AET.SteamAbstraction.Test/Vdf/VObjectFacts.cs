@@ -16,9 +16,9 @@ public class VObjectFacts
         };
 
         var clone = original.DeepClone() as VObject;
-        clone["key1"] = new VValue("value2");
+        clone!["key1"] = new VValue("value2");
 
-        Assert.True(((VValue)original["key1"]).Value.Equals("value1"));
+        Assert.True(((VValue)original["key1"]!).Value!.Equals("value1"));
     }
 
     [Fact]
