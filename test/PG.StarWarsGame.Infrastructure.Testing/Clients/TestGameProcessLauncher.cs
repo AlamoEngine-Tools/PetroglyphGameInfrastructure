@@ -13,9 +13,9 @@ public class TestGameProcessLauncher : IGameProcessLauncher, IDisposable
 
     public bool ThrowsGameStartException { get; set; }
 
-    public IFileInfo ExpectedExecutable { get; set; }
+    public IFileInfo ExpectedExecutable { get; set; } = null!;
 
-    public GameProcessInfo ExpectedProcessInfo { get; set; }
+    public GameProcessInfo ExpectedProcessInfo { get; set; } = null!;
 
     public IGameProcess StartGameProcess(IFileInfo executable, GameProcessInfo processInfo)
     {
@@ -45,6 +45,7 @@ public class TestGameProcessLauncher : IGameProcessLauncher, IDisposable
         }
         catch
         {
+            // Ignore
         }
     }
 }

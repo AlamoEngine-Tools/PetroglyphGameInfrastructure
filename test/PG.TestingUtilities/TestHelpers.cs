@@ -33,7 +33,7 @@ public static class TestHelpers
     public static T GetRandomEnum<T>() where T : struct, Enum
     {
         var values = Enum.GetValues(typeof(T));
-        return (T)values.GetValue(Random.Next(values.Length));
+        return (T)values.GetValue(Random.Next(values.Length))!;
     }
 
     public static T GetRandom<T>(IEnumerable<T> items)
