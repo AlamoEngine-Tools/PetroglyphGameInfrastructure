@@ -73,6 +73,8 @@ public sealed class ModEqualityComparer : IEqualityComparer<IMod>
     /// <inheritdoc/>
     public int GetHashCode(IMod obj)
     {
+        if (obj == null) 
+            throw new ArgumentNullException(nameof(obj));
         var code = new HashCode();
         code.Add(ModReferenceEqualityComparer.Default.GetHashCode(obj));
         if (_includeGameReference)

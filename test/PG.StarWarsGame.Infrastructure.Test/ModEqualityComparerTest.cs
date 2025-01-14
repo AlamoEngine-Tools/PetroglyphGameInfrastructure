@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EawModinfo.Model;
 using EawModinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -13,6 +14,18 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class ModEqualityComparerTest : CommonTestBaseWithRandomGame
 {
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public void GetHashCode_NullArgs_Throws(bool includeDeps, bool includeGame)
+    {
+        var comparer = new ModEqualityComparer(includeDeps, includeGame);
+        Assert.Throws<ArgumentNullException>(() => comparer.GetHashCode(null!));
+    }
+
+
     [Theory]
     [InlineData(false, false)]
     [InlineData(true, false)]
