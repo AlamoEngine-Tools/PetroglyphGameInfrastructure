@@ -8,6 +8,7 @@ using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using Testably.Abstractions;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Processes;
@@ -18,7 +19,7 @@ public class GameProcessLauncherTest : CommonTestBaseWithRandomGame, IDisposable
     private readonly IFileInfo _executable;
 
     // We need to use the real FS here, cause Process.Start uses it too.
-    private readonly FileSystem _realFileSystem = new();
+    private readonly IFileSystem _realFileSystem = new RealFileSystem();
 
     private GameProcess? _gameProcess;
 

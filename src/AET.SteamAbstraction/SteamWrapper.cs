@@ -155,9 +155,9 @@ internal abstract class SteamWrapper(ISteamRegistry registry, IServiceProvider s
             throw new SteamNotFoundException();
     }
 
-    protected override void DisposeManagedResources()
+    protected override void DisposeResources()
     {
         Registry.Dispose();
-        base.DisposeManagedResources();
+        base.DisposeResources();
     }
 }

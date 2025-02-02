@@ -17,6 +17,7 @@ using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Name;
+using Testably.Abstractions;
 
 var services = SetupApplication();
 
@@ -86,7 +87,7 @@ IServiceProvider SetupApplication()
     var sc = new ServiceCollection();
 
     sc.AddSingleton(WindowsRegistry.Default);
-    sc.AddSingleton<IFileSystem>(_ => new FileSystem());
+    sc.AddSingleton<IFileSystem>(_ => new RealFileSystem());
 
     PetroglyphGameInfrastructure.InitializeServices(sc);
     SteamAbstractionLayer.InitializeServices(sc);

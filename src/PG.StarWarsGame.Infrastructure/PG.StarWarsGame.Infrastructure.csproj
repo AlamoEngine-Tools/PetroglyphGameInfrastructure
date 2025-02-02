@@ -22,10 +22,10 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AnakinRaW.CommonUtilities" Version="12.0.59-beta" />
-		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="12.0.59-beta" />
-		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="12.0.59-beta" />
-		<PackageReference Include="eaw.modinfo" Version="6.2.8" />
+		<PackageReference Include="AlamoEngineTools.Modinfo" Version="7.0.1-rc" />
+		<PackageReference Include="AnakinRaW.CommonUtilities" Version="12.0.89-rc" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="12.0.89-rc" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="12.0.89-rc" />
 		<PackageReference Include="IsExternalInit" Version="1.0.3">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -39,6 +39,5 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
 		<PackageReference Include="QuikGraph" Version="2.5.0" PrivateAssets="compile" />
-		<PackageReference Include="System.IO.Abstractions" Version="21.1.7" />
 	</ItemGroup>	
 </Project>

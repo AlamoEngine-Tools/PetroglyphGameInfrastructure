@@ -63,10 +63,10 @@ internal sealed class GameProcess : DisposableObject, IGameProcess
         return State == GameProcessState.Closed ? Task.CompletedTask : Process.WaitForExitAsync(cancellationToken);
     }
 
-    protected override void DisposeManagedResources()
+    protected override void DisposeResources()
     {
-        base.DisposeManagedResources();
         Process.Dispose();
+        base.DisposeResources();
     }
 
     private void RegisterExitEvent(Process process)

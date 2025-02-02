@@ -226,12 +226,12 @@ public class GameArgumentsBuilder : DisposableObject
         return new ArgumentCollection(arguments);
     }
 
-    /// <inheritdoc />
-    protected override void DisposeManagedResources()
+    /// <inheritdoc/>
+    protected override void DisposeResources()
     {
-        base.DisposeManagedResources();
         ClearMods();
         _argumentDict.Clear();
+        base.DisposeResources();
     }
 
     private ModArgumentList BuildModArgumentList(List<IMod>? mods)

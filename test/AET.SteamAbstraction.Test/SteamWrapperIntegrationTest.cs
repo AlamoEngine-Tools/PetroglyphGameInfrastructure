@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AnakinRaW.CommonUtilities.Registry;
 using AnakinRaW.CommonUtilities.Registry.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using Testably.Abstractions;
 using Xunit;
 
 namespace AET.SteamAbstraction.Test;
@@ -16,7 +17,7 @@ public class SteamWrapperIntegrationTest
     {
         var sc = new ServiceCollection();
         // Use actual FS
-        sc.AddSingleton<IFileSystem>(new FileSystem());
+        sc.AddSingleton<IFileSystem>(new RealFileSystem());
         SteamAbstractionLayer.InitializeServices(sc);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

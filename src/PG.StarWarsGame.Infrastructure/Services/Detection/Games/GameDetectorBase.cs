@@ -49,7 +49,7 @@ public abstract class GameDetectorBase : IGameDetector
         ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _tryHandleInitialization = tryHandleInitialization;
         Logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
-        FileSystem = serviceProvider.GetService<IFileSystem>() ?? new FileSystem();
+        FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
     }
     
     /// <inheritdoc/>

@@ -73,12 +73,12 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
             return path == null ? null : _fileSystem.DirectoryInfo.New(path);
         }
     }
-    
-    protected override void DisposeManagedResources()
+
+    protected override void DisposeResources()
     {
         _registryKey?.Dispose();
         _registryKey = null;
-        base.DisposeManagedResources();
+        base.DisposeResources();
     }
 
     private T? ReadFromSubKey<T>(string subKeyName, Func<IRegistryKey, T> keyAction)

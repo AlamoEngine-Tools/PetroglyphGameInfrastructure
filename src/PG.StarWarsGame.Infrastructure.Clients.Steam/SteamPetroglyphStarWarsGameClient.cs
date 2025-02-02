@@ -41,9 +41,9 @@ public class SteamPetroglyphStarWarsGameClient : PetroglyphStarWarsGameClient
     }
 
     /// <inheritdoc />
-    protected override void DisposeManagedResources()
+    protected override void DisposeResources()
     {
         SteamWrapper.Dispose();
-        base.DisposeManagedResources();
+        base.DisposeResources();
     }
 }

@@ -21,10 +21,10 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="12.0.59-beta" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="12.0.89-rc" />
 		<PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
-		<PackageReference Include="AnakinRaW.CommonUtilities" Version="12.0.59-beta" />
-		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="12.0.59-beta" />
+		<PackageReference Include="AnakinRaW.CommonUtilities" Version="12.0.89-rc" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="12.0.89-rc" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
 		<PackageReference Include="Nullable" Version="1.3.1">

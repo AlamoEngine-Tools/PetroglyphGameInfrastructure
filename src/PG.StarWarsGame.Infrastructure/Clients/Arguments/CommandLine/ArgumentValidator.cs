@@ -4,6 +4,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using Testably.Abstractions;
 #if NETSTANDARD2_0
 using AnakinRaW.CommonUtilities.FileSystem;
 #endif
@@ -16,7 +17,7 @@ internal static class ArgumentValidator
 
     static ArgumentValidator()
     {
-        FileSystem = new FileSystem();
+        FileSystem = new RealFileSystem();
     }
 
     // Based on: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/12-Testing_for_Command_Injection
