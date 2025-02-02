@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+		<RootNamespace>PG.StarWarsGame.Infrastructure.Clients.Steam</RootNamespace>
+		<AssemblyName>PG.StarWarsGame.Infrastructure.Clients.Steam</AssemblyName>
+	</PropertyGroup>
+	<PropertyGroup>
+		<Title>PG.StarWarsGame.Infrastructure.Clients.Steam</Title>
+		<Description>Provides augmented, but optional Steam support for Petroglyph Star Wars games.</Description>
+		<PackageId>AlamoEngineTools.PG.StarWarsGame.Infrastructure.Clients</PackageId>
+		<PackageTags>alamo,petroglyph,glyphx</PackageTags>
+		<NeutralLanguage>en</NeutralLanguage>
+	</PropertyGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<InheritDocEnabled>true</InheritDocEnabled>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
+	  <ProjectReference Include="..\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj" />
+	</ItemGroup>
+</Project>

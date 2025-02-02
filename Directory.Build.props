@@ -8,7 +8,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<Authors>Alamo Engine Tools and Contributors</Authors>
-		<Copyright>Copyright © 2024 Alamo Engine Tools and contributors. All rights reserved.</Copyright>
+		<Copyright>Copyright © 2025 Alamo Engine Tools and contributors. All rights reserved.</Copyright>
 		<Company>Alamo Engine Tools</Company>
 		<PackageTags>petroglyph, alamo, glyphx, foc, eaw</PackageTags>
 		<PackageProjectUrl>https://github.com/AlamoEngine-Tools/PetroglyphGameInfrastructure</PackageProjectUrl>
@@ -29,9 +29,9 @@
 	<ItemGroup>
 		<PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">
 			<PrivateAssets>all</PrivateAssets>
-			<Version>3.6.139</Version>
+			<Version>3.7.115</Version>
 		</PackageReference>
-		<PackageReference Include="SauceControl.InheritDoc" Version="2.0.1" PrivateAssets="all" />
+		<PackageReference Include="SauceControl.InheritDoc" Version="2.0.2" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
