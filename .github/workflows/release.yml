@@ -1,4 +1,4 @@
-name: Release PetroglyphGameInfrastructure
+name: Releasing PetroglyphGameInfrastructure
 
 on:
   push:
