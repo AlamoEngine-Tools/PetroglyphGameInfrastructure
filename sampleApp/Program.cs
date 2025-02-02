@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Abstractions;
+using AET.Modinfo.Model;
 using AET.SteamAbstraction;
 using AnakinRaW.CommonUtilities.Registry.Windows;
-using EawModinfo.Model;
-using EawModinfo.Spec;
+using AET.Modinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure;
 using PG.StarWarsGame.Infrastructure.Clients;

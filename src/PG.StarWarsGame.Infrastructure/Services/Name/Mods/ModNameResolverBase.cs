@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
-using EawModinfo.Spec;
-using EawModinfo.Utilities;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

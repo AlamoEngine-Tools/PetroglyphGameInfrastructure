@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Globalization;
-using EawModinfo.Utilities;
+using AET.Modinfo.Utilities;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Name;
 

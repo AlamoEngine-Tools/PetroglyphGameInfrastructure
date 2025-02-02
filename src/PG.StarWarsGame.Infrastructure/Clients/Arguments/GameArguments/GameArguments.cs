@@ -1,5 +1,5 @@
 ﻿using System.IO.Abstractions;
-using EawModinfo.Spec;
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 

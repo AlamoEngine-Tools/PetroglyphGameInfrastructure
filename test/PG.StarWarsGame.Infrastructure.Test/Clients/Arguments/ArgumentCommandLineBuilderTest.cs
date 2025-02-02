@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
-using EawModinfo.Model;
-using EawModinfo.Spec;
+using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;

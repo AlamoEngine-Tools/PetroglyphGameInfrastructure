@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using EawModinfo.Spec;
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
@@ -43,7 +43,7 @@ public interface IMod : IModIdentity, IModReference, IPlayableObject, IModContai
     /// <summary>
     /// Gets the resolve layout of the <see cref="Dependencies"/> property.
     /// Correct value only available if dependencies have been resolved.
-    /// Default value is <see cref="EawModinfo.Spec.DependencyResolveLayout.ResolveRecursive"/>.
+    /// Default value is <see cref="AET.Modinfo.Spec.DependencyResolveLayout.ResolveRecursive"/>.
     /// </summary>
     DependencyResolveLayout DependencyResolveLayout { get; }
 

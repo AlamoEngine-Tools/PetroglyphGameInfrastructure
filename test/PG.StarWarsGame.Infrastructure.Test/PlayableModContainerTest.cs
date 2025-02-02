@@ -1,5 +1,5 @@
 ﻿using System;
-using EawModinfo.Model;
+using AET.Modinfo.Model;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO.Abstractions;
-using EawModinfo.Spec;
+using AET.Modinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;

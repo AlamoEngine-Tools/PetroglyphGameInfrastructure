@@ -1,5 +1,5 @@
 ﻿using System;
-using EawModinfo.Spec;
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;

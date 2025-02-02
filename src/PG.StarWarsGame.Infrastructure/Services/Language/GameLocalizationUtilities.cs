@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
-using EawModinfo.Model;
-using EawModinfo.Spec;
+using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Utilities;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Language;

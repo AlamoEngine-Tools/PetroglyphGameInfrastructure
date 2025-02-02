@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using EawModinfo.Model;
-using EawModinfo.Spec;
-using EawModinfo.Utilities;
+using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Utilities;
 using PG.StarWarsGame.Infrastructure.Services.Name;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
-using EawModinfo;
-using EawModinfo.Spec;
+using AET.Modinfo;
+using AET.Modinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;

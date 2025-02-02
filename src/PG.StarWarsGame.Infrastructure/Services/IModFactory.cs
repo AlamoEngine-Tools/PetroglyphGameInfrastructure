@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using EawModinfo;
-using EawModinfo.Spec;
-using EawModinfo.Utilities;
+using AET.Modinfo;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Utilities;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using EawModinfo.File;
-using EawModinfo.Spec;
+using AET.Modinfo.File;
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Mods;

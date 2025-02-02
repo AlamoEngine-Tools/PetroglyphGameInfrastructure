@@ -1,4 +1,4 @@
-﻿using EawModinfo.Spec;
+﻿using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Utilities;
 

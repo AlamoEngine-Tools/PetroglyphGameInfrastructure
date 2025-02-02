@@ -2,8 +2,8 @@
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
-using EawModinfo.Model;
-using EawModinfo.Spec;
+using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.TestingUtilities;

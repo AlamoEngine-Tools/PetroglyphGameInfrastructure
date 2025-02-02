@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Spec.Equality;
+using AET.Modinfo.Utilities;
 using AnakinRaW.CommonUtilities.Registry;
-using EawModinfo.Model;
-using EawModinfo.Spec;
-using EawModinfo.Spec.Equality;
-using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Games.Registry;

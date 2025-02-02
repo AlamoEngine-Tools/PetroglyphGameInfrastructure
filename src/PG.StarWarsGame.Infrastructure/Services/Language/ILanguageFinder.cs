@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using EawModinfo.Spec;
+using AET.Modinfo.Spec;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Language;
 

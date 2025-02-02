@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
-using EawModinfo.Model;
-using EawModinfo.Spec;
-using EawModinfo.Spec.Steam;
-using EawModinfo.Utilities;
+using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Spec.Steam;
+using AET.Modinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;

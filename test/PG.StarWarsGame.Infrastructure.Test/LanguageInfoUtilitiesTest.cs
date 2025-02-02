@@ -1,6 +1,6 @@
 ﻿using System;
-using EawModinfo.Model;
-using EawModinfo.Spec;
+using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 using Xunit;
 

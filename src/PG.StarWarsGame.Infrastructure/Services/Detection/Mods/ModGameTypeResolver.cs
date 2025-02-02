@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Spec.Steam;
+using AET.Modinfo.Utilities;
 using AnakinRaW.CommonUtilities.Collections;
-using EawModinfo.Spec;
-using EawModinfo.Spec.Steam;
-using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;

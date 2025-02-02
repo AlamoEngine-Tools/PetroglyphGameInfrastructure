@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.IO.Abstractions;
-using EawModinfo.Spec;
-using EawModinfo.Utilities;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 

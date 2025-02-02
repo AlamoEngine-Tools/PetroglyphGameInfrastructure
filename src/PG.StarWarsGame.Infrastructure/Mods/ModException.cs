@@ -1,5 +1,5 @@
 ﻿using System;
-using EawModinfo.Spec;
+using AET.Modinfo.Spec;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
 

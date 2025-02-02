@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using EawModinfo.Spec;
-using EawModinfo.Spec.Equality;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Spec.Equality;
 
 namespace PG.StarWarsGame.Infrastructure.Mods;
 

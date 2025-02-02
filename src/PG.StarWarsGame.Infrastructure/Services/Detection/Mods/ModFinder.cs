@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
+using AET.Modinfo.File;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Utilities;
 using AnakinRaW.CommonUtilities.FileSystem;
-using EawModinfo.File;
-using EawModinfo.Spec;
-using EawModinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;

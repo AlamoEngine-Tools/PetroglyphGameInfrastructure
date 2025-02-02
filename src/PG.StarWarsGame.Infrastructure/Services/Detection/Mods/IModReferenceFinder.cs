@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using EawModinfo.Spec;
-using EawModinfo.Utilities;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Utilities;
 using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;

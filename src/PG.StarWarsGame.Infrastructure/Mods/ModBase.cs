@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using EawModinfo;
-using EawModinfo.Model;
-using EawModinfo.Spec;
-using EawModinfo.Spec.Equality;
-using EawModinfo.Utilities;
+using AET.Modinfo;
+using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Spec.Equality;
+using AET.Modinfo.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;

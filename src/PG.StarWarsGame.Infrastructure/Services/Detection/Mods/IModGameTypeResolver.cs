@@ -1,7 +1,7 @@
 ﻿using System;
+using AET.Modinfo.Spec;
+using AET.Modinfo.Utilities;
 using AnakinRaW.CommonUtilities.Collections;
-using EawModinfo.Spec;
-using EawModinfo.Utilities;
 using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Services.Detection;
