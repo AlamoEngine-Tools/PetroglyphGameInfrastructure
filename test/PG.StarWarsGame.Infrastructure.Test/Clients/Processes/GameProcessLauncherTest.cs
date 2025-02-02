@@ -35,7 +35,7 @@ public class GameProcessLauncherTest : CommonTestBaseWithRandomGame, IDisposable
 
         var scriptContent = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
             ? "@echo off\nexit 0"
-            : "#!/bin/bash\nexit 0";
+            : "#!/bin/bash\nsleep 5\nexit 0";
 
         _realFileSystem.File.WriteAllText(_executable.FullName,scriptContent);
 
