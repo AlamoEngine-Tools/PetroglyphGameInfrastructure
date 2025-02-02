@@ -1,4 +1,4 @@
-name: Releasing PetroglyphGameInfrastructure
+name: "Releasing PetroglyphGameInfrastructure"
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
 
 jobs:
 
-# Builds and tests the solution.
   test:
     uses: ./.github/workflows/test.yml
 
