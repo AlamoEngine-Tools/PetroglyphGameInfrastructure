@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>AET.SteamAbstraction.TestingUtilities</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net48</TargetFrameworks>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>false</IsTestProject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="C:\Users\Anakin\source\repos\AlamoEngine-Tools\PetroglyphGameInfrastructure\README.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="GitHubActionsTestLogger" Version="2.4.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
+		<PackageReference Include="Required" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.0.1">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="6.0.4">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+		<PackageReference Include="Testably.Abstractions.Testing" Version="4.0.0" />
+		<PackageReference Include="xunit" Version="2.9.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Installation\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
+	  <ProjectReference Include="..\PG.TestingUtilities\PG.TestingUtilities.csproj" />
+	</ItemGroup>
+
+</Project>
