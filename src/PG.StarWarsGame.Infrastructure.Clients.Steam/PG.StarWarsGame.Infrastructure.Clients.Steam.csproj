@@ -7,7 +7,7 @@
 	<PropertyGroup>
 		<Title>PG.StarWarsGame.Infrastructure.Clients.Steam</Title>
 		<Description>Provides augmented, but optional Steam support for Petroglyph Star Wars games.</Description>
-		<PackageId>AlamoEngineTools.PG.StarWarsGame.Infrastructure.Clients</PackageId>
+		<PackageId>AlamoEngineTools.PG.StarWarsGame.Infrastructure.Steam</PackageId>
 		<PackageTags>alamo,petroglyph,glyphx</PackageTags>
 		<NeutralLanguage>en</NeutralLanguage>
 	</PropertyGroup>
