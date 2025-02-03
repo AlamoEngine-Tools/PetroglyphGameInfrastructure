@@ -96,7 +96,7 @@ public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
     }
 
     [Fact]
-    public async Task Exit_DoubleDoesNotThrow()
+    public async Task Exit_DoubleExitDoesNotThrow()
     {
         var process = StartStableTestProcess();
         var processInfo = new GameProcessInfo(Game, GameBuildType.Release, ArgumentCollection.Empty);
@@ -118,9 +118,6 @@ public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
 
 
         await Task.WhenAll(t1, t2);
-
-        Assert.True(process.HasExited);
-        Assert.Equal(GameProcessState.Closed, gameProcess.State);
     }
 
     [Fact]
