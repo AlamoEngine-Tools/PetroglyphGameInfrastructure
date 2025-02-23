@@ -22,7 +22,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AlamoEngineTools.Modinfo" Version="7.0.9" />
+		<PackageReference Include="AlamoEngineTools.Modinfo" Version="7.0.17" />
 		<PackageReference Include="AnakinRaW.CommonUtilities" Version="12.1.8" />
 		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="12.1.8" />
 		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="12.1.8" />
