@@ -40,7 +40,7 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
             throw new GameException($"The game '{game}' does not exist");
 
         var modLocationKind = GetModLocationKind(game, directory);
-        _logger?.LogDebug($"Searching mods with at location '{directory.FullName}' of location kind '{modLocationKind}' for game '{game}'");
+        _logger?.LogTrace($"Searching mods with at location '{directory.FullName}' of location kind '{modLocationKind}' for game '{game}'");
         return GetModsFromDirectory(directory, modLocationKind, game.Type);
     }
 

@@ -10,10 +10,14 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 /// <summary>
 /// Default implementation of the <see cref="IGamePlatformIdentifier"/> service.
 /// </summary>
-internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
+/// <remarks>
+/// Creates a new instance.
+/// </remarks>
+/// <param name="serviceProvider">Service Provider</param>
+internal sealed class GamePlatformIdentifier(IServiceProvider serviceProvider) : IGamePlatformIdentifier
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger? _logger;
+    private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    private readonly ILogger? _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(GamePlatformIdentifier));
 
     /// <summary>
     /// Default ordering of <see cref="GamePlatform"/>s for identification.
@@ -31,16 +35,6 @@ internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
         GamePlatform.Disk
     ];
 
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    /// <param name="serviceProvider">Service Provider</param>
-    public GamePlatformIdentifier(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(GamePlatformIdentifier));
-    }
-
     /// <inheritdoc/>
     public GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location)
     {
@@ -49,15 +43,15 @@ internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
         foreach (var platform in DefaultGamePlatformOrdering)
         {
             var validator = GamePlatformIdentifierFactory.Create(platform, _serviceProvider);
-            _logger?.LogDebug($"Validating location for {platform}...");
+            _logger?.LogTrace($"Validating location for {platform}...");
             if (!validator.IsPlatform(type, ref location))
                 continue;
 
-            _logger?.LogDebug($"Game location was identified as {platform}.");
+            _logger?.LogTrace($"Game location was identified as {platform}.");
             return platform;
         }
 
-        _logger?.LogDebug("Unable to determine which which platform the game has.");
+        _logger?.LogTrace("Unable to determine which which platform the game has.");
         return GamePlatform.Undefined;
     }
 }

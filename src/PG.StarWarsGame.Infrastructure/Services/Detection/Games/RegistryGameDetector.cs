@@ -43,17 +43,17 @@ public sealed class RegistryGameDetector : GameDetectorBase, IDisposable
     /// <inheritdoc/>
     protected override GameLocationData FindGameLocation(GameType gameType)
     {
-        Logger?.LogDebug("Attempting to fetch game location from the registry.");
+        Logger?.LogTrace("Attempting to fetch game location from the registry.");
         var registry = GetRegistry(gameType);
         if (!registry.Exits)
         {
-            Logger?.LogDebug("The Game's Registry does not exist.");
+            Logger?.LogTrace("The Game's Registry does not exist.");
             return GameLocationData.NotInstalled;
         }
 
         if (registry.Version is null)
         {
-            Logger?.LogDebug("Registry-Key found, but games are not initialized.");
+            Logger?.LogTrace("Registry-Key found, but games are not initialized.");
             return GameLocationData.RequiresInitialization;
         }
 

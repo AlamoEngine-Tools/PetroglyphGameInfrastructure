@@ -41,9 +41,9 @@ public abstract class ModGameTypeResolver : IModGameTypeResolver
     {
         if (modInformation == null)
             throw new ArgumentNullException(nameof(modInformation));
-        Logger?.LogDebug($"Try getting game type for '{modInformation.ModReference}'");
+        Logger?.LogTrace($"Try getting game type for '{modInformation.ModReference.Identifier}'");
         var result = TryGetGameTypeCore(modInformation, out gameTypes);
-        Logger?.LogDebug($"Detected game types '{modInformation.ModReference}': Success: {result}; Types: [{string.Join("", gameTypes)}]");
+        Logger?.LogDebug($"Detected game types '{modInformation.ModReference.Identifier}': Success: {result}; Types: [{string.Join("", gameTypes)}]");
         return result;
     }
 
@@ -67,7 +67,7 @@ public abstract class ModGameTypeResolver : IModGameTypeResolver
     /// <inheritdoc />
     public bool IsDefinitelyNotCompatibleToGame(DetectedModReference modInformation, GameType expectedGameType)
     {
-        Logger?.LogTrace($"Checking if '{modInformation.ModReference}' is not compatible to {expectedGameType}.");
+        Logger?.LogTrace($"Checking if '{modInformation.ModReference.Identifier}' is not compatible to {expectedGameType}.");
         // If the type resolver was unable to find the type, we have to assume that the current mod matches to the game.
         // Otherwise, we'd produce false negatives. Only if the resolver was able to determine a result, we use that finding.
         return TryGetGameType(modInformation, out var gameTypes) && !gameTypes.Contains(expectedGameType);
@@ -76,7 +76,7 @@ public abstract class ModGameTypeResolver : IModGameTypeResolver
     /// <inheritdoc />
     public bool IsDefinitelyNotCompatibleToGame(IModinfo? modinfo, GameType expectedGameType)
     {
-        Logger?.LogTrace($"Checking if '{modinfo}' is not compatible to {expectedGameType}.");
+        Logger?.LogTrace($"Checking if modinfo '{modinfo?.Name}' is not compatible to {expectedGameType}.");
         // If the type resolver was unable to find the type, we have to assume that the current mod matches to the game.
         // Otherwise, we'd produce false negatives. Only if the resolver was able to determine a result, we use that finding.
         return TryGetGameType(modinfo, out var gameTypes) && !gameTypes.Contains(expectedGameType);

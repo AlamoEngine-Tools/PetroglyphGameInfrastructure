@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 using System.IO.Abstractions;
 using System.Text;
 using AET.SteamAbstraction.Games;

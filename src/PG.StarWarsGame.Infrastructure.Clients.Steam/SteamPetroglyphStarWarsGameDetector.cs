@@ -66,7 +66,7 @@ public sealed class SteamPetroglyphStarWarsGameDetector : GameDetectorBase
         Debug.Assert(registry.Type == gameType);
         if (registry.Version is null)
         {
-            Logger?.LogDebug("Registry-Key found, but games are not initialized.");
+            Logger?.LogTrace("Registry-Key found, but games are not initialized.");
             return GameLocationData.RequiresInitialization;
         }
 
