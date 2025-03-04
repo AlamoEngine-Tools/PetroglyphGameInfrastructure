@@ -44,11 +44,11 @@ public abstract class ModNameResolverBase : IModNameResolver
         if (detectedMod.ModReference.Type == ModType.Virtual)
             throw new NotSupportedException("Virtual mods are not supported.");
 
-        Logger?.LogDebug($"Resolving name for '{detectedMod}' with culture '{culture.EnglishName}'");
+        Logger?.LogTrace($"Resolving name for '{detectedMod}' with culture '{culture.EnglishName}'");
 
         var name = detectedMod.Modinfo is not null ? detectedMod.Modinfo.Name : ResolveCore(detectedMod, culture);
         if (string.IsNullOrEmpty(name))
-            Logger?.LogWarning($"Resolved null or empty name for '{detectedMod}'");
+            Logger?.LogWarning($"Resolved null or empty name for '{detectedMod.ModReference.Identifier}'");
         
         return name;
     }

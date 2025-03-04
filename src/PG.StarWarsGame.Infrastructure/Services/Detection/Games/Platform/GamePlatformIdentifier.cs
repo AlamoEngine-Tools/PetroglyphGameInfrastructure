@@ -49,15 +49,15 @@ internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
         foreach (var platform in DefaultGamePlatformOrdering)
         {
             var validator = GamePlatformIdentifierFactory.Create(platform, _serviceProvider);
-            _logger?.LogDebug($"Validating location for {platform}...");
+            _logger?.LogTrace($"Validating location for {platform}...");
             if (!validator.IsPlatform(type, ref location))
                 continue;
 
-            _logger?.LogDebug($"Game location was identified as {platform}.");
+            _logger?.LogTrace($"Game location was identified as {platform}.");
             return platform;
         }
 
-        _logger?.LogDebug("Unable to determine which which platform the game has.");
+        _logger?.LogTrace("Unable to determine which which platform the game has.");
         return GamePlatform.Undefined;
     }
 }

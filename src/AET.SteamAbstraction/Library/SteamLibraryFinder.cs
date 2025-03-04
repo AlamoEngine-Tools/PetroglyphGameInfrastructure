@@ -23,12 +23,12 @@ internal sealed class SteamLibraryFinder(IServiceProvider serviceProvider) : ISt
 
     public IEnumerable<ISteamLibrary> FindLibraries(IDirectoryInfo steamInstallDir)
     {
-        _logger?.LogTrace("Searching for Steam libraries on system");
+        _logger?.LogTrace("Searching for Steam libraries on system...");
         var libraryLocationsFile = GetLibraryLocationsFile(steamInstallDir);
 
         if (!libraryLocationsFile.Exists)
         {
-            _logger?.LogWarning("Config file with Steam libraries not found. No Steam libraries are created.");
+            _logger?.LogTrace("Config file that should contain Steam libraries information is not found.");
             return Array.Empty<ISteamLibrary>();
         }
 
@@ -75,8 +75,7 @@ internal sealed class SteamLibraryFinder(IServiceProvider serviceProvider) : ISt
         var libraryVdf = _fileSystem.Path.Combine(libraryLocation.FullName, libraryVdfSubPath, libraryVdfName);
         if (!_fileSystem.File.Exists(libraryVdf))
         {
-            _logger?.LogTrace(
-                $"Steam library VDF file '{libraryVdf}' was not found. Library not created.");
+            _logger?.LogTrace($"Steam library VDF file '{libraryVdf}' was not found. Library not created.");
             return false;
         }
 

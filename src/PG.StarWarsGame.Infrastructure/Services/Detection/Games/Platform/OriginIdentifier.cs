@@ -18,11 +18,11 @@ internal class OriginIdentifier(IServiceProvider serviceProvider) : SpecificPlat
     {
         if (!GameDetectorBase.GameExeExists(location, GameType.Foc))
         {
-            Logger?.LogWarning("Unable to find FoC Origin at first location. Trying to fix broken registry path");
+            Logger?.LogTrace("Unable to find FoC Origin at first location. Trying to fix broken registry path");
             TryFixBrokenFocLocation(ref location);
             if (!GameDetectorBase.GameExeExists(location, GameType.Foc))
             {
-                Logger?.LogWarning("Origin location fix was unsuccessful. This is not a Origin installation.");
+                Logger?.LogTrace("Origin location fix was unsuccessful. This is not a Origin installation.");
                 return false;
             }
         }
@@ -40,7 +40,7 @@ internal class OriginIdentifier(IServiceProvider serviceProvider) : SpecificPlat
     {
         if (!GameDetectorBase.MinimumGameFilesExist(GameType.Eaw, location))
         {
-            Logger?.LogWarning("Unable to find EaW Origin at first location.");
+            Logger?.LogTrace("Unable to find EaW Origin at first location.");
             return false;
         }
 
@@ -66,7 +66,7 @@ internal class OriginIdentifier(IServiceProvider serviceProvider) : SpecificPlat
         var correctedPath = location.FileSystem.Path.Combine(parentDir.FullName, "EAWX");
         if (!location.FileSystem.Directory.Exists(correctedPath))
         {
-            Logger?.LogDebug($"Unable to sanitize origin path: Corrected path '{correctedPath}' does not exists.");
+            Logger?.LogTrace($"Unable to sanitize origin path: Corrected path '{correctedPath}' does not exists.");
             return;
         }
         location = location.FileSystem.DirectoryInfo.New(correctedPath);

@@ -57,19 +57,21 @@ public sealed class CompositeGameDetector : IGameDetector
         GameDetectionResult? lastResult = null;
         foreach (var detector in SortedDetectors)
         {
-            _logger?.LogDebug($"Searching for game {gameType} with detector: {detector}");
+            _logger?.LogTrace($"Searching for game '{gameType}' with detector: '{detector}'");
             detector.InitializationRequested += PassThroughInitializationRequest;
             
             try
             {
                 var result = detector.Detect(gameType, platforms);
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                // because this is public API, and we cannot guarantee that the result is not null
                 if (result is not null && result.Installed)
                     return result;
                 lastResult = result;
             }
             catch (Exception e)
             {
-                _logger?.LogTrace($"Failed detecting game using detector {detector}. {e}");
+                _logger?.LogDebug($"Failed detecting game using detector {detector}. {e}");
                 errors.Add(e);
 
                 if (detector.Equals(SortedDetectors[^1]))
@@ -108,7 +110,7 @@ public sealed class CompositeGameDetector : IGameDetector
         }
         catch (Exception e)
         {
-            _logger?.LogWarning(e, "Unable to find any games, due to error in detection.");
+            _logger?.LogDebug(e, "Unable to find any games, due to error in detection.");
             result = GameDetectionResult.NotInstalled(gameType);
             return false;
         }
