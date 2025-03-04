@@ -29,7 +29,7 @@ internal sealed class SteamLibraryFinder(IServiceProvider serviceProvider) : ISt
         if (!libraryLocationsFile.Exists)
         {
             _logger?.LogTrace("Config file that should contain Steam libraries information is not found.");
-            return Array.Empty<ISteamLibrary>();
+            return [];
         }
 
         var libraryLocations = SteamVdfReader.ReadLibraryLocationsFromConfig(libraryLocationsFile);

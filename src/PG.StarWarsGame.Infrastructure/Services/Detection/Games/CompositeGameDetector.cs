@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -38,7 +37,7 @@ public sealed class CompositeGameDetector : IGameDetector
         if (serviceProvider == null)
             throw new ArgumentNullException(nameof(serviceProvider));
         ThrowHelper.ThrowIfCollectionNullOrEmptyOrContainsNull(sortedDetectors);
-        SortedDetectors = sortedDetectors.ToList();
+        SortedDetectors = [.. sortedDetectors];
         _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
         _disposeDetectors = disposeDetectors;
     }

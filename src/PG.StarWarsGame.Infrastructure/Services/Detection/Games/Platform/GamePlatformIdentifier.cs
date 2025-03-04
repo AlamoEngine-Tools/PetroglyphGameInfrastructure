@@ -10,10 +10,14 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 /// <summary>
 /// Default implementation of the <see cref="IGamePlatformIdentifier"/> service.
 /// </summary>
-internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
+/// <remarks>
+/// Creates a new instance.
+/// </remarks>
+/// <param name="serviceProvider">Service Provider</param>
+internal sealed class GamePlatformIdentifier(IServiceProvider serviceProvider) : IGamePlatformIdentifier
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger? _logger;
+    private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    private readonly ILogger? _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(GamePlatformIdentifier));
 
     /// <summary>
     /// Default ordering of <see cref="GamePlatform"/>s for identification.
@@ -30,16 +34,6 @@ internal sealed class GamePlatformIdentifier : IGamePlatformIdentifier
         GamePlatform.DiskGold,
         GamePlatform.Disk
     ];
-
-    /// <summary>
-    /// Creates a new instance.
-    /// </summary>
-    /// <param name="serviceProvider">Service Provider</param>
-    public GamePlatformIdentifier(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(GamePlatformIdentifier));
-    }
 
     /// <inheritdoc/>
     public GamePlatform GetGamePlatform(GameType type, ref IDirectoryInfo location)

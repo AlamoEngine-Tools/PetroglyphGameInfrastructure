@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -167,7 +166,7 @@ public abstract class GameDetectorBase : IGameDetector
         if (!locationData.InitializationRequired)
             return true;
 
-        Logger?.LogDebug($"It appears that the game '{locationData.ToString()}' exists but it is not initialized. Game type '{gameType}'.");
+        Logger?.LogDebug($"It appears that the game '{locationData}' exists but it is not initialized. Game type '{gameType}'.");
         if (!_tryHandleInitialization)
             return false;
 
@@ -189,17 +188,21 @@ public abstract class GameDetectorBase : IGameDetector
         return request.Handled;
     }
 
-    private static ICollection<GamePlatform> NormalizePlatforms(ICollection<GamePlatform> platforms)
+    private static HashSet<GamePlatform> NormalizePlatforms(ICollection<GamePlatform> platforms)
     {
         if (platforms.Count == 0 || platforms.Contains(GamePlatform.Undefined))
             return [GamePlatform.Undefined];
-        return new HashSet<GamePlatform>(platforms);
+        return [..platforms];
     }
 
     /// <summary>
     /// Represents location and initialization state of a game.
     /// </summary>
-    public readonly struct GameLocationData
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="GameLocationData"/> struct of the specified game location.
+    /// </remarks>
+    /// <param name="location">The detected game location or <see langword="null"/> if no game was detected.</param>
+    public readonly struct GameLocationData(IDirectoryInfo? location)
     {
         /// <summary>
         /// Gets a <see cref="GameLocationData"/> representing a not installed location.
@@ -212,18 +215,9 @@ public abstract class GameDetectorBase : IGameDetector
         public static readonly GameLocationData RequiresInitialization = new() { InitializationRequired = true };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GameLocationData"/> struct of the specified game location.
-        /// </summary>
-        /// <param name="location">The detected game location or <see langword="null"/> if no game was detected.</param>
-        public GameLocationData(IDirectoryInfo? location)
-        {
-            Location = location;
-        }
-
-        /// <summary>
         /// Nullable location entry.
         /// </summary>
-        public IDirectoryInfo? Location { get; }
+        public IDirectoryInfo? Location { get; } = location;
 
         /// <summary>
         /// Indicates whether an initialization is required.

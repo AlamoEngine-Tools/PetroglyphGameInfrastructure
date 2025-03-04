@@ -11,19 +11,14 @@ namespace PG.StarWarsGame.Infrastructure.Services.Detection;
 /// <remarks>
 /// This detector does not support game initialization requests.
 /// </remarks>
-public sealed class DirectoryGameDetector : GameDetectorBase
+/// <remarks>
+/// Creates a new instance of the <see cref="DirectoryGameDetector"/> class.
+/// </remarks>
+/// <param name="directory">The directory to search for an installation.</param>
+/// <param name="serviceProvider">The service provider.</param>
+public sealed class DirectoryGameDetector(IDirectoryInfo directory, IServiceProvider serviceProvider) : GameDetectorBase(serviceProvider, false)
 {
-    private readonly IDirectoryInfo _directory;
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="DirectoryGameDetector"/> class.
-    /// </summary>
-    /// <param name="directory">The directory to search for an installation.</param>
-    /// <param name="serviceProvider">The service provider.</param>
-    public DirectoryGameDetector(IDirectoryInfo directory, IServiceProvider serviceProvider) : base(serviceProvider, false)
-    {
-        _directory = directory ?? throw new ArgumentNullException(nameof(directory));
-    }
+    private readonly IDirectoryInfo _directory = directory ?? throw new ArgumentNullException(nameof(directory));
 
     /// <inheritdoc/>
     protected override GameLocationData FindGameLocation(GameType gameType)
