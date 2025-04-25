@@ -23,7 +23,7 @@
 	<ItemGroup>
 		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="12.3.4" />
 		<PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
-		<PackageReference Include="AnakinRaW.CommonUtilities" Version="12.3.4" />
+		<PackageReference Include="AnakinRaW.CommonUtilities" Version="12.3.8" />
 		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="12.3.4" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
