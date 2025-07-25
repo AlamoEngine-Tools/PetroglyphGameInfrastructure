@@ -39,7 +39,7 @@
 		<None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(IsPackable)' == 'true'">
-		<None Include="$(LicenseFile)" Pack="true" PackagePath=""/>
-		<None Include="$(MSBuildThisFileDirectory)aet.png" Pack="true" PackagePath=""/>
+		<None Include="$(LicenseFile)" Pack="true" PackagePath="" />
+		<None Include="$(MSBuildThisFileDirectory)aet.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 </Project>
