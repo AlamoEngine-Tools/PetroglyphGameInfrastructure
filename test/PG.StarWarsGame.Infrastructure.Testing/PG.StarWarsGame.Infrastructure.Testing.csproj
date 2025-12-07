@@ -5,8 +5,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0</TargetFrameworks>
-		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net48</TargetFrameworks>
+		<TargetFrameworks>net10.0</TargetFrameworks>
+		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net481</TargetFrameworks>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>false</IsTestProject>
 	</PropertyGroup>
@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="GitHubActionsTestLogger" Version="2.4.1">
+		<PackageReference Include="GitHubActionsTestLogger" Version="3.0.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -33,9 +33,9 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
-		<PackageReference Include="Testably.Abstractions.Testing" Version="4.3.9" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+		<PackageReference Include="Testably.Abstractions.Testing" Version="5.0.1" />
 		<PackageReference Include="xunit" Version="2.9.3" />
 	</ItemGroup>
 
