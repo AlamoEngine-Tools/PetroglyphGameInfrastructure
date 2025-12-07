@@ -56,7 +56,7 @@ public sealed class CompositeGameDetector : IGameDetector
         GameDetectionResult? lastResult = null;
         foreach (var detector in SortedDetectors)
         {
-            _logger?.LogTrace($"Searching for game '{gameType}' with detector: '{detector}'");
+            _logger?.LogTrace("Searching for game '{GameType}' with detector: '{GameDetector}'", gameType, detector);
             detector.InitializationRequested += PassThroughInitializationRequest;
             
             try
@@ -70,7 +70,7 @@ public sealed class CompositeGameDetector : IGameDetector
             }
             catch (Exception e)
             {
-                _logger?.LogDebug($"Failed detecting game using detector {detector}. {e}");
+                _logger?.LogDebug("Failed detecting game using detector {GameDetector}. {Exception}", detector, e);
                 errors.Add(e);
 
                 if (detector.Equals(SortedDetectors[^1]))

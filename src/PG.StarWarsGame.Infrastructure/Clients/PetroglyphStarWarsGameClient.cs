@@ -90,7 +90,7 @@ public class PetroglyphStarWarsGameClient : DisposableObject, IGameClient
             if (!fallbackToPlay)
                 throw new GameStartException(Game, "Debug version of the game could not be found.");
             buildType = GameBuildType.Release;
-            Logger?.LogTrace($"Falling back to release configuration because debug executables of '{Game}' were not found.");
+            Logger?.LogTrace("Falling back to release configuration because debug executables of '{Game}' were not found.", Game);
         }
         return StartGame(arguments, buildType);
     }

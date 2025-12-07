@@ -66,7 +66,7 @@ internal class OriginIdentifier(IServiceProvider serviceProvider) : SpecificPlat
         var correctedPath = location.FileSystem.Path.Combine(parentDir.FullName, "EAWX");
         if (!location.FileSystem.Directory.Exists(correctedPath))
         {
-            Logger?.LogTrace($"Unable to sanitize origin path: Corrected path '{correctedPath}' does not exists.");
+            Logger?.LogTrace("Unable to sanitize origin path: Corrected path '{Path}' does not exists.", correctedPath);
             return;
         }
         location = location.FileSystem.DirectoryInfo.New(correctedPath);

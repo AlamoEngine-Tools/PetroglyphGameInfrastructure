@@ -66,7 +66,7 @@ internal class SteamLibrary : ISteamLibrary
             }
             catch (SteamException e)
             {
-                _logger?.LogWarning(e, $"Could not read game manifest file '{manifestFile}': {e.Message}");
+                _logger?.LogWarning(e, "Could not read game manifest file '{ManifestFile}': {Message}", manifestFile, e.Message);
             }
         }
         return apps;

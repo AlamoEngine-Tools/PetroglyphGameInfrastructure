@@ -18,8 +18,7 @@ internal sealed class GameProcessLauncher(IServiceProvider serviceProvider) : IG
         {
             var arguments = ArgumentCommandLineBuilder.BuildCommandLine(processInfo.Arguments);
 
-            _logger?.LogDebug(
-                $"Starting game '{processInfo.Game}' with '{processInfo.BuildType}' configuration and with launch arguments '{arguments}'");
+            _logger?.LogDebug("Starting game '{Process}' with '{BuildType}' configuration and with launch arguments '{Args}'", processInfo.Game, processInfo.BuildType, arguments);
 
             var processStartInfo = new ProcessStartInfo(executable.FullName)
             {

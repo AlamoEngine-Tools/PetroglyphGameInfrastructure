@@ -55,14 +55,14 @@ public sealed class OnlineModNameResolver : ModNameResolverBase
 
         if (modsWorkshopWebpage == null)
         {
-            Logger?.LogTrace($"Unable to download website for Steam ID '{modId}'.");
+            Logger?.LogTrace("Unable to download website for Steam ID '{ModId}'.", modId);
             return null;
         }
 
         var node = modsWorkshopWebpage.DocumentNode.SelectSingleNode("//div[contains(@class, 'workshopItemTitle')]");
         if (node is null)
         {
-            Logger?.LogTrace($"Unable to find the item title on website for Steam ID '{modId}',");
+            Logger?.LogTrace("Unable to find the item title on website for Steam ID '{ModId}',", modId);
             return null;
         }
         return node.InnerHtml;

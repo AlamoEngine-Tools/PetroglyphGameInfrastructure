@@ -23,7 +23,7 @@ public sealed class DirectoryGameDetector(IDirectoryInfo directory, IServiceProv
     /// <inheritdoc/>
     protected override GameLocationData FindGameLocation(GameType gameType)
     {
-        Logger?.LogTrace($"Searching for game {gameType} at directory: {_directory}");
+        Logger?.LogTrace("Searching for game {GameType} at directory: {DirectoryInfo}", gameType, _directory);
         return !MinimumGameFilesExist(gameType, _directory) ? GameLocationData.NotInstalled : new GameLocationData(_directory);
     }
 }

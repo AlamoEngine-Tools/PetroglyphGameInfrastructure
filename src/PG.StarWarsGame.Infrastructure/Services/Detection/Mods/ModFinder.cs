@@ -26,7 +26,7 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
             throw new ArgumentNullException(nameof(game));
         if (!game.Exists())
             throw new GameException("The game does not exist");
-        _logger?.LogDebug($"Searching mods for game '{game}'");
+        _logger?.LogDebug("Searching mods for game '{Game}'", game);
         return GetNormalMods(game).Union(GetWorkshopsMods(game));
     }
 
@@ -40,13 +40,13 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
             throw new GameException($"The game '{game}' does not exist");
 
         var modLocationKind = GetModLocationKind(game, directory);
-        _logger?.LogTrace($"Searching mods with at location '{directory.FullName}' of location kind '{modLocationKind}' for game '{game}'");
+        _logger?.LogTrace("Searching mods with at location '{Directory}' of location kind '{Kind}' for game '{Game}'", directory.FullName, modLocationKind, game);
         return GetModsFromDirectory(directory, modLocationKind, game.Type);
     }
 
     private IEnumerable<DetectedModReference> GetNormalMods(IGame game)
     {
-        _logger?.LogTrace($"Searching normal mods for game '{game}'");
+        _logger?.LogTrace("Searching normal mods for game '{Game}'", game);
         return GetAllModsFromContainerPath(game.ModsLocation, ModReferenceBuilder.ModLocationKind.GameModsDirectory, game.Type);
     }
 
@@ -55,7 +55,7 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
         if (game.Platform != GamePlatform.SteamGold)
             return [];
 
-        _logger?.LogTrace($"Searching Steam Workshop mods for game '{game}'");
+        _logger?.LogTrace("Searching Steam Workshop mods for game '{Game}'", game);
         return GetAllModsFromContainerPath(_steamHelper.GetWorkshopsLocation(game),
             ModReferenceBuilder.ModLocationKind.SteamWorkshops, game.Type);
     }
@@ -81,7 +81,7 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
         if (locationKind == ModReferenceBuilder.ModLocationKind.SteamWorkshops && !_steamHelper.ToSteamWorkshopsId(modDirectory.Name, out _))
             yield break;
 
-        _logger?.LogTrace($"Searching for mods at location '{modDirectory.FullName}'");
+        _logger?.LogTrace("Searching for mods at location '{Location}'", modDirectory.FullName);
 
         ModinfoFinderCollection modinfoFiles;
         modinfoFiles = ModinfoFileFinder.FindModinfoFiles(modDirectory);
@@ -90,7 +90,7 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
         {
             if (_gameTypeResolver.IsDefinitelyNotCompatibleToGame(modRef, requestedGameType))
             {
-                _logger?.LogTrace($"Skipping mod reference '{modRef.ModReference}' because it is not compatible to '{requestedGameType}'");
+                _logger?.LogTrace("Skipping mod reference '{ModRef}' because it is not compatible to '{GameType}'", modRef.ModReference, requestedGameType);
                 continue;
             }
             yield return modRef;
