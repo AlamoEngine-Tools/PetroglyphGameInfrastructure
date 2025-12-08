@@ -45,12 +45,12 @@ internal sealed class SteamLibraryFinder(IServiceProvider serviceProvider) : ISt
 
     private bool TryCreateLibraryFromLocation(IDirectoryInfo libraryLocation, bool isDefault, [NotNullWhen(true)] out SteamLibrary? library)
     {
-        _logger?.LogTrace($"Try creating steam library from location '{libraryLocation.FullName}'");
+        _logger?.LogTrace("Try creating steam library from location '{Library}'", libraryLocation.FullName);
         library = null;
 
         if (!libraryLocation.Exists)
         {
-            _logger?.LogTrace($"Steam library location '{libraryLocation.FullName}' does not exist. Library not created.");
+            _logger?.LogTrace("Steam library location '{Library}' does not exist. Library not created.", libraryLocation.FullName);
             return false;
         }
 
@@ -59,7 +59,7 @@ internal sealed class SteamLibraryFinder(IServiceProvider serviceProvider) : ISt
             var steamDll = _fileSystem.Path.Combine(libraryLocation.FullName, SteamDllFileName);
             if (!_fileSystem.File.Exists(steamDll))
             {
-                _logger?.LogTrace($"Steam library location '{libraryLocation.FullName}' does not contain 'steam.dll'. Library not created.");
+                _logger?.LogTrace("Steam library location '{Library}' does not contain 'steam.dll'. Library not created.", libraryLocation.FullName);
                 return false;
             }
         }
@@ -75,7 +75,7 @@ internal sealed class SteamLibraryFinder(IServiceProvider serviceProvider) : ISt
         var libraryVdf = _fileSystem.Path.Combine(libraryLocation.FullName, libraryVdfSubPath, libraryVdfName);
         if (!_fileSystem.File.Exists(libraryVdf))
         {
-            _logger?.LogTrace($"Steam library VDF file '{libraryVdf}' was not found. Library not created.");
+            _logger?.LogTrace("Steam library VDF file '{Library}' was not found. Library not created.", libraryVdf);
             return false;
         }
 

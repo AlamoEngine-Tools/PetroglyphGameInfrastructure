@@ -43,11 +43,11 @@ internal sealed class GamePlatformIdentifier(IServiceProvider serviceProvider) :
         foreach (var platform in DefaultGamePlatformOrdering)
         {
             var validator = GamePlatformIdentifierFactory.Create(platform, _serviceProvider);
-            _logger?.LogTrace($"Validating location for {platform}...");
+            _logger?.LogTrace("Validating location for {GamePlatform}...", platform);
             if (!validator.IsPlatform(type, ref location))
                 continue;
 
-            _logger?.LogTrace($"Game location was identified as {platform}.");
+            _logger?.LogTrace("Game location was identified as {GamePlatform}.", platform);
             return platform;
         }
 

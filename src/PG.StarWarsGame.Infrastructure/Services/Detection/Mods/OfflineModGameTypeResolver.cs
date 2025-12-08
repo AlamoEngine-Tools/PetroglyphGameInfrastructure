@@ -46,14 +46,14 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
 
         if (detector.Detect(GameType.Foc, GamePlatform.Undefined).Installed)
         {
-            Logger?.LogTrace($"{modInformation.ModReference} is located in FoC's Mods directory.");
+            Logger?.LogTrace("{ModRef} is located in FoC's Mods directory.", modInformation.ModReference);
             gameTypes = new ReadOnlyFrugalList<GameType>(GameType.Foc);
             return true;
         }
 
         if (detector.Detect(GameType.Eaw, GamePlatform.Undefined).Installed)
         {
-            Logger?.LogTrace($"{modInformation.ModReference} is located in EaW's Mods directory.");
+            Logger?.LogTrace("{ModRef} is located in EaW's Mods directory.", modInformation.ModReference);
             gameTypes = new ReadOnlyFrugalList<GameType>(GameType.Eaw);
             return true;
         }

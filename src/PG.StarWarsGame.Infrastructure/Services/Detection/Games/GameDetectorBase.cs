@@ -76,7 +76,7 @@ public abstract class GameDetectorBase : IGameDetector
 
         if (!locationData.IsInstalled)
         {
-            Logger?.LogTrace($"Unable to find an installed game of type {gameType}.");
+            Logger?.LogTrace("Unable to find an installed game of type {GameType}.", gameType);
             return GameDetectionResult.NotInstalled(gameType);
         }
 
@@ -91,20 +91,19 @@ public abstract class GameDetectorBase : IGameDetector
         // the detector returned a false result.
         if (!GameExeExists(location, gameType) || !DataAndMegaFilesXmlExists(location))
         {
-            Logger?.LogTrace($"Unable to find the game's executable or megafiles.xml at the given location: {location.FullName}");
+            Logger?.LogTrace("Unable to find the game's executable or megafiles.xml at the given location: {Location}", location.FullName);
             return GameDetectionResult.NotInstalled(gameType);
         }
 
         if (!MatchesOptionsPlatform(platforms, actualPlatform))
         {
             var wrongGameFound = GameDetectionResult.NotInstalled(gameType);
-            Logger?.LogTrace($"Game detected at location: {wrongGameFound.GameLocation?.FullName} " +
-                                   $"but Platform {actualPlatform} was not requested.");
+            Logger?.LogTrace("Game detected at location: {Location} but Platform {Platform} was not requested.", wrongGameFound.GameLocation?.FullName, actualPlatform);
             return wrongGameFound;
         }
 
         var detectedResult = GameDetectionResult.FromInstalled(new GameIdentity(gameType, actualPlatform), location);
-        Logger?.LogDebug($"Game detected: {detectedResult.GameIdentity} at location: '{location.FullName}'");
+        Logger?.LogDebug("Game detected: {Identity} at location: '{Location}'", detectedResult.GameIdentity, location.FullName);
         return detectedResult;
     }
 
@@ -166,7 +165,7 @@ public abstract class GameDetectorBase : IGameDetector
         if (!locationData.InitializationRequired)
             return true;
 
-        Logger?.LogDebug($"It appears that the game '{locationData}' exists but it is not initialized. Game type '{gameType}'.");
+        Logger?.LogDebug("It appears that the game '{Location}' exists but it is not initialized. Game type '{GameType}'.", locationData, gameType);
         if (!_tryHandleInitialization)
             return false;
 

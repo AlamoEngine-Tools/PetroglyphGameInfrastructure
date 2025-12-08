@@ -37,7 +37,7 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
         if (!_steamGameHelpers.ToSteamWorkshopsId(steamIdValue, out var steamId))
             return false;
 
-        Logger?.LogTrace($"Getting steam tags from Steam's webpage for mod '{steamId}'");
+        Logger?.LogTrace("Getting steam tags from Steam's webpage for mod '{SteamId}'", steamId);
 
         var webPage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(steamId, CultureInfo.InvariantCulture)
             .GetAwaiter().GetResult();
