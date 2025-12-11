@@ -2,6 +2,7 @@
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
+// ReSharper disable once InconsistentNaming
 /// <summary>
 /// Level of detail of LUA logging.
 /// </summary>

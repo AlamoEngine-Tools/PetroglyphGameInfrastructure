@@ -70,8 +70,8 @@ internal class ModFactory(IServiceProvider serviceProvider) : IModFactory
     private string GetModName(DetectedModReference detectedMod, CultureInfo culture)
     {
         var name = _nameResolver.ResolveName(detectedMod, culture);
-        if (string.IsNullOrEmpty(name))
-            throw new ModException(detectedMod.ModReference, "Unable to create a mod with an empty name.");
-        return name!;
+        return string.IsNullOrEmpty(name)
+            ? throw new ModException(detectedMod.ModReference, "Unable to create a mod with an empty name.")
+            : name;
     }
 }

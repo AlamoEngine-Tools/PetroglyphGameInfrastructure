@@ -159,7 +159,7 @@ public class GameArgumentTestBase
         var relativeMod = fs.DirectoryInfo.New("with space/otherGame/mods/myMod");
         var steamModDir = fs.DirectoryInfo.New("with space/game/mods/123456");
 
-        var gameFile = fs.FileInfo.New("game/file.txt");
+        fs.FileInfo.New("game/file.txt");
 
         foreach (var value in GetValidStringValues)
             yield return [TestNamedArg.FromValue(value)];

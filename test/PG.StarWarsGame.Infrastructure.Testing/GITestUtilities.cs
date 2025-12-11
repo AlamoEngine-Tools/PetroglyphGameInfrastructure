@@ -5,6 +5,7 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 
 namespace PG.StarWarsGame.Infrastructure.Testing;
 
+// ReSharper disable once InconsistentNaming
 public static class GITestUtilities
 {
     public static ICollection<GamePlatform> RealPlatforms { get; } =

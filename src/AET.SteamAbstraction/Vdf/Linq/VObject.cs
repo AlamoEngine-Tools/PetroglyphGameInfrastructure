@@ -75,7 +75,7 @@ internal class VObject : VToken, IList<VToken>, IDictionary<string, VToken>
 
     public VObject()
     {
-        _children = new List<VToken>();
+        _children = [];
     }
 
     public VObject(VObject other)

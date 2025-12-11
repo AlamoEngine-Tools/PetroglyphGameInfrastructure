@@ -53,7 +53,7 @@ public abstract partial class GameDetectorTestBase<T> : CommonTestBase
         var shouldTriggerInitEvent = SupportInitialization && SupportedPlatforms.Contains(identity.Platform) && shallHandleInitialization;
         var eventTriggered = false;
 
-        detector.InitializationRequested += (s, e) =>
+        detector.InitializationRequested += (_, e) =>
         {
             Assert.True(SupportInitialization);
             eventTriggered = true;

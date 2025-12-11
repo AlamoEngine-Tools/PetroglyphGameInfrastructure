@@ -29,7 +29,7 @@ public class ArgumentCollectionTest
 
         var e = ((IEnumerable)argList).GetEnumerator();
         Assert.True(e.MoveNext());
-        var o = (GameArgument)e.Current;
+        var o = (GameArgument)e.Current!;
 
 
         Assert.Equal(new WindowedArgument(), a);

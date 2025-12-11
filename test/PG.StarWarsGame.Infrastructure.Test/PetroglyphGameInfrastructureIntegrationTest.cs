@@ -322,7 +322,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
 
         public int GetHashCode(DetectedModReference obj)
         {
-            return HashCode.Combine(obj.Directory.FullName, ModIdentityEqualityComparer.Default.GetHashCode(obj.Modinfo), obj.ModReference);
+            return HashCode.Combine(obj.Directory.FullName, ModIdentityEqualityComparer.Default.GetHashCode(obj.Modinfo!), obj.ModReference);
         }
     }
 }

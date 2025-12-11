@@ -8,7 +8,7 @@ namespace AET.SteamAbstraction.Vdf.Linq;
 
 internal class VConditional : VToken
 {
-    private readonly List<Token> _tokens = new();
+    private readonly List<Token> _tokens = [];
 
     public override VTokenType Type => VTokenType.Conditional;
 
