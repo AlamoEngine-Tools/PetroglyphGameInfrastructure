@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace PG.TestingUtilities;
 
-public class PlatformSpecificTheoryAttribute : TheoryAttribute
+public sealed class PlatformSpecificTheoryAttribute : TheoryAttribute
 {
     public PlatformSpecificTheoryAttribute(params TestPlatformIdentifier[] platformIds)
     {

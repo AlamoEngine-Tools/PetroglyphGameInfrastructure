@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using AET.SteamAbstraction;
 using AET.SteamAbstraction.Registry;
-using AET.SteamAbstraction.Test.TestUtilities;
+using AET.SteamAbstraction.Testing;
 using AET.SteamAbstraction.Testing.Installation;
 using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities.Registry;

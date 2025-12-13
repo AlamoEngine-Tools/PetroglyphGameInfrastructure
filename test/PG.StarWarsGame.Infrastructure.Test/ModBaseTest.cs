@@ -248,11 +248,9 @@ public abstract class ModBaseTest : PlayableModContainerTest
         var samish = CreateMod("A");
         var otherA = CreateMod("A", deps: dep);
 
-        ModBase custom;
-        if (mod.ModInfo is not null)
-            custom = new CustomMod(Game, mod.Identifier, mod.Type, mod.ModInfo, ServiceProvider);
-        else
-            custom = new CustomMod(Game, mod.Identifier, mod.Type, mod.Name, ServiceProvider);
+        ModBase custom = mod.ModInfo is not null 
+            ? new CustomMod(Game, mod.Identifier, mod.Type, mod.ModInfo, ServiceProvider) 
+            : new CustomMod(Game, mod.Identifier, mod.Type, mod.Name, ServiceProvider);
 
         Assert.False(mod.Equals(null));
         Assert.False(mod.Equals((object)null!));

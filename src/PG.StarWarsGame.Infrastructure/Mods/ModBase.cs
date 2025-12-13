@@ -21,8 +21,6 @@ public abstract class ModBase : PlayableModContainer, IMod
     /// <inheritdoc/>
     public event EventHandler? DependenciesResolved;
 
-    private SemVersion? _modVersion;
-
     /// <inheritdoc/>
     public string Identifier { get; }
 
@@ -48,7 +46,7 @@ public abstract class ModBase : PlayableModContainer, IMod
     public IModinfo? ModInfo { get; protected init; }
 
     /// <inheritdoc/>
-    public SemVersion? Version => _modVersion ??= InitializeVersion();
+    public SemVersion? Version => field ??= InitializeVersion();
 
     /// <summary>
     /// Gets the mod's dependency list from the modinfo data or an empty list if no modinfo data is specified.

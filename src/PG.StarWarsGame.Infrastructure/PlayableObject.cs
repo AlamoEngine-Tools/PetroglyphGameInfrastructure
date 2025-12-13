@@ -15,9 +15,6 @@ namespace PG.StarWarsGame.Infrastructure;
 /// </summary>
 public abstract class PlayableObject(IServiceProvider serviceProvider) : IPlayableObject
 {
-    private IReadOnlyCollection<ILanguageInfo>? _installedLanguages;
-    private string? _iconFile;
-
     private bool _languageSearched;
     private bool _iconSearched;
 
@@ -38,12 +35,12 @@ public abstract class PlayableObject(IServiceProvider serviceProvider) : IPlayab
         get
         {
             if (_languageSearched)
-                return _installedLanguages!;
-            _installedLanguages = ResolveInstalledLanguages();
-            if (_installedLanguages is null)
+                return field!;
+            field = ResolveInstalledLanguages();
+            if (field is null)
                 throw new PetroglyphException("Resolved languages must not be null.");
             _languageSearched = true;
-            return _installedLanguages;
+            return field;
         }
     }
 
@@ -53,10 +50,10 @@ public abstract class PlayableObject(IServiceProvider serviceProvider) : IPlayab
         get
         {
             if (_iconSearched)
-                return _iconFile;
-            _iconFile = ResolveIconFile();
+                return field;
+            field = ResolveIconFile();
             _iconSearched = true;
-            return _iconFile;
+            return field;
         }
     }
 

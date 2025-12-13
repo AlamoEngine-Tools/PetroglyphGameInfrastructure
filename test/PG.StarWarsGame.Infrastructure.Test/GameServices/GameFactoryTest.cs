@@ -221,13 +221,13 @@ public class GameFactoryTest : CommonTestBase
             var game = _factory.CreateGame(createIdentity, installedGame.Directory, false, CultureInfo.CurrentCulture);
             var expectedName = _nameResolver.ResolveName(game, CultureInfo.CurrentCulture);
 
-            AssertGame(game, createIdentity, installedGame.Directory.FullName, expectedName!);
+            AssertGame(game, createIdentity, installedGame.Directory.FullName, expectedName);
 
             _factory.TryCreateGame(createIdentity, installedGame.Directory, false, CultureInfo.CurrentCulture,
                 out var tryGame);
 
             Assert.NotNull(tryGame);
-            AssertGame(tryGame, createIdentity, installedGame.Directory.FullName, expectedName!);
+            AssertGame(tryGame, createIdentity, installedGame.Directory.FullName, expectedName);
         }
     }
 
@@ -248,12 +248,12 @@ public class GameFactoryTest : CommonTestBase
 
         var createdGame = _factory.CreateGame(gameIdentity, installedGame.Directory, true, CultureInfo.CurrentCulture);
 
-        AssertGame(createdGame, gameIdentity, installedGame.Directory.FullName, expectedName!);
+        AssertGame(createdGame, gameIdentity, installedGame.Directory.FullName, expectedName);
 
         Assert.True(_factory.TryCreateGame(gameIdentity, installedGame.Directory, true, CultureInfo.CurrentCulture,
             out var tryGame));
 
-        AssertGame(tryGame, gameIdentity, installedGame.Directory.FullName, expectedName!);
+        AssertGame(tryGame, gameIdentity, installedGame.Directory.FullName, expectedName);
     }
 
     [Theory]
@@ -269,11 +269,11 @@ public class GameFactoryTest : CommonTestBase
 
         var createdGame = _factory.CreateGame(detectionResult, CultureInfo.CurrentCulture);
 
-        AssertGame(createdGame, gameIdentity, installedGame.Directory.FullName, expectedName!);
+        AssertGame(createdGame, gameIdentity, installedGame.Directory.FullName, expectedName);
 
         Assert.True(_factory.TryCreateGame(detectionResult, CultureInfo.CurrentCulture, out var tryGame));
 
-        AssertGame(tryGame, gameIdentity, installedGame.Directory.FullName, expectedName!);
+        AssertGame(tryGame, gameIdentity, installedGame.Directory.FullName, expectedName);
     }
 
     public class GameFactoryWithNullNameResolver : CommonTestBaseWithRandomGame

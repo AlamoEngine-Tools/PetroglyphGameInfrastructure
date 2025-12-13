@@ -480,7 +480,7 @@ public class ModFinderTest : CommonTestBase
 
         public string Name { get; } = name;
         public SemVersion? Version { get; }
-        public IModDependencyList Dependencies { get; init; } = DependencyList.EmptyDependencyList;
+        public IModDependencyList Dependencies { get; } = DependencyList.EmptyDependencyList;
         public string ToJson()
         {
             return JsonSerializer.Serialize(this, JsonSerializerOptions.Default);

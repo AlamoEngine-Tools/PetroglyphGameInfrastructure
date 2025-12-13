@@ -5,6 +5,8 @@ using PG.StarWarsGame.Infrastructure.Services.Language;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 
+// ReSharper disable InconsistentNaming
+
 #region Flags Normal
 
 /// <summary>
@@ -304,7 +306,7 @@ public sealed class AILogStyleArgument(AILogStyle value)
 /// File location where LUA logging shall be stored to.
 /// </summary>
 /// <remarks>
-/// The directory of the file must already exists.
+/// The directory of the file must already exist.
 /// </remarks>
 public sealed class AILogFileArgument(IFileInfo value, IDirectoryInfo gameDir) : NamedArgument<IFileInfo>(GameArgumentNames.AILogFileArg, value, true)
 {

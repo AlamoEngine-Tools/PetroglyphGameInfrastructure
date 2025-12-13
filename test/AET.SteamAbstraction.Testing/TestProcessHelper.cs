@@ -9,7 +9,7 @@ using AET.SteamAbstraction.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace AET.SteamAbstraction.Test.TestUtilities;
+namespace AET.SteamAbstraction.Testing;
 
 public class TestProcessHelper(IServiceProvider sp) : IProcessHelper
 {
@@ -32,7 +32,7 @@ public class TestProcessHelper(IServiceProvider sp) : IProcessHelper
         return pid == _pid;
     }
 
-    public Process? StartProcess(ProcessStartInfo startInfo)
+    public Process StartProcess(ProcessStartInfo startInfo)
     {
         var registry = _registryFactory.CreateRegistry();
         var expectedFileName = registry.ExecutableFile?.FullName;

@@ -13,8 +13,7 @@ namespace PG.StarWarsGame.Infrastructure.Games;
 public class PetroglyphStarWarsGame : PlayableModContainer, IGame
 {
     private readonly string _normalizedPath;
-    private IDirectoryInfo? _modLocation;
-    
+
     /// <summary>
     /// Gets the file system of this game.
     /// </summary>
@@ -40,13 +39,13 @@ public class PetroglyphStarWarsGame : PlayableModContainer, IGame
     {
         get
         {
-            if (_modLocation is null)
+            if (field is null)
             {
                 var fs = Directory.FileSystem;
                 var modsPath = fs.Path.Combine(Directory.FullName, "Mods");
-                _modLocation = fs.DirectoryInfo.New(modsPath);
+                field = fs.DirectoryInfo.New(modsPath);
             }
-            return _modLocation;
+            return field;
         }
     }
 

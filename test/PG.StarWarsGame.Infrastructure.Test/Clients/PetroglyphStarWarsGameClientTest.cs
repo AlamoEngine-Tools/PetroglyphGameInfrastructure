@@ -277,7 +277,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
 
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
-        var derivedClient = new MyTestClient((arguments, type) =>
+        var derivedClient = new MyTestClient((_, type) =>
         {
             Assert.Equal(GameBuildType.Release, type);
             throw new Exception("Message");

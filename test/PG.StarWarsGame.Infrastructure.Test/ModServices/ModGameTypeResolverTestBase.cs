@@ -255,7 +255,7 @@ public abstract class ModGameTypeResolverTestBase : CommonTestBase
         var info = CreateDetectedModReference(mod.Directory, ModType.Virtual, modinfo);
         var resolver = CreateResolver();
 
-        // We have a installed mod, and modinfo, but still virtual mods shall never return a confirmed value
+        // We have an installed mod, and modinfo, but still virtual mods shall never return a confirmed value
         Assert.False(CreateResolver().TryGetGameType(info, out var types)); 
         Assert.Empty(types);
 

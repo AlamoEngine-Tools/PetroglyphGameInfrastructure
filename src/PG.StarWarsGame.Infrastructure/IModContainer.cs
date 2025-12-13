@@ -6,7 +6,8 @@ using PG.StarWarsGame.Infrastructure.Mods;
 namespace PG.StarWarsGame.Infrastructure;
 
 /// <summary>
-/// This instance can be parent for one or many mods. 
+/// Defines a container for managing a collection of mods, providing methods to add, remove, and search for mods, as
+/// well as an event for tracking modifications to the mod collection.
 /// </summary>
 public interface IModContainer : IEnumerable<IMod>
 {

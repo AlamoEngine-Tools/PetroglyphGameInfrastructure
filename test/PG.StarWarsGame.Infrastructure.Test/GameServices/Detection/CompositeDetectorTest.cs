@@ -185,11 +185,11 @@ public class CompositeDetectorTest : CommonTestBase
         var expectedResult = GameDetectionResult.RequiresInitialization(identity.Type);
 
         var firstDetector = new CallbackDetector(
-            (d, t, _) => GameDetectionResult.RequiresInitialization(t),
+            (_, t, _) => GameDetectionResult.RequiresInitialization(t),
             true);
 
         var secondDetector = new CallbackDetector(
-            (d, t, _) => GameDetectionResult.RequiresInitialization(t),
+            (_, t, _) => GameDetectionResult.RequiresInitialization(t),
             true);
 
         var detector = new CompositeGameDetector([firstDetector, secondDetector], ServiceProvider);
