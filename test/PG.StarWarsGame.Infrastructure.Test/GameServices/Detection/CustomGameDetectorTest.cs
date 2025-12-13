@@ -139,7 +139,7 @@ public class CustomGameDetectorTest
     {
         return state.Value is null
             ? GameDetectorBase.GameLocationData.RequiresInitialization
-            : new GameDetectorBase.GameLocationData(_fileSystem.DirectoryInfo.New(state.Value.ToString()));
+            : new GameDetectorBase.GameLocationData(_fileSystem.DirectoryInfo.New(state.Value.ToString()!));
     }
 
     private static GameDetectorBase.GameLocationData FindGameThrowsException(GameType arg)
