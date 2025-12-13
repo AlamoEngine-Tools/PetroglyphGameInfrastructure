@@ -7,6 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Games.Registry;
 
 internal sealed class GameRegistry : IGameRegistry
 {
+    // ReSharper disable InconsistentNaming
     internal const string VersionKey = "1.0";
     internal const string CDKeyProperty = "CD Key";
     internal const string EawGoldProperty = "EAWGold";
@@ -15,6 +16,7 @@ internal sealed class GameRegistry : IGameRegistry
     internal const string InstallPathProperty = "InstallPath";
     internal const string LauncherProperty = "Launcher";
     internal const string RevisionProperty = "Revision";
+    // ReSharper enable InconsistentNaming
 
     private static readonly Version VersionInstance = new(1, 0);
 

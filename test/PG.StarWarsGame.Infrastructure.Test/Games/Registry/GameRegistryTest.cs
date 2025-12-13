@@ -177,15 +177,16 @@ public class GameRegistryTest
         versionKey.SetValue("Revision", 9876);
     }
 
-    private static void AssertDefaultRegistry(IGameRegistry registry, bool subKeyExists)
+    // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
+    private static void AssertDefaultRegistry(GameRegistry registry, bool subKeyExists)
     {
         Assert.Equal(subKeyExists, registry.Exits);
-        Assert.Equal(default, registry.Installed);
-        Assert.Equal(default, registry.CdKey);
-        Assert.Equal(default, registry.EaWGold);
-        Assert.Equal(default, registry.InstallPath);
-        Assert.Equal(default, registry.Launcher);
-        Assert.Equal(default, registry.Revision);
-        Assert.Equal(default, registry.Version);
+        Assert.Null(registry.Installed);
+        Assert.Null(registry.CdKey);
+        Assert.Null(registry.EaWGold);
+        Assert.Null(registry.InstallPath);
+        Assert.Null(registry.Launcher);
+        Assert.Null(registry.Revision);
+        Assert.Null(registry.Version);
     }
 }

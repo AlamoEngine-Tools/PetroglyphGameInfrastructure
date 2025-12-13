@@ -9,6 +9,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Arguments;
 /// </summary>
 public static class GameArgumentNames
 {
+    // ReSharper disable InconsistentNaming
     internal const string ModListArg = "MODLIST";
     internal const string WindowedArg = "WINDOWED";
     internal const string MCEArg = "MCE";
@@ -68,6 +69,7 @@ public static class GameArgumentNames
     internal const string ConsoleCommandFileArg = "CONSOLECOMMANDFILE";
     internal const string ConnectPortArg = "CONNECTPORT";
     internal const string ConnectIPArg = "CONNECTIP";
+    // ReSharper enable InconsistentNaming
 
     internal static readonly IReadOnlyCollection<string> SupportedFlagArgumentNames =
         new ReadOnlyCollection<string>(

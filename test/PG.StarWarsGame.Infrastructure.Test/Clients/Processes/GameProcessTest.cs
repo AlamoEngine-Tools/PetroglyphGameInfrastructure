@@ -33,8 +33,8 @@ public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
     {
         try
         {
-            _testProcess?.Kill();
-            _testProcess?.Dispose();
+            _testProcess.Kill();
+            _testProcess.Dispose();
         }
         catch (Exception)
         {

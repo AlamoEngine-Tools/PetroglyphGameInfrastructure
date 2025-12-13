@@ -64,7 +64,7 @@ public abstract class CommonTestBase
     {
         var languages = new HashSet<ILanguageInfo>(PossibleLanguages.Length);
 
-        for (var i = 0; i < PossibleLanguages.Length; i++)
+        foreach (var _ in PossibleLanguages)
         {
             var code = TestHelpers.GetRandom(PossibleLanguages);
             var support = TestHelpers.GetRandomEnum<LanguageSupportLevel>();

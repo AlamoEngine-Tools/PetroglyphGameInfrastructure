@@ -236,7 +236,7 @@ public class GameArgumentsBuilderTest : CommonTestBase
             CreateVirtualMod().virtualMod
         };
 
-        var result = _builder.AddMods(virtualMods);
+        _builder.AddMods(virtualMods);
 
         var builtResult = _builder.Build();
         Assert.Empty(builtResult);

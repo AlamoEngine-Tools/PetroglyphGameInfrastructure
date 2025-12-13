@@ -42,7 +42,7 @@ public static partial class ModInstallations
         var fileInfo = fs.FileInfo.New(modinfoFilePath);
 
         if (variantSubFileName is null)
-            return new ModinfoVariantFile(fileInfo);
+            return new MainModinfoFile(fileInfo);
         return new ModinfoVariantFile(fileInfo);
     }
 

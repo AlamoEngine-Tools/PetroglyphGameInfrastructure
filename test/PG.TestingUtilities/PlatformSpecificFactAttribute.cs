@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace PG.TestingUtilities;
 
-public class PlatformSpecificFactAttribute : FactAttribute
+public sealed class PlatformSpecificFactAttribute : FactAttribute
 {
     public PlatformSpecificFactAttribute(params TestPlatformIdentifier[] platformIds)
     {

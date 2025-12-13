@@ -19,7 +19,7 @@ public static class SteamAbstractionLayer
     {
         serviceCollection.AddSingleton<ISteamWrapperFactory>(sp => new SteamWrapperFactory(sp));
         serviceCollection.AddSingleton<ISteamRegistryFactory>(sp => new SteamRegistryFactory(sp));
-        serviceCollection.AddSingleton<IProcessHelper>(sp => new ProcessHelper());
+        serviceCollection.AddSingleton<IProcessHelper>(new ProcessHelper());
         serviceCollection.AddSingleton<ISteamLibraryFinder>(sp => new SteamLibraryFinder(sp));
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Clients.Utilities;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -34,6 +35,16 @@ public class GameExecutableFileUtilitiesTest : CommonTestBase
                 }
             }
         }
+    }
+
+    [Theory]
+    [MemberData(nameof(RealGameIdentities))]
+    public void GetExecutableForGame_NullGame_ThrowsArgumentNullException(GameIdentity gameIdentity)
+    {
+        FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var buildTypes = new List<GameBuildType> { GameBuildType.Release, GameBuildType.Debug };
+        foreach (var buildType in buildTypes) 
+            Assert.Throws<ArgumentNullException>(() => GameExecutableFileUtilities.GetExecutableForGame(null!, buildType));
     }
 
     [Theory]
