@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Services;
 
-public class LanguageFinderTest : CommonTestBaseWithRandomGame
+public class LanguageFinderTest : GameInfrastructureTestBaseWithRandomGame
 {
     private readonly InstalledLanguageFinder _languageFinder;
 

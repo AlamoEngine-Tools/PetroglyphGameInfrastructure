@@ -4,13 +4,14 @@ using AET.SteamAbstraction;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
-public class IGameClientFactoryTest : CommonTestBase
+public class IGameClientFactoryTest : GameInfrastructureTestBase
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
 
@@ -24,7 +25,7 @@ public class IGameClientFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateClient_CreatesCorrectClientType(GameIdentity identity)
     {
         var game = FileSystem.InstallGame(identity, ServiceProvider);

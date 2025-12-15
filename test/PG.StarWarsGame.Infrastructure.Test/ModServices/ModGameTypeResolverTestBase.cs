@@ -19,7 +19,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-public abstract class ModGameTypeResolverTestBase : CommonTestBase
+public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
 {
     public abstract ModGameTypeResolver CreateResolver();
 

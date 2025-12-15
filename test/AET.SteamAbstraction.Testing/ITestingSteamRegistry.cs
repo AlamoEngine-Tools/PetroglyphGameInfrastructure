@@ -1,13 +1,9 @@
-﻿using AnakinRaW.CommonUtilities.Registry;
-using System;
+﻿using System;
 using System.IO.Abstractions;
 
-namespace AET.SteamAbstraction.Registry;
+namespace AET.SteamAbstraction.Testing;
 
-/// <summary>
-/// Registry representation for the Steam Client.
-/// </summary>
-internal interface ISteamRegistry : IDisposable
+public interface ITestingSteamRegistry : IDisposable
 {
     /// <summary>
     /// Gets the executable of the Steam client.
@@ -24,9 +20,9 @@ internal interface ISteamRegistry : IDisposable
     /// </summary>
     int? ProcessId { get; }
 
-    /// <summary>
-    /// Opens the Steam registry and returns a writeable key.
-    /// </summary>
-    /// <returns>The steam registry key.</returns>
-    IRegistryKey? OpenSteamRegistryKey();
+    void InstallSteam();
+
+    void SetPid(int? pid);
+
+    void SetUserId(uint userId);
 }

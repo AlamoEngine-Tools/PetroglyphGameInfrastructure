@@ -38,14 +38,14 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<EmptyStruct>
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_GamesNotInstalled_DirectoryNotFound(GameIdentity identity)
     {
         TestNotInstalledWithCustomSetup(identity, _ => FileSystem.DirectoryInfo.New("doesNotExist"));
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_GamesNotInstalled_GameExeNotFound(GameIdentity identity)
     {
         FileSystem.Initialize().WithFile("Game/Data/megafiles.xml");
@@ -53,7 +53,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<EmptyStruct>
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_GamesNotInstalled_GameDataWithMegaFilesNotFound(GameIdentity identity)
     {
         var exeName = identity.Type == GameType.Eaw
@@ -68,7 +68,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<EmptyStruct>
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_GamesInstalled_WrongPathGiven(GameIdentity identity)
     {
         TestNotInstalledWithCustomSetup(identity, i =>

@@ -14,7 +14,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
-public class GameFactoryTest : CommonTestBase
+public class GameFactoryTest : GameInfrastructureTestBase
 {
     private readonly GameFactory _factory;
     private readonly IGameNameResolver _nameResolver;
@@ -239,7 +239,7 @@ public class GameFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateGame_FromIdentity_GameCreated(GameIdentity gameIdentity)
     {
         var installedGame = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -257,7 +257,7 @@ public class GameFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateGame_FromDetectionResult_GameCreated(GameIdentity gameIdentity)
     {
         var installedGame = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -276,7 +276,7 @@ public class GameFactoryTest : CommonTestBase
         AssertGame(tryGame, gameIdentity, installedGame.Directory.FullName, expectedName);
     }
 
-    public class GameFactoryWithNullNameResolver : CommonTestBaseWithRandomGame
+    public class GameFactoryWithNullNameResolver : GameInfrastructureTestBaseWithRandomGame
     {
         private readonly GameFactory _factory;
 
@@ -306,7 +306,7 @@ public class GameFactoryTest : CommonTestBase
         }
     }
 
-    public class GameFactoryWithCustomNameResolver : CommonTestBaseWithRandomGame
+    public class GameFactoryWithCustomNameResolver : GameInfrastructureTestBaseWithRandomGame
     {
         private readonly GameFactory _factory;
 

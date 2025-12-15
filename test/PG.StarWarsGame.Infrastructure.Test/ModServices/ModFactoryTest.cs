@@ -23,7 +23,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-public class ModFactoryTest : CommonTestBase
+public class ModFactoryTest : GameInfrastructureTestBase
 {
     private const string DefaultModName = "Default Mod Name";
     private const string SteamModName = "Steam Mod Name";
@@ -75,7 +75,7 @@ public class ModFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_FromModsDir_WithoutModinfo(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -91,7 +91,7 @@ public class ModFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_FromModsDir_WithModinfo(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -145,7 +145,7 @@ public class ModFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_WithInvalidModinfo(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -160,7 +160,7 @@ public class ModFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_InvalidNameResolved_Throws(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -174,7 +174,7 @@ public class ModFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_ModNotCompatible_Throws(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -207,7 +207,7 @@ public class ModFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod_WithInvalidModinfo(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -222,7 +222,7 @@ public class ModFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod_WithInvalidModinfo_NoDependencies(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -236,7 +236,7 @@ public class ModFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);

@@ -10,7 +10,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
-public class ModDependencyTraverserTest : CommonTestBaseWithRandomGame
+public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGame
 {
     private readonly ModDependencyTraverser _traverser;
 

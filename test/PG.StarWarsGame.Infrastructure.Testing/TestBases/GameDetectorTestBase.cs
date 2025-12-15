@@ -6,7 +6,7 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
-public abstract partial class GameDetectorTestBase<T> : CommonTestBase
+public abstract partial class GameDetectorTestBase<T> : GameInfrastructureTestBase
 {
     protected abstract bool SupportInitialization { get; }
 

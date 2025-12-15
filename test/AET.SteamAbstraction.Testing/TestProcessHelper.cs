@@ -1,22 +1,26 @@
-﻿using System;
+﻿using AET.SteamAbstraction.Utilities;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using AET.SteamAbstraction.Registry;
-using AET.SteamAbstraction.Testing.Installation;
-using AET.SteamAbstraction.Utilities;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace AET.SteamAbstraction.Testing;
 
-public class TestProcessHelper(IServiceProvider sp) : IProcessHelper
+public sealed class TestProcessHelper : IProcessHelper
 {
-    private readonly ISteamRegistryFactory _registryFactory = sp.GetRequiredService<ISteamRegistryFactory>();
-    private readonly IFileSystem _fileSystem = sp.GetRequiredService<IFileSystem>();
+    private readonly IFileSystem _fileSystem;
+    private readonly ITestingSteamRegistry _registry;
 
     private int? _pid;
+
+    public TestProcessHelper(IServiceProvider sp)
+    {
+        _fileSystem = sp.GetRequiredService<IFileSystem>();
+        _registry = ITestingSteamRegistry.Create(_fileSystem, sp);
+    }
 
     public Process? CurrentProcess { get; private set; }
 
@@ -34,8 +38,7 @@ public class TestProcessHelper(IServiceProvider sp) : IProcessHelper
 
     public Process StartProcess(ProcessStartInfo startInfo)
     {
-        var registry = _registryFactory.CreateRegistry();
-        var expectedFileName = registry.ExecutableFile?.FullName;
+        var expectedFileName = _registry.ExecutableFile?.FullName;
         Assert.Equal(expectedFileName, _fileSystem.Path.GetFullPath(startInfo.FileName));
 
         var processName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash";
@@ -47,7 +50,7 @@ public class TestProcessHelper(IServiceProvider sp) : IProcessHelper
         var pid = p.Id;
 
         SetRunningPid(pid);
-        registry.SetPid(pid);
+        _registry.SetPid(pid);
 
         CurrentProcess = p;
         return p;
@@ -60,7 +63,7 @@ public class TestProcessHelper(IServiceProvider sp) : IProcessHelper
             CurrentProcess?.Kill();
             CurrentProcess = null;
             SetRunningPid(null);
-            _registryFactory.CreateRegistry().SetPid(null);
+            _registry.SetPid(null);
         }
         catch
         {

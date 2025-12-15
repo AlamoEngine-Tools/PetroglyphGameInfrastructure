@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Services;
 
-public class IconFinderTest : CommonTestBaseWithRandomGame
+public class IconFinderTest : GameInfrastructureTestBaseWithRandomGame
 {
     private readonly IconFinder _iconFinder = new();
 

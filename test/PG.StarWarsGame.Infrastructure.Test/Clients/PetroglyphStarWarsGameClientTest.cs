@@ -18,7 +18,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients;
 
-public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
+public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDisposable
 {
     private readonly IGameClientFactory _clientFactory;
     private readonly TestGameProcessLauncher _processLauncher = new();
@@ -58,7 +58,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void IsDebugAvailable_NoDebugFilesAvailable(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -89,7 +89,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Play_CancelGameStart_Throws(GameIdentity gameIdentity)
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
@@ -123,7 +123,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void PlayDebug_ProcessLauncherThrows(GameIdentity gameIdentity)
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
@@ -150,7 +150,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Play(GameIdentity gameIdentity)
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
@@ -163,7 +163,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Play_Args(GameIdentity gameIdentity)
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
@@ -178,7 +178,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Play_Mod(GameIdentity gameIdentity)
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
@@ -210,7 +210,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Debug_FallbackToRelease(GameIdentity gameIdentity)
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
@@ -226,7 +226,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Debug_DoNotFallbackToRelease_Throws(GameIdentity gameIdentity)
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
@@ -243,7 +243,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void PlayDebug_GameExecutablesNotAvailable_Throws(GameIdentity gameIdentity)
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
@@ -269,7 +269,7 @@ public class PetroglyphStarWarsGameClientTest : CommonTestBase, IDisposable
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void PlayDebug_Derived_OnGameStarting_ThrowsCustom(GameIdentity gameIdentity)
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))

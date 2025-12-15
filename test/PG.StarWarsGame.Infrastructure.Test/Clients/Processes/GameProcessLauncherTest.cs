@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Processes;
 
-public class GameProcessLauncherTest : CommonTestBaseWithRandomGame, IDisposable
+public class GameProcessLauncherTest : GameInfrastructureTestBaseWithRandomGame, IDisposable
 {
     private readonly GameProcessLauncher _launcher;
     private readonly IFileInfo _executable;

@@ -11,7 +11,7 @@ using System;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Processes;
 
-public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
+public class GameProcessTest : GameInfrastructureTestBaseWithRandomGame, IDisposable
 {
     private Process _testProcess = null!;
 

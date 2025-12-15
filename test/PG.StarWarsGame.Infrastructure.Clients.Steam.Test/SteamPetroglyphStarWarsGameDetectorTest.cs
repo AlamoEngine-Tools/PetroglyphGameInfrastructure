@@ -4,8 +4,7 @@ using System;
 using System.Collections.Generic;
 using AET.SteamAbstraction;
 using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Registry;
-using AET.SteamAbstraction.Testing.Installation;
+using AET.SteamAbstraction.Testing;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -45,7 +44,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
     {
         return SetupGame(gameIdentity, (game, otherGameType) =>
         {
-            TestGameRegistrySetupData.Installed(game.Type, game.Directory).Create(ServiceProvider);
+            _registry.InstallGame(game, ServiceProvider);
             otherGameType.CreateNonExistingRegistry(ServiceProvider);
         });
     }
@@ -115,7 +114,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
 
         var info = SetupGame(gameId, (game, otherGameType) =>
         {
-            TestGameRegistrySetupData.Installed(game.Type, game.Directory).Create(ServiceProvider);
+            _registry.InstallGame(game, ServiceProvider);
             otherGameType.CreateNonExistingRegistry(ServiceProvider);
         }, SteamAppState.StateUpdateRequired);
 
@@ -131,17 +130,17 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         SteamAppState appState = SteamAppState.StateFullyInstalled)
     {
         // Install Steam (regardless whether the identity is supported)
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        FileSystem.InstallSteam(registry);
+        var steam = FileSystem.Steam(ServiceProvider);
+        steam.Install();
 
         if (gameIdentity.Platform != GamePlatform.SteamGold)
             return new GameDetectorTestInfo<EmptyStruct>(gameIdentity.Type, null, default);
-
+        
         // Install Game
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
 
         // Register Game to Steam
-        var lib = FileSystem.InstallDefaultLibrary(ServiceProvider);
+        var lib = steam.InstallDefaultLibrary();
         IList<uint> depots = gameIdentity.Type == GameType.Foc ? [32472] : [];
         lib.InstallGame(32470, "Star Wars Empire at War", depots, appState);
 

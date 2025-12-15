@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Registry;
 using AnakinRaW.CommonUtilities;
+using AnakinRaW.CommonUtilities.Registry;
 
 namespace AET.SteamAbstraction;
 
@@ -16,4 +17,8 @@ internal class LinuxSteamRegistry(IServiceProvider serviceProvider) : Disposable
     public IDirectoryInfo? InstallationDirectory { get; }
 
     public int? ProcessId { get; }
+    public IRegistryKey? OpenSteamRegistryKey()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -14,7 +14,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
-public class GameArgumentsBuilderTest : CommonTestBase
+public class GameArgumentsBuilderTest : GameInfrastructureTestBase
 {
     private readonly MockFileSystem _fileSystem = new();
     private readonly GameArgumentsBuilder _builder = new();

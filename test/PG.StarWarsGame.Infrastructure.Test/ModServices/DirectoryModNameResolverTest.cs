@@ -53,7 +53,7 @@ public class OnlineModNameResolverTest : ModNameResolverTestBase
     }
 }
 
-public abstract class ModNameResolverTestBase : CommonTestBase
+public abstract class ModNameResolverTestBase : GameInfrastructureTestBase
 {
     public abstract ModNameResolverBase CreateResolver();
 

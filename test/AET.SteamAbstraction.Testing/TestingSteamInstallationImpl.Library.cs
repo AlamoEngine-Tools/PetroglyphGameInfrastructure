@@ -1,48 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using AET.SteamAbstraction.Library;
 using AnakinRaW.CommonUtilities.FileSystem;
 using PG.TestingUtilities;
 using Xunit;
 
 namespace AET.SteamAbstraction.Testing.Installation;
 
-internal static partial class SteamInstallation
+internal sealed partial class TestingSteamInstallationImpl
 {
-    public static ISteamLibrary InstallDefaultLibrary(this IFileSystem fs, IServiceProvider serviceProvider, bool addToConfig = true)
+    public ITestingSteamLibrary InstallDefaultLibrary(bool addToConfig = true)
     {
-        var steamPath = fs.Path.GetFullPath(SteamInstallPath);
-        return InstallSteamLibrary(fs, steamPath, true, serviceProvider, addToConfig);
-
+        var steamPath = _fileSystem.Path.GetFullPath(TestingSteamConstants.SteamInstallPath);
+        return InstallSteamLibrary(steamPath, true, addToConfig);
     }
 
-    public static ISteamLibrary InstallSteamLibrary(
-        this IFileSystem fs, 
-        string path, 
-        IServiceProvider serviceProvider, 
-        bool addToConfig = true)
+    public ITestingSteamLibrary InstallLibrary(string path, bool addToConfig = true)
     {
-        return InstallSteamLibrary(fs, path, false, serviceProvider, addToConfig);
+        return InstallSteamLibrary(path, false, addToConfig);
     }
 
-    private static ISteamLibrary InstallSteamLibrary(
-        this IFileSystem fs,
-        string path,
-        bool isDefault,
-        IServiceProvider serviceProvider,
-        bool addToConfig = true)
+    private ITestingSteamLibrary InstallSteamLibrary(string path, bool isDefault, bool addToConfig = true)
     {
-        var commonPath = fs.Path.Combine(path, "steamapps", "common");
-        var workshopPath = fs.Path.Combine(path, "steamapps", "workshop");
+        var commonPath = _fileSystem.Path.Combine(path, "steamapps", "common");
+        var workshopPath = _fileSystem.Path.Combine(path, "steamapps", "workshop");
 
-        fs.Directory.CreateDirectory(commonPath);
-        fs.Directory.CreateDirectory(workshopPath);
+        _fileSystem.Directory.CreateDirectory(commonPath);
+        _fileSystem.Directory.CreateDirectory(workshopPath);
 
-        var libDir = fs.DirectoryInfo.New(path);
+        var libDir = _fileSystem.DirectoryInfo.New(path);
         Assert.True(libDir.Exists);
 
         var contentId = TestHelpers.RandomLong();
@@ -62,23 +50,23 @@ internal static partial class SteamInstallation
             libraryVdfSubPath = "steamapps";
         }
 
-        fs.File.WriteAllText(fs.Path.Combine(libDir.FullName, libraryVdfSubPath, libraryVdfName), libraryVdf);
+        _fileSystem.File.WriteAllText(_fileSystem.Path.Combine(libDir.FullName, libraryVdfSubPath, libraryVdfName), libraryVdf);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            using var _ = fs.File.Create(fs.Path.Combine(libDir.FullName, "steam.dll"));
+            using var _ = _fileSystem.File.Create(_fileSystem.Path.Combine(libDir.FullName, "steam.dll"));
         }
 
-        var lib = new SteamLibrary(libDir, serviceProvider);
+        var lib = new TestingSteamLibrary(libDir, serviceProvider);
 
         if (addToConfig)
-            AddToConfig(lib, fs);
+            AddToConfig(lib, _fileSystem);
         return lib;
     }
 
-    private static void AddToConfig(ISteamLibrary lib, IFileSystem fs)
+    private static void AddToConfig(TestingSteamLibrary lib, IFileSystem fs)
     {
-        var steamPath = fs.Path.GetFullPath(SteamInstallPath);
+        var steamPath = fs.Path.GetFullPath(TestingSteamConstants.SteamInstallPath);
         if (!fs.Directory.Exists(steamPath))
             Assert.Fail("Steam not installed.");
 

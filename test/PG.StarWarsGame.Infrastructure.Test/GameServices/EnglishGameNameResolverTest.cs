@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
-public class EnglishGameNameResolverTest : CommonTestBase
+public class EnglishGameNameResolverTest : GameInfrastructureTestBase
 {
     public static IEnumerable<object[]> GetCultures()
     {

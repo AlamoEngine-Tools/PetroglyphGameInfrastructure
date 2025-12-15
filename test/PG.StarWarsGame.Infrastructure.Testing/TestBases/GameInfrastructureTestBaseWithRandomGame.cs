@@ -6,11 +6,11 @@ using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
-public abstract class CommonTestBaseWithRandomGame : CommonTestBase
+public abstract class GameInfrastructureTestBaseWithRandomGame : GameInfrastructureTestBase
 {
     protected readonly IGame Game;
 
-    protected CommonTestBaseWithRandomGame()
+    protected GameInfrastructureTestBaseWithRandomGame()
     {
         Game = CreateRandomGame();
     }

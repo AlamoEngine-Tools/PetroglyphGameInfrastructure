@@ -101,7 +101,7 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetModDirTest(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);

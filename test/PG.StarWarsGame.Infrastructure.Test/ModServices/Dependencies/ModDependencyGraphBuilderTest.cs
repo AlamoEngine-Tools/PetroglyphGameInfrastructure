@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
-public class ModDependencyGraphBuilderTest : CommonTestBaseWithRandomGame
+public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRandomGame
 {
     private readonly ModDependencyGraphBuilder _graphBuilder = new();
 

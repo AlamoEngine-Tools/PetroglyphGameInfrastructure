@@ -11,7 +11,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
-public class ModDependencyResolverTest : CommonTestBaseWithRandomGame
+public class ModDependencyResolverTest : GameInfrastructureTestBaseWithRandomGame
 {
     private readonly ModDependencyResolver _resolver;
 

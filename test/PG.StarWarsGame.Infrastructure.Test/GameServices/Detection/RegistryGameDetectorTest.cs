@@ -106,7 +106,7 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Dispose_ShallDisposeRegistries(GameIdentity identity)
     {
         var info = SetupGame(identity);

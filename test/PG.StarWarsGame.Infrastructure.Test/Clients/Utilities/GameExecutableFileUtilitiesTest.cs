@@ -10,7 +10,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Utilities;
 
-public class GameExecutableFileUtilitiesTest : CommonTestBase
+public class GameExecutableFileUtilitiesTest : GameInfrastructureTestBase
 {
     public static IEnumerable<object[]> GetGameExeNamesTestData()
     {
@@ -38,7 +38,7 @@ public class GameExecutableFileUtilitiesTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetExecutableForGame_NullGame_ThrowsArgumentNullException(GameIdentity gameIdentity)
     {
         FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -48,7 +48,7 @@ public class GameExecutableFileUtilitiesTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetExecutableForGame_GameExeFilesNotInstalled_ReturnsNull(GameIdentity gameIdentity)
     {
         var gameDir = FileSystem.DirectoryInfo.New("Game");
@@ -95,7 +95,7 @@ public class GameExecutableFileUtilitiesTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetExecutableForGame_DebugFilesForOtherThanSteam_ShouldReturnNull(GameIdentity identity)
     {
         if (identity.Platform == GamePlatform.SteamGold)

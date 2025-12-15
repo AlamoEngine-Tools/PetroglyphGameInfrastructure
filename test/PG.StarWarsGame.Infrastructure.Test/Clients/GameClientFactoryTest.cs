@@ -6,7 +6,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients;
 
-public class GameClientFactoryTest : CommonTestBase
+public class GameClientFactoryTest : GameInfrastructureTestBase
 {
     protected override void SetupServiceProvider(IServiceCollection sc)
     {

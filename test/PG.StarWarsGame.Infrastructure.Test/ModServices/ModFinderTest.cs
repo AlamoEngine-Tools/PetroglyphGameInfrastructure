@@ -22,7 +22,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-public class ModFinderTest : CommonTestBase
+public class ModFinderTest : GameInfrastructureTestBase
 {
     private readonly ModFinder _modFinder;
     private readonly ISteamGameHelpers _steamGameHelpers;
@@ -43,7 +43,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_GameNotExists_Throws(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -53,7 +53,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_NoModsDirectory_ShouldNotFindMods(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -73,7 +73,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_EmptyModsDirectory_ShouldNotFindMods(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -90,7 +90,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_OneMod_WithoutModinfo(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -104,7 +104,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_OneMod_WithInvalidModinfo(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -120,7 +120,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_OneMod_WithOneInvalidModinfoVariant(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -139,7 +139,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_OneMod_WithMainModinfo(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -156,7 +156,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_WithOnlyManyVariantModinfos(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -189,7 +189,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_WithMainAndManyVariantModinfos(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -222,7 +222,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FindAllInstalledMods(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -296,7 +296,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FromExternal(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -310,7 +310,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FromExternal_DirectoryNotFoundShouldSkip(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -325,7 +325,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FromExternal_WithVariantModinfoLayout(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -423,7 +423,7 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_InvalidModinfoContentIsSkippedButModIsFound(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);

@@ -3,26 +3,36 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
 using AET.SteamAbstraction.Library;
-using AET.SteamAbstraction.Testing.Installation;
+using AET.SteamAbstraction.Testing;
+using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public class SteamLibraryTest
+public class SteamLibraryTest : IDisposable
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly MockFileSystem _fileSystem = new();
+    private readonly IRegistry _registry = new InMemoryRegistry();
+    private readonly ITestingSteamInstallation _steam;
 
     public SteamLibraryTest()
     {
         var sc = new ServiceCollection();
         sc.AddSingleton<IFileSystem>(_ => _fileSystem);
         SteamAbstractionLayer.InitializeServices(sc);
+        sc.AddSingleton(_registry);
         _serviceProvider = sc.BuildServiceProvider();
 
-        _fileSystem.InstallSteamFiles();
+        _steam = _fileSystem.Steam(_serviceProvider);
+        _steam.InstallSteamFilesOnly();
+    }
+
+    public void Dispose()
+    {
+        _steam.Dispose();
     }
 
     [Fact]
@@ -77,7 +87,7 @@ public class SteamLibraryTest
     [Fact]
     public void GetApps_NoAppsInstalled_Empty()
     {
-        var library = _fileSystem.InstallSteamLibrary("Library", _serviceProvider);
+        var library = _steam.InstallLibrary("Library");
         
         var apps = library.GetApps();
         
@@ -87,7 +97,7 @@ public class SteamLibraryTest
     [Fact]
     public void GetApps_NoSteamAppsDirectoryDoesNotExists_Empty()
     {
-        var library = _fileSystem.InstallSteamLibrary("Library", _serviceProvider);
+        var library = _steam.InstallLibrary("Library");
         library.SteamAppsLocation.Delete(true);
 
         var apps = library.GetApps();
@@ -98,8 +108,8 @@ public class SteamLibraryTest
     [Fact]
     public void GetApps_InvalidAcfFile_Skipped()
     {
-        var library = _fileSystem.InstallSteamLibrary("Library", _serviceProvider);
-        library.InstallCorruptApp(_fileSystem);
+        var library = _steam.InstallLibrary("Library");
+        library.InstallCorruptApp();
         
         var apps = library.GetApps();
         
@@ -109,9 +119,9 @@ public class SteamLibraryTest
     [Fact]
     public void TestApps()
     {
-        var library = _fileSystem.InstallSteamLibrary("Library", _serviceProvider);
+        var library = _steam.InstallLibrary("Library");
         
-        library.InstallCorruptApp(_fileSystem);
+        library.InstallCorruptApp();
         library.InstallGame(123, "Game1", "manifest1.acf");
         var expectedGame2 = library.InstallGame(456, "Game2");
         library.InstallGame(123, "NotGame1", "manifest2.acf");

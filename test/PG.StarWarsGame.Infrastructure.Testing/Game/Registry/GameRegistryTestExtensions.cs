@@ -11,10 +11,15 @@ public static class GameRegistryTestExtensions
 {
     public static IGameRegistry CreateNonExistingRegistry(this GameType gameType, IServiceProvider serviceProvider)
     {
-        var factory = new GameRegistryFactory(serviceProvider);
-        return factory.CreateRegistry(gameType);
+        return serviceProvider.GetRequiredService<IGameRegistryFactory>().CreateRegistry(gameType);
     }
-    
+
+    public static IGameRegistry InstallGame(this IRegistry registry, IGame game, IServiceProvider serviceProvider)
+    {
+        InitializeRegistry(registry, TestGameRegistrySetupData.Installed(game.Type, game.Directory), null, serviceProvider);
+        return serviceProvider.GetRequiredService<IGameRegistryFactory>().CreateRegistry(game.Type);
+    }
+
     public static IGameRegistry Create(this TestGameRegistrySetupData registrySetupData, IServiceProvider serviceProvider)
     {
         var gameRegistry = CreateNonExistingRegistry(registrySetupData.GameType, serviceProvider);

@@ -9,7 +9,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
-public class SteamGameHelpersTest : CommonTestBase
+public class SteamGameHelpersTest : GameInfrastructureTestBase
 {
     private readonly SteamGameHelpers _service;
 

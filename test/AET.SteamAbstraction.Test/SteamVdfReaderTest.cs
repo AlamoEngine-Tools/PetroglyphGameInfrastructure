@@ -1,27 +1,37 @@
-﻿using System;
+﻿using AET.SteamAbstraction.Games;
+using AET.SteamAbstraction.Testing;
+using AnakinRaW.CommonUtilities.Registry;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Testing.Installation;
-using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions.Testing;
 using Xunit;
 using VdfException = AET.SteamAbstraction.Vdf.VdfException;
 
 namespace AET.SteamAbstraction.Test;
 
-public class SteamVdfReaderTest
+public class SteamVdfReaderTest : IDisposable
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly MockFileSystem _fileSystem = new();
+    private readonly IRegistry _registry = new InMemoryRegistry();
+    private readonly ITestingSteamInstallation _steam;
 
     public SteamVdfReaderTest()
     {
         var sc = new ServiceCollection();
         sc.AddSingleton<IFileSystem>(_ => _fileSystem);
-        _serviceProvider = sc.BuildServiceProvider();
+        sc.AddSingleton(_registry);
+        SteamAbstractionLayer.InitializeServices(sc);
+        _steam = _fileSystem.Steam(sc.BuildServiceProvider());
+        _steam.InstallSteamFilesOnly();
+    }
+
+    public void Dispose()
+    {
+        _steam.Dispose();
     }
 
     #region ReadLibraryLocationsFromConfig
@@ -137,7 +147,7 @@ public class SteamVdfReaderTest
     [Fact]
     public void ReadManifest_NullArgs_Throws()
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
+        var lib = _steam.InstallLibrary("steamLib", false);
         Assert.Throws<ArgumentNullException>(() => SteamVdfReader.ReadManifest(null!, lib));
         Assert.Throws<ArgumentNullException>(() => SteamVdfReader.ReadManifest(_fileSystem.FileInfo.New("path"), null!));
     }
@@ -145,7 +155,7 @@ public class SteamVdfReaderTest
     [Fact]
     public void ReadManifest_CorrectManifest()
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
+        var lib = _steam.InstallLibrary("steamLib", false);
 
         var expectedManifest = lib.InstallGame(
             1230,
@@ -295,7 +305,7 @@ public class SteamVdfReaderTest
     [MemberData(nameof(GetInvalidAppManifestContent))]
     public void ReadManifest_InvalidAppManifest_Throws(string content)
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
+        var lib = _steam.InstallLibrary("steamLib", false);
 
         var manifestFile = _fileSystem.Path.Combine(lib.SteamAppsLocation.FullName, "manifest.acf");
         _fileSystem.File.WriteAllText(manifestFile, content);
@@ -306,8 +316,8 @@ public class SteamVdfReaderTest
     [Fact]
     public void ReadManifest_ManifestNotPartOfLibrary_Throws()
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
-        var otherLib = _fileSystem.InstallSteamLibrary("otherLib", _serviceProvider, false);
+        var lib = _steam.InstallLibrary("steamLib", false);
+        var otherLib = _steam.InstallLibrary("otherLib",  false);
 
         var manifestFile = otherLib.InstallGame(1230, "MyGame").ManifestFile;
 
@@ -473,9 +483,7 @@ public class SteamVdfReaderTest
     [Fact]
     public void ReadLoginUsers()
     {
-        _fileSystem.InstallSteamFiles();
-
-        var expectedUsers = new List<SteamUserLoginMetadata>
+        var expectedUsers = new List<TestingSteamUserLoginMetadata>
         {
             new(1, true, false),
             new(2, false, false),
@@ -483,11 +491,14 @@ public class SteamVdfReaderTest
             new(4, true, true),
         };
 
-        var file = _fileSystem.WriteLoginUsers(expectedUsers);
+        var file = _steam.WriteLoginUsers(expectedUsers);
 
         var users = SteamVdfReader.ReadLoginUsers(file);
 
-        Assert.Equal(expectedUsers, users.Users.OrderBy(x => x.UserId).ToList(), new SteamUserLoginMetadataEqualityComparer());
+        Assert.Equal(
+            expectedUsers.Select(x => new SteamUserLoginMetadata(x.UserId, x.MostRecent, x.UserWantsOffline)), 
+            users.Users.OrderBy(x => x.UserId).ToList(), 
+            new SteamUserLoginMetadataEqualityComparer());
     }
 
     private class SteamUserLoginMetadataEqualityComparer : IEqualityComparer<SteamUserLoginMetadata>

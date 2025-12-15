@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
-using System.Linq;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,13 +13,13 @@ using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
-public abstract class CommonTestBase
+public abstract class GameInfrastructureTestBase
 {
     protected readonly IServiceProvider ServiceProvider;
     protected readonly MockFileSystem FileSystem = new();
 
     [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
-    protected CommonTestBase()
+    protected GameInfrastructureTestBase()
     {
         var sc = new ServiceCollection();
         SetupServiceProvider(sc);
@@ -34,20 +32,6 @@ public abstract class CommonTestBase
         PetroglyphGameInfrastructure.InitializeServices(sc);
     }
 
-    public static IEnumerable<object[]> RealPlatforms()
-    {
-        return GITestUtilities.RealPlatforms.Select(platform => (object[])[platform]);
-    }
-
-    public static IEnumerable<object[]> RealGameIdentities()
-    {
-        foreach (var platform in GITestUtilities.RealPlatforms)
-        {
-            yield return [new GameIdentity(GameType.Eaw, platform)];
-            yield return [new GameIdentity(GameType.Foc, platform)];
-        }
-    }
-
     protected static GameIdentity CreateRandomGameIdentity()
     {
         return new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), TestHelpers.GetRandom(GITestUtilities.RealPlatforms));
@@ -56,22 +40,6 @@ public abstract class CommonTestBase
     protected PetroglyphStarWarsGame CreateRandomGame()
     {
         return FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
-    }
-
-    private static readonly string[] PossibleLanguages = ["en", "de", "es", "it"];
-
-    protected static ICollection<ILanguageInfo> GetRandomLanguages()
-    {
-        var languages = new HashSet<ILanguageInfo>(PossibleLanguages.Length);
-
-        foreach (var _ in PossibleLanguages)
-        {
-            var code = TestHelpers.GetRandom(PossibleLanguages);
-            var support = TestHelpers.GetRandomEnum<LanguageSupportLevel>();
-            languages.Add(new LanguageInfo(code, support));
-        }
-
-        return languages;
     }
 
     protected IMod CreateAndAddMod(IGame game, bool isWorkshop, string name, IModDependencyList dependencies)

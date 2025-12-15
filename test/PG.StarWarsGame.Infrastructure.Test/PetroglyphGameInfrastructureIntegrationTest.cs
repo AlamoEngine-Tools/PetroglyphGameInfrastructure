@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using AET.Modinfo.Model;
+﻿using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Modinfo.Spec.Equality;
 using AET.Modinfo.Utilities;
@@ -15,16 +11,21 @@ using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
+using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Semver;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
-public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
+public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTestBase
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
 
@@ -37,7 +38,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealPlatforms))]
+    [MemberData(nameof(GITestUtilities.GetRealPlatforms), MemberType = typeof(GITestUtilities))]
     public void FullWorkflow_WithGamesAndMultipleModsWithMultipleModsDependencies(GamePlatform platform)
     {
         // Init Mods uninitialized
@@ -58,10 +59,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
         var initCount = 0;
         gameDetector.InitializationRequested += (_, args) =>
         {
-            if (args.GameType == GameType.Eaw)
-                TestGameRegistrySetupData.Installed(GameType.Eaw, eaw.Directory).Create(ServiceProvider);
-            else
-                TestGameRegistrySetupData.Installed(GameType.Foc, foc.Directory).Create(ServiceProvider);
+            _registry.InstallGame(args.GameType == GameType.Eaw ? eaw : foc, ServiceProvider);
             args.Handled = true;
             initCount++;
         };

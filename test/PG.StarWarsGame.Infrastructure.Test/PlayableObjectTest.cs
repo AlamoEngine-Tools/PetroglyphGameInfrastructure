@@ -2,12 +2,13 @@
 using AET.Modinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Services.Language;
+using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
-public abstract class PlayableObjectTest : CommonTestBase
+public abstract class PlayableObjectTest : GameInfrastructureTestBase
 {
     protected abstract IPlayableObject CreatePlayableObject(
         string? iconPath = null, 
@@ -40,14 +41,14 @@ public abstract class PlayableObjectTest : CommonTestBase
     [Fact]
     public void InstalledLanguages()
     {
-        var expected = GetRandomLanguages();
+        var expected = GITestUtilities.GetRandomLanguages();
         var obj = CreatePlayableObject(languages: expected);
         Assert.Equivalent(expected, obj.InstalledLanguages, true);
         // Get a second time
         Assert.Equivalent(expected, obj.InstalledLanguages, true);
     }
 
-    public class PlayableObjectAbstractTest : CommonTestBaseWithRandomGame
+    public class PlayableObjectAbstractTest : GameInfrastructureTestBaseWithRandomGame
     { 
         protected override void SetupServiceProvider(IServiceCollection sc)
         {

@@ -12,7 +12,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
-public class ModEqualityComparerTest : CommonTestBaseWithRandomGame
+public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
 {
     [Theory]
     [InlineData(false, false)]

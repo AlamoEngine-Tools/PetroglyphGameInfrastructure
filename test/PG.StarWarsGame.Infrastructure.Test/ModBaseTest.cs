@@ -281,7 +281,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         Assert.True(mod.Equals((IModReference)custom));
     }
 
-    public class ModBaseAbstractTest : CommonTestBaseWithRandomGame
+    public class ModBaseAbstractTest : GameInfrastructureTestBaseWithRandomGame
     {
         [Fact]
         public void ResolveDependencies_CalledTwice_Throws()
