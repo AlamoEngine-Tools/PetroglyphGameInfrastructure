@@ -48,7 +48,7 @@ public static class GITestUtilities
 
     public static ICollection<ILanguageInfo> GetRandomLanguages()
     {
-        var languages = new HashSet<ILanguageInfo>(PossibleLanguages.Length);
+        var languages = new HashSet<ILanguageInfo>();
 
         foreach (var _ in PossibleLanguages)
         {
