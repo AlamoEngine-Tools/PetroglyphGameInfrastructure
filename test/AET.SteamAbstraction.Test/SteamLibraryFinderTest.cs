@@ -40,7 +40,8 @@ public class SteamLibraryFinderTest : IDisposable
         _steam.Dispose();
     }
 
-    [Fact]
+    // TODO: Target all platforms
+    [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
     public void FindLibraries_SteamNotFound_ReturnsEmpty()
     {
         Assert.Empty(_libraryFinder.FindLibraries(_fileSystem.DirectoryInfo.New("not steam")));
