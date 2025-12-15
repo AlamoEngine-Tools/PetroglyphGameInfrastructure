@@ -13,12 +13,11 @@ using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
-using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
-public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<EmptyStruct>
+public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<object>
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
 
@@ -35,12 +34,12 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         SteamPetroglyphStarWarsGameClients.InitializeServices(sc);
     }
 
-    protected override IGameDetector CreateDetector(GameDetectorTestInfo<EmptyStruct> gameInfo, bool shallHandleInitialization)
+    protected override IGameDetector CreateDetector(GameDetectorTestInfo<object> gameInfo, bool shallHandleInitialization)
     {
         return new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
     }
 
-    protected override GameDetectorTestInfo<EmptyStruct> SetupGame(GameIdentity gameIdentity)
+    protected override GameDetectorTestInfo<object> SetupGame(GameIdentity gameIdentity)
     {
         return SetupGame(gameIdentity, (game, otherGameType) =>
         {
@@ -49,7 +48,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         });
     }
 
-    protected override GameDetectorTestInfo<EmptyStruct> SetupForRequiredInitialization(GameIdentity gameIdentity)
+    protected override GameDetectorTestInfo<object> SetupForRequiredInitialization(GameIdentity gameIdentity)
     {
         return SetupGame(gameIdentity, (game, otherGameType) =>
         {
@@ -58,7 +57,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         });
     }
 
-    protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<EmptyStruct> info)
+    protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<object> info)
     {
         if (!shallInitSuccessfully)
             return;
@@ -124,7 +123,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         expected.AssertEqual(result);
     }
 
-    private GameDetectorTestInfo<EmptyStruct> SetupGame(
+    private GameDetectorTestInfo<object> SetupGame(
         GameIdentity gameIdentity,
         Action<IGame, GameType> registrySetup,
         SteamAppState appState = SteamAppState.StateFullyInstalled)
@@ -134,7 +133,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         steam.Install();
 
         if (gameIdentity.Platform != GamePlatform.SteamGold)
-            return new GameDetectorTestInfo<EmptyStruct>(gameIdentity.Type, null, default);
+            return new GameDetectorTestInfo<object>(gameIdentity.Type, null, null);
         
         // Install Game
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
@@ -148,7 +147,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         var otherGameType = gameIdentity.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw;
         registrySetup(game, otherGameType);
 
-        return new GameDetectorTestInfo<EmptyStruct>(gameIdentity.Type, game.Directory, default);
+        return new GameDetectorTestInfo<object>(gameIdentity.Type, game.Directory, null);
     }
 }
 

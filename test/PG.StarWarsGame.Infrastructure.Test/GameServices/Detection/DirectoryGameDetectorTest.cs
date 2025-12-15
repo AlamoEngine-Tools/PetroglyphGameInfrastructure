@@ -6,24 +6,23 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
-using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
-public class DirectoryGameDetectorTest : GameDetectorTestBase<EmptyStruct>
+public class DirectoryGameDetectorTest : GameDetectorTestBase<object>
 {
     protected override bool SupportInitialization => false;
     protected override ICollection<GamePlatform> SupportedPlatforms => GITestUtilities.RealPlatforms;
     protected override bool CanDisableInitRequest => false;
 
-    protected override IGameDetector CreateDetector(GameDetectorTestInfo<EmptyStruct> gameInfo, bool shallHandleInitialization)
+    protected override IGameDetector CreateDetector(GameDetectorTestInfo<object> gameInfo, bool shallHandleInitialization)
     {
         return new DirectoryGameDetector(gameInfo.GameDirectory ?? FileSystem.DirectoryInfo.New("doesNotExist"), ServiceProvider);
     }
 
-    protected override GameDetectorTestInfo<EmptyStruct> SetupGame(GameIdentity gameIdentity)
+    protected override GameDetectorTestInfo<object> SetupGame(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
         return new(gameIdentity.Type, game.Directory, default);
@@ -84,15 +83,15 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<EmptyStruct>
         TestDetectorCore(
             identity,
             false,
-            _ => new GameDetectorTestInfo<EmptyStruct>(identity.Type, customSetup(identity), default),
+            _ => new GameDetectorTestInfo<object>(identity.Type, customSetup(identity), default),
             _ => expected,
             null,
             queryPlatforms: []);
     }
 
-    protected override GameDetectorTestInfo<EmptyStruct> SetupForRequiredInitialization(GameIdentity gameIdentity)
+    protected override GameDetectorTestInfo<object> SetupForRequiredInitialization(GameIdentity gameIdentity)
         => throw new NotSupportedException();
 
-    protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<EmptyStruct> info)
+    protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<object> info)
         => throw new NotSupportedException();
 }
