@@ -1,19 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<AssemblyName>PG.StarWarsGame.Infrastructure.TestingUtilities</AssemblyName>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<TargetFrameworks>net10.0</TargetFrameworks>
 		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net481</TargetFrameworks>
-		<IsPackable>false</IsPackable>
+		<IsPackable>true</IsPackable>
 		<IsTestProject>false</IsTestProject>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="C:\Users\Anakin\source\repos\AlamoEngine-Tools\PetroglyphGameInfrastructure\README.md" />
-	</ItemGroup>
+	<PropertyGroup>
+		<Title>PG.StarWarsGame.Infrastructure.Testing</Title>
+		<Description>Provides a testing layer that allowes to virtualize PG Star Wars game installations, so that they do not need to be physically installed.</Description>
+		<PackageId>AlamoEngineTools.PG.StarWarsGame.Infrastructure.Testing</PackageId>
+		<PackageTags>alamo,petroglyph,glyphx</PackageTags>
+		<NeutralLanguage>en</NeutralLanguage>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<InheritDocEnabled>true</InheritDocEnabled>
+	</PropertyGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="GitHubActionsTestLogger" Version="3.0.1">
