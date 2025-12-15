@@ -1,5 +1,4 @@
-﻿using AET.SteamAbstraction.Testing.Installation;
-using System;
+﻿using System;
 using System.IO.Abstractions;
 using Testably.Abstractions.Testing;
 
@@ -7,7 +6,7 @@ namespace AET.SteamAbstraction.Testing;
 
 public static class SteamInstallationExtensions
 {
-    public static ITestingSteamInstallation Steam(this MockFileSystem fs, IServiceProvider serviceProvider)
+    public static ITestingSteamInstallation Steam(this IFileSystem fs, IServiceProvider serviceProvider)
     {
         return new TestingSteamInstallationImpl(fs, serviceProvider);
     }

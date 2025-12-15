@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
 
-namespace AET.SteamAbstraction.Testing.Installation;
+namespace AET.SteamAbstraction.Testing;
 
 internal sealed partial class TestingSteamInstallationImpl(IFileSystem fileSystem, IServiceProvider serviceProvider) : ITestingSteamInstallation
 {

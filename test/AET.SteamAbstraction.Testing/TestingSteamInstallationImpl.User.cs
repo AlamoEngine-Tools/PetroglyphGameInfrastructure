@@ -3,7 +3,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 
-namespace AET.SteamAbstraction.Testing.Installation;
+namespace AET.SteamAbstraction.Testing;
 internal sealed partial class TestingSteamInstallationImpl
 {
     public void DeleteLoginUsersFile()

@@ -11,7 +11,7 @@ public static partial class GameInstallation
     private const string EawGoldPath = "games/gold/eaw";
     private const string EawGameDataSubPath = "GameData";
 
-    private static IDirectoryInfo InstallEaw(this MockFileSystem fs, GamePlatform platform)
+    private static IDirectoryInfo InstallEaw(this IFileSystem fs, GamePlatform platform)
     {
         IDirectoryInfo gameDirectory;
         switch (platform)
@@ -39,7 +39,7 @@ public static partial class GameInstallation
         return gameDirectory;
     }
 
-    private static IDirectoryInfo InstallEawDisk(this MockFileSystem fs)
+    private static IDirectoryInfo InstallEawDisk(this IFileSystem fs)
     {
         fs.Initialize();
         CreateFile(fs, fs.Path.Combine(EawNormalPath, "sweaw.exe"));
@@ -47,7 +47,7 @@ public static partial class GameInstallation
         return gameDir;
     }
 
-    private static IDirectoryInfo InstallEawOrigin(this MockFileSystem fs)
+    private static IDirectoryInfo InstallEawOrigin(this IFileSystem fs)
     {
         var basePath = fs.Path.Combine(OriginBasePath, EawGameDataSubPath);
 
@@ -58,7 +58,7 @@ public static partial class GameInstallation
         return fs.DirectoryInfo.New(basePath);
     }
 
-    private static IDirectoryInfo InstallEawGog(this MockFileSystem fs)
+    private static IDirectoryInfo InstallEawGog(this IFileSystem fs)
     {
         var basePath = fs.Path.Combine(GogBasePath, EawGameDataSubPath);
 
@@ -70,7 +70,7 @@ public static partial class GameInstallation
         return fs.DirectoryInfo.New(basePath);
     }
 
-    private static IDirectoryInfo InstallEawSteam(this MockFileSystem fs)
+    private static IDirectoryInfo InstallEawSteam(this IFileSystem fs)
     {
         var basePath = fs.Path.Combine(SteamBasePath, EawGameDataSubPath);
 
@@ -82,7 +82,7 @@ public static partial class GameInstallation
         return fs.DirectoryInfo.New(fs.Path.Combine(basePath));
     }
 
-    private static IDirectoryInfo InstallEawDiskGold(this MockFileSystem fs)
+    private static IDirectoryInfo InstallEawDiskGold(this IFileSystem fs)
     {
         fs.Initialize();
         CreateFile(fs, fs.Path.Combine(EawGoldPath, EawGameDataSubPath, "sweaw.exe"));

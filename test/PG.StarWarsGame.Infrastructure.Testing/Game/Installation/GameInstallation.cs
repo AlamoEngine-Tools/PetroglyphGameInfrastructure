@@ -12,9 +12,9 @@ public static partial class GameInstallation
     private const string GogBasePath = "games/gog";
     private const string OriginBasePath = "games/origin";
 
-    public static PetroglyphStarWarsGame InstallGame(this MockFileSystem fs, GameIdentity gameIdentity, IServiceProvider sp)
+    public static PetroglyphStarWarsGame InstallGame(this IFileSystem fs, GameIdentity gameIdentity, IServiceProvider sp)
     { 
-        Func<MockFileSystem, GamePlatform, IDirectoryInfo> installFunc;
+        Func<IFileSystem, GamePlatform, IDirectoryInfo> installFunc;
 
         if (gameIdentity.Type == GameType.Foc)
             installFunc = InstallFoc;
@@ -39,13 +39,13 @@ public static partial class GameInstallation
         CreateFile(fs, fs.Path.Combine(game.Directory.FullName, "StarWarsI.exe"));
     }
 
-    private static void InstallDataAndMegaFilesXml(this MockFileSystem fs, IDirectoryInfo directory)
+    private static void InstallDataAndMegaFilesXml(this IFileSystem fs, IDirectoryInfo directory)
     {
         fs.Initialize();
         CreateFile(fs, fs.Path.Combine(directory.FullName, "Data", "megafiles.xml"));
     }
 
-    private static void InstallSteamFiles(this MockFileSystem fs, Action initAction)
+    private static void InstallSteamFiles(this IFileSystem fs, Action initAction)
     {
         fs.Initialize();
         CreateFile(fs, fs.Path.Combine(SteamBasePath, "32470_install.vdf"));
@@ -59,7 +59,7 @@ public static partial class GameInstallation
         initAction();
     }
 
-    private static void InstallGoGFiles(this MockFileSystem fs, Action initAction)
+    private static void InstallGoGFiles(this IFileSystem fs, Action initAction)
     {
         fs.Initialize();
         CreateFile(fs, fs.Path.Combine(GogBasePath, "goggame.sdb"));
@@ -69,7 +69,7 @@ public static partial class GameInstallation
         initAction();
     }
 
-    private static void InstallOriginFiles(this MockFileSystem fs, Action initAction)
+    private static void InstallOriginFiles(this IFileSystem fs, Action initAction)
     {
         fs.Initialize();
         fs.Directory.CreateDirectory(fs.Path.Combine(OriginBasePath, "Manuals"));
@@ -77,7 +77,7 @@ public static partial class GameInstallation
         initAction();
     }
 
-    private static void InstallModsLocations(this MockFileSystem fileSystem, IDirectoryInfo directory)
+    private static void InstallModsLocations(this IFileSystem fileSystem, IDirectoryInfo directory)
     {
         fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(directory.FullName, "Mods"));
     }

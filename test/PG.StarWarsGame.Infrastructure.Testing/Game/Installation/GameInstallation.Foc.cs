@@ -18,7 +18,7 @@ public static partial class GameInstallation
         return fs.DirectoryInfo.New(fs.Path.Combine(OriginBasePath, "corruption"));
     }
 
-    public static IDirectoryInfo InstallFoc(MockFileSystem fs, GamePlatform platform)
+    public static IDirectoryInfo InstallFoc(IFileSystem fs, GamePlatform platform)
     {
         IDirectoryInfo gameDirectory;
         switch (platform)
@@ -46,7 +46,7 @@ public static partial class GameInstallation
         return gameDirectory;
     }
 
-    private static IDirectoryInfo InstallFocDisk(this MockFileSystem fs)
+    private static IDirectoryInfo InstallFocDisk(this IFileSystem fs)
     {
         fs.Initialize();
         CreateFile(fs, fs.Path.Combine(FocNormalPath, "swfoc.exe"));
@@ -54,7 +54,7 @@ public static partial class GameInstallation
         return gameDir;
     }
 
-    private static IDirectoryInfo InstallFocOrigin(this MockFileSystem fs)
+    private static IDirectoryInfo InstallFocOrigin(this IFileSystem fs)
     {
         var basePath = fs.Path.Combine(OriginBasePath, FocOriginSubPath);
 
@@ -66,7 +66,7 @@ public static partial class GameInstallation
         return fs.DirectoryInfo.New(basePath);
     }
 
-    private static IDirectoryInfo InstallFocGog(this MockFileSystem fs)
+    private static IDirectoryInfo InstallFocGog(this IFileSystem fs)
     {
         var basePath = fs.Path.Combine(GogBasePath, FocGogSubPath);
 
@@ -77,7 +77,7 @@ public static partial class GameInstallation
         return fs.DirectoryInfo.New(basePath);
     }
 
-    private static IDirectoryInfo InstallFocSteam(this MockFileSystem fs)
+    private static IDirectoryInfo InstallFocSteam(this IFileSystem fs)
     {
         var basePath = fs.Path.Combine(SteamBasePath, FocSteamSubPath);
 
@@ -89,7 +89,7 @@ public static partial class GameInstallation
         return fs.DirectoryInfo.New(basePath);
     }
 
-    private static IDirectoryInfo InstallFocDiskGold(this MockFileSystem fs)
+    private static IDirectoryInfo InstallFocDiskGold(this IFileSystem fs)
     {
         fs.Initialize();
         CreateFile(fs, fs.Path.Combine(FocGoldPath, "swfoc.exe"));

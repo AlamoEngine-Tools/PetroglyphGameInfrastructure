@@ -7,7 +7,7 @@ using AnakinRaW.CommonUtilities.FileSystem;
 using PG.TestingUtilities;
 using Xunit;
 
-namespace AET.SteamAbstraction.Testing.Installation;
+namespace AET.SteamAbstraction.Testing;
 
 internal sealed partial class TestingSteamInstallationImpl
 {
