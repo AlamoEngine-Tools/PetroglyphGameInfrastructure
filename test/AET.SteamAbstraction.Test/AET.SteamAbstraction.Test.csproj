@@ -40,6 +40,12 @@
 	  <ProjectReference Include="..\AET.SteamAbstraction.Testing\AET.SteamAbstraction.Testing.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Reference Include="PG.TestingUtilities">
+	    <HintPath>..\AET.SteamAbstraction.Testing\bin\Debug\netstandard2.0\PG.TestingUtilities.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 	<PropertyGroup>
 		<IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
 		<IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' != 'true'">true</IsLinux>

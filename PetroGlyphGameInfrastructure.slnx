@@ -10,6 +10,7 @@
     <Project Path="test/PG.StarWarsGame.Infrastructure.Test/PG.StarWarsGame.Infrastructure.Test.csproj" />
   </Folder>
   <Folder Name="/testing/">
+    <Project Path="../PetroglyphGameInfrastructure/test/AET.Testing/AET.Testing.shproj" Id="f52e1de8-1a9f-41c0-aae4-935c35783026" />
     <Project Path="test/AET.SteamAbstraction.Testing/AET.SteamAbstraction.Testing.csproj" />
     <Project Path="test/PG.StarWarsGame.Infrastructure.Testing/PG.StarWarsGame.Infrastructure.Testing.csproj" />
     <Project Path="test/PG.TestingUtilities/PG.TestingUtilities.csproj" />

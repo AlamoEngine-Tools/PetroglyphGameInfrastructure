@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PG.TestingUtilities;
+namespace AET.Testing;
 
 public static class TestHelpers
 {

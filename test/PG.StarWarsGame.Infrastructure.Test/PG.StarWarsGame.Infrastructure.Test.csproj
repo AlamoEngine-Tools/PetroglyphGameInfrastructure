@@ -37,4 +37,10 @@
 	  <ProjectReference Include="..\PG.StarWarsGame.Infrastructure.Testing\PG.StarWarsGame.Infrastructure.Testing.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Reference Include="PG.TestingUtilities">
+	    <HintPath>..\AET.SteamAbstraction.Testing\bin\Debug\netstandard2.0\PG.TestingUtilities.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 </Project>
