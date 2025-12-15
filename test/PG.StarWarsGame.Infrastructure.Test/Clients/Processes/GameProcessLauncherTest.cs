@@ -34,7 +34,9 @@ public class GameProcessLauncherTest : GameInfrastructureTestBaseWithRandomGame,
         _executable = _realFileSystem.FileInfo.New(_realFileSystem.Path.Combine(tempDir, executableName));
 
         var scriptContent = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? "@echo off\nexit 0"
+            ? "@echo off\r\n" +
+              "timeout /t 5 /nobreak >nul\r\n" +
+              "exit 0"
             : "#!/bin/bash\nsleep 5\nexit 0";
 
         _realFileSystem.File.WriteAllText(_executable.FullName,scriptContent);
