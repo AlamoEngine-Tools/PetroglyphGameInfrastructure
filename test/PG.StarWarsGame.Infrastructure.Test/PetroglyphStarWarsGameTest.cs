@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AET.Modinfo.Spec;
-using AET.Testing;
+using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
@@ -15,7 +15,7 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null)
     {
-        var gameId = new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), TestHelpers.GetRandom(GITestUtilities.RealPlatforms));
+        var gameId = new GameIdentity(Random.Enum<GameType>(), Random.Item(GITestUtilities.RealPlatforms));
         var game =  FileSystem.InstallGame(gameId, ServiceProvider);
         if (languages is not null)
         {

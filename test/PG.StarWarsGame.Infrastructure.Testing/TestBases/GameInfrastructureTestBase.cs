@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
-using AET.Testing;
+using AET.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
@@ -34,7 +34,7 @@ public abstract class GameInfrastructureTestBase
 
     protected static GameIdentity CreateRandomGameIdentity()
     {
-        return new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), TestHelpers.GetRandom(GITestUtilities.RealPlatforms));
+        return new GameIdentity(Random.Enum<GameType>(), Random.Item(GITestUtilities.RealPlatforms));
     }
 
     protected PetroglyphStarWarsGame CreateRandomGame()

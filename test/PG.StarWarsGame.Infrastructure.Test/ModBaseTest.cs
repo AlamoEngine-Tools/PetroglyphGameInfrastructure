@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
-using AET.Testing;
+using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
@@ -85,7 +85,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         // Do not add mod to game
         var notAddedDep = Game.InstallMod("NotAddedMod", false, ServiceProvider);
 
-        var mod = CreateMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), notAddedDep);
+        var mod = CreateMod("Mod", Random.Enum<DependencyResolveLayout>(), notAddedDep);
         Game.AddMod(mod);
         var e = Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
         Assert.Same(Game, e.ModContainer);
@@ -107,7 +107,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         var otherGameReference = new PetroglyphStarWarsGame(Game, Game.Directory, Game.Name, ServiceProvider);
         var wrongGameDep = otherGameReference.InstallAndAddMod("WrongGameRefMod", 
             GITestUtilities.GetRandomWorkshopFlag(otherGameReference), ServiceProvider);
-        var mod = CreateMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), wrongGameDep);
+        var mod = CreateMod("Mod", Random.Enum<DependencyResolveLayout>(), wrongGameDep);
         
         var e = Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
         Assert.Same(Game, e.ModContainer);

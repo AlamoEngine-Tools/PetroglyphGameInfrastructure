@@ -25,7 +25,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<object>
     protected override GameDetectorTestInfo<object> SetupGame(GameIdentity gameIdentity)
     {
         var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
-        return new(gameIdentity.Type, game.Directory, default);
+        return new(gameIdentity.Type, game.Directory, null);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<object>
         TestDetectorCore(
             identity,
             false,
-            _ => new GameDetectorTestInfo<object>(identity.Type, customSetup(identity), default),
+            _ => new GameDetectorTestInfo<object>(identity.Type, customSetup(identity), null),
             _ => expected,
             null,
             queryPlatforms: []);

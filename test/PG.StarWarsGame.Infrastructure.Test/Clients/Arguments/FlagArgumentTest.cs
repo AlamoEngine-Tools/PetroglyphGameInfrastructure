@@ -1,5 +1,5 @@
 ﻿using System;
-using AET.Testing;
+using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using Xunit;
 
@@ -10,18 +10,18 @@ public class FlagArgumentTest
     [Fact]
     public void Ctor_InvalidArgs_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new TestFlagArg(null!, TestHelpers.RandomBool(), TestHelpers.RandomBool()));
-        Assert.Throws<ArgumentException>(() => new TestFlagArg(string.Empty, TestHelpers.RandomBool(), TestHelpers.RandomBool()));
+        Assert.Throws<ArgumentNullException>(() => new TestFlagArg(null!, Random.Bool(), Random.Bool()));
+        Assert.Throws<ArgumentException>(() => new TestFlagArg(string.Empty, Random.Bool(), Random.Bool()));
     }
 
     [Fact]
     public void Ctor_SetProperty()
     {
-        var name = TestHelpers.GetRandom(GameArgumentNames.AllInternalSupportedArgumentNames);
-        var isDebug = TestHelpers.RandomBool();
-        var value = TestHelpers.RandomBool();
+        var name = Random.Item(GameArgumentNames.AllInternalSupportedArgumentNames);
+        var isDebug = Random.Bool();
+        var value = Random.Bool();
 
-        var a = new TestFlagArg(name, value, TestHelpers.RandomBool(), isDebug);
+        var a = new TestFlagArg(name, value, Random.Bool(), isDebug);
         Assert.Equal(name, a.Name);
         Assert.Equal(value, a.Value);
         Assert.Equal(value, ((GameArgument)a).Value);

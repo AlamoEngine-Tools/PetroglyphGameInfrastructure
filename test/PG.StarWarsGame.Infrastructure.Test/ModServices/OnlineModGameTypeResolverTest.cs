@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AET.Modinfo.Spec;
-using AET.Testing;
+using AET.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
@@ -27,7 +28,7 @@ public class OnlineModGameTypeResolverTest : ModGameTypeResolverTestBase
     [MemberData(nameof(GetOnlineModsData))]
     public void Online_GetTagsFromSteamOnline(string knownId, ICollection<GameType> expectedTypes, GameType? incompatibleWith)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), GamePlatform.SteamGold), ServiceProvider);
+        var game = FileSystem.InstallGame(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold), ServiceProvider);
 
         var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var modDir = steamHelpers.GetWorkshopsLocation(game).CreateSubdirectory(knownId);
@@ -39,7 +40,7 @@ public class OnlineModGameTypeResolverTest : ModGameTypeResolverTestBase
         Assert.True(CreateResolver().TryGetGameType(info, out var types));
         Assert.Equivalent(expectedTypes, types, true);
 
-        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, TestHelpers.GetRandom(expectedTypes)));
+        Assert.False(resolver.IsDefinitelyNotCompatibleToGame(info, Random.Item(expectedTypes)));
         if (incompatibleWith is not null)
             Assert.True(resolver.IsDefinitelyNotCompatibleToGame(info, incompatibleWith.Value));
     }

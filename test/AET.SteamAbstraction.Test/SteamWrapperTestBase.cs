@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Testing;
 using AET.SteamAbstraction.Utilities;
-using AET.Testing;
+using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions.Testing;
@@ -77,7 +77,7 @@ public abstract class SteamWrapperTestBase : IDisposable
 
         Assert.Throws<SteamNotFoundException>(() => wrapper.IsGameInstalled(123, out _));
         Assert.Throws<SteamNotFoundException>(wrapper.StartSteam);
-        await Assert.ThrowsAsync<SteamNotFoundException>(() => wrapper.WaitSteamRunningAndLoggedInAsync(TestHelpers.RandomBool(), CancellationToken.None));
+        await Assert.ThrowsAsync<SteamNotFoundException>(() => wrapper.WaitSteamRunningAndLoggedInAsync(Random.Bool(), CancellationToken.None));
 
         // Install Steam
         InstallSteam();
@@ -105,7 +105,7 @@ public abstract class SteamWrapperTestBase : IDisposable
         Assert.Throws<ObjectDisposedException>(() => wrapper.UserWantsOfflineMode);
         Assert.Throws<ObjectDisposedException>(wrapper.StartSteam);
         Assert.Throws<ObjectDisposedException>(() => wrapper.IsGameInstalled(123, out _));
-        await Assert.ThrowsAsync<ObjectDisposedException>(() => wrapper.WaitSteamRunningAndLoggedInAsync(TestHelpers.RandomBool(), CancellationToken.None));
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => wrapper.WaitSteamRunningAndLoggedInAsync(Random.Bool(), CancellationToken.None));
     }
 
     [Fact]

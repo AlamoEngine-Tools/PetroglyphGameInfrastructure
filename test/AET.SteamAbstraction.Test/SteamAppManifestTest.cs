@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Testing;
-using AET.Testing;
+using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions.Testing;
@@ -87,7 +87,7 @@ public class SteamAppManifestTest : IDisposable
 
         var appB = new SteamAppManifest(lib, _fileSystem.FileInfo.New(_fileSystem.Path.GetRandomFileName()), aId, _fileSystem.Path.GetRandomFileName(),
             _fileSystem.DirectoryInfo.New(_fileSystem.Path.GetRandomFileName()),
-            TestHelpers.GetRandomEnum<SteamAppState>(), new HashSet<uint>());
+            Random.Enum<SteamAppState>(), new HashSet<uint>());
 
         var appOtherLib = new SteamAppManifest(otherLib, _fileSystem.FileInfo.New("file.acf"), aId, "name",
             _fileSystem.DirectoryInfo.New("path"),

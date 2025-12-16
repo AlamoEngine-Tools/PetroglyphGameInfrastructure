@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
-using AET.Modinfo.Model;
-using AET.Modinfo.Spec;
-using AET.Testing;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using AET.Testing.Extensions;
 using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
@@ -198,22 +199,22 @@ public class GameArgumentTestBase
 
         yield return [new LanguageArgument(new LanguageInfo("en", LanguageSupportLevel.Default))];
         yield return [new LanguageArgument(new LanguageInfo("de", LanguageSupportLevel.SFX))];
-        yield return [new LocalPortArgument(TestHelpers.RandomUInt())];
-        yield return [new MonitorArgument(TestHelpers.RandomUInt())];
-        yield return [new ScreenWidthArgument(TestHelpers.RandomUInt())];
-        yield return [new ScreenHeightArgument(TestHelpers.RandomUInt())];
-        yield return [new FPSCapArgument(TestHelpers.RandomUInt())];
-        yield return [new RandomSeedArgument(TestHelpers.RandomUInt())];
-        yield return [new ProfileArgument(TestHelpers.RandomUInt())];
-        yield return [new BCast2Argument(TestHelpers.RandomUInt())];
-        yield return [new BCast3Argument(TestHelpers.RandomUInt())];
-        yield return [new BCast4Argument(TestHelpers.RandomUInt())];
-        yield return [new AILogStyleArgument(TestHelpers.GetRandomEnum<AILogStyle>())];
-        yield return [new SyncLogFilterArgument(TestHelpers.RandomUShort())];
-        yield return [new ConnectPortArgument(TestHelpers.RandomUInt())];
-        foreach (var nonPathArg in GetNonPathKeyValueArgs(TestHelpers.GetRandom(GetValidStringValues)))
+        yield return [new LocalPortArgument(Random.UInt())];
+        yield return [new MonitorArgument(Random.UInt())];
+        yield return [new ScreenWidthArgument(Random.UInt())];
+        yield return [new ScreenHeightArgument(Random.UInt())];
+        yield return [new FPSCapArgument(Random.UInt())];
+        yield return [new RandomSeedArgument(Random.UInt())];
+        yield return [new ProfileArgument(Random.UInt())];
+        yield return [new BCast2Argument(Random.UInt())];
+        yield return [new BCast3Argument(Random.UInt())];
+        yield return [new BCast4Argument(Random.UInt())];
+        yield return [new AILogStyleArgument(Random.Enum<AILogStyle>())];
+        yield return [new SyncLogFilterArgument(Random.UShort())];
+        yield return [new ConnectPortArgument(Random.UInt())];
+        foreach (var nonPathArg in GetNonPathKeyValueArgs(Random.Item(GetValidStringValues)))
             yield return [nonPathArg];
-        foreach (var pathArg in GetPathKeyValueArgs(TestHelpers.GetRandom(GetValidStringValues), gameDir.FullName, fs))
+        foreach (var pathArg in GetPathKeyValueArgs(Random.Item(GetValidStringValues), gameDir.FullName, fs))
             yield return [pathArg];
 
         // Mod
@@ -225,8 +226,8 @@ public class GameArgumentTestBase
         yield return
         [
             new ModArgumentList([
-                new ModArgument(fs.DirectoryInfo.New(TestHelpers.GetRandom(GetValidStringValues)), gameDir, false),
-                new ModArgument(fs.DirectoryInfo.New(TestHelpers.GetRandom(GetValidStringValues)), gameDir, false),
+                new ModArgument(fs.DirectoryInfo.New(Random.Item(GetValidStringValues)), gameDir, false),
+                new ModArgument(fs.DirectoryInfo.New(Random.Item(GetValidStringValues)), gameDir, false),
             ])
         ];
 

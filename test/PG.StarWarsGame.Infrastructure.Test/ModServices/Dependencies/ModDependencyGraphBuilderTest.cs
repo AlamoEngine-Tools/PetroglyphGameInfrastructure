@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
-using AET.Testing;
+using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
@@ -37,7 +37,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     public void Build_OneDependency()
     {
         var b = CreateAndAddMod("B");
-        var mod = CreateAndAddMod("A", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), b);
+        var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(), b);
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -260,7 +260,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
             Dependencies = new DependencyList(new List<IModReference>
             {
                 depA
-            }, TestHelpers.GetRandomEnum<DependencyResolveLayout>())
+            }, Random.Enum<DependencyResolveLayout>())
         };
         var mod = Game.InstallAndAddMod(false, modinfo, ServiceProvider);
 
@@ -273,7 +273,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     {
         var depA = new ModReference("A", ModType.Default);
 
-        var b = CreateAndAddMod("B", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), depA);
+        var b = CreateAndAddMod("B", Random.Enum<DependencyResolveLayout>(), depA);
 
         var modinfo = new ModinfoData("A")
         {
@@ -301,7 +301,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     public void Build_DirectDependencyNotFound_Throws()
     {
         var b = Game.InstallMod("B", false, ServiceProvider);
-        var mod = CreateAndAddMod("A", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), b);
+        var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(), b);
         var e = Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
         Assert.Same(Game, e.ModContainer);
         Assert.Equal(b, e.Mod);
@@ -338,7 +338,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
         var b = CreateAndAddMod(new ModinfoData("B") { Version = version });
         Assert.Equal(version, b.Version);
 
-        var mod = CreateAndAddMod("A", TestHelpers.GetRandomEnum<DependencyResolveLayout>(),
+        var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(),
             new ModReference(b.Identifier, b.Type, ranges));
 
         var graph = _graphBuilder.Build(mod);
@@ -388,7 +388,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
         });
         Assert.Equal(version, b.Version);
 
-        var mod = CreateAndAddMod("A", TestHelpers.GetRandomEnum<DependencyResolveLayout>(),
+        var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(),
             new ModReference(b.Identifier, b.Type, range));
 
         var e = Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));

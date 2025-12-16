@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using AET.Testing;
+using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities.FileSystem;
 using Xunit;
 
@@ -33,7 +34,7 @@ internal sealed partial class TestingSteamInstallationImpl
         var libDir = _fileSystem.DirectoryInfo.New(path);
         Assert.True(libDir.Exists);
 
-        var contentId = TestHelpers.RandomLong();
+        var contentId = Random.Long();
 
         var libraryVdf = $@"""libraryfolder""
 {{

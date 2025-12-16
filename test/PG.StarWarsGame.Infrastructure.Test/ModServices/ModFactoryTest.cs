@@ -8,7 +8,7 @@ using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Modinfo.Spec.Steam;
 using AET.Modinfo.Utilities;
-using AET.Testing;
+using AET.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
@@ -181,7 +181,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
 
         var oppositeGameType = gameIdentity.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw;
         var otherGame = FileSystem.InstallGame(
-            new GameIdentity(oppositeGameType, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
+            new GameIdentity(oppositeGameType, Random.Item(GITestUtilities.RealPlatforms)), ServiceProvider);
 
         var modDir = otherGame.GetModDirectory("Mod_Name", false, ServiceProvider);
         var modData = CreateDetectedModReference(otherGame, modDir, false, null);

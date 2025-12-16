@@ -1,5 +1,5 @@
 ﻿using System;
-using AET.Testing;
+using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
@@ -28,7 +28,7 @@ public class SteamGameHelpersTest : GameInfrastructureTestBase
     [Fact]
     public void GetWorkshopsLocation_Success()
     {
-        var game = FileSystem.InstallGame(new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), GamePlatform.SteamGold),
+        var game = FileSystem.InstallGame(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold),
             ServiceProvider);
 
         var wsDir = _service.GetWorkshopsLocation(game);
@@ -46,7 +46,7 @@ public class SteamGameHelpersTest : GameInfrastructureTestBase
         var gameDir = FileSystem.DirectoryInfo.New("SteamFakeFame");
         gameDir.Create();
         var game = new PetroglyphStarWarsGame(
-            new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), GamePlatform.SteamGold), gameDir, "Game",
+            new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold), gameDir, "Game",
             ServiceProvider);
 
         Assert.Throws<GameException>(() => _service.GetWorkshopsLocation(game));
@@ -60,7 +60,7 @@ public class SteamGameHelpersTest : GameInfrastructureTestBase
     [InlineData(GamePlatform.Origin)]
     public void GetWorkshopsLocation_FailNoSteam(GamePlatform platform)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), platform),
+        var game = FileSystem.InstallGame(new GameIdentity(Random.Enum<GameType>(), platform),
             ServiceProvider);
         Assert.Throws<GameException>(() => _service.GetWorkshopsLocation(game));
         Assert.False(_service.TryGetWorkshopsLocation(game, out _));

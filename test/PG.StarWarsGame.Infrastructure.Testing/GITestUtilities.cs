@@ -5,7 +5,7 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AET.Testing;
+using AET.Testing.Extensions;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing;
@@ -53,8 +53,8 @@ public static class GITestUtilities
 
         foreach (var _ in PossibleLanguages)
         {
-            var code = TestHelpers.GetRandom(PossibleLanguages);
-            var support = TestHelpers.GetRandomEnum<LanguageSupportLevel>();
+            var code = Random.Item(PossibleLanguages);
+            var support = Random.Enum<LanguageSupportLevel>();
             languages.Add(new LanguageInfo(code, support));
         }
 

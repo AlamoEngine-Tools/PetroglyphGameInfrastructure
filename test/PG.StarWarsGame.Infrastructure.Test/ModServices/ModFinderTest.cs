@@ -7,7 +7,7 @@ using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Modinfo.Spec.Steam;
 using AET.Modinfo.Utilities;
-using AET.Testing;
+using AET.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
@@ -279,7 +279,7 @@ public class ModFinderTest : GameInfrastructureTestBase
         var steamData = new SteamData(
             new Random().Next(0, int.MaxValue).ToString(),
             "path",
-            TestHelpers.GetRandomEnum<SteamWorkshopVisibility>(),
+            Random.Enum<SteamWorkshopVisibility>(),
             "Title",
             [$"{oppositeGameType.ToString().ToUpper()}"]);
         var modinfo = new ModinfoData("Name")
@@ -393,9 +393,9 @@ public class ModFinderTest : GameInfrastructureTestBase
     public void FindMods_ModInstalledInWrongGameModsDirectoryShouldBeSkipped(GameType type)
     {
         var oppositeGameType = type is GameType.Eaw ? GameType.Foc : GameType.Eaw;
-        var game = FileSystem.InstallGame(new GameIdentity(type, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
+        var game = FileSystem.InstallGame(new GameIdentity(type, Random.Item(GITestUtilities.RealPlatforms)), ServiceProvider);
         // Other, random platform to shuffle a bit more.
-        var otherTypeGame = FileSystem.InstallGame(new GameIdentity(oppositeGameType, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
+        var otherTypeGame = FileSystem.InstallGame(new GameIdentity(oppositeGameType, Random.Item(GITestUtilities.RealPlatforms)), ServiceProvider);
 
         var wrongMod = otherTypeGame.InstallMod("MyMod", false, ServiceProvider);
 

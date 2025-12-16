@@ -1,6 +1,7 @@
-﻿using AET.Testing;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
+using System;
+using AET.Testing.Extensions;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
@@ -12,7 +13,7 @@ public class TestNamedArg(string name, string value, bool isDebug) : NamedArgume
 
     public static TestNamedArg FromValue(string value)
     {
-        var name = TestHelpers.GetRandom(GameArgumentNames.SupportedKeyValueArgumentNames);
+        var name = Random.Item(GameArgumentNames.SupportedKeyValueArgumentNames);
         return new TestNamedArg(name, value, false);
     }
 }
@@ -21,7 +22,7 @@ public class TestFlagArg(string name, bool value, bool dashed = false, bool debu
     : FlagArgument(name, value, dashed, debug)
 {
     public TestFlagArg(bool value, bool dashed) : this(
-        TestHelpers.GetRandom(GameArgumentNames.SupportedFlagArgumentNames), value, dashed)
+        Random.Item(GameArgumentNames.SupportedFlagArgumentNames), value, dashed)
     {
     }
 
@@ -31,7 +32,7 @@ public class TestFlagArg(string name, bool value, bool dashed = false, bool debu
 }
 
 public class LowerCaseNameArg()
-    : FlagArgument(TestHelpers.GetRandom(GameArgumentNames.AllInternalSupportedArgumentNames).ToLowerInvariant(), true);
+    : FlagArgument(Random.Item(GameArgumentNames.AllInternalSupportedArgumentNames).ToLowerInvariant(), true);
 
 
 [SerializeEnumValue]

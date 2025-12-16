@@ -1,6 +1,6 @@
 ﻿using System;
 using AET.Modinfo.Spec;
-using AET.Testing;
+using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
@@ -45,7 +45,7 @@ public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGa
         // Do not add to provoke faulted
         var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
 
-        var mod = CreateAndAddMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), dep);
+        var mod = CreateAndAddMod("Mod", Random.Enum<DependencyResolveLayout>(), dep);
 
         try
         {
@@ -65,7 +65,7 @@ public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGa
     {
         // Do not add to provoke faulted
         var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        var mod = CreateAndAddMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), dep);
+        var mod = CreateAndAddMod("Mod", Random.Enum<DependencyResolveLayout>(), dep);
         
         Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);
         Assert.Throws<InvalidOperationException>(() => _traverser.Traverse(mod));

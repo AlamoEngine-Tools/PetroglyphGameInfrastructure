@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
-using AET.Testing;
+using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
@@ -82,7 +82,7 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
         var differentDep = new Mod(Game, modA.Identifier, modA.Directory, modA.Type == ModType.Workshops, "A",
             ServiceProvider);
 
-        var comparer = new ModEqualityComparer(depAware, TestHelpers.RandomBool());
+        var comparer = new ModEqualityComparer(depAware, Random.Bool());
         Assert.True(comparer.Equals(modA, modA));
         Assert.Equal(comparer.GetHashCode(modA), comparer.GetHashCode(modA));
 
@@ -118,7 +118,7 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
 
         var diffGameMod = diffGame.InstallMod("A", modA.Type == ModType.Workshops, ServiceProvider);
 
-        var comparer = new ModEqualityComparer(TestHelpers.RandomBool(), gameAware);
+        var comparer = new ModEqualityComparer(Random.Bool(), gameAware);
         Assert.True(comparer.Equals(modA, modA));
         Assert.Equal(comparer.GetHashCode(modA), comparer.GetHashCode(modA));
 

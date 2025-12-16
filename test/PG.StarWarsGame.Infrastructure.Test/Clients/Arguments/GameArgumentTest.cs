@@ -1,4 +1,5 @@
-﻿using AET.Testing;
+﻿using System;
+using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using Xunit;
 
@@ -52,7 +53,7 @@ public class GameArgumentTest : GameArgumentTestBase
     }
 
     public class ValidatingTestArgument(bool isValueValid, string value)
-        : GameArgument(TestHelpers.GetRandom(GameArgumentNames.AllInternalSupportedArgumentNames), value)
+        : GameArgument(Random.Item(GameArgumentNames.AllInternalSupportedArgumentNames), value)
     {
         private protected override bool IsDataValid()
         {
