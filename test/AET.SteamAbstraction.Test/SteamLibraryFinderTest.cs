@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Testing;
+using AET.Testing.Attributes;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 

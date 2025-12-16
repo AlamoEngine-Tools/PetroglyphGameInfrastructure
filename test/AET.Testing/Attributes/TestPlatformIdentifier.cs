@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PG.TestingUtilities;
+namespace AET.Testing.Attributes;
 
 [Flags]
 public enum TestPlatformIdentifier

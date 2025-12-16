@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO.Abstractions;
+using AET.Testing.Attributes;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 

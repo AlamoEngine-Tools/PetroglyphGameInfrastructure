@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace PG.TestingUtilities;
+namespace AET.Testing;
 
 public sealed class ReferenceEqualityComparer : IEqualityComparer<object?>, IEqualityComparer
 {

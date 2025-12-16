@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>AET.Testing</AssemblyName>
+		<TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
+		<IsPackable>true</IsPackable>
+		<IsTestProject>false</IsTestProject>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Title>AET.Testing</Title>
+		<Description>Provides common utilities for testing projects, used by Alamo Engine Tools.</Description>
+		<PackageId>AlamoEngineTools.Testing</PackageId>
+		<PackageTags>alamo,petroglyph,glyphx,testing</PackageTags>
+		<NeutralLanguage>en</NeutralLanguage>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<InheritDocEnabled>true</InheritDocEnabled>
+	</PropertyGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="xunit" Version="2.9.3" />
+		<PackageReference Include="coverlet.collector" Version="6.0.4">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+</Project>

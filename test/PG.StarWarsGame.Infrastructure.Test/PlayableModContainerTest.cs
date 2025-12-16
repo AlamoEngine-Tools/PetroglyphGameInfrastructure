@@ -8,7 +8,7 @@ using Xunit;
 #if NET5_0_OR_GREATER
 using System.Collections.Generic;
 #else
-using PG.TestingUtilities;
+using AET.Testing;
 #endif
 
 namespace PG.StarWarsGame.Infrastructure.Test;

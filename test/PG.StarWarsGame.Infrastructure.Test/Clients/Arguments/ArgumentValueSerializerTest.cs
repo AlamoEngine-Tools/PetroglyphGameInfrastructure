@@ -1,7 +1,7 @@
 ﻿using System;
+using AET.Testing.Attributes;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
-using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 

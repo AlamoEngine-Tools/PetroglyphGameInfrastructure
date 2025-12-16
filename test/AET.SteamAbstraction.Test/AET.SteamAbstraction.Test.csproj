@@ -38,7 +38,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
 	  <ProjectReference Include="..\AET.SteamAbstraction.Testing\AET.SteamAbstraction.Testing.csproj" />
-	  <ProjectReference Include="..\PG.TestingUtilities\PG.TestingUtilities.csproj" />
+	  <ProjectReference Include="..\AET.Testing\AET.Testing.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup>

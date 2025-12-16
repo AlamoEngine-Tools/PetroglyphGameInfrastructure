@@ -1,6 +1,6 @@
 ﻿using System;
+using AET.Testing;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
@@ -11,7 +11,7 @@ public static class GameExceptionTest
     public static void Ctor()
     {
         var exception = new GameException();
-        ExceptionTest.AssertException(exception, validateMessage: false);
+        ExceptionHelpers.ValidateExceptionProperties(exception, validateMessage: false);
     }
 
     [Fact]
@@ -19,7 +19,7 @@ public static class GameExceptionTest
     {
         var message = "game error";
         var exception = new GameException(message);
-        ExceptionTest.AssertException(exception, message: message);
+        ExceptionHelpers.ValidateExceptionProperties(exception, message: message);
     }
 
     [Fact]
@@ -28,6 +28,6 @@ public static class GameExceptionTest
         var message = "game error";
         var innerException = new Exception("Inner exception");
         var exception = new GameException(message, innerException);
-        ExceptionTest.AssertException(exception, innerException: innerException, message: message);
+        ExceptionHelpers.ValidateExceptionProperties(exception, innerException: innerException, message: message);
     }
 }

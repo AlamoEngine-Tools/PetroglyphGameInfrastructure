@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Xunit;
 
-namespace PG.TestingUtilities;
+namespace AET.Testing.Attributes;
 
-public sealed class PlatformSpecificTheoryAttribute : TheoryAttribute
+public sealed class PlatformSpecificFactAttribute : FactAttribute
 {
-    public PlatformSpecificTheoryAttribute(params TestPlatformIdentifier[] platformIds)
+    public PlatformSpecificFactAttribute(params TestPlatformIdentifier[] platformIds)
     {
         var platforms = platformIds.Select(targetPlatform => OSPlatform.Create(Enum.GetName(typeof(TestPlatformIdentifier), targetPlatform)!.ToUpper()));
         var platformMatches = platforms.Any(RuntimeInformation.IsOSPlatform);
