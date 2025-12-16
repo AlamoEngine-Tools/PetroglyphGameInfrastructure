@@ -1,6 +1,6 @@
-﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+﻿using AET.Testing;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
-using PG.TestingUtilities;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 

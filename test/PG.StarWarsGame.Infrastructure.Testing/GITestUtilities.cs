@@ -2,10 +2,10 @@
 using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
-using PG.TestingUtilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AET.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing;
 

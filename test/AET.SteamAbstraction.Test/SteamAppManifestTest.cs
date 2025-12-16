@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Testing;
+using AET.Testing;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 

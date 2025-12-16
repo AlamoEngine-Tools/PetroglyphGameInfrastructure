@@ -56,10 +56,5 @@
 	  <ProjectReference Include="..\PG.TestingUtilities\PG.TestingUtilities.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Reference Include="PG.TestingUtilities">
-	    <HintPath>bin\Debug\netstandard2.0\PG.TestingUtilities.dll</HintPath>
-	  </Reference>
-	</ItemGroup>
-
+	<Import Project="..\AET.Testing\AET.Testing.projitems" Label="Shared" />
 </Project>

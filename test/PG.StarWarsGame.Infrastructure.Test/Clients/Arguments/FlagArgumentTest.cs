@@ -1,6 +1,6 @@
 ﻿using System;
+using AET.Testing;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
-using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
