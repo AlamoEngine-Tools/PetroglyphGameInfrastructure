@@ -2,6 +2,7 @@
 using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 using Testably.Abstractions.Testing;
+using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 

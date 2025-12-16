@@ -4,6 +4,7 @@ using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Games.Registry;
+using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
 

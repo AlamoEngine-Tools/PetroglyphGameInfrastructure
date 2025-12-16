@@ -4,6 +4,7 @@ using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
+using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Clients;
 

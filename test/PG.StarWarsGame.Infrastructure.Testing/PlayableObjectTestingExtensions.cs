@@ -1,6 +1,7 @@
 ﻿using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Utilities;
+using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing;
 

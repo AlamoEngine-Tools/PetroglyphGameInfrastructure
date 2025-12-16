@@ -6,6 +6,7 @@ using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Utilities;
+using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Mods;
 

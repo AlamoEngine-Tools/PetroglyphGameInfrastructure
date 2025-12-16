@@ -1,5 +1,6 @@
 ﻿using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
+using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
