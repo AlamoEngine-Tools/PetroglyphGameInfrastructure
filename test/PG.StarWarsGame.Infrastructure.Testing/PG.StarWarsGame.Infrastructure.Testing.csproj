@@ -49,7 +49,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj" />
-	  <ProjectReference Include="..\PG.TestingUtilities\PG.TestingUtilities.csproj" />
 	</ItemGroup>
 
 	<Import Project="..\AET.Testing\AET.Testing.projitems" Label="Shared" />
