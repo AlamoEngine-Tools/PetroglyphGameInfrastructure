@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
+using AET.Testing;
 using AET.Testing.Attributes;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,27 +8,20 @@ using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public class SteamWrapperFactoryTest
+public class SteamWrapperFactoryTest : TestBaseWithServiceProvider
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public SteamWrapperFactoryTest()
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        var sc = new ServiceCollection();
-        var registry = new InMemoryRegistry();
-        var fs = new MockFileSystem();
-        
-        sc.AddSingleton<IFileSystem>(fs);
-        sc.AddSingleton<IRegistry>(registry);
-        SteamAbstractionLayer.InitializeServices(sc);
-
-        _serviceProvider = sc.BuildServiceProvider();
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<IFileSystem>(new MockFileSystem());
+        serviceCollection.AddSingleton<IRegistry>(new InMemoryRegistry());
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
     }
 
     [PlatformSpecificFact(TestPlatformIdentifier.Windows)]
     public void Test_CreateWrapper_Windows()
     {
-        var factory = new SteamWrapperFactory(_serviceProvider);
+        var factory = new SteamWrapperFactory(ServiceProvider);
         var wrapper = factory.CreateWrapper();
         Assert.IsType<WindowsSteamWrapper>(wrapper);
     }

@@ -1,45 +1,25 @@
 ﻿using System;
-using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
 using AET.SteamAbstraction.Library;
-using AET.SteamAbstraction.Testing;
-using AnakinRaW.CommonUtilities.Registry;
-using Microsoft.Extensions.DependencyInjection;
-using Testably.Abstractions.Testing;
+using AET.SteamAbstraction.Testing.TestBases;
 using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public class SteamLibraryTest : IDisposable
+public class SteamLibraryTest : InMemorySteamTestBase
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly MockFileSystem _fileSystem = new();
-    private readonly IRegistry _registry = new InMemoryRegistry();
-    private readonly ITestingSteamInstallation _steam;
-
     public SteamLibraryTest()
     {
-        var sc = new ServiceCollection();
-        sc.AddSingleton<IFileSystem>(_ => _fileSystem);
-        SteamAbstractionLayer.InitializeServices(sc);
-        sc.AddSingleton(_registry);
-        _serviceProvider = sc.BuildServiceProvider();
-
-        _steam = SteamTesting.Steam(_serviceProvider);
-        _steam.InstallSteamFilesOnly();
+        Steam.InstallSteamFilesOnly();
     }
 
-    public void Dispose()
-    {
-        _steam.Dispose();
-    }
 
     [Fact]
     public void Ctor_NullArgs_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new SteamLibrary(null!, _serviceProvider));
-        Assert.Throws<ArgumentNullException>(() => new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), null!));
+        Assert.Throws<ArgumentNullException>(() => new SteamLibrary(null!, ServiceProvider));
+        Assert.Throws<ArgumentNullException>(() => new SteamLibrary(FileSystem.DirectoryInfo.New("Library"), null!));
     }
 
     [Theory]
@@ -49,8 +29,8 @@ public class SteamLibraryTest : IDisposable
     [InlineData("other", false, false)]
     public void TestEquality(string path, bool equalWindows, bool equalLinux)
     {
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
-        var other = new SteamLibrary(_fileSystem.DirectoryInfo.New(path), _serviceProvider);
+        var lib = new SteamLibrary(FileSystem.DirectoryInfo.New("Library"), ServiceProvider);
+        var other = new SteamLibrary(FileSystem.DirectoryInfo.New(path), ServiceProvider);
 
         var equal = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? equalWindows : equalLinux;
 
@@ -61,7 +41,7 @@ public class SteamLibraryTest : IDisposable
     [Fact]
     public void TestEquality_NullAndSame()
     {
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
+        var lib = new SteamLibrary(FileSystem.DirectoryInfo.New("Library"), ServiceProvider);
 
         Assert.False(lib.Equals((object)null!));
         Assert.False(lib.Equals(null));
@@ -73,12 +53,12 @@ public class SteamLibraryTest : IDisposable
     [Fact]
     public void Locations()
     {
-        var libDirBasePath = _fileSystem.DirectoryInfo.New("Library");
-        var expectedSteamApps = _fileSystem.Path.Combine(libDirBasePath.FullName, "steamapps");
-        var expectedCommon = _fileSystem.Path.Combine(expectedSteamApps, "common");
-        var expectedWorkshop = _fileSystem.Path.Combine(expectedSteamApps, "workshop");
+        var libDirBasePath = FileSystem.DirectoryInfo.New("Library");
+        var expectedSteamApps = FileSystem.Path.Combine(libDirBasePath.FullName, "steamapps");
+        var expectedCommon = FileSystem.Path.Combine(expectedSteamApps, "common");
+        var expectedWorkshop = FileSystem.Path.Combine(expectedSteamApps, "workshop");
 
-        var lib = new SteamLibrary(_fileSystem.DirectoryInfo.New("Library"), _serviceProvider);
+        var lib = new SteamLibrary(FileSystem.DirectoryInfo.New("Library"), ServiceProvider);
         Assert.Equal(expectedSteamApps, lib.SteamAppsLocation.FullName);
         Assert.Equal(expectedCommon, lib.CommonLocation.FullName);
         Assert.Equal(expectedWorkshop, lib.WorkshopsLocation.FullName);
@@ -87,7 +67,7 @@ public class SteamLibraryTest : IDisposable
     [Fact]
     public void GetApps_NoAppsInstalled_Empty()
     {
-        var library = _steam.InstallLibrary("Library");
+        var library = Steam.InstallLibrary("Library");
         
         var apps = library.GetApps();
         
@@ -97,7 +77,7 @@ public class SteamLibraryTest : IDisposable
     [Fact]
     public void GetApps_NoSteamAppsDirectoryDoesNotExists_Empty()
     {
-        var library = _steam.InstallLibrary("Library");
+        var library = Steam.InstallLibrary("Library");
         library.SteamAppsLocation.Delete(true);
 
         var apps = library.GetApps();
@@ -108,7 +88,7 @@ public class SteamLibraryTest : IDisposable
     [Fact]
     public void GetApps_InvalidAcfFile_Skipped()
     {
-        var library = _steam.InstallLibrary("Library");
+        var library = Steam.InstallLibrary("Library");
         library.InstallCorruptApp();
         
         var apps = library.GetApps();
@@ -119,7 +99,7 @@ public class SteamLibraryTest : IDisposable
     [Fact]
     public void TestApps()
     {
-        var library = _steam.InstallLibrary("Library");
+        var library = Steam.InstallLibrary("Library");
         
         library.InstallCorruptApp();
         library.InstallGame(123, "Game1", "manifest1.acf");

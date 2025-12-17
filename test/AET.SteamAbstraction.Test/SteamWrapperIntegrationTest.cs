@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using AET.Testing;
 using AnakinRaW.CommonUtilities.Registry;
 using AnakinRaW.CommonUtilities.Registry.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,21 +10,22 @@ using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public class SteamWrapperIntegrationTest
+public class SteamWrapperIntegrationTest : TestBaseWithServiceProvider
 {
     private readonly ISteamWrapper _service;
 
     public SteamWrapperIntegrationTest()
     {
-        var sc = new ServiceCollection();
-        // Use actual FS
-        sc.AddSingleton<IFileSystem>(new RealFileSystem());
-        SteamAbstractionLayer.InitializeServices(sc);
+        _service = ServiceProvider.GetRequiredService<ISteamWrapperFactory>().CreateWrapper();
+    }
 
+    protected override void SetupServices(IServiceCollection serviceCollection)
+    {
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<IFileSystem>(new RealFileSystem());
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            sc.AddSingleton<IRegistry>(new WindowsRegistry());
-
-        _service = sc.BuildServiceProvider().GetRequiredService<ISteamWrapperFactory>().CreateWrapper();
+            serviceCollection.AddSingleton<IRegistry>(new WindowsRegistry());
     }
 
     //[Fact]

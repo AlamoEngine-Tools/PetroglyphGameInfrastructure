@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Testing;
+using AET.SteamAbstraction.Testing.TestBases;
 using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;

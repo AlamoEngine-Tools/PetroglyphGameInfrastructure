@@ -7,10 +7,8 @@ namespace AET.SteamAbstraction.Testing;
 
 public interface ITestingSteamInstallation : IDisposable
 {
-    [SupportedOSPlatform("windows")]
     IDirectoryInfo? InstallationDirectory { get; }
 
-    [SupportedOSPlatform("windows")]
     ITestingSteamRegistry Registry { get; }
 
     [SupportedOSPlatform("windows")]

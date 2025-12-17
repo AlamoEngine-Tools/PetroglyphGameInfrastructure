@@ -1,32 +1,29 @@
-﻿using System;
-using System.IO.Abstractions;
-using System.Runtime.InteropServices;
-using AET.SteamAbstraction.Registry;
+﻿using AET.SteamAbstraction.Registry;
+using AET.Testing;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
+using System;
+using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public class SteamRegistryFactoryTest
+public class SteamRegistryFactoryTest : TestBaseWithServiceProvider
 {
-    private readonly IRegistry _registry = new InMemoryRegistry();
-    private readonly MockFileSystem _fileSystem = new();
-    private readonly IServiceProvider _serviceProvider;
-
-    public SteamRegistryFactoryTest()
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        var sc = new ServiceCollection();
-        sc.AddSingleton<IFileSystem>(_fileSystem);
-        sc.AddSingleton(_registry);
-        _serviceProvider = sc.BuildServiceProvider();
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<IFileSystem>(new MockFileSystem());
+        serviceCollection.AddSingleton<IRegistry>(new InMemoryRegistry());
     }
 
     [Fact]
     public void Test_CreateWrapper()
     {
-        var factory = new SteamRegistryFactory(_serviceProvider);
+        var factory = new SteamRegistryFactory(ServiceProvider);
 
         var registry = factory.CreateRegistry();
 

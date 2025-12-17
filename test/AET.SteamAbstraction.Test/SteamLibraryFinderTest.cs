@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AET.SteamAbstraction.Library;
-using AET.SteamAbstraction.Testing;
+using AET.SteamAbstraction.Testing.TestBases;
 using AET.Testing.Attributes;
 using Xunit;
+
 #if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
 #endif

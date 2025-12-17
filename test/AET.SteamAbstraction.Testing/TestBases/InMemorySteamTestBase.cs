@@ -4,7 +4,7 @@ using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions.Testing;
 
-namespace AET.SteamAbstraction.Testing;
+namespace AET.SteamAbstraction.Testing.TestBases;
 
 public abstract class InMemorySteamTestBase : SteamTestBase
 {

@@ -2,7 +2,7 @@
 using AET.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AET.SteamAbstraction.Testing;
+namespace AET.SteamAbstraction.Testing.TestBases;
 
 public abstract class SteamTestBase : TestBaseWithServiceProvider, IDisposable
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Abstractions;
+using System.Runtime.Versioning;
 
 namespace AET.SteamAbstraction.Testing;
 
@@ -20,8 +21,10 @@ public interface ITestingSteamRegistry : IDisposable
     /// </summary>
     int? ProcessId { get; }
 
+    [SupportedOSPlatform("windows")]
     void InstallSteam();
 
+    [SupportedOSPlatform("windows")]
     void SetPid(int? pid);
 
     void SetUserId(uint userId);

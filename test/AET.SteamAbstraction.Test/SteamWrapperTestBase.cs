@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Testing;
+using AET.SteamAbstraction.Testing.TestBases;
 using AET.SteamAbstraction.Utilities;
 using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities;

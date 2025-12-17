@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.IO.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.Versioning;
 
 namespace AET.SteamAbstraction.Testing;
 
@@ -10,8 +11,10 @@ internal sealed partial class TestingSteamInstallationImpl(IServiceProvider serv
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
     public IDirectoryInfo? InstallationDirectory => Registry.InstallationDirectory;
+
     public ITestingSteamRegistry Registry { get; } = SteamTesting.SteamRegistry(serviceProvider);
 
+    [SupportedOSPlatform("windows")]
     public void Install()
     {
         Registry.InstallSteam();
@@ -27,6 +30,7 @@ internal sealed partial class TestingSteamInstallationImpl(IServiceProvider serv
         using var _ = _fileSystem.File.Create(exePath);
     }
 
+    [SupportedOSPlatform("windows")]
     public ISteamFakeProcess FakeStart(int pid)
     {
         Registry.SetPid(pid);
