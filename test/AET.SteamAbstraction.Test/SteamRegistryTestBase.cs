@@ -1,39 +1,37 @@
-﻿using System;
+﻿using AET.SteamAbstraction.Registry;
+using AET.Testing;
+using AnakinRaW.CommonUtilities.Registry;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.IO.Abstractions;
 using System.Reflection;
-using AET.SteamAbstraction.Registry;
-using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.InteropServices;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public abstract class SteamRegistryTestBase
+public abstract class SteamRegistryTestBase : TestBaseWithServiceProvider
 {
     protected readonly MockFileSystem FileSystem = new();
+    protected readonly IRegistry InternalRegistry = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
+        ? new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike) 
+        : new InMemoryRegistry();
 
     protected readonly string SteamInstallPath = "steamDir";
     protected readonly string SteamExePath = "steamDir/steam";
 
-    protected readonly IServiceProvider ServiceProvider;
-
-    protected SteamRegistryTestBase()
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        var sc = new ServiceCollection();
-        sc.AddSingleton<IFileSystem>(FileSystem);
-        SteamAbstractionLayer.InitializeServices(sc);
-        // ReSharper disable once VirtualMemberCallInConstructor
-        BuildServiceCollection(sc);
-        ServiceProvider = sc.BuildServiceProvider();
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<IFileSystem>(FileSystem);
+        serviceCollection.AddSingleton(InternalRegistry);
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
     }
 
     private protected abstract ISteamRegistry CreateRegistry(bool steamExists = true);
 
     protected abstract void SetSteamPid(int pid);
-
-    protected virtual void BuildServiceCollection(IServiceCollection serviceCollection)
-    {
-    }
 
     [Fact]
     public void TestInstallationProperties_SteamNotInstalled()

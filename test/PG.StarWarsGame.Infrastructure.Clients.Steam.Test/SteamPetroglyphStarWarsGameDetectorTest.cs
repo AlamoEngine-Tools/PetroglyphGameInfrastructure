@@ -129,7 +129,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
         SteamAppState appState = SteamAppState.StateFullyInstalled)
     {
         // Install Steam (regardless whether the identity is supported)
-        var steam = FileSystem.Steam(ServiceProvider);
+        var steam = SteamTesting.Steam(ServiceProvider);
         steam.Install();
 
         if (gameIdentity.Platform != GamePlatform.SteamGold)

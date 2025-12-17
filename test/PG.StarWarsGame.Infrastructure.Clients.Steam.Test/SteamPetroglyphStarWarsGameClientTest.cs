@@ -29,7 +29,7 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
     protected override void BeforePlay()
     {
         // Install Steam (regardless whether the identity is supported)
-        var steam = FileSystem.Steam(ServiceProvider);
+        var steam = SteamTesting.Steam(ServiceProvider);
         steam.Install();
         _steamProcess = steam.FakeStart(12345);
         base.BeforePlay();
@@ -95,7 +95,7 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
     public void Play_SteamNotRunning_Throws()
     {
         // Install Steam (regardless whether the identity is supported)
-        FileSystem.Steam(ServiceProvider).Install();
+        SteamTesting.Steam(ServiceProvider).Install();
 
         var expected = new GameProcessInfo(_game, GameBuildType.Release, ArgumentCollection.Empty);
 

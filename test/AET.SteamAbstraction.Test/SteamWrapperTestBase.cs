@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,50 +9,39 @@ using AET.SteamAbstraction.Utilities;
 using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities;
 using Microsoft.Extensions.DependencyInjection;
-using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public abstract class SteamWrapperTestBase : IDisposable
+public abstract class SteamWrapperTestBase : InMemorySteamTestBase
 {
     private readonly ISteamWrapperFactory _wrapperFactory;
 
-    protected readonly MockFileSystem FileSystem = new();
-    protected readonly IServiceProvider ServiceProvider;
-    
-    protected ITestingSteamInstallation? Steam;
     internal TestProcessHelper? ProcessHelper;
 
     protected SteamWrapperTestBase()
     {
-        var sc = new ServiceCollection();
-        sc.AddSingleton<IFileSystem>(FileSystem);
-        SteamAbstractionLayer.InitializeServices(sc);
-        sc.AddSingleton<TestProcessHelper>(sp =>
-        {
-            return ProcessHelper = new TestProcessHelper(sp);
-        });
-        sc.AddSingleton<IProcessHelper>(sp => sp.GetRequiredService<TestProcessHelper>());
-        // ReSharper disable once VirtualMemberCallInConstructor
-        BuildServiceCollection(sc);
-        ServiceProvider = sc.BuildServiceProvider();
         _wrapperFactory = ServiceProvider.GetRequiredService<ISteamWrapperFactory>();
     }
 
-    public void Dispose()
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<TestProcessHelper>(sp =>
+        {
+            return ProcessHelper = new TestProcessHelper(sp);
+        });
+        serviceCollection.AddSingleton<IProcessHelper>(sp => sp.GetRequiredService<TestProcessHelper>());
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
         ProcessHelper?.KillCurrent();
     }
 
-    protected virtual void BuildServiceCollection(IServiceCollection serviceCollection)
-    {
-    }
-
-    [MemberNotNull(nameof(Steam))]
     protected void InstallSteam()
     {
-        Steam = SteamTesting.Steam(ServiceProvider);
         Steam.Install();
     }
 

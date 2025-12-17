@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Testing;
-using AET.Testing;
 using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,28 +11,20 @@ using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public class SteamAppManifestTest : TestBaseWithServiceProvider, IDisposable
+public class SteamAppManifestTest : SteamTestBase
 {
     private readonly MockFileSystem _fileSystem = new();
-    private readonly ITestingSteamInstallation _steam;
 
     public SteamAppManifestTest()
     {
-        _steam = SteamTesting.Steam(ServiceProvider);
-        _steam.InstallSteamFilesOnly();
+        Steam.InstallSteamFilesOnly();
     }
 
     protected override void SetupServices(IServiceCollection serviceCollection)
     {
         base.SetupServices(serviceCollection);
         serviceCollection.AddSingleton<IFileSystem>(_fileSystem);
-        SteamAbstractionLayer.InitializeServices(serviceCollection);
         serviceCollection.AddSingleton<IRegistry>(new InMemoryRegistry());
-    }
-
-    public void Dispose()
-    {
-        _steam.Dispose();
     }
 
     [Fact]
@@ -42,7 +33,7 @@ public class SteamAppManifestTest : TestBaseWithServiceProvider, IDisposable
         Assert.Throws<ArgumentNullException>(() => new SteamAppManifest(null!, _fileSystem.FileInfo.New("file.acf"), 0, "name", _fileSystem.DirectoryInfo.New("path"),
             SteamAppState.StateFullyInstalled, new HashSet<uint>()));
 
-        var lib = _steam.InstallLibrary("path", false);
+        var lib = Steam.InstallLibrary("path", false);
         Assert.Throws<ArgumentNullException>(() => new SteamAppManifest(lib, null!, 0, "name", _fileSystem.DirectoryInfo.New("path"),
             SteamAppState.StateFullyInstalled, new HashSet<uint>()));
 
@@ -62,7 +53,7 @@ public class SteamAppManifestTest : TestBaseWithServiceProvider, IDisposable
     [Fact]
     public void Ctor_SetsProperties()
     {
-        var lib = _steam.InstallLibrary("path", false);
+        var lib = Steam.InstallLibrary("path", false);
         var appManifest = new SteamAppManifest(lib, _fileSystem.FileInfo.New("file.acf"), 123, "name",
             _fileSystem.DirectoryInfo.New("path"),
             SteamAppState.StateFullyInstalled, new HashSet<uint> {987, 654});
@@ -79,8 +70,8 @@ public class SteamAppManifestTest : TestBaseWithServiceProvider, IDisposable
     [Fact]
     public void Equality()
     {
-        var lib = _steam.InstallLibrary("path", false);
-        var otherLib = _steam.InstallLibrary("other", false);
+        var lib = Steam.InstallLibrary("path", false);
+        var otherLib = Steam.InstallLibrary("other", false);
 
         const uint aId = 123;
         const uint bId = 456;
