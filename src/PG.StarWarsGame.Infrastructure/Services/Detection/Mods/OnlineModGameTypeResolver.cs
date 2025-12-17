@@ -5,6 +5,7 @@ using System.Linq;
 using AET.Modinfo.Spec;
 using AET.Modinfo.Utilities;
 using AnakinRaW.CommonUtilities.Collections;
+using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -39,10 +40,19 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
 
         Logger?.LogTrace("Getting steam tags from Steam's webpage for mod '{SteamId}'", steamId);
 
-        var webPage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(steamId, CultureInfo.InvariantCulture)
-            .GetAwaiter().GetResult();
-        if (webPage is null)
+        HtmlDocument webPage;
+        try
+        {
+            webPage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(steamId, CultureInfo.InvariantCulture)
+                .GetAwaiter().GetResult();
+            if (webPage is null)
+                return false;
+        }
+        catch (Exception e)
+        {
+            Logger?.LogTrace(e, "Failed to get steam tags from Steam's webpage for mod '{SteamId}'", steamId);
             return false;
+        }
 
         var tagNodes = webPage.DocumentNode.SelectNodes("//div[@class='workshopTags']/a/text()");
         if (tagNodes is null || tagNodes.Count == 0)
