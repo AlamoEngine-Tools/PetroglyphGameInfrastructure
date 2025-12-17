@@ -25,13 +25,13 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
     protected override ICollection<GamePlatform> SupportedPlatforms => [GamePlatform.SteamGold];
     protected override bool CanDisableInitRequest => false;
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        sc.AddSingleton(_registry);
-        SteamAbstractionLayer.InitializeServices(sc);
-        PetroglyphGameInfrastructure.InitializeServices(sc);
-        SteamPetroglyphStarWarsGameClients.InitializeServices(sc);
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton(_registry);
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
+        PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
+        SteamPetroglyphStarWarsGameClients.InitializeServices(serviceCollection);
     }
 
     protected override IGameDetector CreateDetector(GameDetectorTestInfo<object> gameInfo, bool shallHandleInitialization)

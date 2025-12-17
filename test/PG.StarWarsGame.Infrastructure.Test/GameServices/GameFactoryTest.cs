@@ -285,10 +285,10 @@ public class GameFactoryTest : GameInfrastructureTestBase
             _factory = new GameFactory(ServiceProvider);
         }
 
-        protected override void SetupServiceProvider(IServiceCollection sc)
+        protected override void SetupServices(IServiceCollection serviceCollection)
         {
-            base.SetupServiceProvider(sc);
-            sc.AddSingleton<IGameNameResolver>(new NullGameNameResolver());
+            base.SetupServices(serviceCollection);
+            serviceCollection.AddSingleton<IGameNameResolver>(new NullGameNameResolver());
         }
 
         [Fact]
@@ -315,10 +315,10 @@ public class GameFactoryTest : GameInfrastructureTestBase
             _factory = new GameFactory(ServiceProvider);
         }
 
-        protected override void SetupServiceProvider(IServiceCollection sc)
+        protected override void SetupServices(IServiceCollection serviceCollection)
         {
-            base.SetupServiceProvider(sc);
-            sc.AddSingleton<IGameNameResolver>(new CultureAwareGameNameResolver());
+            base.SetupServices(serviceCollection);
+            serviceCollection.AddSingleton<IGameNameResolver>(new CultureAwareGameNameResolver());
         }
 
         public static IEnumerable<object[]> GetCultures()

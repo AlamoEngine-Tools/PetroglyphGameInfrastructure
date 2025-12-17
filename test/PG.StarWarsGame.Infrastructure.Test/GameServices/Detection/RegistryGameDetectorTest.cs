@@ -27,10 +27,10 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
     protected override bool CanDisableInitRequest => true;
     protected override ICollection<GamePlatform> SupportedPlatforms => GITestUtilities.RealPlatforms;
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        sc.AddSingleton(_registry);
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton(_registry);
     }
 
     protected override IGameDetector CreateDetector(GameDetectorTestInfo<GameRegistryContainer> gameInfo, bool shallHandleInitialization)

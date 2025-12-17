@@ -50,10 +50,10 @@ public abstract class PlayableObjectTest : GameInfrastructureTestBase
 
     public class PlayableObjectAbstractTest : GameInfrastructureTestBaseWithRandomGame
     { 
-        protected override void SetupServiceProvider(IServiceCollection sc)
+        protected override void SetupServices(IServiceCollection serviceCollection)
         {
-            base.SetupServiceProvider(sc);
-            sc.AddSingleton<ILanguageFinder>(new NullLanguageFinder());
+            base.SetupServices(serviceCollection);
+            serviceCollection.AddSingleton<ILanguageFinder>(new NullLanguageFinder());
         }
 
         [Fact]

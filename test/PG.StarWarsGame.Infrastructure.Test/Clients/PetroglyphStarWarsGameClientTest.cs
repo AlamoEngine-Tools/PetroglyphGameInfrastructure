@@ -25,6 +25,11 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
 
     protected virtual ICollection<GamePlatform> SupportedPlatforms => GITestUtilities.RealPlatforms;
 
+    public virtual void Dispose()
+    {
+        _processLauncher.Dispose();
+    }
+
     protected virtual void BeforePlay()
     {
     }
@@ -34,11 +39,11 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         _clientFactory = ServiceProvider.GetRequiredService<IGameClientFactory>();
     }
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        PetroglyphGameInfrastructure.InitializeServices(sc);
-        sc.AddSingleton<IGameProcessLauncher>(_processLauncher);
+        base.SetupServices(serviceCollection);
+        PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
+        serviceCollection.AddSingleton<IGameProcessLauncher>(_processLauncher);
     }
 
     [Fact]
@@ -342,11 +347,6 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         Assert.Equal(expected.Game, actual.Game);
         Assert.Equal(expected.BuildType, actual.BuildType);
         Assert.Equal(expected.Arguments, actual.Arguments);
-    }
-
-    public virtual void Dispose()
-    {
-        _processLauncher.Dispose();
     }
 
     private delegate void OnGameStartingDelegate(ArgumentCollection arguments, GameBuildType type);

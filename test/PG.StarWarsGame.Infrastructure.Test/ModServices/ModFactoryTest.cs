@@ -36,10 +36,10 @@ public class ModFactoryTest : GameInfrastructureTestBase
         _factory = new ModFactory(ServiceProvider);
     }
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        sc.AddSingleton<IModNameResolver>(_ => _nameResolver);
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<IModNameResolver>(_ => _nameResolver);
     }
 
     #region CreatePhysicalMod

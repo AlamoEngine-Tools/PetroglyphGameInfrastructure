@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Clients;
 
-public class TestGameProcessLauncher : IGameProcessLauncher, IDisposable
+public sealed class TestGameProcessLauncher : IGameProcessLauncher, IDisposable
 {
     private Process? _process;
 

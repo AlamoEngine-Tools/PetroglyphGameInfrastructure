@@ -3,7 +3,7 @@ using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
 
-public class TestGameRegistrySetupData
+public sealed class TestGameRegistrySetupData
 {
     public required GameType GameType { get; init; }
 

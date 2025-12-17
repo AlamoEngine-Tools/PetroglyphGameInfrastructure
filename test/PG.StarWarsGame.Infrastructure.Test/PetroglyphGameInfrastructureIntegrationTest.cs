@@ -31,10 +31,10 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
 
     private const string ExternalModPath = "externalMods/MyExternalMod";
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        sc.AddSingleton(_registry);
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton(_registry);
     }
 
     [Theory]

@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
+using System.Threading;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
+using AET.Testing;
 using AET.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
@@ -13,23 +14,20 @@ using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
-public abstract class GameInfrastructureTestBase
+public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
 {
-    protected readonly IServiceProvider ServiceProvider;
-    protected readonly MockFileSystem FileSystem = new();
-
-    [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
-    protected GameInfrastructureTestBase()
+    public IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem);
+    
+    protected virtual IFileSystem CreateFileSystem()
     {
-        var sc = new ServiceCollection();
-        SetupServiceProvider(sc);
-        ServiceProvider = sc.BuildServiceProvider();
+        return new MockFileSystem();
     }
 
-    protected virtual void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        sc.AddSingleton<IFileSystem>(FileSystem);
-        PetroglyphGameInfrastructure.InitializeServices(sc);
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<IFileSystem>(FileSystem);
+        PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
     }
 
     protected static GameIdentity CreateRandomGameIdentity()

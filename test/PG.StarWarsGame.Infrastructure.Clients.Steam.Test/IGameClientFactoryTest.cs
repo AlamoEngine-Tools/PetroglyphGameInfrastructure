@@ -15,13 +15,13 @@ public class IGameClientFactoryTest : GameInfrastructureTestBase
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        sc.AddSingleton(_registry);
-        SteamAbstractionLayer.InitializeServices(sc);
-        PetroglyphGameInfrastructure.InitializeServices(sc);
-        SteamPetroglyphStarWarsGameClients.InitializeServices(sc);
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton(_registry);
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
+        PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
+        SteamPetroglyphStarWarsGameClients.InitializeServices(serviceCollection);
     }
 
     [Theory]

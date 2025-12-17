@@ -13,10 +13,12 @@ using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
+[SupportedOSPlatform("windows")]
 public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClientTest
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
@@ -40,15 +42,15 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
         _game = FileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
     }
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        sc.AddSingleton(_registry);
-        base.SetupServiceProvider(sc);
-        SteamAbstractionLayer.InitializeServices(sc);
-        SteamPetroglyphStarWarsGameClients.InitializeServices(sc);
+        serviceCollection.AddSingleton(_registry);
+        base.SetupServices(serviceCollection);
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
+        SteamPetroglyphStarWarsGameClients.InitializeServices(serviceCollection);
 
-        sc.AddSingleton<TestProcessHelper>(sp => new TestProcessHelper(sp));
-        sc.AddSingleton<IProcessHelper>(sp => sp.GetRequiredService<TestProcessHelper>());
+        serviceCollection.AddSingleton<TestProcessHelper>(sp => new TestProcessHelper(sp));
+        serviceCollection.AddSingleton<IProcessHelper>(sp => sp.GetRequiredService<TestProcessHelper>());
         
     }
 
