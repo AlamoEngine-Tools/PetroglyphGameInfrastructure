@@ -30,7 +30,7 @@ public static class GITestUtilities
     {
         if (game.Platform is not GamePlatform.SteamGold)
             return false;
-        return new Random().NextDouble() >= 0.5;
+        return Random.Bool();
     }
 
     public static IEnumerable<object[]> GetRealPlatforms()

@@ -10,9 +10,7 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public abstract class PlayableObjectTest : GameInfrastructureTestBase
 {
-    protected abstract IPlayableObject CreatePlayableObject(
-        string? iconPath = null, 
-        ICollection<ILanguageInfo>? languages = null);
+    protected abstract IPlayableObject CreatePlayableObject(string? iconPath = null, ICollection<ILanguageInfo>? languages = null);
 
     [Fact]
     public void IconFile_NoIcon()

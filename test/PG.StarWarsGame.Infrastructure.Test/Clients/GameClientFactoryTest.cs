@@ -25,10 +25,10 @@ public class GameClientFactoryTest : GameInfrastructureTestBase
     public void CreateClient_CorrectTypeAndSetsProperty()
     {
         var factory = new GameClientFactory(ServiceProvider);
-        var game = CreateRandomGame();
+        InstallRandomGame();
 
-        var client = factory.CreateClient(game);
+        var client = factory.CreateClient(GameInstallation.Game);
         Assert.IsType<PetroglyphStarWarsGameClient>(client);
-        Assert.Same(game, client.Game);
+        Assert.Same(GameInstallation.Game, client.Game);
     }
 }

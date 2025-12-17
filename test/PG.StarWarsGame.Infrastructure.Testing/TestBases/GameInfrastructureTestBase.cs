@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Threading;
 using AET.Modinfo.Model;
@@ -16,7 +17,14 @@ namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
 public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
 {
-    public IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem);
+    protected IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem);
+
+    protected ITestingGameInstallation GameInstallation;
+
+    protected GameInfrastructureTestBase()
+    {
+        GameInstallation = GameTesting.Game(ServiceProvider);
+    }
     
     protected virtual IFileSystem CreateFileSystem()
     {
@@ -26,7 +34,7 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
     protected override void SetupServices(IServiceCollection serviceCollection)
     {
         base.SetupServices(serviceCollection);
-        serviceCollection.AddSingleton<IFileSystem>(FileSystem);
+        serviceCollection.AddSingleton(FileSystem);
         PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
     }
 
@@ -35,25 +43,25 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
         return new GameIdentity(Random.Enum<GameType>(), Random.Item(GITestUtilities.RealPlatforms));
     }
 
-    protected PetroglyphStarWarsGame CreateRandomGame()
+    protected void InstallRandomGame()
     {
-        return FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
+        GameInstallation.Install(CreateRandomGameIdentity());
     }
 
-    protected IMod CreateAndAddMod(IGame game, bool isWorkshop, string name, IModDependencyList dependencies)
+    protected IMod CreateAndAddMod(bool isWorkshop, string name, IModDependencyList dependencies)
     {
         if (dependencies.Count == 0)
-            return game.InstallAndAddMod(name, isWorkshop, ServiceProvider);
+            return GameInstallation.Game.InstallAndAddMod(name, isWorkshop, ServiceProvider);
 
         var modinfo = new ModinfoData(name)
         {
             Dependencies = dependencies
         };
-        return CreateAndAddMod(game, isWorkshop, modinfo);
+        return CreateAndAddMod(isWorkshop, modinfo);
     }
 
-    protected IMod CreateAndAddMod(IGame game, bool isWorkshop, IModinfo modinfo)
+    protected IMod CreateAndAddMod(bool isWorkshop, IModinfo modinfo)
     {
-        return game.InstallAndAddMod(isWorkshop, modinfo, ServiceProvider);
+        return GameInstallation.Game.InstallAndAddMod(isWorkshop, modinfo, ServiceProvider);
     }
 }

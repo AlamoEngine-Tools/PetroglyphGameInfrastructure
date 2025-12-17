@@ -269,7 +269,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
         Assert.Equal(expectedDepList, depList);
     }
 
-    private void AssertExpectedGame(PetroglyphStarWarsGame expected, IGame actual)
+    private void AssertExpectedGame(IGame expected, IGame actual)
     {
         Assert.Equal(expected.Directory.FullName, actual.Directory.FullName);
         Assert.Equal(expected.Type, actual.Type);

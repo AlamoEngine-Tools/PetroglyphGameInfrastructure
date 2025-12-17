@@ -17,11 +17,12 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public abstract class ModBaseTest : PlayableModContainerTest
 {
-    protected IGame Game;
+    protected readonly IGame Game;
 
     protected ModBaseTest()
     {
-        Game = CreateRandomGame();
+        InstallRandomGame();
+        Game = GameInstallation.Game;
     }
 
     protected abstract ModBase CreateMod(
@@ -44,7 +45,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
     {
-        return CreateAndAddMod(Game, isWorkshop, name, new DependencyList(deps, layout));
+        return CreateAndAddMod(isWorkshop, name, new DependencyList(deps, layout));
     }
 
     [Fact]

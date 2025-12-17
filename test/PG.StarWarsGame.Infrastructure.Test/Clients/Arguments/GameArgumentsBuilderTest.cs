@@ -6,7 +6,6 @@ using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Testably.Abstractions.Testing;
@@ -22,7 +21,8 @@ public class GameArgumentsBuilderTest : GameInfrastructureTestBase
 
     public GameArgumentsBuilderTest()
     {
-        _game = _fileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
+        GameInstallation.Install(new GameIdentity(GameType.Foc, GamePlatform.SteamGold));
+        _game = GameInstallation.Game;
     }
 
     [Fact]

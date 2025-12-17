@@ -1,10 +1,66 @@
-﻿using System;
-using System.IO.Abstractions;
+﻿using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO.Abstractions;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+
+public static class GameTesting
+{
+    public static ITestingGameInstallation Game(IServiceProvider serviceProvider)
+    {
+        return new TestingGameImpl(serviceProvider);
+    }
+}
+
+public interface ITestingGameInstallation
+{
+    IGame? Game { get; }
+
+    [MemberNotNull(nameof(Game))]
+    void Install(GameIdentity gameIdentity);
+
+    void InstallDebug();
+}
+
+internal class TestingGameImpl(IServiceProvider serviceProvider) : ITestingGameInstallation
+{
+    private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+
+    public IGame? Game { get; private set; }
+
+    [MemberNotNull(nameof(Game))]
+    public void Install(GameIdentity gameIdentity)
+    {
+        var gameDir = gameIdentity.Type == GameType.Foc
+            ? GameInstallation.InstallFoc(_fileSystem, gameIdentity.Platform)
+            : GameInstallation.InstallEaw(_fileSystem, gameIdentity.Platform);
+
+        _fileSystem.InstallModsLocations(gameDir);
+
+        var game = new PetroglyphStarWarsGame(gameIdentity, gameDir, gameIdentity.ToString(), serviceProvider);
+        Assert.True(game.Exists());
+        Game = game;
+    }
+
+    public void InstallDebug()
+    {
+        ThrowIfNotInstalled();
+        Game.InstallDebug();
+    }
+
+
+    [MemberNotNull(nameof(Game))]
+    private void ThrowIfNotInstalled()
+    {
+        if (Game is null)
+            throw new InvalidOperationException("Game not installed");
+    }
+}
+
 
 public static partial class GameInstallation
 {
@@ -13,20 +69,15 @@ public static partial class GameInstallation
     private const string GogBasePath = "games/gog";
     private const string OriginBasePath = "games/origin";
 
-    public static PetroglyphStarWarsGame InstallGame(this IFileSystem fs, GameIdentity gameIdentity, IServiceProvider sp)
-    { 
-        Func<IFileSystem, GamePlatform, IDirectoryInfo> installFunc;
+    public static IGame InstallGame(this IFileSystem fileSystem, GameIdentity gameIdentity, IServiceProvider serviceProvider)
+    {
+        var gameDir = gameIdentity.Type == GameType.Foc
+            ? InstallFoc(fileSystem, gameIdentity.Platform)
+            : InstallEaw(fileSystem, gameIdentity.Platform);
 
-        if (gameIdentity.Type == GameType.Foc)
-            installFunc = InstallFoc;
-        else
-            installFunc = InstallEaw;
+        fileSystem.InstallModsLocations(gameDir);
 
-        var gameDir = installFunc(fs, gameIdentity.Platform);
-
-        fs.InstallModsLocations(gameDir);
-
-        var game = new PetroglyphStarWarsGame(gameIdentity, gameDir, gameIdentity.ToString(), sp);
+        var game = new PetroglyphStarWarsGame(gameIdentity, gameDir, gameIdentity.ToString(), serviceProvider);
         Assert.True(game.Exists());
         return game;
     }
@@ -78,7 +129,7 @@ public static partial class GameInstallation
         initAction();
     }
 
-    private static void InstallModsLocations(this IFileSystem fileSystem, IDirectoryInfo directory)
+    internal static void InstallModsLocations(this IFileSystem fileSystem, IDirectoryInfo directory)
     {
         fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(directory.FullName, "Mods"));
     }

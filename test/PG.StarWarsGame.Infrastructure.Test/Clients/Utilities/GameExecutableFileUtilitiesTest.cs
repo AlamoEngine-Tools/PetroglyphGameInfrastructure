@@ -41,7 +41,7 @@ public class GameExecutableFileUtilitiesTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetExecutableForGame_NullGame_ThrowsArgumentNullException(GameIdentity gameIdentity)
     {
-        FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        GameInstallation.Install(gameIdentity);
         var buildTypes = new List<GameBuildType> { GameBuildType.Release, GameBuildType.Debug };
         foreach (var buildType in buildTypes) 
             Assert.Throws<ArgumentNullException>(() => GameExecutableFileUtilities.GetExecutableForGame(null!, buildType));
@@ -71,11 +71,11 @@ public class GameExecutableFileUtilitiesTest : GameInfrastructureTestBase
     [MemberData(nameof(GetGameExeNamesTestData))]
     public void GetExecutableForGame_ReturnsFileHandle(GameIdentity gameIdentity, GameBuildType buildType, string expectedName)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        GameInstallation.Install(gameIdentity);
         if (buildType == GameBuildType.Debug)
-            game.InstallDebug();
+            GameInstallation.InstallDebug();
 
-        var exeFile = GameExecutableFileUtilities.GetExecutableForGame(game, buildType);
+        var exeFile = GameExecutableFileUtilities.GetExecutableForGame(GameInstallation.Game, buildType);
         Assert.NotNull(exeFile);
         Assert.Equal(expectedName, exeFile.Name);
     }

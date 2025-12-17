@@ -1,13 +1,14 @@
-﻿using System;
+﻿using PG.StarWarsGame.Infrastructure.Clients;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
+using PG.StarWarsGame.Infrastructure.Clients.Processes;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using System;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using PG.StarWarsGame.Infrastructure.Clients;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments;
-using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
-using PG.StarWarsGame.Infrastructure.Clients.Processes;
-using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Testably.Abstractions;
 using Xunit;
 

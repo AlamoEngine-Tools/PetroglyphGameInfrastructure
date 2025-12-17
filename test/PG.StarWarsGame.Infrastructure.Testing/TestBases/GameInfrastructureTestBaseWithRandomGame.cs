@@ -11,8 +11,9 @@ public abstract class GameInfrastructureTestBaseWithRandomGame : GameInfrastruct
     protected readonly IGame Game;
 
     protected GameInfrastructureTestBaseWithRandomGame()
-    {
-        Game = CreateRandomGame();
+    { 
+        InstallRandomGame();
+        Game = GameInstallation.Game;
     }
 
     protected IMod CreateAndAddMod(
@@ -20,11 +21,11 @@ public abstract class GameInfrastructureTestBaseWithRandomGame : GameInfrastruct
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
         params IList<IModReference> deps)
     {
-        return CreateAndAddMod(Game, GITestUtilities.GetRandomWorkshopFlag(Game), name, new DependencyList(deps, layout));
+        return CreateAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), name, new DependencyList(deps, layout));
     }
 
     protected IMod CreateAndAddMod(IModinfo modinfo)
     {
-        return CreateAndAddMod(Game, GITestUtilities.GetRandomWorkshopFlag(Game), modinfo);
+        return CreateAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), modinfo);
     }
 }

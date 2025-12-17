@@ -11,7 +11,7 @@ public static partial class GameInstallation
     private const string EawGoldPath = "games/gold/eaw";
     private const string EawGameDataSubPath = "GameData";
 
-    private static IDirectoryInfo InstallEaw(this IFileSystem fs, GamePlatform platform)
+    internal static IDirectoryInfo InstallEaw(IFileSystem fs, GamePlatform platform)
     {
         IDirectoryInfo gameDirectory;
         switch (platform)

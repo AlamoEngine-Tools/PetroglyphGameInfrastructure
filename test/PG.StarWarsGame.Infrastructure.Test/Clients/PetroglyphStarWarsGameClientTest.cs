@@ -50,16 +50,16 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
     public void Ctor_NullArgs_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGameClient(null!, ServiceProvider));
-        var game = CreateRandomGame();
-        Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGameClient(game, null!));
+        InstallRandomGame();
+        Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGameClient(GameInstallation.Game, null!));
     }
 
     [Fact]
     public void Ctor_SetsGame()
     {
-        var game = CreateRandomGame();
-        using var client = new PetroglyphStarWarsGameClient(game, ServiceProvider);
-        Assert.Same(game, client.Game);
+        InstallRandomGame();
+        using var client = new PetroglyphStarWarsGameClient(GameInstallation.Game, ServiceProvider);
+        Assert.Same(GameInstallation.Game, client.Game);
     }
 
     [Theory]

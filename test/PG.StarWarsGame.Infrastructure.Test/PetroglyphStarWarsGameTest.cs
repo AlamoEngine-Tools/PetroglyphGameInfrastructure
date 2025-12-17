@@ -11,9 +11,7 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class PetroglyphStarWarsGameTest : PlayableModContainerTest
 {
-    private PetroglyphStarWarsGame CreateGame(
-        string? iconPath = null,
-        ICollection<ILanguageInfo>? languages = null)
+    private IGame CreateGame(string? iconPath = null, ICollection<ILanguageInfo>? languages = null)
     {
         var gameId = new GameIdentity(Random.Enum<GameType>(), Random.Item(GITestUtilities.RealPlatforms));
         var game =  FileSystem.InstallGame(gameId, ServiceProvider);
@@ -32,16 +30,14 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
         return game;
     }
 
-    protected override IPlayableObject CreatePlayableObject(
-        string? iconPath = null,
-        ICollection<ILanguageInfo>? languages = null)
+    protected override IPlayableObject CreatePlayableObject(string? iconPath = null, ICollection<ILanguageInfo>? languages = null)
     {
         return CreateGame(iconPath, languages);
     }
 
     protected override PlayableModContainer CreateModContainer()
     {
-        return CreateGame();
+        return CreateGame() as PlayableModContainer;
     }
 
     [Fact]

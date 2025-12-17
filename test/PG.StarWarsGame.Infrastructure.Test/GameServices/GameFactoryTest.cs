@@ -185,16 +185,16 @@ public class GameFactoryTest : GameInfrastructureTestBase
     [Fact]
     public void CreateGame_UnidentifiedPlatform_Throws()
     {
-        var installedGame = CreateRandomGame();
+        InstallRandomGame();
         Assert.Throws<GameException>(() => _factory.CreateGame(
             new GameIdentity(Random.Enum<GameType>(), GamePlatform.Undefined),
-            installedGame.Directory,
+            GameInstallation.Game.Directory,
             Random.Bool(),
             CultureInfo.CurrentCulture));
 
         Assert.False(_factory.TryCreateGame(
             new GameIdentity(Random.Enum<GameType>(), GamePlatform.Undefined),
-            installedGame.Directory,
+            GameInstallation.Game.Directory,
             Random.Bool(),
             CultureInfo.CurrentCulture, out _));
     }

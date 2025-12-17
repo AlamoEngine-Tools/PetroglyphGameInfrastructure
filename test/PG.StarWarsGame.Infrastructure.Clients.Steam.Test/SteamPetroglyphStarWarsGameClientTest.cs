@@ -22,11 +22,17 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClientTest
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
-    private readonly PetroglyphStarWarsGame _game;
+    private readonly IGame _game;
 
     private ISteamFakeProcess? _steamProcess;
 
     protected override ICollection<GamePlatform> SupportedPlatforms { get; } = [GamePlatform.SteamGold];
+
+    public SteamPetroglyphStarWarsGameClientTest()
+    { 
+        GameInstallation.Install(new GameIdentity(GameType.Foc, GamePlatform.SteamGold));
+        _game = GameInstallation.Game;
+    }
 
     protected override void BeforePlay()
     {
@@ -35,11 +41,6 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
         steam.Install();
         _steamProcess = steam.FakeStart(12345);
         base.BeforePlay();
-    }
-
-    public SteamPetroglyphStarWarsGameClientTest()
-    {
-        _game = FileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
     }
 
     protected override void SetupServices(IServiceCollection serviceCollection)
@@ -78,8 +79,9 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
     {
         if (identity.Platform is GamePlatform.SteamGold)
             return;
-        var game = FileSystem.InstallGame(identity, ServiceProvider);
-        Assert.Throws<ArgumentException>(() => new SteamPetroglyphStarWarsGameClient(game, ServiceProvider));
+        var otherGameInstallation = GameTesting.Game(ServiceProvider);
+        otherGameInstallation.Install(identity);
+        Assert.Throws<ArgumentException>(() => new SteamPetroglyphStarWarsGameClient(otherGameInstallation.Game, ServiceProvider));
     }
 
     [Fact]

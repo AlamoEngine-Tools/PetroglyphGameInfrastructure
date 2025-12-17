@@ -5,7 +5,6 @@ using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
@@ -28,12 +27,12 @@ public class IGameClientFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateClient_CreatesCorrectClientType(GameIdentity identity)
     {
-        var game = FileSystem.InstallGame(identity, ServiceProvider);
+        GameInstallation.Install(identity);
         var factory = ServiceProvider.GetRequiredService<IGameClientFactory>();
-        var client = factory.CreateClient(game);
+        var client = factory.CreateClient(GameInstallation.Game);
 
         var expectedClientType = typeof(PetroglyphStarWarsGameClient);
-        if (game.Platform is GamePlatform.SteamGold)
+        if (GameInstallation.Game.Platform is GamePlatform.SteamGold)
             expectedClientType = typeof(SteamPetroglyphStarWarsGameClient);
 
         Assert.IsType(expectedClientType, client);
