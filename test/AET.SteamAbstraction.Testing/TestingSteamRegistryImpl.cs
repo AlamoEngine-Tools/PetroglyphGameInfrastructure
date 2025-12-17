@@ -6,9 +6,10 @@ using Xunit;
 
 namespace AET.SteamAbstraction.Testing;
 
-internal class TestingSteamRegistryImpl(IFileSystem fileSystem, IServiceProvider serviceProvider) : ITestingSteamRegistry
+internal class TestingSteamRegistryImpl(IServiceProvider serviceProvider) : ITestingSteamRegistry
 {
     private readonly ISteamRegistry _registry = serviceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
+    private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
 
     public IFileInfo? ExecutableFile => _registry.ExecutableFile;
     public IDirectoryInfo? InstallationDirectory => _registry.InstallationDirectory;
@@ -42,8 +43,8 @@ internal class TestingSteamRegistryImpl(IFileSystem fileSystem, IServiceProvider
     {
         using var key = _registry.OpenSteamRegistryKey();
         Assert.NotNull(key);
-        key.SetValue("SteamExe", fileSystem.Path.GetFullPath(TestingSteamConstants.SteamExePath));
-        key.SetValue("SteamPath", fileSystem.Path.GetFullPath(TestingSteamConstants.SteamInstallPath));
+        key.SetValue("SteamExe", _fileSystem.Path.GetFullPath(TestingSteamConstants.SteamExePath));
+        key.SetValue("SteamPath", _fileSystem.Path.GetFullPath(TestingSteamConstants.SteamInstallPath));
     }
 
     private void SetPidWindowsRegistry(int? pid)

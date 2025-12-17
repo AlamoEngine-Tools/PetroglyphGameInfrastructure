@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Testing;
+using AET.Testing;
 using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,20 +12,23 @@ using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public class SteamAppManifestTest : IDisposable
+public class SteamAppManifestTest : TestBaseWithServiceProvider, IDisposable
 {
     private readonly MockFileSystem _fileSystem = new();
     private readonly ITestingSteamInstallation _steam;
 
     public SteamAppManifestTest()
     {
-        var sc = new ServiceCollection();
-        sc.AddSingleton<IFileSystem>(_fileSystem);
-        SteamAbstractionLayer.InitializeServices(sc);
-        sc.AddSingleton<IRegistry>(new InMemoryRegistry());
-        var sp = sc.BuildServiceProvider();
-        _steam = _fileSystem.Steam(sp);
+        _steam = SteamTesting.Steam(ServiceProvider);
         _steam.InstallSteamFilesOnly();
+    }
+
+    protected override void SetupServices(IServiceCollection serviceCollection)
+    {
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<IFileSystem>(_fileSystem);
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
+        serviceCollection.AddSingleton<IRegistry>(new InMemoryRegistry());
     }
 
     public void Dispose()

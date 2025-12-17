@@ -58,7 +58,7 @@ internal sealed partial class TestingSteamInstallationImpl
             using var _ = _fileSystem.File.Create(_fileSystem.Path.Combine(libDir.FullName, "steam.dll"));
         }
 
-        var lib = new TestingSteamLibrary(libDir, serviceProvider);
+        var lib = new TestingSteamLibrary(libDir, _serviceProvider);
 
         if (addToConfig)
             AddToConfig(lib, _fileSystem);

@@ -26,7 +26,7 @@ public class SteamLibraryTest : IDisposable
         sc.AddSingleton(_registry);
         _serviceProvider = sc.BuildServiceProvider();
 
-        _steam = _fileSystem.Steam(_serviceProvider);
+        _steam = SteamTesting.Steam(_serviceProvider);
         _steam.InstallSteamFilesOnly();
     }
 

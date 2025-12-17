@@ -54,7 +54,7 @@ public abstract class SteamWrapperTestBase : IDisposable
     [MemberNotNull(nameof(Steam))]
     protected void InstallSteam()
     {
-        Steam = FileSystem.Steam(ServiceProvider);
+        Steam = SteamTesting.Steam(ServiceProvider);
         Steam.Install();
     }
 

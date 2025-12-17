@@ -2,20 +2,25 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using AET.SteamAbstraction.Utilities;
+using AET.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public class ProcessHelperTest
+public class ProcessHelperTest : TestBaseWithServiceProvider
 {
     private readonly IProcessHelper _processHelper;
 
     public ProcessHelperTest()
     {
-        var sc = new ServiceCollection();
-        SteamAbstractionLayer.InitializeServices(sc);
-        _processHelper = sc.BuildServiceProvider().GetRequiredService<IProcessHelper>();
+        _processHelper = ServiceProvider.GetRequiredService<IProcessHelper>();
+    }
+
+    protected override void SetupServices(IServiceCollection serviceCollection)
+    {
+        base.SetupServices(serviceCollection);
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
     }
 
     [Fact]

@@ -1,21 +1,16 @@
 ﻿using System;
-using System.IO.Abstractions;
 
 namespace AET.SteamAbstraction.Testing;
 
-public static class SteamInstallationExtensions
+public static class SteamTesting
 {
-    public static ITestingSteamInstallation Steam(this IFileSystem fs, IServiceProvider serviceProvider)
+    public static ITestingSteamInstallation Steam(IServiceProvider serviceProvider)
     {
-        return new TestingSteamInstallationImpl(fs, serviceProvider);
+        return new TestingSteamInstallationImpl(serviceProvider);
     }
-    
-    
-    extension(ITestingSteamRegistry)
+
+    public static ITestingSteamRegistry SteamRegistry(IServiceProvider serviceProvider)
     {
-        public static ITestingSteamRegistry Create(IFileSystem fileSystem, IServiceProvider serviceProvider)
-        {
-            return new TestingSteamRegistryImpl(fileSystem, serviceProvider);
-        }
+        return new TestingSteamRegistryImpl(serviceProvider);
     }
 }

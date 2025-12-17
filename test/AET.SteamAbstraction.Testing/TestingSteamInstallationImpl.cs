@@ -1,15 +1,16 @@
 ﻿using System;
 using System.IO.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction.Testing;
 
-internal sealed partial class TestingSteamInstallationImpl(IFileSystem fileSystem, IServiceProvider serviceProvider) : ITestingSteamInstallation
+internal sealed partial class TestingSteamInstallationImpl(IServiceProvider serviceProvider) : ITestingSteamInstallation
 {
-    private readonly IFileSystem _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+    private readonly IFileSystem _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
     public IDirectoryInfo? InstallationDirectory => Registry.InstallationDirectory;
-    public ITestingSteamRegistry Registry { get; } = new TestingSteamRegistryImpl(fileSystem, serviceProvider);
+    public ITestingSteamRegistry Registry { get; } = SteamTesting.SteamRegistry(serviceProvider);
 
     public void Install()
     {

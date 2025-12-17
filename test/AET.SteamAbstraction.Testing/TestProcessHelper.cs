@@ -19,7 +19,7 @@ public sealed class TestProcessHelper : IProcessHelper
     public TestProcessHelper(IServiceProvider sp)
     {
         _fileSystem = sp.GetRequiredService<IFileSystem>();
-        _registry = ITestingSteamRegistry.Create(_fileSystem, sp);
+        _registry = SteamTesting.SteamRegistry(sp);
     }
 
     public Process? CurrentProcess { get; private set; }

@@ -25,7 +25,7 @@ public class SteamVdfReaderTest : IDisposable
         sc.AddSingleton<IFileSystem>(_ => _fileSystem);
         sc.AddSingleton(_registry);
         SteamAbstractionLayer.InitializeServices(sc);
-        _steam = _fileSystem.Steam(sc.BuildServiceProvider());
+        _steam = SteamTesting.Steam(sc.BuildServiceProvider());
         _steam.InstallSteamFilesOnly();
     }
 
