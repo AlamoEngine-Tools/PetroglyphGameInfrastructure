@@ -5,7 +5,7 @@ using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
-public static partial class GameInstallation
+internal static partial class GameInstallation
 {
     private const string EawNormalPath = "games/eaw";
     private const string EawGoldPath = "games/gold/eaw";

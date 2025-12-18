@@ -1,47 +1,47 @@
-﻿using System;
-using System.IO.Abstractions;
-using AnakinRaW.CommonUtilities.Registry;
+﻿using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Games.Registry;
+using System;
+using System.IO.Abstractions;
 using Xunit;
+using RegistryHive = AnakinRaW.CommonUtilities.Registry.RegistryHive;
+using RegistryView = AnakinRaW.CommonUtilities.Registry.RegistryView;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
 
-public static class GameRegistryTestExtensions
+internal sealed class TestingGameRegistryImpl(IServiceProvider serviceProvider) : ITestingGameRegistry
 {
-    public static IGameRegistry CreateNonExistingRegistry(this GameType gameType, IServiceProvider serviceProvider)
+    private readonly IGameRegistryFactory _registryFactory = serviceProvider.GetRequiredService<IGameRegistryFactory>();
+    private readonly IRegistry _registry = serviceProvider.GetRequiredService<IRegistry>();
+
+    public IGameRegistry CreateNonExistingRegistry(GameType gameType)
     {
-        return serviceProvider.GetRequiredService<IGameRegistryFactory>().CreateRegistry(gameType);
+        return _registryFactory.CreateRegistry(gameType);
     }
 
-    public static IGameRegistry InstallGame(this IRegistry registry, IGame game, IServiceProvider serviceProvider)
+    public IGameRegistry CreateInstlled(IGame game)
     {
-        InitializeRegistry(registry, TestGameRegistrySetupData.Installed(game.Type, game.Directory), null, serviceProvider);
-        return serviceProvider.GetRequiredService<IGameRegistryFactory>().CreateRegistry(game.Type);
+        return CreateFrom(TestGameRegistrySetupData.Installed(game.Type, game.Directory));
     }
 
-    public static IGameRegistry Create(this TestGameRegistrySetupData registrySetupData, IServiceProvider serviceProvider)
+    public IGameRegistry CreateFrom(TestGameRegistrySetupData registrySetupData)
     {
-        var gameRegistry = CreateNonExistingRegistry(registrySetupData.GameType, serviceProvider);
-        var registry = serviceProvider.GetRequiredService<IRegistry>();
-        InitializeRegistry(registry, registrySetupData, null, serviceProvider);
+        var gameRegistry = _registryFactory.CreateRegistry(registrySetupData.GameType);
+        InitializeRegistry(registrySetupData, null);
         return gameRegistry;
     }
 
-    private static void InitializeRegistry(
-        IRegistry registry, 
-        TestGameRegistrySetupData setupData, 
-        IDirectoryInfo? customDirectoryInfo, IServiceProvider serviceProvider)
+    private void InitializeRegistry(TestGameRegistrySetupData setupData, IDirectoryInfo? customDirectoryInfo)
     {
         var gameKeyPath = setupData.GameType == GameType.Eaw ? GameRegistryFactory.EawRegistryPath : GameRegistryFactory.FocRegistryPath;
 
-        using var hklm = registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+        using var hklm = _registry.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
         hklm.DeleteKey(gameKeyPath, true);
 
         if (!setupData.CreateRegistry)
             return;
-        
+
         using var gameKey = hklm.CreateSubKey(gameKeyPath);
 
         if (!setupData.InitRegistry)

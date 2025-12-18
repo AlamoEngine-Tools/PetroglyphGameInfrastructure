@@ -60,4 +60,10 @@ public static class GITestUtilities
 
         return languages;
     }
+
+    public static GameIdentity GetRandomGameIdentity(bool realOnly = true)
+    {
+        var platforms = realOnly ? RealPlatforms : (GamePlatform[])Enum.GetValues(typeof(GamePlatform));
+        return new GameIdentity(Random.Enum<GameType>(), Random.Item(platforms));
+    }
 }

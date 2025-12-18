@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using AET.Modinfo.Model;
+﻿using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using System;
+using System.Collections.Generic;
 using Xunit;
+using PG.StarWarsGame.Infrastructure.Testing.Game;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Services;
 
@@ -71,7 +71,7 @@ public class LanguageFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindLanguages_Mod_WithLanguages_En_De_Steam()
     {
-        var game = FileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
+        var game = GameInfrastructureTesting.Game(ServiceProvider).Install(new GameIdentity(GameType.Foc, GamePlatform.SteamGold));
         var mod = game.InstallMod("myMod", true, ServiceProvider);
         InstallModLanguage(mod, new LanguageInfo("de", LanguageSupportLevel.SFX));
         InstallModLanguage(mod, new LanguageInfo("en", LanguageSupportLevel.FullLocalized));

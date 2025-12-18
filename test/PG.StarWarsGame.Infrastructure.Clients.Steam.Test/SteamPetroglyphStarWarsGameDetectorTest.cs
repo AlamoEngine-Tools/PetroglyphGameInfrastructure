@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
@@ -30,7 +30,6 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
         base.SetupServices(serviceCollection);
         serviceCollection.AddSingleton(_registry);
         SteamAbstractionLayer.InitializeServices(serviceCollection);
-        PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
         SteamPetroglyphStarWarsGameClients.InitializeServices(serviceCollection);
     }
 
@@ -43,8 +42,8 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
     {
         return SetupGame(gameIdentity, (game, otherGameType) =>
         {
-            _registry.InstallGame(game, ServiceProvider);
-            otherGameType.CreateNonExistingRegistry(ServiceProvider);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstlled(game);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(otherGameType);
         });
     }
 
@@ -52,8 +51,8 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
     {
         return SetupGame(gameIdentity, (game, otherGameType) =>
         {
-            TestGameRegistrySetupData.Uninitialized(game.Type).Create(ServiceProvider);
-            otherGameType.CreateNonExistingRegistry(ServiceProvider);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(game.Type));
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(otherGameType);
         });
     }
 
@@ -62,7 +61,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
         if (!shallInitSuccessfully)
             return;
         var registrySetupData = TestGameRegistrySetupData.Installed(info.GameType, info.GameDirectory!);
-        registrySetupData.Create(ServiceProvider);
+        GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(registrySetupData);
     }
 
     [Fact]
@@ -79,7 +78,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
         var gameId = new GameIdentity(gameType, GamePlatform.SteamGold);
         var expected = GameDetectionResult.NotInstalled(gameId.Type);
 
-        GameInstallation.Install(gameId);
+        GetOrÍnstallGame(gameId);
 
         var detector = new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
         var result = detector.Detect(gameType, GamePlatform.SteamGold);
@@ -95,7 +94,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
         var gameId = new GameIdentity(gameType, GamePlatform.SteamGold);
         var expected = GameDetectionResult.NotInstalled(gameId.Type);
 
-        GameInstallation.Install(gameId);
+        GetOrÍnstallGame(gameId);
 
         var detector = new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
         var result = detector.Detect(gameType, GamePlatform.SteamGold);
@@ -113,8 +112,8 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
 
         var info = SetupGame(gameId, (game, otherGameType) =>
         {
-            _registry.InstallGame(game, ServiceProvider);
-            otherGameType.CreateNonExistingRegistry(ServiceProvider);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstlled(game);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(otherGameType);
         }, SteamAppState.StateUpdateRequired);
 
         var detector = CreateDetector(info, true);
@@ -136,8 +135,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
             return new GameDetectorTestInfo<object>(gameIdentity.Type, null, null);
 
         // Install Game
-        GameInstallation.Install(gameIdentity);
-        var game = GameInstallation.Game;
+        var game = GetOrÍnstallGame(gameIdentity);
 
         // Register Game to Steam
         var lib = steam.InstallDefaultLibrary();

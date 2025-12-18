@@ -12,7 +12,7 @@ using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
@@ -43,11 +43,11 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
     {
         // Init Mods uninitialized
 
-        var eaw = FileSystem.InstallGame(new GameIdentity(GameType.Eaw, platform), ServiceProvider);
-        var foc = FileSystem.InstallGame(new GameIdentity(GameType.Foc, platform), ServiceProvider);
+        var eaw = GameInfrastructureTesting.Game(ServiceProvider).Install(new GameIdentity(GameType.Eaw, platform));
+        var foc = GameInfrastructureTesting.Game(ServiceProvider).Install(new GameIdentity(GameType.Foc, platform));
 
-        TestGameRegistrySetupData.Uninitialized(GameType.Eaw).Create(ServiceProvider); 
-        TestGameRegistrySetupData.Uninitialized(GameType.Foc).Create(ServiceProvider);
+        GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(GameType.Eaw));
+        GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(GameType.Foc));
 
         var registryFactory = ServiceProvider.GetRequiredService<IGameRegistryFactory>();
         var eawRegistry = registryFactory.CreateRegistry(GameType.Eaw);
@@ -59,7 +59,8 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
         var initCount = 0;
         gameDetector.InitializationRequested += (_, args) =>
         {
-            _registry.InstallGame(args.GameType == GameType.Eaw ? eaw : foc, ServiceProvider);
+            var game = args.GameType == GameType.Eaw ? eaw : foc;
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstlled(game);
             args.Handled = true;
             initCount++;
         };

@@ -5,18 +5,13 @@ using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
-public static partial class GameInstallation
+internal static partial class GameInstallation
 {
     private const string FocNormalPath = "games/foc";
     private const string FocGoldPath = "games/gold/foc";
     private const string FocSteamSubPath = "corruption";
     private const string FocGogSubPath = "EAWX";
     private const string FocOriginSubPath = "EAWX";
-
-    public static IDirectoryInfo GetWrongOriginFocRegistryLocation(this IFileSystem fs)
-    {
-        return fs.DirectoryInfo.New(fs.Path.Combine(OriginBasePath, "corruption"));
-    }
 
     public static IDirectoryInfo InstallFoc(IFileSystem fs, GamePlatform platform)
     {

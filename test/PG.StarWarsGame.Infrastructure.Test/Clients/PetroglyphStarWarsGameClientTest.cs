@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AET.Modinfo.Spec;
+using AET.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
@@ -11,7 +12,6 @@ using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Clients;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
@@ -34,6 +34,22 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
     {
     }
 
+    protected override IGame GetOrÍnstallGame(IGameIdentity? identity = null)
+    {
+        if (GameInstallation.Game is not null)
+            return GameInstallation.Game;
+
+        if (identity is not null)
+        {
+            if (!SupportedPlatforms.Contains(identity.Platform))
+                throw new NotSupportedException($"The requested game platform '{identity.Platform}' is not supported by this client test");
+            return GameInstallation.Install(identity);
+        }
+
+        var newIdentity = new GameIdentity(Random.Enum<GameType>(), Random.Item(SupportedPlatforms));
+        return GameInstallation.Install(newIdentity);
+    }
+
     public PetroglyphStarWarsGameClientTest()
     {
         _clientFactory = ServiceProvider.GetRequiredService<IGameClientFactory>();
@@ -50,15 +66,15 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
     public void Ctor_NullArgs_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGameClient(null!, ServiceProvider));
-        InstallRandomGame();
-        Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGameClient(GameInstallation.Game, null!));
+        var game = GetOrÍnstallGame();
+        Assert.Throws<ArgumentNullException>(() => new PetroglyphStarWarsGameClient(game, null!));
     }
 
     [Fact]
     public void Ctor_SetsGame()
     {
-        InstallRandomGame();
-        using var client = new PetroglyphStarWarsGameClient(GameInstallation.Game, ServiceProvider);
+        var game = GetOrÍnstallGame();
+        using var client = new PetroglyphStarWarsGameClient(game, ServiceProvider);
         Assert.Same(GameInstallation.Game, client.Game);
     }
 
@@ -66,7 +82,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void IsDebugAvailable_NoDebugFilesAvailable(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
         using var client = _clientFactory.CreateClient(game);
         Assert.False(client.IsDebugAvailable());
     }
@@ -76,8 +92,8 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
     [InlineData(GameType.Foc)]
     public void IsDebugAvailable_DebugFilesAvailable(GameType gameType)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.SteamGold), ServiceProvider);
-        game.InstallDebug();
+        var game = GetOrÍnstallGame(new GameIdentity(gameType, GamePlatform.SteamGold));
+        GameInstallation.InstallDebug();
         using var client = _clientFactory.CreateClient(game);
         Assert.True(client.IsDebugAvailable());
     }
@@ -85,7 +101,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
     [Fact]
     public void PlayDebug_NullArgs_Throws()
     {
-        var game = FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
+        var game = GetOrÍnstallGame();
         var client = _clientFactory.CreateClient(game);
 
         Assert.Throws<ArgumentNullException>(() => client.Play((IPhysicalMod)null!));
@@ -99,10 +115,10 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
     {
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
-
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+       
+        var game = GetOrÍnstallGame(gameIdentity);
         if (gameIdentity.Platform == GamePlatform.SteamGold)
-            game.InstallDebug();
+            GameInstallation.InstallDebug();
         var mod = game.InstallMod("MyMod", false, ServiceProvider);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
@@ -134,9 +150,9 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
 
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
         if (gameIdentity.Platform == GamePlatform.SteamGold)
-            game.InstallDebug();
+            GameInstallation.InstallDebug();
         var mod = game.InstallMod("MyMod", false, ServiceProvider);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
@@ -161,7 +177,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
 
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
         TestPlay(game, expectedProcessInfo, client => client.Play());
@@ -174,7 +190,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
 
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
 
         var arg = new WindowedArgument();
 
@@ -189,7 +205,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
 
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
         var mod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
 
         var expectedArguments = new ArgumentCollection([new ModArgumentList([
@@ -204,8 +220,8 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
     [InlineData(GameType.Foc)]
     public void Debug_DebugIsAvailable(GameType gameType)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.SteamGold), ServiceProvider);
-        game.InstallDebug();
+        var game = GetOrÍnstallGame(new GameIdentity(gameType, GamePlatform.SteamGold));
+        GameInstallation.InstallDebug();
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Debug, ArgumentCollection.Empty);
         TestPlay(
@@ -221,7 +237,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
 
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
         TestPlay(
@@ -237,7 +253,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
 
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
         TestPlay(
@@ -254,7 +270,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
 
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
 
@@ -280,7 +296,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
 
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
 
         var derivedClient = new MyTestClient((_, type) =>
         {
@@ -342,7 +358,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         }
     }
 
-    private void AssertProcessStartInfo(GameProcessInfo expected, GameProcessInfo actual)
+    private static void AssertProcessStartInfo(GameProcessInfo expected, GameProcessInfo actual)
     {
         Assert.Equal(expected.Game, actual.Game);
         Assert.Equal(expected.BuildType, actual.BuildType);

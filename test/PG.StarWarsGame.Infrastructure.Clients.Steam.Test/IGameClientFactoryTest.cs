@@ -27,12 +27,12 @@ public class IGameClientFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateClient_CreatesCorrectClientType(GameIdentity identity)
     {
-        GameInstallation.Install(identity);
+        var game = GetOrÍnstallGame(identity);
         var factory = ServiceProvider.GetRequiredService<IGameClientFactory>();
-        var client = factory.CreateClient(GameInstallation.Game);
+        var client = factory.CreateClient(game);
 
         var expectedClientType = typeof(PetroglyphStarWarsGameClient);
-        if (GameInstallation.Game.Platform is GamePlatform.SteamGold)
+        if (game.Platform is GamePlatform.SteamGold)
             expectedClientType = typeof(SteamPetroglyphStarWarsGameClient);
 
         Assert.IsType(expectedClientType, client);

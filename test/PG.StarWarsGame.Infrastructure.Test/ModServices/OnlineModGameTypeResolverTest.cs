@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
@@ -21,14 +21,14 @@ public class OnlineModGameTypeResolverTest : ModGameTypeResolverTestBase
     public static IEnumerable<object[]> GetOnlineModsData()
     {
         yield return ["1125718579", new[] {GameType.Foc}, GameType.Eaw]; //z3r0x's Mod (3.5)
-        yield return ["2508288191", new[] {GameType.Foc, GameType.Eaw}, null!]; //Deep Core SDK
+        yield return ["2508288191", new[] {GameType.Foc, GameType.Eaw}, null!]; //Mod Template
     }
 
     [Theory]
     [MemberData(nameof(GetOnlineModsData))]
     public void Online_GetTagsFromSteamOnline(string knownId, ICollection<GameType> expectedTypes, GameType? incompatibleWith)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold), ServiceProvider);
+        var game = GetOrÍnstallGame(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold));
 
         var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var modDir = steamHelpers.GetWorkshopsLocation(game).CreateSubdirectory(knownId);

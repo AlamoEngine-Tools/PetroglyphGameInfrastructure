@@ -1,16 +1,14 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO.Abstractions;
-using System.Threading;
-using AET.Modinfo.Model;
+﻿using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Testing;
-using AET.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using System.IO.Abstractions;
+using System.Threading;
 using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
@@ -23,7 +21,7 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
 
     protected GameInfrastructureTestBase()
     {
-        GameInstallation = GameTesting.Game(ServiceProvider);
+        GameInstallation = GameInfrastructureTesting.Game(ServiceProvider);
     }
     
     protected virtual IFileSystem CreateFileSystem()
@@ -38,16 +36,15 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
         PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
     }
 
-    protected static GameIdentity CreateRandomGameIdentity()
+    protected virtual IGame GetOrÍnstallGame(IGameIdentity? identity = null)
     {
-        return new GameIdentity(Random.Enum<GameType>(), Random.Item(GITestUtilities.RealPlatforms));
+        if (GameInstallation.Game is not null)
+            return GameInstallation.Game;
+        return identity is not null ? GameInstallation.Install(identity) : GameInstallation.InstallRandom();
     }
 
-    protected void InstallRandomGame()
-    {
-        GameInstallation.Install(CreateRandomGameIdentity());
-    }
 
+    // TODO: To installation
     protected IMod CreateAndAddMod(bool isWorkshop, string name, IModDependencyList dependencies)
     {
         if (dependencies.Count == 0)

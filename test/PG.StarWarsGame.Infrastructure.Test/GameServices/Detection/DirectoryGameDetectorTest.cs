@@ -4,7 +4,6 @@ using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Testably.Abstractions.Testing;
 using Xunit;
@@ -24,7 +23,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<object>
 
     protected override GameDetectorTestInfo<object> SetupGame(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrÍnstallGame(gameIdentity);
         return new(gameIdentity.Type, game.Directory, null);
     }
 
@@ -72,7 +71,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<object>
     {
         TestNotInstalledWithCustomSetup(identity, i =>
         {
-            FileSystem.InstallGame(i, ServiceProvider);
+            if (i != null) GetOrÍnstallGame(i);
             return FileSystem.DirectoryInfo.New("other");
         });
     }

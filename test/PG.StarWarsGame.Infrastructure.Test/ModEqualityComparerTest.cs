@@ -5,7 +5,7 @@ using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
@@ -113,8 +113,8 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
         var sameishGame = new PetroglyphStarWarsGame(Game, Game.Directory, Game.Name, ServiceProvider);
         var modSamish = sameishGame.InstallAndAddMod(modA.Name, modA.Type == ModType.Workshops, ServiceProvider);
 
-        var diffGame = FileSystem.InstallGame(
-                new GameIdentity(Game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw, Game.Platform), ServiceProvider);
+        var diffGame = GameInfrastructureTesting.Game(ServiceProvider)
+            .Install(new GameIdentity(Game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw, Game.Platform));
 
         var diffGameMod = diffGame.InstallMod("A", modA.Type == ModType.Workshops, ServiceProvider);
 

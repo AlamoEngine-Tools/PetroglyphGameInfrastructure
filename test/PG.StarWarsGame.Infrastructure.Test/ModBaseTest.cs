@@ -21,8 +21,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
 
     protected ModBaseTest()
     {
-        InstallRandomGame();
-        Game = GameInstallation.Game;
+        Game = GetOrÍnstallGame();
     }
 
     protected abstract ModBase CreateMod(

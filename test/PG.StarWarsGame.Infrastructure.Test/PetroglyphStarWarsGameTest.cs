@@ -4,17 +4,17 @@ using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Game;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class PetroglyphStarWarsGameTest : PlayableModContainerTest
 {
-    private IGame CreateGame(string? iconPath = null, ICollection<ILanguageInfo>? languages = null)
+    private PetroglyphStarWarsGame CreateGame(string? iconPath = null, ICollection<ILanguageInfo>? languages = null)
     {
         var gameId = new GameIdentity(Random.Enum<GameType>(), Random.Item(GITestUtilities.RealPlatforms));
-        var game =  FileSystem.InstallGame(gameId, ServiceProvider);
+        var game = GetOrÍnstallGame(gameId);
         if (languages is not null)
         {
             foreach (var languageInfo in languages)
@@ -27,7 +27,7 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
             FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, iconPath));
         }
 
-        return game;
+        return game as PetroglyphStarWarsGame;
     }
 
     protected override IPlayableObject CreatePlayableObject(string? iconPath = null, ICollection<ILanguageInfo>? languages = null)
@@ -37,7 +37,7 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
 
     protected override PlayableModContainer CreateModContainer()
     {
-        return CreateGame() as PlayableModContainer;
+        return CreateGame();
     }
 
     [Fact]
@@ -63,9 +63,9 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
         var focSteamId = new GameIdentity(GameType.Foc, GamePlatform.SteamGold);
         var eawDiskId = new GameIdentity(GameType.Eaw, GamePlatform.Disk);
 
-        var eawSteam = FileSystem.InstallGame(eawSteamId, ServiceProvider);
-        var focSteam = FileSystem.InstallGame(focSteamId, ServiceProvider);
-        var eawDisc = FileSystem.InstallGame(eawDiskId, ServiceProvider);
+        var eawSteam = GameInfrastructureTesting.Game(ServiceProvider).Install(eawSteamId);
+        var focSteam = GameInfrastructureTesting.Game(ServiceProvider).Install(focSteamId);
+        var eawDisc = GameInfrastructureTesting.Game(ServiceProvider).Install(eawDiskId);
 
         Assert.False(eawSteam.Equals(null));
         Assert.False(eawSteam.Equals((object)null!));
@@ -100,7 +100,7 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetModDirTest(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GameInstallation.Install(gameIdentity);
         var dataLocation = game.ModsLocation;
         Assert.Equal(FileSystem.Path.GetFullPath(FileSystem.Path.Combine(game.Directory.FullName, "Mods")), dataLocation.FullName);
     }

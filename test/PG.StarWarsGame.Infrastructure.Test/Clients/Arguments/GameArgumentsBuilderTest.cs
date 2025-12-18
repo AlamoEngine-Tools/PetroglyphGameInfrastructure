@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
-public class GameArgumentsBuilderTest : GameInfrastructureTestBase
+public sealed class GameArgumentsBuilderTest : GameInfrastructureTestBase
 {
     private readonly MockFileSystem _fileSystem = new();
     private readonly GameArgumentsBuilder _builder = new();
@@ -21,8 +21,7 @@ public class GameArgumentsBuilderTest : GameInfrastructureTestBase
 
     public GameArgumentsBuilderTest()
     {
-        GameInstallation.Install(new GameIdentity(GameType.Foc, GamePlatform.SteamGold));
-        _game = GameInstallation.Game;
+        _game = GetOrÍnstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold));
     }
 
     [Fact]
