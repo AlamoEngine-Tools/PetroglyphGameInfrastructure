@@ -44,14 +44,14 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
 
     protected override GameDetectorTestInfo<GameRegistryContainer> SetupGame(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         var registryContainer = SetupRegistry(game.Type, TestGameRegistrySetupData.Installed(game.Type, game.Directory));
         return new GameDetectorTestInfo<GameRegistryContainer>(game.Type, game.Directory, registryContainer);
     }
 
     protected override GameDetectorTestInfo<GameRegistryContainer> SetupForRequiredInitialization(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         var registryContainer = SetupRegistry(game.Type, TestGameRegistrySetupData.Uninitialized(gameIdentity.Type));
         return new GameDetectorTestInfo<GameRegistryContainer>(game.Type, game.Directory, registryContainer);
     }

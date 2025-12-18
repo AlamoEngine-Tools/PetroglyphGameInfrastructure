@@ -17,12 +17,8 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
 {
     protected IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem);
 
-    protected ITestingGameInstallation GameInstallation { get; }
+    private ITestingGameInstallation? _gameInstallation;
 
-    protected GameInfrastructureTestBase()
-    {
-        GameInstallation = GameInfrastructureTesting.Game(ServiceProvider);
-    }
     
     protected virtual IFileSystem CreateFileSystem()
     {
@@ -36,11 +32,12 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
         PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
     }
 
-    protected virtual IGame GetOrÍnstallGame(IGameIdentity? identity = null)
-    {
-        if (GameInstallation.Game is not null)
-            return GameInstallation.Game;
-        return identity is not null ? GameInstallation.Install(identity) : GameInstallation.InstallRandom();
+    protected virtual ITestingGameInstallation GetOrCreateGameInstallation(IGameIdentity? identity = null)
+    { 
+        if (_gameInstallation is not null)
+            return _gameInstallation;
+        identity ??= GITestUtilities.GetRandomGameIdentity(realOnly: true);
+        return _gameInstallation = GameInfrastructureTesting.Game(identity, ServiceProvider);
     }
 
 
@@ -48,7 +45,7 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
     protected IMod CreateAndAddMod(bool isWorkshop, string name, IModDependencyList dependencies)
     {
         if (dependencies.Count == 0)
-            return GameInstallation.Game.InstallAndAddMod(name, isWorkshop, ServiceProvider);
+            return GetOrCreateGameInstallation().Game.InstallAndAddMod(name, isWorkshop, ServiceProvider);
 
         var modinfo = new ModinfoData(name)
         {
@@ -59,6 +56,6 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
 
     protected IMod CreateAndAddMod(bool isWorkshop, IModinfo modinfo)
     {
-        return GameInstallation.Game.InstallAndAddMod(isWorkshop, modinfo, ServiceProvider);
+        return GetOrCreateGameInstallation().Game.InstallAndAddMod(isWorkshop, modinfo, ServiceProvider);
     }
 }

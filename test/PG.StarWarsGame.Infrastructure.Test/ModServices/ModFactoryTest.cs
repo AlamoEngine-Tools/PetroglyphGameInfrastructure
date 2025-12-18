@@ -47,7 +47,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [Fact]
     public void CreatePhysicalMod_NullArgs_Throws()
     {
-        var game = GetOrÍnstallGame();
+        var game = GetOrCreateGameInstallation().Game;
         var modData = CreateDetectedModReference(game, "path", null, null);
 
         Assert.Throws<ArgumentNullException>(() => _factory.CreatePhysicalMod(null!, modData, CultureInfo.CurrentCulture));
@@ -58,7 +58,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [Fact]
     public void CreatePhysicalMod_VirtualMod_Throws()
     {
-        var game = GetOrÍnstallGame();
+        var game = GetOrCreateGameInstallation().Game;
         var modDir = FileSystem.DirectoryInfo.New("path");
         modDir.Create();
         var modData = new DetectedModReference(new ModReference("SOME_ID", ModType.Virtual), modDir, null);
@@ -68,7 +68,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [Fact]
     public void CreatePhysicalMod_ModDirectoryNotFound_Throws()
     {
-        var game = GetOrÍnstallGame();
+        var game = GetOrCreateGameInstallation().Game;
         var modData = CreateDetectedModReference(game, "path", null, null);
         modData.Directory.Delete(true);
         Assert.Throws<DirectoryNotFoundException>(() => _factory.CreatePhysicalMod(game, modData, CultureInfo.CurrentCulture));
@@ -78,7 +78,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_FromModsDir_WithoutModinfo(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         var modDir = game.GetModDirectory("Mod_Name", false, ServiceProvider);
 
         var modData = CreateDetectedModReference(game, modDir, false, null);
@@ -94,7 +94,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_FromModsDir_WithModinfo(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         var modDir = game.GetModDirectory("Mod_Name", false, ServiceProvider);
 
         var modinfo = new ModinfoData("MyMod");
@@ -113,7 +113,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [InlineData(GameType.Foc)]
     public void CreatePhysicalMod_Steam_WithoutModinfo(GameType gameType)
     {
-        var game = GetOrÍnstallGame(new GameIdentity(gameType, GamePlatform.SteamGold));
+        var game = GetOrCreateGameInstallation(new GameIdentity(gameType, GamePlatform.SteamGold)).Game;
         var modDir = game.GetModDirectory("Mod_Name", true, ServiceProvider);
 
         var modinfo = new ModinfoData("MyMod");
@@ -132,7 +132,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [InlineData(GameType.Foc)]
     public void CreatePhysicalMod_Steam_WithModinfo(GameType gameType)
     {
-        var game = GetOrÍnstallGame(new GameIdentity(gameType, GamePlatform.SteamGold));
+        var game = GetOrCreateGameInstallation(new GameIdentity(gameType, GamePlatform.SteamGold)).Game;
         var modDir = game.GetModDirectory("Mod_Name", true, ServiceProvider);
 
         var modRef = CreateDetectedModReference(game, modDir, true, null);
@@ -148,7 +148,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_WithInvalidModinfo(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
 
         var ws = GITestUtilities.GetRandomWorkshopFlag(game);
         var modDir = game.GetModDirectory("Mod_Name", ws, ServiceProvider);
@@ -163,7 +163,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_InvalidNameResolved_Throws(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
 
         var ws = GITestUtilities.GetRandomWorkshopFlag(game);
         var modDir = game.GetModDirectory("Mod_Name", ws, ServiceProvider);
@@ -177,11 +177,11 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreatePhysicalMod_ModNotCompatible_Throws(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
 
         var oppositeGameType = gameIdentity.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw;
-        var otherGame = GameInfrastructureTesting.Game(ServiceProvider)
-            .Install(new GameIdentity(oppositeGameType, Random.Item(GITestUtilities.RealPlatforms)));
+        var otherGame = GameInfrastructureTesting
+            .Game(new GameIdentity(oppositeGameType, Random.Item(GITestUtilities.RealPlatforms)), ServiceProvider).Game;
 
         var modDir = otherGame.GetModDirectory("Mod_Name", false, ServiceProvider);
         var modData = CreateDetectedModReference(otherGame, modDir, false, null);
@@ -196,7 +196,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [Fact]
     public void CreateVirtualMod_NullArgs_Throws()
     {
-        var game = GetOrÍnstallGame();
+        var game = GetOrCreateGameInstallation().Game;
         var dep = game.InstallMod("dep", false, ServiceProvider);
 
         Assert.Throws<ArgumentNullException>(() => _factory.CreateVirtualMod(null!, new ModinfoData("Name")
@@ -210,7 +210,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod_WithInvalidModinfo(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         var dep = game.InstallMod("dep", false, ServiceProvider);
 
         var invalidModinfo = new CustomModInfo(string.Empty)
@@ -225,7 +225,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod_WithInvalidModinfo_NoDependencies(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
 
         var invalidModinfo = new CustomModInfo("MyVirtualMod")
         {
@@ -239,7 +239,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         var dep = game.InstallMod("dep", false, ServiceProvider);
 
         var modinfo = new CustomModInfo("VirtualModName")

@@ -71,7 +71,7 @@ public class LanguageFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindLanguages_Mod_WithLanguages_En_De_Steam()
     {
-        var game = GameInfrastructureTesting.Game(ServiceProvider).Install(new GameIdentity(GameType.Foc, GamePlatform.SteamGold));
+        var game = GameInfrastructureTesting.Game(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider).Game;
         var mod = game.InstallMod("myMod", true, ServiceProvider);
         InstallModLanguage(mod, new LanguageInfo("de", LanguageSupportLevel.SFX));
         InstallModLanguage(mod, new LanguageInfo("en", LanguageSupportLevel.FullLocalized));

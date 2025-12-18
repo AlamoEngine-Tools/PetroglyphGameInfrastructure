@@ -22,7 +22,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
 
     protected ModBaseTest()
     {
-        Game = GetOrÍnstallGame();
+        Game = GetOrCreateGameInstallation().Game;
     }
 
     protected abstract ModBase CreateMod(
@@ -105,9 +105,8 @@ public abstract class ModBaseTest : PlayableModContainerTest
     [Fact]
     public void ResolveDependencies_DepOfWrongGame_Throws()
     {
-        var otherGameInstallRef = GameInfrastructureTesting.Game(ServiceProvider);
-        var otherGame = otherGameInstallRef.Install(Game);
-        var wrongGameDep = otherGameInstallRef.InstallAndAddMod("WrongGameRefMod", GITestUtilities.GetRandomWorkshopFlag(otherGame));
+        var otherGameInstallRef = GameInfrastructureTesting.Game(Game, ServiceProvider);
+        var wrongGameDep = otherGameInstallRef.InstallAndAddMod("WrongGameRefMod", GITestUtilities.GetRandomWorkshopFlag(otherGameInstallRef.Game));
 
         var mod = CreateMod("Mod", Random.Enum<DependencyResolveLayout>(), wrongGameDep.Mod);
         

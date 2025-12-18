@@ -43,8 +43,8 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
     {
         // Init Mods uninitialized
 
-        var eaw = GameInfrastructureTesting.Game(ServiceProvider).Install(new GameIdentity(GameType.Eaw, platform));
-        var foc = GameInfrastructureTesting.Game(ServiceProvider).Install(new GameIdentity(GameType.Foc, platform));
+        var eaw = GameInfrastructureTesting.Game(new GameIdentity(GameType.Eaw, platform), ServiceProvider).Game;
+        var foc = GameInfrastructureTesting.Game(new GameIdentity(GameType.Foc, platform), ServiceProvider).Game;
 
         GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(GameType.Eaw));
         GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(GameType.Foc));

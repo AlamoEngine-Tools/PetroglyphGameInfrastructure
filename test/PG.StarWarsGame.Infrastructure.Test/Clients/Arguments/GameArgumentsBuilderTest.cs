@@ -21,7 +21,7 @@ public sealed class GameArgumentsBuilderTest : GameInfrastructureTestBase
 
     public GameArgumentsBuilderTest()
     {
-        _game = GetOrÍnstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold));
+        _game = GetOrCreateGameInstallation(new GameIdentity(GameType.Foc, GamePlatform.SteamGold)).Game;
     }
 
     [Fact]

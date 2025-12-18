@@ -40,7 +40,7 @@ public class GameExecutableFileUtilitiesTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetExecutableForGame_NullGame_ThrowsArgumentNullException(GameIdentity gameIdentity)
     {
-        GetOrÍnstallGame(gameIdentity);
+        GetOrCreateGameInstallation(gameIdentity);
         var buildTypes = new List<GameBuildType> { GameBuildType.Release, GameBuildType.Debug };
         foreach (var buildType in buildTypes) 
             Assert.Throws<ArgumentNullException>(() => GameExecutableFileUtilities.GetExecutableForGame(null!, buildType));
@@ -70,11 +70,11 @@ public class GameExecutableFileUtilitiesTest : GameInfrastructureTestBase
     [MemberData(nameof(GetGameExeNamesTestData))]
     public void GetExecutableForGame_ReturnsFileHandle(GameIdentity gameIdentity, GameBuildType buildType, string expectedName)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
         if (buildType == GameBuildType.Debug)
-            GameInstallation.InstallDebug();
+            gameInstallation.InstallDebug();
 
-        var exeFile = GameExecutableFileUtilities.GetExecutableForGame(game, buildType);
+        var exeFile = GameExecutableFileUtilities.GetExecutableForGame(gameInstallation.Game, buildType);
         Assert.NotNull(exeFile);
         Assert.Equal(expectedName, exeFile.Name);
     }
@@ -84,7 +84,7 @@ public class GameExecutableFileUtilitiesTest : GameInfrastructureTestBase
     [InlineData(GameType.Foc)]
     public void GetExecutableForGame_SteamHasReleaseButNotDebugFiles(GameType gameType)
     {
-        var game = GetOrÍnstallGame(new GameIdentity(gameType, GamePlatform.SteamGold));
+        var game = GetOrCreateGameInstallation(new GameIdentity(gameType, GamePlatform.SteamGold)).Game;
 
         var releaseExe = GameExecutableFileUtilities.GetExecutableForGame(game, GameBuildType.Release);
         Assert.NotNull(releaseExe);
@@ -100,7 +100,7 @@ public class GameExecutableFileUtilitiesTest : GameInfrastructureTestBase
         if (identity.Platform == GamePlatform.SteamGold)
             return;
 
-        var game = GetOrÍnstallGame(identity);
+        var game = GetOrCreateGameInstallation(identity).Game;
         using var _ = FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "StarWarsG.exe"));
 
         Assert.Null(GameExecutableFileUtilities.GetExecutableForGame(game, GameBuildType.Debug));

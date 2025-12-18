@@ -8,7 +8,7 @@ namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
 public abstract class GameInfrastructureTestBaseWithRandomGame : GameInfrastructureTestBase
 {
-    protected IGame Game => GetOrÍnstallGame(identity: null);
+    protected IGame Game => GetOrCreateGameInstallation(identity: null).Game;
 
     protected IMod CreateAndAddMod(
         string name,

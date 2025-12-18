@@ -148,7 +148,7 @@ public class GameFactoryTest : GameInfrastructureTestBase
         var actualGameType = Random.Enum<GameType>();
 
         // Use Disk so that we can check against more specific platforms
-        var installedGame = GetOrÍnstallGame(new GameIdentity(actualGameType, GamePlatform.Disk));
+        var installedGame = GetOrCreateGameInstallation(new GameIdentity(actualGameType, GamePlatform.Disk)).Game;
 
         var createIdentity = new GameIdentity(actualGameType, platform);
 
@@ -171,7 +171,7 @@ public class GameFactoryTest : GameInfrastructureTestBase
         var actualGameType = Random.Enum<GameType>();
 
         // Use Disk so that we can check against more specific platforms
-        var installedGame = GetOrÍnstallGame(new GameIdentity(actualGameType, platform));
+        var installedGame = GetOrCreateGameInstallation(new GameIdentity(actualGameType, platform)).Game;
 
         var createGameType = actualGameType == GameType.Eaw ? GameType.Foc : GameType.Eaw;
         var createIdentity = new GameIdentity(createGameType, platform);
@@ -182,7 +182,7 @@ public class GameFactoryTest : GameInfrastructureTestBase
     [Fact]
     public void CreateGame_UnidentifiedPlatform_Throws()
     {
-        var game = GetOrÍnstallGame();
+        var game = GetOrCreateGameInstallation().Game;
         Assert.Throws<GameException>(() => _factory.CreateGame(
             new GameIdentity(Random.Enum<GameType>(), GamePlatform.Undefined),
             game.Directory,
@@ -239,7 +239,7 @@ public class GameFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateGame_FromIdentity_GameCreated(GameIdentity gameIdentity)
     {
-        var installedGame = GetOrÍnstallGame(gameIdentity);
+        var installedGame = GetOrCreateGameInstallation(gameIdentity).Game;
 
         var expectedName = _nameResolver.ResolveName(gameIdentity, CultureInfo.CurrentCulture);
 
@@ -257,7 +257,7 @@ public class GameFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateGame_FromDetectionResult_GameCreated(GameIdentity gameIdentity)
     {
-        var installedGame = GetOrÍnstallGame(gameIdentity);
+        var installedGame = GetOrCreateGameInstallation(gameIdentity).Game;
 
         var detector = new DirectoryGameDetector(installedGame.Directory, ServiceProvider);
         var detectionResult = detector.Detect(gameIdentity.Type, gameIdentity.Platform);

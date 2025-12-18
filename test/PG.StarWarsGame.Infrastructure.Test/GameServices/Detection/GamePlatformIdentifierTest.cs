@@ -33,7 +33,7 @@ public class GamePlatformIdentifierTest : GameInfrastructureTestBase
     public void GetGamePlatform_WrongGameInstalledReturnsUndefined(GameIdentity identity)
     {
         var oppositeGameType = identity.Type == GameType.Foc ? GameType.Eaw : GameType.Foc;
-        var game = GetOrÍnstallGame(new GameIdentity(oppositeGameType, identity.Platform));
+        var game = GetOrCreateGameInstallation(new GameIdentity(oppositeGameType, identity.Platform)).Game;
         var gameLocation = game.Directory;
 
         var actual = _platformIdentifier.GetGamePlatform(identity.Type, ref gameLocation);
@@ -57,9 +57,9 @@ public class GamePlatformIdentifierTest : GameInfrastructureTestBase
     [Fact]
     public void GetGamePlatform_FocOriginWithSanitization()
     {
-        GetOrÍnstallGame(new GameIdentity(GameType.Foc, GamePlatform.Origin));
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(GameType.Foc, GamePlatform.Origin));
 
-        var locRef = GameInstallation.GetWrongOriginFocRegistryLocation();
+        var locRef = gameInstallation.GetWrongOriginFocRegistryLocation();
         var locStore = locRef;
 
         var actual = _platformIdentifier.GetGamePlatform(GameType.Foc, ref locRef);

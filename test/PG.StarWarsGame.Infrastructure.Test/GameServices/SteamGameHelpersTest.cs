@@ -27,7 +27,7 @@ public class SteamGameHelpersTest : GameInfrastructureTestBase
     [Fact]
     public void GetWorkshopsLocation_Success()
     {
-        var game = GetOrÍnstallGame(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold));
+        var game = GetOrCreateGameInstallation(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold)).Game;
 
         var wsDir = _steamGameHelpers.GetWorkshopsLocation(game);
 
@@ -58,7 +58,7 @@ public class SteamGameHelpersTest : GameInfrastructureTestBase
     [InlineData(GamePlatform.Origin)]
     public void GetWorkshopsLocation_FailNoSteam(GamePlatform platform)
     {
-        var game = GetOrÍnstallGame(new GameIdentity(Random.Enum<GameType>(), platform));
+        var game = GetOrCreateGameInstallation(new GameIdentity(Random.Enum<GameType>(), platform)).Game;
         Assert.Throws<GameException>(() => _steamGameHelpers.GetWorkshopsLocation(game));
         Assert.False(_steamGameHelpers.TryGetWorkshopsLocation(game, out _));
     }

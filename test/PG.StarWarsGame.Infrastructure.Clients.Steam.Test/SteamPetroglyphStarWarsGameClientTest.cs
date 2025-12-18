@@ -16,6 +16,7 @@ using System.Runtime.Versioning;
 using AET.Testing.Extensions;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Testing.Game;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
@@ -25,16 +26,17 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
 
     private ISteamFakeProcess? _steamProcess;
+    private ITestingGameInstallation? _gameInstallation;
 
     protected override ICollection<GamePlatform> SupportedPlatforms { get; } = [GamePlatform.SteamGold];
 
-    protected override IGame GetOrÍnstallGame(IGameIdentity? identity = null)
+    protected override ITestingGameInstallation GetOrCreateGameInstallation(IGameIdentity? identity = null)
     {
-        if (GameInstallation.Game is not null)
-            return GameInstallation.Game;
+        if (_gameInstallation is not null)
+            return _gameInstallation;
         var type = identity?.Type ?? Random.Enum<GameType>();
         var steamIdentity = new GameIdentity(type, GamePlatform.SteamGold);
-        return GameInstallation.Install(steamIdentity);
+        return GameInfrastructureTesting.Game(steamIdentity, ServiceProvider);
     }
 
     protected override void BeforePlay()
@@ -62,13 +64,13 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
     public void Ctor_SteamClient_NullArgs_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameClient(null!, ServiceProvider));
-        Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameClient(GetOrÍnstallGame(), null!));
+        Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameClient(GetOrCreateGameInstallation().Game, null!));
     }
 
     [Fact]
     public void SteamPetroglyphStarWarsGameClient_Lifecycle()
     {
-        var client = new SteamPetroglyphStarWarsGameClient(GetOrÍnstallGame(), ServiceProvider);
+        var client = new SteamPetroglyphStarWarsGameClient(GetOrCreateGameInstallation().Game, ServiceProvider);
         Assert.NotNull(client.SteamWrapper);
 
         client.Dispose();
@@ -82,15 +84,14 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
     {
         if (identity.Platform is GamePlatform.SteamGold)
             return;
-        var otherGameInstallation = GameInfrastructureTesting.Game(ServiceProvider);
-        var otherGame = otherGameInstallation.Install(identity);
+        var otherGame = GameInfrastructureTesting.Game(identity, ServiceProvider).Game;
         Assert.Throws<ArgumentException>(() => new SteamPetroglyphStarWarsGameClient(otherGame, ServiceProvider));
     }
 
     [Fact]
     public void Play_SteamNotInstalled_Throws()
     {
-        var game = GetOrÍnstallGame();
+        var game = GetOrCreateGameInstallation().Game;
         var client = new SteamPetroglyphStarWarsGameClient(game, ServiceProvider);
         Assert.Throws<GameStartException>(client.Play);
 
@@ -105,7 +106,7 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
         // Install Steam (regardless whether the identity is supported)
         SteamTesting.Steam(ServiceProvider).Install();
 
-        var game = GetOrÍnstallGame();
+        var game = GetOrCreateGameInstallation().Game;
         var expected = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
 
         TestPlay(game, expected, gameClient => gameClient.Play(), shallThrowGameStartException: true);

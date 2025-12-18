@@ -14,7 +14,7 @@ public class CustomGameDetectorTest : GameInfrastructureTestBase
     public void Detect_TryDetect_FindGameLocationThrowsException(GameIdentity identity)
     {
         var expected = GameDetectionResult.NotInstalled(identity.Type);
-        var game = GetOrÍnstallGame(identity);
+        var game = GetOrCreateGameInstallation(identity);
         Assert.NotNull(game);
 
         var detector = new CallbackGameDetectorBase(FindGameThrowsException, ServiceProvider, false);
@@ -44,7 +44,7 @@ public class CustomGameDetectorTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_InitializationRequestedIsNotTriggeredWhenSupported_DoNotHandle(GameIdentity identity)
     {
-        var game = GetOrÍnstallGame(identity);
+        var game = GetOrCreateGameInstallation(identity).Game;
         Assert.NotNull(game);
         Detect_TryDetect_InitializationRequestedIsTriggeredWhenSupported_DoNotHandle(game, false);
         Detect_TryDetect_InitializationRequestedIsTriggeredWhenSupported_DoNotHandle(game, true);
@@ -84,7 +84,7 @@ public class CustomGameDetectorTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_InitializationRequestedIsTriggeredAndHandled(GameIdentity identity)
     {
-        var game = GetOrÍnstallGame(identity);
+        var game = GetOrCreateGameInstallation(identity).Game;
         Assert.NotNull(game);
 
         var installed = GameDetectionResult.FromInstalled(identity, game.Directory);

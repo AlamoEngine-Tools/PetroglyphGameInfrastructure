@@ -78,7 +78,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
         var gameId = new GameIdentity(gameType, GamePlatform.SteamGold);
         var expected = GameDetectionResult.NotInstalled(gameId.Type);
 
-        GetOrÍnstallGame(gameId);
+        GetOrCreateGameInstallation(gameId);
 
         var detector = new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
         var result = detector.Detect(gameType, GamePlatform.SteamGold);
@@ -94,7 +94,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
         var gameId = new GameIdentity(gameType, GamePlatform.SteamGold);
         var expected = GameDetectionResult.NotInstalled(gameId.Type);
 
-        GetOrÍnstallGame(gameId);
+        GetOrCreateGameInstallation(gameId);
 
         var detector = new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
         var result = detector.Detect(gameType, GamePlatform.SteamGold);
@@ -135,7 +135,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
             return new GameDetectorTestInfo<object>(gameIdentity.Type, null, null);
 
         // Install Game
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
 
         // Register Game to Steam
         var lib = steam.InstallDefaultLibrary();

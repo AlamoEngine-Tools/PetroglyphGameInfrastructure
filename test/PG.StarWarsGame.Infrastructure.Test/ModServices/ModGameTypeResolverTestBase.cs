@@ -124,7 +124,7 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
         };
 
         // Installing FOC, while tags has EAW. So technically, EAW does not even exist.
-        var game = GetOrÍnstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold));
+        var game = GetOrCreateGameInstallation(new GameIdentity(GameType.Foc, GamePlatform.SteamGold)).Game;
         var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         // Using a known MODID (RaW), which is FOC, to implicitly assert cache is not used.
         var modDir = steamHelpers.GetWorkshopsLocation(game).CreateSubdirectory("1129810972");
@@ -146,7 +146,7 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
         // No SteamData here
         var modinfo = new ModinfoData("Name");
 
-        var game = GetOrÍnstallGame(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold));
+        var game = GetOrCreateGameInstallation(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold)).Game;
 
         var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
 
@@ -179,7 +179,7 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
             SteamData = steamData
         };
 
-        var game = GetOrÍnstallGame(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold));
+        var game = GetOrCreateGameInstallation(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold)).Game;
         
         var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var modDir = steamHelpers.GetWorkshopsLocation(game).CreateSubdirectory("notASteamId");
@@ -217,7 +217,7 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
         // No SteamData here
         var modinfo = new ModinfoData("Name");
 
-        var game = GetOrÍnstallGame(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold));
+        var game = GetOrCreateGameInstallation(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold)).Game;
 
         var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
 
@@ -248,7 +248,7 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
             SteamData = steamData
         };
 
-        var game = GetOrÍnstallGame();
+        var game = GetOrCreateGameInstallation().Game;
         var mod = game.InstallMod("Name", false, ServiceProvider);
 
         var info = CreateDetectedModReference(mod.Directory, ModType.Virtual, modinfo);
@@ -303,7 +303,7 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
             SteamData = steamData
         };
 
-        var game = GetOrÍnstallGame(new GameIdentity(gameType, Random.Item(GITestUtilities.RealPlatforms)));
+        var game = GetOrCreateGameInstallation(new GameIdentity(gameType, Random.Item(GITestUtilities.RealPlatforms))).Game;
         var mod = game.InstallMod("Name", false, ServiceProvider);
 
         var info = CreateDetectedModReference(mod.Directory, ModType.Default, modinfo);
@@ -333,7 +333,7 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
             SteamData = steamData
         };
 
-        var game = GetOrÍnstallGame(new GameIdentity(gameType, Random.Item(GITestUtilities.RealPlatforms)));
+        var game = GetOrCreateGameInstallation(new GameIdentity(gameType, Random.Item(GITestUtilities.RealPlatforms))).Game;
         var modDir = game.Directory.CreateSubdirectory("ModsOther").CreateSubdirectory("MyMod");
         var mod = game.InstallMod(modDir, false, modinfo, ServiceProvider);
 

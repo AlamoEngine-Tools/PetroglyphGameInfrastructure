@@ -23,7 +23,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<object>
 
     protected override GameDetectorTestInfo<object> SetupGame(GameIdentity gameIdentity)
     {
-        var game = GetOrÍnstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         return new(gameIdentity.Type, game.Directory, null);
     }
 
@@ -71,7 +71,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<object>
     {
         TestNotInstalledWithCustomSetup(identity, i =>
         {
-            if (i != null) GetOrÍnstallGame(i);
+            if (i != null) GetOrCreateGameInstallation(i);
             return FileSystem.DirectoryInfo.New("other");
         });
     }

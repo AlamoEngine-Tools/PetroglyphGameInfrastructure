@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +27,7 @@ public class OnlineModGameTypeResolverTest : ModGameTypeResolverTestBase
     [MemberData(nameof(GetOnlineModsData))]
     public void Online_GetTagsFromSteamOnline(string knownId, ICollection<GameType> expectedTypes, GameType? incompatibleWith)
     {
-        var game = GetOrÍnstallGame(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold));
+        var game = GetOrCreateGameInstallation(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold)).Game;
 
         var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var modDir = steamHelpers.GetWorkshopsLocation(game).CreateSubdirectory(knownId);

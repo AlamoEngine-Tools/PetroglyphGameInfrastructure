@@ -27,7 +27,7 @@ public class IGameClientFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateClient_CreatesCorrectClientType(GameIdentity identity)
     {
-        var game = GetOrÍnstallGame(identity);
+        var game = GetOrCreateGameInstallation(identity).Game;
         var factory = ServiceProvider.GetRequiredService<IGameClientFactory>();
         var client = factory.CreateClient(game);
 

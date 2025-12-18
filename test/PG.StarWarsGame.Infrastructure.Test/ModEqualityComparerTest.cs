@@ -3,7 +3,6 @@ using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
@@ -110,12 +109,12 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
     {
         var modA = CreateAndAddMod("A");
 
-        var otherGameInstallRef = GameInfrastructureTesting.Game(ServiceProvider);
-        otherGameInstallRef.Install(Game);
+        var otherGameInstallRef = GameInfrastructureTesting.Game(Game, ServiceProvider);
         var modSamish = otherGameInstallRef.InstallAndAddMod(modA.Name, modA.Type == ModType.Workshops);
 
-        var diffGame = GameInfrastructureTesting.Game(ServiceProvider)
-            .Install(new GameIdentity(Game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw, Game.Platform));
+        var diffGame = GameInfrastructureTesting
+            .Game(new GameIdentity(Game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw, Game.Platform), ServiceProvider)
+            .Game;
 
         var diffGameMod = diffGame.InstallMod("A", modA.Type == ModType.Workshops, ServiceProvider);
 
