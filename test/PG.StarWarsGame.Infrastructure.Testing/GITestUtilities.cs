@@ -26,7 +26,7 @@ public static class GITestUtilities
         Assert.Equal(expected.InitializationRequired, actual.InitializationRequired);
     }
 
-    public static bool GetRandomWorkshopFlag(IGame game)
+    public static bool GetRandomWorkshopFlag(IGameIdentity game)
     {
         if (game.Platform is not GamePlatform.SteamGold)
             return false;

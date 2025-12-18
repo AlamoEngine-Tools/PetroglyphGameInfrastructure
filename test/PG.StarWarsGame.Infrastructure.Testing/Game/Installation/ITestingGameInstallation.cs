@@ -1,6 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using PG.StarWarsGame.Infrastructure.Games;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
-using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
@@ -17,4 +18,6 @@ public interface ITestingGameInstallation
     void InstallDebug();
 
     IDirectoryInfo GetWrongOriginFocRegistryLocation();
+
+    ITestingModInstallation InstallAndAddMod(string name, bool workshop);
 }

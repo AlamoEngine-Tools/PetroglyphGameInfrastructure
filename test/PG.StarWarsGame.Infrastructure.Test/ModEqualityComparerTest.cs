@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using AET.Modinfo.Model;
+﻿using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
@@ -106,12 +107,12 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
     [InlineData(false)]
     [InlineData(true)]
     public void Equals_GameAware(bool gameAware)
-    { 
-
+    {
         var modA = CreateAndAddMod("A");
 
-        var sameishGame = new PetroglyphStarWarsGame(Game, Game.Directory, Game.Name, ServiceProvider);
-        var modSamish = sameishGame.InstallAndAddMod(modA.Name, modA.Type == ModType.Workshops, ServiceProvider);
+        var otherGameInstallRef = GameInfrastructureTesting.Game(ServiceProvider);
+        otherGameInstallRef.Install(Game);
+        var modSamish = otherGameInstallRef.InstallAndAddMod(modA.Name, modA.Type == ModType.Workshops);
 
         var diffGame = GameInfrastructureTesting.Game(ServiceProvider)
             .Install(new GameIdentity(Game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw, Game.Platform));
@@ -122,8 +123,8 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
         Assert.True(comparer.Equals(modA, modA));
         Assert.Equal(comparer.GetHashCode(modA), comparer.GetHashCode(modA));
 
-        Assert.True(comparer.Equals(modA, modSamish));
-        Assert.Equal(comparer.GetHashCode(modA), comparer.GetHashCode(modSamish));
+        Assert.True(comparer.Equals(modA, modSamish.Mod));
+        Assert.Equal(comparer.GetHashCode(modA), comparer.GetHashCode(modSamish.Mod));
 
         if (gameAware)
         {

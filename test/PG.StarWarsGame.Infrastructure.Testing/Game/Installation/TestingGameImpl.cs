@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
@@ -46,6 +47,14 @@ internal class TestingGameImpl(IServiceProvider serviceProvider) : ITestingGameI
         return _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(GameInstallation.OriginBasePath, "corruption"));
     }
 
+    public ITestingModInstallation InstallAndAddMod(string name, bool workshop)
+    {
+        ThrowIfNotInstalled();
+        var mod = Game.InstallMod(name, workshop, serviceProvider);
+        Game.AddMod(mod);
+        return new TestingModImpl(this, mod, serviceProvider);
+    }
+
 
     [MemberNotNull(nameof(Game))]
     private void ThrowIfNotInstalled()
@@ -60,3 +69,4 @@ internal class TestingGameImpl(IServiceProvider serviceProvider) : ITestingGameI
             throw new InvalidOperationException("Game already installed for this testing instance. Create a new one.");
     }
 }
+

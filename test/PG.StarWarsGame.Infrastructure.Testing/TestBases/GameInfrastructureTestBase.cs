@@ -17,7 +17,7 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
 {
     protected IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem);
 
-    protected ITestingGameInstallation GameInstallation;
+    protected ITestingGameInstallation GameInstallation { get; }
 
     protected GameInfrastructureTestBase()
     {

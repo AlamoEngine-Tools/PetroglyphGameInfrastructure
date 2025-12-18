@@ -10,6 +10,7 @@ using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Game;
 using Semver;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
@@ -104,14 +105,15 @@ public abstract class ModBaseTest : PlayableModContainerTest
     [Fact]
     public void ResolveDependencies_DepOfWrongGame_Throws()
     {
-        var otherGameReference = new PetroglyphStarWarsGame(Game, Game.Directory, Game.Name, ServiceProvider);
-        var wrongGameDep = otherGameReference.InstallAndAddMod("WrongGameRefMod", 
-            GITestUtilities.GetRandomWorkshopFlag(otherGameReference), ServiceProvider);
-        var mod = CreateMod("Mod", Random.Enum<DependencyResolveLayout>(), wrongGameDep);
+        var otherGameInstallRef = GameInfrastructureTesting.Game(ServiceProvider);
+        var otherGame = otherGameInstallRef.Install(Game);
+        var wrongGameDep = otherGameInstallRef.InstallAndAddMod("WrongGameRefMod", GITestUtilities.GetRandomWorkshopFlag(otherGame));
+
+        var mod = CreateMod("Mod", Random.Enum<DependencyResolveLayout>(), wrongGameDep.Mod);
         
         var e = Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
         Assert.Same(Game, e.ModContainer);
-        Assert.Equal(wrongGameDep, e.Mod);
+        Assert.Equal(wrongGameDep.Mod, e.Mod);
         Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
     }
 
