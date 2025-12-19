@@ -4,8 +4,8 @@ using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
-internal sealed class TestingVirtualModImpl(ITestingGameInstallation gameInstallation, IVirtualMod mod, IServiceProvider serviceProvider)
-    : TestingModImpl(gameInstallation, mod, serviceProvider), ITestingVirtualModInstallation
+internal sealed class TestingVirtualModInstallationImpl(ITestingGameInstallation gameInstallation, IVirtualMod mod, IServiceProvider serviceProvider)
+    : TestingModInstallationImpl(gameInstallation, mod, serviceProvider), ITestingVirtualModInstallation
 {
     public ITestingGameInstallation GameInstallation { get; } = gameInstallation;
 

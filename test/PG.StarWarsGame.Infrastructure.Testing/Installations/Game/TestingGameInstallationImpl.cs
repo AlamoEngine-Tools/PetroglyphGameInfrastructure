@@ -1,28 +1,22 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using PG.StarWarsGame.Infrastructure.Games;
+﻿using PG.StarWarsGame.Infrastructure.Games;
 using System;
 using System.IO.Abstractions;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
-internal partial class TestingGameInstallationImpl : ITestingGameInstallation
+internal partial class TestingGameInstallationImpl : TestingModContainerInstallation, ITestingGameInstallation
 {
-    private readonly IFileSystem _fileSystem;
-    private readonly IServiceProvider _serviceProvider;
-
     public IGame Game { get; }
 
-    public ITestingGameInstallation GameInstallation => this;
+    public override ITestingGameInstallation GameInstallation => this;
 
-    public PlayableModContainer ModContainer => Game as PlayableModContainer;
+    public override PlayableModContainer ModContainer => Game as PlayableModContainer;
 
-    public IPlayableObject PlayableObject => Game;
+    public override IPlayableObject PlayableObject => Game;
 
-    public TestingGameInstallationImpl(IGameIdentity gameIdentity, IServiceProvider serviceProvider)
+    public TestingGameInstallationImpl(IGameIdentity gameIdentity, IServiceProvider serviceProvider) : base(serviceProvider)
     {
-        _serviceProvider = serviceProvider;
-        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         Game = Install(gameIdentity);
     }
 
@@ -30,23 +24,23 @@ internal partial class TestingGameInstallationImpl : ITestingGameInstallation
     {
         if (Game.Platform is not GamePlatform.SteamGold)
             Assert.Fail($"Cannot install Debug files for non-Steam game '{Game}'");
-        GameInstallationHelper.CreateFile(_fileSystem, _fileSystem.Path.Combine(Game.Directory.FullName, "StarWarsI.exe"));
+        GameInstallationHelper.CreateFile(FileSystem, FileSystem.Path.Combine(Game.Directory.FullName, "StarWarsI.exe"));
     }
 
     public IDirectoryInfo GetWrongOriginFocRegistryLocation()
     {
-        return _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(GameInstallationHelper.OriginBasePath, "corruption"));
+        return FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(GameInstallationHelper.OriginBasePath, "corruption"));
     }
 
     private IGame Install(IGameIdentity gameIdentity)
     {
         var gameDir = gameIdentity.Type == GameType.Foc
-            ? GameInstallationHelper.InstallFoc(_fileSystem, gameIdentity.Platform)
-            : GameInstallationHelper.InstallEaw(_fileSystem, gameIdentity.Platform);
+            ? GameInstallationHelper.InstallFoc(FileSystem, gameIdentity.Platform)
+            : GameInstallationHelper.InstallEaw(FileSystem, gameIdentity.Platform);
 
-        _fileSystem.InstallModsLocations(gameDir);
+        FileSystem.InstallModsLocations(gameDir);
 
-        var game = new PetroglyphStarWarsGame(gameIdentity, gameDir, gameIdentity.ToString(), _serviceProvider);
+        var game = new PetroglyphStarWarsGame(gameIdentity, gameDir, gameIdentity.ToString(), ServiceProvider);
         Assert.True(game.Exists());
         return game;
     }

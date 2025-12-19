@@ -16,8 +16,8 @@ internal partial class TestingGameInstallationImpl
 {
     public ITestingPhysicalModInstallation InstallMod(string name, bool workshop)
     {
-        var mod = CreateMod(name, workshop, modDir => new Mod(Game, name, modDir, workshop, name, _serviceProvider));
-        return new TestingPhysicalModImpl(this, mod, _serviceProvider);
+        var mod = CreateMod(name, workshop, modDir => new Mod(Game, name, modDir, workshop, name, ServiceProvider));
+        return new TestingPhysicalModInstallationImpl(this, mod, ServiceProvider);
     }
 
     public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo)
@@ -29,8 +29,8 @@ internal partial class TestingGameInstallationImpl
     public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo, bool workshop)
     {
         var name = modinfo.Name;
-        var mod = CreateMod(name, workshop, modDir => new Mod(Game, name, modDir, workshop, modinfo, _serviceProvider));
-        return new TestingPhysicalModImpl(this, mod, _serviceProvider);
+        var mod = CreateMod(name, workshop, modDir => new Mod(Game, name, modDir, workshop, modinfo, ServiceProvider));
+        return new TestingPhysicalModInstallationImpl(this, mod, ServiceProvider);
     }
 
     public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo, IDirectoryInfo directory)
@@ -41,8 +41,8 @@ internal partial class TestingGameInstallationImpl
 
     public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo, IDirectoryInfo directory, bool workshop)
     {
-        var mod = CreateMod(directory, dir => new Mod(Game, modinfo.Name, dir, workshop, modinfo, _serviceProvider));
-        return new TestingPhysicalModImpl(this, mod, _serviceProvider);
+        var mod = CreateMod(directory, dir => new Mod(Game, modinfo.Name, dir, workshop, modinfo, ServiceProvider));
+        return new TestingPhysicalModInstallationImpl(this, mod, ServiceProvider);
     }
 
     public ITestingPhysicalModInstallation InstallMod(string name)
@@ -98,9 +98,9 @@ internal partial class TestingGameInstallationImpl
 
     public ITestingVirtualModInstallation AddVirtualMod(string name, ModinfoData modinfo)
     {
-        var mod = new VirtualMod(Game, "VirtualModId", modinfo, _serviceProvider);
+        var mod = new VirtualMod(Game, "VirtualModId", modinfo, ServiceProvider);
         Game.AddMod(mod);
-        return new TestingVirtualModImpl(this, mod, _serviceProvider);
+        return new TestingVirtualModInstallationImpl(this, mod, ServiceProvider);
     }
 
     public ITestingPhysicalModInstallation InstallAndAddMod(string name, bool isWorkshop, IModDependencyList dependencies)
@@ -118,25 +118,25 @@ internal partial class TestingGameInstallationImpl
     public IDirectoryInfo GetModDirectory(string name, bool workshop)
     {
         if (!workshop)
-            return _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(Game.ModsLocation.FullName, name));
+            return FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(Game.ModsLocation.FullName, name));
         if (workshop && Game.Platform is not GamePlatform.SteamGold)
         {
             Assert.Fail($"Game: {Game}, Mod: {name}, {workshop}");
             throw new InvalidOperationException("compiler flow");
         }
 
-        var steamHelpers = _serviceProvider.GetRequiredService<ISteamGameHelpers>();
+        var steamHelpers = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var wsDir = steamHelpers.GetWorkshopsLocation(Game);
         Assert.True(wsDir.Exists);
 
         var nameHash = name.GetHashCode();
         var steamId = (ulong)nameHash;
-        if (!_fileSystem.Directory.Exists(_fileSystem.Path.Combine(wsDir.FullName, steamId.ToString())))
+        if (!FileSystem.Directory.Exists(FileSystem.Path.Combine(wsDir.FullName, steamId.ToString())))
         {
             steamHelpers.ToSteamWorkshopsId(steamId.ToString(), out var id);
             Assert.Equal(steamId, id);
         }
-        return _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(wsDir.FullName, steamId.ToString()));
+        return FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(wsDir.FullName, steamId.ToString()));
     }
 
     private Mod CreateMod(string modName, bool workshop, Func<IDirectoryInfo, Mod> modFactory)
