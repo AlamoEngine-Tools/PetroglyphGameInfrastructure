@@ -5,7 +5,7 @@ using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
-internal static partial class GameInstallation
+internal static partial class GameInstallationHelper
 {
     private const string FocNormalPath = "games/foc";
     private const string FocGoldPath = "games/gold/foc";

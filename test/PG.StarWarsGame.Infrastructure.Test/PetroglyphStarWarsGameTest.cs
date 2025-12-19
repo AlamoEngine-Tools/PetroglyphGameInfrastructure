@@ -5,39 +5,44 @@ using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Game;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class PetroglyphStarWarsGameTest : PlayableModContainerTest
 {
-    private PetroglyphStarWarsGame CreateGame(string? iconPath = null, ICollection<ILanguageInfo>? languages = null)
+    private ITestingGameInstallation CreateGameInstallation(string? iconPath = null, ICollection<ILanguageInfo>? languages = null)
     {
         var gameId = new GameIdentity(Random.Enum<GameType>(), Random.Item(GITestUtilities.RealPlatforms));
-        var game = GetOrCreateGameInstallation(gameId).Game;
+        var gameInstallation = GetOrCreateGameInstallation(gameId);
+
         if (languages is not null)
         {
             foreach (var languageInfo in languages)
-                game.InstallLanguage(languageInfo);
+                gameInstallation.Game.InstallLanguage(languageInfo);
         }
 
         if (iconPath is not null)
         {
-            iconPath = game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
-            FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, iconPath));
+            iconPath = gameInstallation.Game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
+            FileSystem.File.Create(FileSystem.Path.Combine(gameInstallation.Game.Directory.FullName, iconPath));
         }
 
-        return game as PetroglyphStarWarsGame;
+        return gameInstallation;
     }
 
-    protected override IPlayableObject CreatePlayableObject(string? iconPath = null, ICollection<ILanguageInfo>? languages = null)
+    protected override ITestingPlayableObjectInstallation CreatePlayableObjectInstallation(
+        string? iconPath = null, 
+        ICollection<ILanguageInfo>? languages = null)
     {
-        return CreateGame(iconPath, languages);
+        return CreateGameInstallation(iconPath, languages);
     }
 
-    protected override PlayableModContainer CreateModContainer()
+    protected override ITestingModContainerInstallation CreateModContainerInstallation()
     {
-        return CreateGame();
+        return CreateGameInstallation();
     }
 
     [Fact]

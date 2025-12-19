@@ -3,7 +3,6 @@ using AET.Modinfo.Spec;
 using AET.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
@@ -42,20 +41,20 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
 
 
     // TODO: To installation
-    protected IMod CreateAndAddMod(bool isWorkshop, string name, IModDependencyList dependencies)
+    protected ITestingModInstallation CreateAndAddModInstallation(bool isWorkshop, string name, IModDependencyList dependencies)
     {
         if (dependencies.Count == 0)
-            return GetOrCreateGameInstallation().Game.InstallAndAddMod(name, isWorkshop, ServiceProvider);
+            return GetOrCreateGameInstallation().InstallAndAddMod(name, isWorkshop);
 
         var modinfo = new ModinfoData(name)
         {
             Dependencies = dependencies
         };
-        return CreateAndAddMod(isWorkshop, modinfo);
+        return CreateAndAddModInstallation(isWorkshop, modinfo);
     }
 
-    protected IMod CreateAndAddMod(bool isWorkshop, IModinfo modinfo)
+    protected ITestingModInstallation CreateAndAddModInstallation(bool isWorkshop, IModinfo modinfo)
     {
-        return GetOrCreateGameInstallation().Game.InstallAndAddMod(isWorkshop, modinfo, ServiceProvider);
+        return GetOrCreateGameInstallation().InstallAndAddMod(isWorkshop, modinfo);
     }
 }

@@ -15,7 +15,7 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class VirtualModTest : ModBaseTest
 {
-    private VirtualMod CreateVirtualMod(
+    private ITestingVirtualModInstallation CreateVirtualMod(
         string name,
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null,
@@ -25,7 +25,7 @@ public class VirtualModTest : ModBaseTest
         IModDependencyList depList;
         if (deps.Count == 0)
         {
-            var dep = CreateOtherMod("dep", false);
+            var dep = CreateOtherModInstallation("dep", false).Mod;
             depList = new DependencyList(new List<IModReference> { dep }, layout);
         }
         else
@@ -40,12 +40,10 @@ public class VirtualModTest : ModBaseTest
             Dependencies = depList
         };
 
-        var mod = new VirtualMod(Game, "VirtualModId", modinfo, ServiceProvider);
-        Game.AddMod(mod);
-        return mod;
+        return GetOrCreateGameInstallation().AddVirtualMod("VirtualModId", modinfo);
     }
 
-    protected override ModBase CreateMod(
+    protected override ITestingModInstallation CreateModInstallation(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
@@ -53,16 +51,16 @@ public class VirtualModTest : ModBaseTest
         return CreateVirtualMod(name, layout: layout, deps: deps);
     }
 
-    protected override IPlayableObject CreatePlayableObject(
+    protected override ITestingPlayableObjectInstallation CreatePlayableObjectInstallation(
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null)
     {
         return CreateVirtualMod("Mod", iconPath, languages);
     }
 
-    protected override PlayableModContainer CreateModContainer()
+    protected override ITestingModContainerInstallation CreateModContainerInstallation()
     {
-        return CreateMod("Mod");
+        return CreateModInstallation("Mod");
     }
 
     [Fact]
@@ -92,7 +90,7 @@ public class VirtualModTest : ModBaseTest
     [Fact]
     public void Ctor_FromModinfo_Properties()
     {
-        var dep = CreateOtherMod("dep");
+        var dep = CreateOtherModInstallation("dep").Mod;
 
         var modinfo = new ModinfoData("VirtualMod")
         {

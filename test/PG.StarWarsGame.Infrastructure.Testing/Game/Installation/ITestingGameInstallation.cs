@@ -1,10 +1,12 @@
 ﻿using PG.StarWarsGame.Infrastructure.Games;
 using System.IO.Abstractions;
+using AET.Modinfo.Model;
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Testing.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
-public interface ITestingGameInstallation
+public interface ITestingGameInstallation : ITestingModContainerInstallation
 {
     IGame Game { get; }
     
@@ -12,5 +14,11 @@ public interface ITestingGameInstallation
 
     IDirectoryInfo GetWrongOriginFocRegistryLocation();
 
-    ITestingModInstallation InstallAndAddMod(string name, bool workshop);
+    ITestingPhysicalModInstallation InstallAndAddMod(string name, bool workshop);
+
+    ITestingPhysicalModInstallation InstallAndAddMod(bool workshop, IModinfo modinfo);
+
+    ITestingPhysicalModInstallation InstallAndAddMod(IDirectoryInfo directory, bool workshop, IModinfo modinfo);
+    
+    ITestingVirtualModInstallation AddVirtualMod(string name, ModinfoData modinfo);
 }

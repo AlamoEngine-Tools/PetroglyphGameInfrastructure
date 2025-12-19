@@ -70,7 +70,7 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
     public void Equals_DependencyAware(bool depAware)
     {
         var dep = new ModReference("B", ModType.Default);
-        var modA = (IPhysicalMod)CreateAndAddMod("A", deps: dep);
+        var modA = (IPhysicalMod)CreateAndAddMod("A", deps: dep).Mod;
 
         var sameishModindo = new ModinfoData("A")
         {
@@ -107,7 +107,7 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
     [InlineData(true)]
     public void Equals_GameAware(bool gameAware)
     {
-        var modA = CreateAndAddMod("A");
+        var modA = CreateAndAddMod("A").Mod;
 
         var otherGameInstallRef = GameInfrastructureTesting.Game(Game, ServiceProvider);
         var modSamish = otherGameInstallRef.InstallAndAddMod(modA.Name, modA.Type == ModType.Workshops);
@@ -140,7 +140,7 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void ToJson()
     {
-        var mod = CreateAndAddMod("A");
+        var mod = CreateAndAddMod("A").Mod;
         var expected = new ModReference(mod).ToJson();
         Assert.Equal(expected, mod.ToJson());
     }

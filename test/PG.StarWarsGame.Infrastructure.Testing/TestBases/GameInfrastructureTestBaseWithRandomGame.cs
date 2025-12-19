@@ -2,24 +2,27 @@
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
 public abstract class GameInfrastructureTestBaseWithRandomGame : GameInfrastructureTestBase
 {
-    protected IGame Game => GetOrCreateGameInstallation(identity: null).Game;
+    protected IGame Game => GameInstallation.Game;
+    
+    protected ITestingGameInstallation GameInstallation => GetOrCreateGameInstallation(identity: null);
 
-    protected IMod CreateAndAddMod(
+    protected ITestingModInstallation CreateAndAddMod(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
         params IList<IModReference> deps)
     {
-        return CreateAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), name, new DependencyList(deps, layout));
+        return CreateAndAddModInstallation(GITestUtilities.GetRandomWorkshopFlag(Game), name, new DependencyList(deps, layout));
     }
 
-    protected IMod CreateAndAddMod(IModinfo modinfo)
+    protected ITestingModInstallation CreateAndAddMod(IModinfo modinfo)
     {
-        return CreateAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), modinfo);
+        return CreateAndAddModInstallation(GITestUtilities.GetRandomWorkshopFlag(Game), modinfo);
     }
 }

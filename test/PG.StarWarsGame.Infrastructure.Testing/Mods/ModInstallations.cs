@@ -5,26 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Utilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Mods;
-
-
-public interface ITestingModInstallation
-{
-    ITestingGameInstallation GameInstallation { get; }
-
-    IPhysicalMod Mod { get; }
-}
-
-internal sealed class TestingModImpl(ITestingGameInstallation gameInstallation, IPhysicalMod mod, IServiceProvider serviceProvider) : ITestingModInstallation
-{
-    public ITestingGameInstallation GameInstallation { get; } = gameInstallation;
-
-    public IPhysicalMod Mod { get; } = mod;
-}
 
 public static partial class ModInstallations
 {

@@ -26,7 +26,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_NoDependencies()
     {
-        var mod = CreateAndAddMod("A");
+        var mod = CreateAndAddMod("A").Mod;
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -36,8 +36,8 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_OneDependency()
     {
-        var b = CreateAndAddMod("B");
-        var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(), b);
+        var b = CreateAndAddMod("B").Mod;
+        var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(), b).Mod;
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -60,8 +60,8 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     {
         // C is not added to game. Building a graph should not throw, because it's not used.
         var c = Game.InstallMod("C", false, ServiceProvider);
-        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c);
-        var mod = CreateAndAddMod("A", DependencyResolveLayout.FullResolved, b);
+        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c).Mod;
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.FullResolved, b).Mod;
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -82,9 +82,9 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_GraphContainsOnlyVerticesAsDefinedByLayout_ResolveRecursive()
     {
-        var c = CreateAndAddMod("C");
-        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c);
-        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
+        var c = CreateAndAddMod("C").Mod;
+        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c).Mod;
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b).Mod;
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -107,10 +107,10 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_GraphContainsOnlyVerticesAsDefinedByLayout_ResolveLastItem_Variant1()
     {
-        var d = CreateAndAddMod("D");
-        var c = CreateAndAddMod("C");
-        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c);
-        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveLastItem, b, d);
+        var d = CreateAndAddMod("D").Mod;
+        var c = CreateAndAddMod("C").Mod;
+        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c).Mod;
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveLastItem, b, d).Mod;
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -133,10 +133,10 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_GraphContainsOnlyVerticesAsDefinedByLayout_ResolveLastItem_Variant2()
     {
-        var d = CreateAndAddMod("D");
-        var c = CreateAndAddMod("C");
-        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c);
-        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveLastItem, d, b);
+        var d = CreateAndAddMod("D").Mod;
+        var c = CreateAndAddMod("C").Mod;
+        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c).Mod;
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveLastItem, d, b).Mod;
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -162,10 +162,10 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_ResolveLayoutFromTransitiveApplied_ResolveRecursive()
     {
-        var d = CreateAndAddMod("D");
-        var c = CreateAndAddMod("C", DependencyResolveLayout.FullResolved, d);
-        var b = CreateAndAddMod("B", DependencyResolveLayout.ResolveRecursive, c);
-        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
+        var d = CreateAndAddMod("D").Mod;
+        var c = CreateAndAddMod("C", DependencyResolveLayout.FullResolved, d).Mod;
+        var b = CreateAndAddMod("B", DependencyResolveLayout.ResolveRecursive, c).Mod;
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b).Mod;
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -191,11 +191,11 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_ResolveLayoutFromTransitiveApplied_ResolveLastItem_Variant1()
     {
-        var e = CreateAndAddMod("E");
-        var d = CreateAndAddMod("D");
-        var c = CreateAndAddMod("C", DependencyResolveLayout.FullResolved, d);
-        var b = CreateAndAddMod("B", DependencyResolveLayout.ResolveLastItem, e, c);
-        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
+        var e = CreateAndAddMod("E").Mod;
+        var d = CreateAndAddMod("D").Mod;
+        var c = CreateAndAddMod("C", DependencyResolveLayout.FullResolved, d).Mod;
+        var b = CreateAndAddMod("B", DependencyResolveLayout.ResolveLastItem, e, c).Mod;
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b).Mod;
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -224,11 +224,11 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_ResolveLayoutFromTransitiveApplied_ResolveLastItem_Variant2()
     {
-        var e = CreateAndAddMod("E");
-        var d = CreateAndAddMod("D");
-        var c = CreateAndAddMod("C", DependencyResolveLayout.FullResolved, d);
-        var b = CreateAndAddMod("B", DependencyResolveLayout.ResolveLastItem, c, e);
-        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
+        var e = CreateAndAddMod("E").Mod;
+        var d = CreateAndAddMod("D").Mod;
+        var c = CreateAndAddMod("C", DependencyResolveLayout.FullResolved, d).Mod;
+        var b = CreateAndAddMod("B", DependencyResolveLayout.ResolveLastItem, c, e).Mod;
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b).Mod;
         var graph = _graphBuilder.Build(mod);
 
         Assert.False(graph.HasCycle());
@@ -273,7 +273,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     {
         var depA = new ModReference("A", ModType.Default);
 
-        var b = CreateAndAddMod("B", Random.Enum<DependencyResolveLayout>(), depA);
+        var b = CreateAndAddMod("B", Random.Enum<DependencyResolveLayout>(), depA).Mod;
 
         var modinfo = new ModinfoData("A")
         {
@@ -301,7 +301,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     public void Build_DirectDependencyNotFound_Throws()
     {
         var b = Game.InstallMod("B", false, ServiceProvider);
-        var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(), b);
+        var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(), b).Mod;
         var e = Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
         Assert.Same(Game, e.ModContainer);
         Assert.Equal(b, e.Mod);
@@ -311,8 +311,8 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     public void Build_TransitiveDependencyNotFound_Throws()
     {
         var c = Game.InstallMod("C", false, ServiceProvider);
-        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c);
-        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
+        var b = CreateAndAddMod("B", DependencyResolveLayout.FullResolved, c).Mod;
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b).Mod;
         var e = Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
         Assert.Same(Game, e.ModContainer);
         Assert.Equal(c, e.Mod);
@@ -335,11 +335,11 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [MemberData(nameof(GetMatchingVersionRanges))]
     public void Build_OneDependency_VersionRangeMatches(SemVersion? version, SemVersionRange ranges)
     {
-        var b = CreateAndAddMod(new ModinfoData("B") { Version = version });
+        var b = CreateAndAddMod(new ModinfoData("B") { Version = version }).Mod;
         Assert.Equal(version, b.Version);
 
         var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(),
-            new ModReference(b.Identifier, b.Type, ranges));
+            new ModReference(b.Identifier, b.Type, ranges)).Mod;
 
         var graph = _graphBuilder.Build(mod);
 
@@ -385,11 +385,11 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
         var b = CreateAndAddMod(new ModinfoData("B")
         {
             Version = version
-        });
+        }).Mod;
         Assert.Equal(version, b.Version);
 
         var mod = CreateAndAddMod("A", Random.Enum<DependencyResolveLayout>(),
-            new ModReference(b.Identifier, b.Type, range));
+            new ModReference(b.Identifier, b.Type, range)).Mod;
 
         var e = Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
         Assert.Equal(new ModReference(b), e.Mod);
@@ -403,12 +403,12 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
         var c = CreateAndAddMod(new ModinfoData("C")
         {
             Version = version
-        });
+        }).Mod;
         Assert.Equal(version, c.Version);
 
-        var b = CreateAndAddMod("B", deps: new List<IModReference>{new ModReference(c.Identifier, c.Type, range)});
+        var b = CreateAndAddMod("B", deps: new List<IModReference>{new ModReference(c.Identifier, c.Type, range)}).Mod;
 
-        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b);
+        var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, b).Mod;
 
         var e = Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
         Assert.Equal(new ModReference(c), e.Mod);
@@ -428,16 +428,16 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
               \^
                C
          */
-        var b = CreateAndAddMod(new ModinfoData("B") { Version = new SemVersion(1, 0, 0) });
+        var b = CreateAndAddMod(new ModinfoData("B") { Version = new SemVersion(1, 0, 0) }).Mod;
 
         var c = CreateAndAddMod("C",
-            deps: new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(2, 0, 0))));
+            deps: new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(2, 0, 0)))).Mod;
 
         var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, deps:
         [
             new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(1, 0, 0))),
             c
-        ]);
+        ]).Mod;
         var e = Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
         Assert.Equal(new ModReference(b), e.Mod);
         Assert.Equal(b, e.Dependency);
@@ -456,16 +456,16 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
            	   >
            	   C
          */
-        var b = CreateAndAddMod(new ModinfoData("B") { Version = new SemVersion(1, 0, 0) });
+        var b = CreateAndAddMod(new ModinfoData("B") { Version = new SemVersion(1, 0, 0) }).Mod;
 
         var c = CreateAndAddMod("C", DependencyResolveLayout.ResolveRecursive,
-            deps: new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(2, 0, 0))));
+            deps: new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(2, 0, 0)))).Mod;
 
         var mod = CreateAndAddMod("A", DependencyResolveLayout.ResolveRecursive, deps:
         [
             c, // Before b in this variant
             new ModReference(b.Identifier, b.Type, SemVersionRange.Equals(new SemVersion(1, 0, 0)))
-        ]);
+        ]).Mod;
         var e = Assert.Throws<VersionMismatchException>(() => _graphBuilder.Build(mod));
         Assert.Equal(new ModReference(b), e.Mod);
         Assert.Equal(b, e.Dependency);

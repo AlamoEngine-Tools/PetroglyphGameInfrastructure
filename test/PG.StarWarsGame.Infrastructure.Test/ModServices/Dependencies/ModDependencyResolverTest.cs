@@ -129,7 +129,7 @@ public class ModDependencyResolverTest : GameInfrastructureTestBaseWithRandomGam
     private IMod CreateMod(string name, DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, params IModReference[] deps)
     {
         if (deps.Length == 0)
-            return Game.InstallAndAddMod(name, GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+            return GameInstallation.InstallAndAddMod(name, GITestUtilities.GetRandomWorkshopFlag(Game)).Mod;
 
         var modinfo = new ModinfoData("A")
         {

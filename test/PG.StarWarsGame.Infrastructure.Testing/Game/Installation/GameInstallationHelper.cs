@@ -4,7 +4,7 @@ using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 
-internal static partial class GameInstallation
+internal static partial class GameInstallationHelper
 {
     // Ensure starts on path 'steam'. See SteamInstallation.cs
     internal const string SteamBasePath = "steam/steamapps/common/Star Wars Empire at War";
