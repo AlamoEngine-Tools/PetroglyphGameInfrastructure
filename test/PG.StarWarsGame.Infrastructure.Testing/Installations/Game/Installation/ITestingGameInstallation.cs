@@ -2,9 +2,9 @@
 using System.IO.Abstractions;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
 
 public interface ITestingGameInstallation : ITestingModContainerInstallation
 {

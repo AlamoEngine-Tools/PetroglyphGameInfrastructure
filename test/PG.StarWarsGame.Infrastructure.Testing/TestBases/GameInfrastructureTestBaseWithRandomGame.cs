@@ -2,8 +2,8 @@
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 

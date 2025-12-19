@@ -1,4 +1,4 @@
-﻿namespace PG.StarWarsGame.Infrastructure.Testing.Mods;
+﻿namespace PG.StarWarsGame.Infrastructure.Testing.Installations;
 
 public interface ITestingModContainerInstallation : ITestingPlayableObjectInstallation
 {

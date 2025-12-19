@@ -1,9 +1,9 @@
 ﻿using System;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Game;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations;
 
 public static class GameInfrastructureTesting
 {

@@ -6,7 +6,7 @@ using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Icon;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using PG.StarWarsGame.Infrastructure.Utilities;
 using Xunit;

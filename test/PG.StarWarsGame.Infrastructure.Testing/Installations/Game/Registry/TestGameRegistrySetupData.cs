@@ -1,7 +1,7 @@
 ﻿using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
 
 public sealed class TestGameRegistrySetupData
 {

@@ -8,7 +8,7 @@ using Xunit;
 using RegistryHive = AnakinRaW.CommonUtilities.Registry.RegistryHive;
 using RegistryView = AnakinRaW.CommonUtilities.Registry.RegistryView;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
 
 internal sealed class TestingGameRegistryImpl(IServiceProvider serviceProvider) : ITestingGameRegistry
 {

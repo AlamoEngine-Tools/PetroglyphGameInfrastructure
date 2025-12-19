@@ -1,8 +1,8 @@
 ﻿using System;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Mods;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 internal class TestingModImpl(ITestingGameInstallation gameInstallation, IMod mod, IServiceProvider serviceProvider) : ITestingModInstallation
 {

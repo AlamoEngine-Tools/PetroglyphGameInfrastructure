@@ -15,8 +15,8 @@ using System.Collections.Generic;
 using System.Runtime.Versioning;
 using AET.Testing.Extensions;
 using Xunit;
-using PG.StarWarsGame.Infrastructure.Testing.Game;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 

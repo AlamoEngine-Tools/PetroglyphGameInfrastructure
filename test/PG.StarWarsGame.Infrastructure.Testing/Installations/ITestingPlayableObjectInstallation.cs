@@ -1,6 +1,6 @@
-﻿using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+﻿using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Mods;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations;
 
 public interface ITestingPlayableObjectInstallation
 {

@@ -2,9 +2,11 @@
 using AET.Modinfo.Model;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Xunit;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
+
+
 #if NET5_0_OR_GREATER
 using System.Collections.Generic;
 #else

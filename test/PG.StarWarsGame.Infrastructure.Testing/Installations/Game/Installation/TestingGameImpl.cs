@@ -3,12 +3,12 @@ using AET.Modinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using System;
 using System.IO.Abstractions;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
 
 internal class TestingGameImpl : ITestingGameInstallation
 {

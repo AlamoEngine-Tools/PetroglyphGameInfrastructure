@@ -12,15 +12,15 @@ using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Semver;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;

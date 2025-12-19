@@ -4,12 +4,12 @@ using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Language;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using System;
 using System.Collections.Generic;
 using Xunit;
-using PG.StarWarsGame.Infrastructure.Testing.Game;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Services;
 

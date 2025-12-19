@@ -1,7 +1,7 @@
 ﻿using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Games.Registry;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
 
 public interface ITestingGameRegistry
 {

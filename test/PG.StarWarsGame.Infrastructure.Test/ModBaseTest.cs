@@ -6,13 +6,13 @@ using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game;
 using Semver;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 

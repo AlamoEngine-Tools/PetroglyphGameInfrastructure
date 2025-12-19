@@ -2,7 +2,6 @@
 using AET.Testing;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
 using System;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;

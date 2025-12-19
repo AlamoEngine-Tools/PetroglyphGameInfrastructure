@@ -1,6 +1,6 @@
 ﻿using PG.StarWarsGame.Infrastructure.Mods;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Mods;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 public interface ITestingVirtualModInstallation : ITestingModInstallation
 {

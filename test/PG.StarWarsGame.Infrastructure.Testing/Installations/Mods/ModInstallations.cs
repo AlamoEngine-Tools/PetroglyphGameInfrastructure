@@ -8,7 +8,7 @@ using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Utilities;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Mods;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 public static partial class ModInstallations
 {
