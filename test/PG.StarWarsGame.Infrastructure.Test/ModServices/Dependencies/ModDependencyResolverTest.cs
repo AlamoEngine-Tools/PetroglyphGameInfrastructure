@@ -4,8 +4,6 @@ using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
@@ -30,7 +28,7 @@ public class ModDependencyResolverTest : GameInfrastructureTestBaseWithRandomGam
     [Fact]
     public void Resolve_NoDependencies()
     {
-        var mod = CreateMod("A");
+        var mod = GameInstallation.InstallAndAddMod("A").Mod;
         var dependencies = _resolver.Resolve(mod);
         Assert.Empty(dependencies);
     }
@@ -45,7 +43,7 @@ public class ModDependencyResolverTest : GameInfrastructureTestBaseWithRandomGam
                 new ModReference("B", ModType.Default)
             }, DependencyResolveLayout.FullResolved)
         };
-        var mod = Game.InstallAndAddMod(false, modinfo, ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod(modinfo, false).Mod;
         Assert.Throws<ModNotFoundException>(() => _resolver.Resolve(mod));
     }
 
@@ -61,15 +59,15 @@ public class ModDependencyResolverTest : GameInfrastructureTestBaseWithRandomGam
                 depA
             }, DependencyResolveLayout.FullResolved)
         };
-        var mod = Game.InstallAndAddMod(false, modinfo, ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod(modinfo, false).Mod;
         Assert.Throws<ModDependencyCycleException>(() => _resolver.Resolve(mod));
     }
 
     [Fact]
     public void Resolve_SingleDependency()
     {
-        var dep = CreateMod("B");
-        var mod = CreateMod("A", DependencyResolveLayout.FullResolved, new ModReference(dep));
+        var dep = GameInstallation.InstallAndAddMod("B").Mod;
+        var mod = InstallAndAddModWithDependencies("A", DependencyResolveLayout.FullResolved, new ModReference(dep)).Mod;
 
         var deps = _resolver.Resolve(mod);
 
@@ -80,9 +78,9 @@ public class ModDependencyResolverTest : GameInfrastructureTestBaseWithRandomGam
     [Fact]
     public void Resolve_TwoDependency()
     {
-        var b = CreateMod("B");
-        var c = CreateMod("C");
-        var mod = CreateMod("A", DependencyResolveLayout.FullResolved, b, c);
+        var b = GameInstallation.InstallAndAddMod("B").Mod;
+        var c = GameInstallation.InstallAndAddMod("C").Mod;
+        var mod = InstallAndAddModWithDependencies("A", DependencyResolveLayout.FullResolved, b, c).Mod;
 
         var deps = _resolver.Resolve(mod);
 
@@ -92,12 +90,12 @@ public class ModDependencyResolverTest : GameInfrastructureTestBaseWithRandomGam
     [Fact]
     public void Resolve_ResolveCompleteChain_DependenciesHaveDeps_ButResolveLayoutIsFullResolved()
     {
-        var b2 = CreateMod("B2");
-        var b = CreateMod("B", DependencyResolveLayout.ResolveRecursive, b2);
-        var c2 = CreateMod("C2");
-        var c = CreateMod("C", DependencyResolveLayout.ResolveRecursive, c2);
+        var b2 = GameInstallation.InstallAndAddMod("B2").Mod;
+        var b = InstallAndAddModWithDependencies("B", DependencyResolveLayout.ResolveRecursive, b2).Mod;
+        var c2 = GameInstallation.InstallAndAddMod("C2").Mod;
+        var c = InstallAndAddModWithDependencies("C", DependencyResolveLayout.ResolveRecursive, c2).Mod;
         // Layout is recursive
-        var mod = CreateMod("A", DependencyResolveLayout.FullResolved, b, c);
+        var mod = InstallAndAddModWithDependencies("A", DependencyResolveLayout.FullResolved, b, c).Mod;
 
         var deps = _resolver.Resolve(mod);
 
@@ -112,30 +110,17 @@ public class ModDependencyResolverTest : GameInfrastructureTestBaseWithRandomGam
     [Fact]
     public void Resolve_ResolveCompleteChain_DependenciesHaveResolvedDeps_ButResolveLayoutIsFullResolved()
     {
-        var b2 = CreateMod("B2");
-        var b = CreateMod("B", DependencyResolveLayout.ResolveRecursive, b2);
+        var b2 = GameInstallation.InstallAndAddMod("B2").Mod;
+        var b = InstallAndAddModWithDependencies("B", DependencyResolveLayout.ResolveRecursive, b2).Mod;
         b.ResolveDependencies();
-        var c2 = CreateMod("C2");
-        var c = CreateMod("C", DependencyResolveLayout.ResolveRecursive, c2);
+        var c2 = GameInstallation.InstallAndAddMod("C2").Mod;
+        var c = InstallAndAddModWithDependencies("C", DependencyResolveLayout.ResolveRecursive, c2).Mod;
         c.ResolveDependencies();
-        var mod = CreateMod("A", DependencyResolveLayout.FullResolved, b, c);
+        var mod = InstallAndAddModWithDependencies("A", DependencyResolveLayout.FullResolved, b, c).Mod;
 
         var deps = _resolver.Resolve(mod);
 
         // Only b and c, because a has layout FullResolved
         Assert.Equal([b, c], deps);
-    }
-
-    private IMod CreateMod(string name, DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, params IModReference[] deps)
-    {
-        if (deps.Length == 0)
-            return GameInstallation.InstallAndAddMod(name).Mod;
-
-        var modinfo = new ModinfoData("A")
-        {
-            Dependencies = new DependencyList(deps, layout)
-        };
-
-        return Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), modinfo, ServiceProvider);
     }
 }

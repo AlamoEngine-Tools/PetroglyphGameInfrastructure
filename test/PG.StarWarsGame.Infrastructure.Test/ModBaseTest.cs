@@ -47,7 +47,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         var mod = ModTestScenarios.CreateTestScenario(
                 testScenario,
                 (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
-                (name, layout, dependencies) => InstallAndAddMod(name, layout, dependencies).Mod)
+                (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod)
             .Mod;
 
         var expectedDirectDeps = mod.ModInfo!.Dependencies.Select(d =>
@@ -146,7 +146,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         var scenario = ModTestScenarios.CreateTestScenario(
             ModTestScenarios.TestScenario.SingleDepAndTransitive,
             (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
-            (name, layout, dependencies) => InstallAndAddMod(name, layout, dependencies).Mod);
+            (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod);
 
         var mod = scenario.Mod;
         var b = Game.FindMod(scenario.ExpectedTraversedList![1])!;
@@ -229,7 +229,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
     [Fact]
     public void EqualsHashCode()
     {
-        var dep = InstallAndAddMod("B").Mod;
+        var dep = GameInstallation.InstallAndAddMod("B").Mod;
         var mod = CreateModInstallation("A").Mod;
         var samish = CreateModInstallation("A").Mod;
         var otherA = CreateModInstallation("A", deps: dep).Mod;
@@ -272,7 +272,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         [Fact]
         public void ResolveDependencies_CalledTwice_Throws()
         {
-            var dep = InstallAndAddMod("Dep").Mod;
+            var dep = GameInstallation.InstallAndAddMod("Dep").Mod;
             var modinfo = new ModinfoData("CustomMod")
             {
                 Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)

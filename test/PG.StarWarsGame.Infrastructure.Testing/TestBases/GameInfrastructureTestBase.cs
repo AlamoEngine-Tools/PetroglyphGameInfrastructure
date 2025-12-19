@@ -39,20 +39,11 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
         return _gameInstallation = GameInfrastructureTesting.Game(identity, ServiceProvider);
     }
 
-    protected ITestingPhysicalModInstallation InstallAndAddMod(
+    protected ITestingPhysicalModInstallation InstallAndAddModWithDependencies(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
         params IList<IModReference> deps)
     {
         return GetOrCreateGameInstallation().InstallAndAddMod(name, new DependencyList(deps, layout));
-    }
-
-    protected ITestingPhysicalModInstallation InstallAndAddMod(
-        string name,
-        bool workshop,
-        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
-        params IList<IModReference> deps)
-    {
-        return GetOrCreateGameInstallation().InstallAndAddMod(name, workshop, new DependencyList(deps, layout));
     }
 }

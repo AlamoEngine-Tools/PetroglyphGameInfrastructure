@@ -25,7 +25,7 @@ public class VirtualModTest : ModBaseTest
         IModDependencyList depList;
         if (deps.Count == 0)
         {
-            var dep = InstallAndAddMod("dep", false).Mod;
+            var dep = GameInstallation.InstallAndAddMod("dep", false).Mod;
             depList = new DependencyList(new List<IModReference> { dep }, layout);
         }
         else
@@ -90,7 +90,7 @@ public class VirtualModTest : ModBaseTest
     [Fact]
     public void Ctor_FromModinfo_Properties()
     {
-        var dep = InstallAndAddMod("dep").Mod;
+        var dep = GameInstallation.InstallAndAddMod("dep").Mod;
 
         var modinfo = new ModinfoData("VirtualMod")
         {

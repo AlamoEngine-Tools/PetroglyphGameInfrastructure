@@ -152,7 +152,7 @@ public class ModTest : ModBaseTest
     [Fact]
     public void ValidCtor_Properties_FromModinfo_WithDependencies()
     {
-        var dep = InstallAndAddMod("dep").Mod;
+        var dep = GameInstallation.InstallAndAddMod("dep").Mod;
 
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
 
@@ -160,7 +160,7 @@ public class ModTest : ModBaseTest
         {
             Dependencies = new DependencyList(new List<IModReference>{ dep }, DependencyResolveLayout.ResolveLastItem)
         };
-        var mod = Game.InstallAndAddMod(ws, modInfo, ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod(modInfo, ws).Mod;
 
         Assert.Empty(mod.Dependencies);
         Assert.Single(((IModIdentity)mod).Dependencies);
@@ -188,7 +188,7 @@ public class ModTest : ModBaseTest
         var mod = ModTestScenarios.CreateTestScenarioCycle(
                 testScenario,
                 (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
-                (name, layout, dependencies) => InstallAndAddMod(name, layout, dependencies).Mod,
+                (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod,
                 CreateModRef)
             .Mod;
 

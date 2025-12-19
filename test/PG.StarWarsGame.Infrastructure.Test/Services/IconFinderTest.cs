@@ -5,8 +5,6 @@ using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Icon;
-using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using PG.StarWarsGame.Infrastructure.Utilities;
 using Xunit;
@@ -86,7 +84,7 @@ public class IconFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_UseIconFromFs_ModinfoIconIsNull()
     {
-        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name"), ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod(new ModinfoData("name")).Mod;
 
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
@@ -106,10 +104,10 @@ public class IconFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_UseIconFromFs_ModinfoIconIsEmpty()
     {
-        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name")
+        var mod = GameInstallation.InstallAndAddMod(new ModinfoData("name")
         {
             Icon = string.Empty
-        }, ServiceProvider);
+        }).Mod;
 
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
@@ -129,10 +127,10 @@ public class IconFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_UseIconFromModinfo()
     {
-        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name")
+        var mod = GameInstallation.InstallAndAddMod(new ModinfoData("name")
         {
             Icon = "icon.ico"
-        }, ServiceProvider);
+        }).Mod;
 
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
@@ -152,7 +150,7 @@ public class IconFinderTest : GameInfrastructureTestBaseWithRandomGame
         FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "foc.ico"));
         var expectedFileName = Game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
 
-        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name"), ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod(new ModinfoData("name")).Mod;
 
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "Data", "notAnIcon.ico"));
 

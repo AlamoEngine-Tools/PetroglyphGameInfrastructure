@@ -12,13 +12,6 @@ namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 public static partial class ModInstallations
 {
-    public static Mod InstallAndAddMod(this IGame game, bool workshop, IModinfo modinfo, IServiceProvider serviceProvider)
-    {
-        var mod = game.InstallMod(workshop, modinfo, serviceProvider);
-        game.AddMod(mod);
-        return mod;
-    }
-
     public static Mod InstallMod(this IGame game, string name, bool workshop, IServiceProvider serviceProvider)
     {
         return CreateMod(game, name, workshop, serviceProvider,
