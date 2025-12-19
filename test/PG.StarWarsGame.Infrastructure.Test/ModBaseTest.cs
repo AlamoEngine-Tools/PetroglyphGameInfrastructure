@@ -69,7 +69,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_DepNotAdded_Throws_ThenAddingModResolvesCorrectly()
     {
         // Do not add mod to game
-        var notAddedDep = Game.InstallMod("NotAddedMod", false, ServiceProvider);
+        var notAddedDep = GameInstallation.InstallMod("NotAddedMod", false).Mod;
 
         var mod = CreateModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), notAddedDep).Mod;
         Game.AddMod(mod);

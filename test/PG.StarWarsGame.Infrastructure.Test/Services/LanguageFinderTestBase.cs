@@ -62,7 +62,7 @@ public class LanguageFinderTest : GameInfrastructureTestBaseWithRandomGame
     public void FindLanguages_Mod_WithNoLanguages_UsesGame()
     {
         InstallGameLanguage(new LanguageInfo("de", LanguageSupportLevel.SFX));
-        var mod = Game.InstallMod("myMod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        var mod = GameInstallation.InstallMod("myMod").Mod;
         var langs = _languageFinder.FindLanguages(mod);
 
         Assert.Equivalent(new List<ILanguageInfo> { new LanguageInfo("de", LanguageSupportLevel.SFX) }, langs, true);
@@ -71,8 +71,8 @@ public class LanguageFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindLanguages_Mod_WithLanguages_En_De_Steam()
     {
-        var game = GameInfrastructureTesting.Game(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider).Game;
-        var mod = game.InstallMod("myMod", true, ServiceProvider);
+        var game = GameInfrastructureTesting.Game(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
+        var mod = game.InstallMod("myMod", true).Mod;
         InstallModLanguage(mod, new LanguageInfo("de", LanguageSupportLevel.SFX));
         InstallModLanguage(mod, new LanguageInfo("en", LanguageSupportLevel.FullLocalized));
 

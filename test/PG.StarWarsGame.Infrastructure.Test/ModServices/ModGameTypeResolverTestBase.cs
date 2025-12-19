@@ -248,8 +248,7 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
             SteamData = steamData
         };
 
-        var game = GetOrCreateGameInstallation().Game;
-        var mod = game.InstallMod("Name", false, ServiceProvider);
+        var mod = GetOrCreateGameInstallation().InstallMod("Name", false).Mod;
 
         var info = CreateDetectedModReference(mod.Directory, ModType.Virtual, modinfo);
         var resolver = CreateResolver();
@@ -303,8 +302,9 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
             SteamData = steamData
         };
 
-        var game = GetOrCreateGameInstallation(new GameIdentity(gameType, Random.Item(GITestUtilities.RealPlatforms))).Game;
-        var mod = game.InstallMod("Name", false, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(gameType, Random.Item(GITestUtilities.RealPlatforms)));
+        var game = gameInstallation.Game;
+        var mod = gameInstallation.InstallMod("Name", false).Mod;
 
         var info = CreateDetectedModReference(mod.Directory, ModType.Default, modinfo);
         var resolver = CreateResolver();

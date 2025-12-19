@@ -14,6 +14,10 @@ public interface ITestingGameInstallation : ITestingModContainerInstallation
 
     IDirectoryInfo GetWrongOriginFocRegistryLocation();
 
+    ITestingPhysicalModInstallation InstallMod(string name);
+
+    ITestingPhysicalModInstallation InstallMod(string name, bool workshop);
+
     ITestingPhysicalModInstallation InstallAndAddMod(string name);
 
     ITestingPhysicalModInstallation InstallAndAddMod(string name, bool workshop);

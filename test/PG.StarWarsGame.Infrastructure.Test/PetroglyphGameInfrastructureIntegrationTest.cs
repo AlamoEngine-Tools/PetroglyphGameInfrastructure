@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using Xunit;
 
@@ -43,8 +44,11 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
     {
         // Init Mods uninitialized
 
-        var eaw = GameInfrastructureTesting.Game(new GameIdentity(GameType.Eaw, platform), ServiceProvider).Game;
-        var foc = GameInfrastructureTesting.Game(new GameIdentity(GameType.Foc, platform), ServiceProvider).Game;
+        var eawInstallation = GameInfrastructureTesting.Game(new GameIdentity(GameType.Eaw, platform), ServiceProvider);
+        var focInstallation = GameInfrastructureTesting.Game(new GameIdentity(GameType.Foc, platform), ServiceProvider);
+
+        var eaw = eawInstallation.Game;
+        var foc = focInstallation.Game;
 
         GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(GameType.Eaw));
         GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(GameType.Foc));
@@ -82,7 +86,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
         CreateExternalMod(actualFoc);
         if (platform == GamePlatform.SteamGold)
             CreateAndAddSteamScenario(actualFoc);
-        Eaw_CreateModInModsDir(eaw);
+        Eaw_CreateModInModsDir(eawInstallation);
 
 
         // Test Mod detection
@@ -293,9 +297,9 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
     }
 
 
-    private void Eaw_CreateModInModsDir(IGame game)
+    private void Eaw_CreateModInModsDir(ITestingGameInstallation installation)
     {
-        game.InstallMod("In-Mods-Dir", false, ServiceProvider);
+        installation.InstallMod("In-Mods-Dir", false);
     }
 
     private class DetectedModReferenceEqualityComparer : IEqualityComparer<DetectedModReference>

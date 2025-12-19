@@ -42,6 +42,19 @@ internal class TestingGameImpl : ITestingGameInstallation
         return _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(GameInstallationHelper.OriginBasePath, "corruption"));
     }
 
+    public ITestingPhysicalModInstallation InstallMod(string name, bool workshop)
+    {
+        var mod = ModInstallations.CreateMod(Game, name, workshop, _serviceProvider,
+            modDir => new Mod(Game, name, modDir, workshop, name, _serviceProvider));
+        return new TestingPhysicalModImpl(this, mod, _serviceProvider);
+    }
+
+    public ITestingPhysicalModInstallation InstallMod(string name)
+    {
+        var workshop = GITestUtilities.GetRandomWorkshopFlag(Game);
+        return InstallMod(name, workshop);
+    }
+
     public ITestingPhysicalModInstallation InstallAndAddMod(string name)
     {
         var isWorkshop = GITestUtilities.GetRandomWorkshopFlag(Game);
@@ -50,9 +63,9 @@ internal class TestingGameImpl : ITestingGameInstallation
 
     public ITestingPhysicalModInstallation InstallAndAddMod(string name, bool workshop)
     {
-        var mod = Game.InstallMod(name, workshop, _serviceProvider);
-        Game.AddMod(mod);
-        return new TestingPhysicalModImpl(this, mod, _serviceProvider);
+        var modInstallation = InstallMod(name, workshop);
+        Game.AddMod(modInstallation.Mod);
+        return modInstallation;
     }
 
     public ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo)

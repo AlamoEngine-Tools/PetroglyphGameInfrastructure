@@ -14,7 +14,6 @@ using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Clients;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
@@ -122,7 +121,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         var game = gameInstallation.Game;
         if (gameIdentity.Platform == GamePlatform.SteamGold)
             gameInstallation.InstallDebug();
-        var mod = game.InstallMod("MyMod", false, ServiceProvider);
+        var mod = gameInstallation.InstallMod("MyMod", false).Mod;
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
 
@@ -157,7 +156,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         var game = gameInstallation.Game;
         if (gameIdentity.Platform == GamePlatform.SteamGold)
             gameInstallation.InstallDebug();
-        var mod = game.InstallMod("MyMod", false, ServiceProvider);
+        var mod = gameInstallation.InstallMod("MyMod", false).Mod;
 
         var expectedProcessInfo = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
         
@@ -209,8 +208,9 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
         if (!SupportedPlatforms.Contains(gameIdentity.Platform))
             return;
 
-        var game = GetOrCreateGameInstallation(gameIdentity).Game;
-        var mod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
+        var mod = gameInstallation.InstallMod("MyMod").Mod;
 
         var expectedArguments = new ArgumentCollection([new ModArgumentList([
             new ModArgument(mod.Directory, game.Directory, mod.Type == ModType.Workshops)

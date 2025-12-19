@@ -7,7 +7,6 @@ using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using System;
 using System.Collections.Generic;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
@@ -33,8 +32,8 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
     [InlineData(true, true)]
     public void Equals_ModsShouldNeverBeEquals(bool includeDeps, bool includeGame)
     {
-        var modA = Game.InstallMod("A", false, ServiceProvider);
-        var modB = Game.InstallMod("B", false, ServiceProvider);
+        var modA = GameInstallation.InstallMod("A", false).Mod;
+        var modB = GameInstallation.InstallMod("B", false).Mod;
 
         var comparer = new ModEqualityComparer(includeDeps, includeGame);
 
@@ -53,13 +52,13 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
     [InlineData(true, true)]
     public void Equals_ShouldAlwaysBeEquals(bool includeDeps, bool includeGame)
     {
-        var modA = Game.InstallMod("A", false, ServiceProvider);
+        var modA = GameInstallation.InstallMod("A", false).Mod;
 
         var comparer = new ModEqualityComparer(includeDeps, includeGame);
         Assert.True(comparer.Equals(modA, modA));
         Assert.Equal(comparer.GetHashCode(modA), comparer.GetHashCode(modA));
 
-        var samish = Game.InstallMod("A", false, ServiceProvider);
+        var samish = GameInstallation.InstallMod("A", false).Mod;
         Assert.True(comparer.Equals(modA, samish));
         Assert.Equal(comparer.GetHashCode(modA), comparer.GetHashCode(samish));
     }
@@ -113,10 +112,9 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
         var modSamish = otherGameInstallRef.InstallAndAddMod(modA.Name, modA.Type == ModType.Workshops);
 
         var diffGame = GameInfrastructureTesting
-            .Game(new GameIdentity(Game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw, Game.Platform), ServiceProvider)
-            .Game;
+            .Game(new GameIdentity(Game.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw, Game.Platform), ServiceProvider);
 
-        var diffGameMod = diffGame.InstallMod("A", modA.Type == ModType.Workshops, ServiceProvider);
+        var diffGameMod = diffGame.InstallMod("A", modA.Type == ModType.Workshops).Mod;
 
         var comparer = new ModEqualityComparer(Random.Bool(), gameAware);
         Assert.True(comparer.Equals(modA, modA));

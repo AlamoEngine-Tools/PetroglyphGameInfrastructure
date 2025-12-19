@@ -196,8 +196,9 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [Fact]
     public void CreateVirtualMod_NullArgs_Throws()
     {
-        var game = GetOrCreateGameInstallation().Game;
-        var dep = game.InstallMod("dep", false, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation();
+        var game = gameInstallation.Game;
+        var dep = gameInstallation.InstallMod("dep", false).Mod;
 
         Assert.Throws<ArgumentNullException>(() => _factory.CreateVirtualMod(null!, new ModinfoData("Name")
         {
@@ -210,8 +211,9 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod_WithInvalidModinfo(GameIdentity gameIdentity)
     {
-        var game = GetOrCreateGameInstallation(gameIdentity).Game;
-        var dep = game.InstallMod("dep", false, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation();
+        var game = gameInstallation.Game;
+        var dep = gameInstallation.InstallMod("dep", false).Mod;
 
         var invalidModinfo = new CustomModInfo(string.Empty)
         {
@@ -239,8 +241,9 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod(GameIdentity gameIdentity)
     {
-        var game = GetOrCreateGameInstallation(gameIdentity).Game;
-        var dep = game.InstallMod("dep", false, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation();
+        var game = gameInstallation.Game;
+        var dep = gameInstallation.InstallMod("dep", false).Mod;
 
         var modinfo = new CustomModInfo("VirtualModName")
         {

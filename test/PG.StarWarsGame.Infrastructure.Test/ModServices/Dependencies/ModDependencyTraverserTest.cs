@@ -3,8 +3,6 @@ using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
@@ -44,7 +42,7 @@ public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGa
     public void Traverse_FaultedResolvedMod_Throws()
     {
         // Do not add to provoke faulted
-        var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        var dep = GameInstallation.InstallMod("B").Mod;
 
         var mod = InstallAndAddModWithDependencies("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
 
@@ -65,7 +63,7 @@ public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGa
     public void Traverse_NotResolvedMod_Throws()
     {
         // Do not add to provoke faulted
-        var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        var dep = GameInstallation.InstallMod("B").Mod;
         var mod = InstallAndAddModWithDependencies("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
         
         Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);

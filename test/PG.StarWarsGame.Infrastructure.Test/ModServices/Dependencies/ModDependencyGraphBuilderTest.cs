@@ -5,8 +5,6 @@ using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Semver;
 using Xunit;
@@ -59,7 +57,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     public void Build_GraphContainsOnlyVerticesAsDefinedByLayout_FullResolved()
     {
         // C is not added to game. Building a graph should not throw, because it's not used.
-        var c = Game.InstallMod("C", false, ServiceProvider);
+        var c = GameInstallation.InstallMod("C", false).Mod;
         var b = InstallAndAddModWithDependencies("B", DependencyResolveLayout.FullResolved, c).Mod;
         var mod = InstallAndAddModWithDependencies("A", DependencyResolveLayout.FullResolved, b).Mod;
         var graph = _graphBuilder.Build(mod);
@@ -291,7 +289,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_SelfNotFound_Throws()
     {
-        var mod = Game.InstallMod("A", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        var mod = GameInstallation.InstallMod("A").Mod;
         var e = Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
         Assert.Same(Game, e.ModContainer);
         Assert.Equal(mod, e.Mod);
@@ -300,7 +298,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_DirectDependencyNotFound_Throws()
     {
-        var b = Game.InstallMod("B", false, ServiceProvider);
+        var b = GameInstallation.InstallMod("B", false).Mod;
         var mod = InstallAndAddModWithDependencies("A", Random.Enum<DependencyResolveLayout>(), b).Mod;
         var e = Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));
         Assert.Same(Game, e.ModContainer);
@@ -310,7 +308,7 @@ public class ModDependencyGraphBuilderTest : GameInfrastructureTestBaseWithRando
     [Fact]
     public void Build_TransitiveDependencyNotFound_Throws()
     {
-        var c = Game.InstallMod("C", false, ServiceProvider);
+        var c = GameInstallation.InstallMod("C", false).Mod;
         var b = InstallAndAddModWithDependencies("B", DependencyResolveLayout.FullResolved, c).Mod;
         var mod = InstallAndAddModWithDependencies("A", DependencyResolveLayout.ResolveRecursive, b).Mod;
         var e = Assert.Throws<ModNotFoundException>(() => _graphBuilder.Build(mod));

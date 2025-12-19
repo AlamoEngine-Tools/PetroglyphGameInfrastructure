@@ -4,9 +4,6 @@ using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
-
-
 #if NET5_0_OR_GREATER
 using System.Collections.Generic;
 #else
@@ -39,10 +36,9 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
     {
         var containerInstallation = CreateModContainerInstallation();
         var container = containerInstallation.ModContainer;
-        var game = container.Game;
 
-        var mod = game.InstallMod(_randomModName, false, ServiceProvider);
-        var modSame = game.InstallMod(_randomModName, false, ServiceProvider);
+        var mod = containerInstallation.GameInstallation.InstallMod(_randomModName, false).Mod;
+        var modSame = containerInstallation.GameInstallation.InstallMod(_randomModName, false).Mod;
 
         Assert.DoesNotContain(mod, container.Mods);
         Assert.DoesNotContain(modSame, container.Mods);
@@ -113,10 +109,9 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
     [Fact]
     public void AddMod_RemoveMod_RaiseEvent()
     {
-        var container = CreateModContainerInstallation().ModContainer;
-        var game = container.Game;
-
-        var mod = game.InstallMod(_randomModName, GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var containerInstallation = CreateModContainerInstallation();
+        var container = containerInstallation.ModContainer;
+        var mod = containerInstallation.GameInstallation.InstallMod(_randomModName).Mod;
 
         var evtAdd = Assert.Raises<ModCollectionChangedEventArgs>(
             a => container.ModsCollectionModified += a,
@@ -145,10 +140,9 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
     [Fact]
     public void RemoveMod_NotExisting_DoesNotRaiseEvent()
     {
-        var container = CreateModContainerInstallation().ModContainer;
-        var game = container.Game;
-
-        var mod = game.InstallMod(_randomModName, GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var containerInstallation = CreateModContainerInstallation();
+        var container = containerInstallation.ModContainer;
+        var mod = containerInstallation.GameInstallation.InstallMod(_randomModName).Mod;
 
         var containerRaised = false;
         container.ModsCollectionModified += (_, _) =>
@@ -162,18 +156,19 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
             gameRaised = true;
         };
 
-        game.RemoveMod(mod);
+        container.Game.RemoveMod(mod);
         Assert.False(containerRaised);
         Assert.False(gameRaised);
     }
 
     [Fact]
-    public void AddMod_Existing_DoesNotRaiseEvent()
+    public void AddMod_AlreadyExisting_DoesNotRaiseEvent()
     {
-        var container = CreateModContainerInstallation().ModContainer;
-        var game = container.Game;
+        var containerInstallation = CreateModContainerInstallation();
+        var container = containerInstallation.ModContainer;
+        var mod = containerInstallation.GameInstallation.InstallMod(_randomModName).Mod;
 
-        var mod = game.InstallMod(_randomModName, GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        // Add before registering events
         container.AddMod(mod);
 
         var containerRaised = false;
@@ -196,23 +191,22 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
     [Fact]
     public void AddMod_ExistingFromContainer_ShouldBeAlreadyInGame()
     {
-        var container = CreateModContainerInstallation().ModContainer;
-        var game = container.Game;
-
-        var mod = game.InstallMod(_randomModName, GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var containerInstallation = CreateModContainerInstallation();
+        var container = containerInstallation.ModContainer;
+        var game = containerInstallation.GameInstallation.Game;
+        var mod = containerInstallation.GameInstallation.InstallMod(_randomModName).Mod;
+        
         Assert.True(container.AddMod(mod));
-
         Assert.False(game.AddMod(mod));
     }
 
     [Fact]
     public void FindMod()
     {
-        var container = CreateModContainerInstallation().ModContainer;
-        var game = container.Game;
+        var containerInstallation = CreateModContainerInstallation();
+        var container = containerInstallation.ModContainer;
+        var mod = containerInstallation.GameInstallation.InstallMod(_randomModName).Mod;
 
-        var mod = game.InstallMod(_randomModName, GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
-        
         Assert.True(container.AddMod(mod));
 
         Assert.Same(mod, container.FindMod(mod));
