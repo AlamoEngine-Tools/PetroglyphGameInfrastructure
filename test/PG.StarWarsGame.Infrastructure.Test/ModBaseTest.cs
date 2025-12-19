@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Testing.Extensions;
@@ -53,31 +54,30 @@ public abstract class ModBaseTest : PlayableModContainerTest
         Assert.Null(mod.VersionRange);
     }
 
-    // TODO: Re-enable once events are supported again
-    //[Theory]
-    //[MemberData(nameof(ModTestScenarios.ValidScenarios), MemberType = typeof(ModTestScenarios))]
-    //public void ResolveDependencies_ResolvesCorrectly(ModTestScenarios.TestScenario testScenario)
-    //{
-    //    var mod = ModTestScenarios.CreateTestScenario(
-    //            testScenario, 
-    //            CreateModInstallation, 
-    //            CreateOtherModInstallation)
-    //        .Mod;
+    [Theory]
+    [MemberData(nameof(ModTestScenarios.ValidScenarios), MemberType = typeof(ModTestScenarios))]
+    public void ResolveDependencies_ResolvesCorrectly(ModTestScenarios.TestScenario testScenario)
+    {
+        var mod = ModTestScenarios.CreateTestScenario(
+                testScenario,
+                (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
+                (name, layout, dependencies) => CreateOtherModInstallation(name, layout, dependencies).Mod)
+            .Mod;
 
-    //    var expectedDirectDeps = mod.ModInfo!.Dependencies.Select(d =>
-    //    {
-    //        var dep = Game.FindMod(d);
-    //        Assert.NotNull(dep);
-    //        return dep;
-    //    });
+        var expectedDirectDeps = mod.ModInfo!.Dependencies.Select(d =>
+        {
+            var dep = Game.FindMod(d);
+            Assert.NotNull(dep);
+            return dep;
+        });
 
-    //    mod.ResolveDependencies();
+        mod.ResolveDependencies();
 
-    //    Assert.Equal(expectedDirectDeps, mod.Dependencies);
-    //    Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
+        Assert.Equal(expectedDirectDeps, mod.Dependencies);
+        Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
 
-    //    AssertDependenciesResolved(mod);
-    //}
+        AssertDependenciesResolved(mod);
+    }
 
     [Fact]
     public void ResolveDependencies_DepNotAdded_Throws_ThenAddingModResolvesCorrectly()
@@ -154,36 +154,35 @@ public abstract class ModBaseTest : PlayableModContainerTest
         Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
     }
 
-    // TODO: Re-enable once events are supported again
-    //[Fact]
-    //public void ResolveDependencies_RaiseEvent()
-    //{
-    //    var scenario = ModTestScenarios.CreateTestScenario(
-    //        ModTestScenarios.TestScenario.SingleDepAndTransitive,
-    //        CreateModInstallation,
-    //        CreateOtherModInstallation);
+    [Fact]
+    public void ResolveDependencies_RaiseEvent()
+    {
+        var scenario = ModTestScenarios.CreateTestScenario(
+            ModTestScenarios.TestScenario.SingleDepAndTransitive,
+            (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
+            (name, layout, dependencies) => CreateOtherModInstallation(name, layout, dependencies).Mod);
 
-    //    var mod = scenario.Mod;
-    //    var b = Game.FindMod(scenario.ExpectedTraversedList![1])!;
+        var mod = scenario.Mod;
+        var b = Game.FindMod(scenario.ExpectedTraversedList![1])!;
 
-    //    var bRaised = false;
-    //    var modRaised = false;
-    //    b.DependenciesResolved += (sender, _) =>
-    //    {
-    //        Assert.Equal(b, sender);
-    //        bRaised = true;
-    //    };
-    //    mod.DependenciesResolved += (sender, _) =>
-    //    {
-    //        Assert.Equal(mod, sender);
-    //        modRaised = true;
-    //    };
+        var bRaised = false;
+        var modRaised = false;
+        b.DependenciesResolved += (sender, _) =>
+        {
+            Assert.Equal(b, sender);
+            bRaised = true;
+        };
+        mod.DependenciesResolved += (sender, _) =>
+        {
+            Assert.Equal(mod, sender);
+            modRaised = true;
+        };
 
-    //    mod.ResolveDependencies();
+        mod.ResolveDependencies();
 
-    //    Assert.True(bRaised);
-    //    Assert.True(modRaised);
-    //}
+        Assert.True(bRaised);
+        Assert.True(modRaised);
+    }
 
     [Fact]
     public void ResolveDependencies_AlreadyResolved_DoesNotRaiseEvent()
@@ -287,7 +286,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         [Fact]
         public void ResolveDependencies_CalledTwice_Throws()
         {
-            var dep = CreateAndAddMod("Dep").Mod;
+            var dep = CreateAndAddModInstallation("Dep").Mod;
             var modinfo = new ModinfoData("CustomMod")
             {
                 Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)

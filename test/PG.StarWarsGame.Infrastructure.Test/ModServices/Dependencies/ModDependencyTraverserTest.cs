@@ -21,32 +21,32 @@ public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGa
         _traverser = new ModDependencyTraverser(ServiceProvider);
     }
 
-    // TODO
-    //[Theory]
-    //[MemberData(nameof(ModTestScenarios.ValidScenarios), MemberType = typeof(ModTestScenarios))]
-    //public void Traverse_ValidScenarios(ModTestScenarios.TestScenario testScenario)
-    //{
 
-    //    var scenario = ModTestScenarios.CreateTestScenario(
-    //        testScenario,
-    //        CreateAndAddModInstallation,
-    //        CreateAndAddModInstallation);
+    [Theory]
+    [MemberData(nameof(ModTestScenarios.ValidScenarios), MemberType = typeof(ModTestScenarios))]
+    public void Traverse_ValidScenarios(ModTestScenarios.TestScenario testScenario)
+    {
 
-    //    var mod = scenario.Mod;
-    //    mod.ResolveDependencies();
+        var scenario = ModTestScenarios.CreateTestScenario(
+            testScenario,
+            (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod,
+            (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod);
 
-    //    var traversedList = _traverser.Traverse(mod);
+        var mod = scenario.Mod;
+        mod.ResolveDependencies();
 
-    //    Assert.Equal(scenario.ExpectedTraversedList, traversedList);
-    //}
-    
+        var traversedList = _traverser.Traverse(mod);
+
+        Assert.Equal(scenario.ExpectedTraversedList, traversedList);
+    }
+
     [Fact]
     public void Traverse_FaultedResolvedMod_Throws()
     {
         // Do not add to provoke faulted
         var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
 
-        var mod = CreateAndAddMod("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
+        var mod = CreateAndAddModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
 
         try
         {
@@ -66,7 +66,7 @@ public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGa
     {
         // Do not add to provoke faulted
         var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        var mod = CreateAndAddMod("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
+        var mod = CreateAndAddModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
         
         Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);
         Assert.Throws<InvalidOperationException>(() => _traverser.Traverse(mod));

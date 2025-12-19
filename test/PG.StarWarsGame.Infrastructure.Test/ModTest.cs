@@ -180,21 +180,20 @@ public class ModTest : ModBaseTest
         Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
     }
 
-    // TODO: Enable
-    //[Theory]
-    //[MemberData(nameof(ModTestScenarios.CycleScenarios), MemberType = typeof(ModTestScenarios))]
-    //public void ResolveDependencies_ResolvesCycle_Throws(ModTestScenarios.CycleTestScenario testScenario)
-    //{
-    //    var mod = ModTestScenarios.CreateTestScenarioCycle(
-    //            testScenario,
-    //            CreateModInstallation,
-    //            CreateOtherModInstallation,
-    //            CreateModRef)
-    //        .Mod;
+    [Theory]
+    [MemberData(nameof(ModTestScenarios.CycleScenarios), MemberType = typeof(ModTestScenarios))]
+    public void ResolveDependencies_ResolvesCycle_Throws(ModTestScenarios.CycleTestScenario testScenario)
+    {
+        var mod = ModTestScenarios.CreateTestScenarioCycle(
+                testScenario,
+                (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
+                (name, layout, dependencies) => CreateOtherModInstallation(name, layout, dependencies).Mod,
+                CreateModRef)
+            .Mod;
 
-    //    var e = Assert.Throws<ModDependencyCycleException>(mod.ResolveDependencies);
-    //    Assert.Equal(mod, e.Mod);
-    //    Assert.Null(e.Dependency);
-    //    Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
-    //}
+        var e = Assert.Throws<ModDependencyCycleException>(mod.ResolveDependencies);
+        Assert.Equal(mod, e.Mod);
+        Assert.Null(e.Dependency);
+        Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
+    }
 }

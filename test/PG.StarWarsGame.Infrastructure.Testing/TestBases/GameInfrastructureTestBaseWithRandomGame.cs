@@ -13,7 +13,7 @@ public abstract class GameInfrastructureTestBaseWithRandomGame : GameInfrastruct
     
     protected ITestingGameInstallation GameInstallation => GetOrCreateGameInstallation(identity: null);
 
-    protected ITestingModInstallation CreateAndAddMod(
+    protected ITestingModInstallation CreateAndAddModInstallation(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
         params IList<IModReference> deps)
@@ -21,7 +21,7 @@ public abstract class GameInfrastructureTestBaseWithRandomGame : GameInfrastruct
         return CreateAndAddModInstallation(GITestUtilities.GetRandomWorkshopFlag(Game), name, new DependencyList(deps, layout));
     }
 
-    protected ITestingModInstallation CreateAndAddMod(IModinfo modinfo)
+    protected ITestingModInstallation CreateAndAddModInstallation(IModinfo modinfo)
     {
         return CreateAndAddModInstallation(GITestUtilities.GetRandomWorkshopFlag(Game), modinfo);
     }
