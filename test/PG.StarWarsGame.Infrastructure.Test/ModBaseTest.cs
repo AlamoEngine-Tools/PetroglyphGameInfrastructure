@@ -13,16 +13,18 @@ using Semver;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
 public abstract class ModBaseTest : PlayableModContainerTest
 {
-    protected readonly IGame Game;
+    protected IGame Game => GameInstallation.Game;
+    protected ITestingGameInstallation GameInstallation { get; }
 
     protected ModBaseTest()
     {
-        Game = GetOrCreateGameInstallation().Game;
+        GameInstallation = GetOrCreateGameInstallation();
     }
 
     protected abstract ITestingModInstallation CreateModInstallation(
@@ -89,7 +91,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_DepOfWrongGame_Throws()
     {
         var otherGameInstallRef = GameInfrastructureTesting.Game(Game, ServiceProvider);
-        var wrongGameDep = otherGameInstallRef.InstallAndAddMod("WrongGameRefMod", GITestUtilities.GetRandomWorkshopFlag(otherGameInstallRef.Game));
+        var wrongGameDep = otherGameInstallRef.InstallAndAddMod("WrongGameRefMod");
 
         var mod = CreateModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), wrongGameDep.Mod).Mod;
         

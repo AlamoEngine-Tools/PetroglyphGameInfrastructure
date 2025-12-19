@@ -6,7 +6,6 @@ using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using Semver;
@@ -67,7 +66,7 @@ public class VirtualModTest : ModBaseTest
     [Fact]
     public void InvalidCtor_ArgumentNull_Throws()
     {
-        Game.InstallAndAddMod("Dep", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        GameInstallation.InstallAndAddMod("Dep");
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, "VirtualModId", new ModinfoData("Name"), ServiceProvider));
 
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "VirtualModId", null!, ServiceProvider));

@@ -93,7 +93,7 @@ public abstract class PlayableModContainerTest : PlayableObjectTest
 
         // Same game, just different reference
         var otherInstallation = GameInfrastructureTesting.Game(game, ServiceProvider);
-        var mod = otherInstallation.InstallAndAddMod(_randomModName, GITestUtilities.GetRandomWorkshopFlag(game)).Mod;
+        var mod = otherInstallation.InstallAndAddMod(_randomModName).Mod;
         Assert.Throws<ModException>(() => container.AddMod(mod));
     }
 

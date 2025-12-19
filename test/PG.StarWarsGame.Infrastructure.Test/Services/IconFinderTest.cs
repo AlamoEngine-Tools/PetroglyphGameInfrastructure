@@ -57,7 +57,7 @@ public class IconFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_NotInstalled()
     {
-        var mod = Game.InstallAndAddMod("Mod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod("Mod").Mod;
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "Data", "icon.ico"));
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "icon.txt"));
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "icon.ic"));
@@ -67,8 +67,7 @@ public class IconFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_Installed()
     {
-        var mod = Game.InstallAndAddMod("Mod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-
+        var mod = GameInstallation.InstallAndAddMod("Mod").Mod;
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
 
@@ -167,7 +166,7 @@ public class IconFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindIcon_VirtualMod_UseIconFromModinfo()
     {
-        var dep = Game.InstallAndAddMod("dep", false, ServiceProvider);
+        var dep = GameInstallation.InstallAndAddMod("Mod", false).Mod;
         var mod = new VirtualMod(Game, "Mod",
             new ModinfoData("Mod")
             {

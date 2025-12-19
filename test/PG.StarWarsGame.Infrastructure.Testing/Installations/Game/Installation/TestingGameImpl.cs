@@ -42,6 +42,12 @@ internal class TestingGameImpl : ITestingGameInstallation
         return _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(GameInstallationHelper.OriginBasePath, "corruption"));
     }
 
+    public ITestingPhysicalModInstallation InstallAndAddMod(string name)
+    {
+        var isWorkshop = GITestUtilities.GetRandomWorkshopFlag(Game);
+        return InstallAndAddMod(name, isWorkshop);
+    }
+
     public ITestingPhysicalModInstallation InstallAndAddMod(string name, bool workshop)
     {
         var mod = Game.InstallMod(name, workshop, _serviceProvider);
