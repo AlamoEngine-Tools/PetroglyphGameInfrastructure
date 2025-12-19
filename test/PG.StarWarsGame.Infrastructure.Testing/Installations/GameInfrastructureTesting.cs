@@ -1,6 +1,6 @@
 ﻿using System;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations;

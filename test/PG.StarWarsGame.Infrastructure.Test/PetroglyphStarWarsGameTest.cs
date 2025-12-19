@@ -5,7 +5,7 @@ using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;

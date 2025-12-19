@@ -4,7 +4,7 @@ using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 public interface ITestingGameInstallation : ITestingModContainerInstallation
 {

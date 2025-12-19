@@ -13,7 +13,7 @@ using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Clients;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 

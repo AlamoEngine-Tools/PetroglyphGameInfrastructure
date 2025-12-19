@@ -4,7 +4,7 @@ using AET.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using System.Collections.Generic;
 using System.IO.Abstractions;

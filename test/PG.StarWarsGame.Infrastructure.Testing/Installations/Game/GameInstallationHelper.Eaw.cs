@@ -3,7 +3,7 @@ using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 using Testably.Abstractions.Testing;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 internal static partial class GameInstallationHelper
 {

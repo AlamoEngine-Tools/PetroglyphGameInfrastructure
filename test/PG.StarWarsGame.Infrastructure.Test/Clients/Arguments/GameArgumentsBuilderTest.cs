@@ -6,7 +6,7 @@ using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Testably.Abstractions.Testing;
 using Xunit;

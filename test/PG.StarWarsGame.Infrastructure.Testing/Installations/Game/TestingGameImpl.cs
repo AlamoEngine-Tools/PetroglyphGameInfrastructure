@@ -8,7 +8,7 @@ using System;
 using System.IO.Abstractions;
 using Xunit;
 
-namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 internal class TestingGameImpl : ITestingGameInstallation
 {

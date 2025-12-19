@@ -1,6 +1,6 @@
 ﻿using System;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 

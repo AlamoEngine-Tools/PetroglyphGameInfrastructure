@@ -20,9 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using Xunit;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
