@@ -20,9 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
@@ -83,9 +83,9 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
         AssertExpectedGame(foc, actualFoc);
 
         // Init Mods
-        CreateExternalMod(actualFoc);
+        CreateExternalMod(focInstallation);
         if (platform == GamePlatform.SteamGold)
-            CreateAndAddSteamScenario(actualFoc);
+            CreateAndAddSteamScenario(focInstallation);
         Eaw_CreateModInModsDir(eawInstallation);
 
 
@@ -219,18 +219,18 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
         }
     }
 
-    private void CreateAndAddSteamScenario(IGame actualFoc)
+    private void CreateAndAddSteamScenario(ITestingGameInstallation gameInstallation)
     {
-        Assert.Equal(GamePlatform.SteamGold, actualFoc.Platform);
+        var game = gameInstallation.Game;
+        Assert.Equal(GamePlatform.SteamGold, game.Platform);
         var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
 
-        var republicAtWarDir = FileSystem.Path.Combine(steamHelper.GetWorkshopsLocation(actualFoc).FullName, "1129810972"); // This is RaW's Steam ID
-        actualFoc.InstallMod(FileSystem.DirectoryInfo.New(republicAtWarDir), true, new ModinfoData("NOT USED"), ServiceProvider);
+        var republicAtWarDir = FileSystem.Path.Combine(steamHelper.GetWorkshopsLocation(game).FullName, "1129810972"); // This is RaW's Steam ID
+        gameInstallation.InstallMod(new ModinfoData("NOT USED"), FileSystem.DirectoryInfo.New(republicAtWarDir), true);
 
 
-        var rawSubModDir = FileSystem.Path.Combine(steamHelper.GetWorkshopsLocation(actualFoc).FullName, "123456"); // Just some ID
-        var rawSubMod = actualFoc.InstallMod(FileSystem.DirectoryInfo.New(rawSubModDir), true,
-            new ModinfoData("NOT USED"), ServiceProvider);
+        var rawSubModDir = FileSystem.Path.Combine(steamHelper.GetWorkshopsLocation(game).FullName, "123456"); // Just some ID
+        var rawSubMod = gameInstallation.InstallMod(new ModinfoData("NOT USED"), FileSystem.DirectoryInfo.New(rawSubModDir), true).Mod;
 
 
         var rawSubModModinfoContent = @"
@@ -290,10 +290,10 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
         assertAction(mod);
     }
 
-    private void CreateExternalMod(IGame game)
+    private void CreateExternalMod(ITestingGameInstallation gameInstallation)
     {
         var modinfo = new ModinfoData("NAME NOT TAKE CAUSE NO MODINFO"); 
-        game.InstallMod(FileSystem.DirectoryInfo.New("externalMods/MyExternalMod"), false, modinfo, ServiceProvider);
+        gameInstallation.InstallMod(modinfo, FileSystem.DirectoryInfo.New("externalMods/MyExternalMod"), false);
     }
 
 

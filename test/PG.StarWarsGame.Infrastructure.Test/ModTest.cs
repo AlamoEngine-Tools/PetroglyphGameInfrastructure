@@ -24,7 +24,7 @@ public class ModTest : ModBaseTest
 
     private IDirectoryInfo CreateModDirectoryInfo(string name)
     {
-        return FileSystem.DirectoryInfo.New(Game.GetModDirectory(name, _isWorkshop, ServiceProvider));
+        return GameInstallation.GetModDirectory(name, _isWorkshop);
     }
 
     private IModReference CreateModRef(string name)
@@ -96,9 +96,9 @@ public class ModTest : ModBaseTest
     public void ValidCtor_Properties_FromName()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var loc = Game.GetModDirectory("Mod", ws, ServiceProvider);
+        var loc = GameInstallation.GetModDirectory("Mod", ws);
 
-        var mod = new Mod(Game, "ModId", FileSystem.DirectoryInfo.New(loc), ws, "Mod", ServiceProvider);
+        var mod = new Mod(Game, "ModId", loc, ws, "Mod", ServiceProvider);
 
         Assert.Same(Game, mod.Game);
         Assert.Equal("Mod", mod.Name);
@@ -121,7 +121,7 @@ public class ModTest : ModBaseTest
     public void ValidCtor_Properties_FromModinfo_WithoutDependencies()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var loc = Game.GetModDirectory("Mod", ws, ServiceProvider);
+        var loc = GameInstallation.GetModDirectory("Mod", ws);
 
         var modInfo = new ModinfoData("Mod")
         {
@@ -129,7 +129,7 @@ public class ModTest : ModBaseTest
             Version = new SemVersion(1, 0, 0),
             Languages = new List<ILanguageInfo>(),
         };
-        var mod = new Mod(Game, "ModId", FileSystem.DirectoryInfo.New(loc), ws, modInfo, ServiceProvider);
+        var mod = new Mod(Game, "ModId", loc, ws, modInfo, ServiceProvider);
 
         Assert.Same(Game, mod.Game);
         Assert.Equal("Mod", mod.Name);

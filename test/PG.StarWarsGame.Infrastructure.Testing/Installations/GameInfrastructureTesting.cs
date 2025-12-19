@@ -9,7 +9,7 @@ public static class GameInfrastructureTesting
 {
     public static ITestingGameInstallation Game(IGameIdentity gameIdentity, IServiceProvider serviceProvider)
     {
-        return new TestingGameImpl(gameIdentity, serviceProvider);
+        return new TestingGameInstallationImpl(gameIdentity, serviceProvider);
     }
 
     public static ITestingGameRegistry Registry(IServiceProvider serviceProvider)

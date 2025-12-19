@@ -3,49 +3,20 @@ using AET.Modinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using System;
 using System.IO.Abstractions;
+using PG.StarWarsGame.Infrastructure.Utilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
-internal class TestingGameImpl : ITestingGameInstallation
+internal partial class TestingGameInstallationImpl
 {
-    private readonly IFileSystem _fileSystem;
-    private readonly IServiceProvider _serviceProvider;
-
-    public IGame Game { get; }
-
-    public ITestingGameInstallation GameInstallation => this;
-
-    public PlayableModContainer ModContainer => Game as PlayableModContainer;
-
-    public IPlayableObject PlayableObject => Game;
-
-    public TestingGameImpl(IGameIdentity gameIdentity, IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
-        Game = Install(gameIdentity);
-    }
-
-    public void InstallDebug()
-    {
-        if (Game.Platform is not GamePlatform.SteamGold)
-            Assert.Fail($"Cannot install Debug files for non-Steam game '{Game}'");
-        GameInstallationHelper.CreateFile(_fileSystem, _fileSystem.Path.Combine(Game.Directory.FullName, "StarWarsI.exe"));
-    }
-
-    public IDirectoryInfo GetWrongOriginFocRegistryLocation()
-    {
-        return _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(GameInstallationHelper.OriginBasePath, "corruption"));
-    }
-
     public ITestingPhysicalModInstallation InstallMod(string name, bool workshop)
     {
-        var mod = ModInstallations.CreateMod(Game, name, workshop, _serviceProvider,
-            modDir => new Mod(Game, name, modDir, workshop, name, _serviceProvider));
+        var mod = CreateMod(name, workshop, modDir => new Mod(Game, name, modDir, workshop, name, _serviceProvider));
         return new TestingPhysicalModImpl(this, mod, _serviceProvider);
     }
 
@@ -58,8 +29,7 @@ internal class TestingGameImpl : ITestingGameInstallation
     public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo, bool workshop)
     {
         var name = modinfo.Name;
-        var mod = ModInstallations.CreateMod(Game, name, workshop, _serviceProvider, modDir
-            => new Mod(Game, name, modDir, workshop, modinfo, _serviceProvider));
+        var mod = CreateMod(name, workshop, modDir => new Mod(Game, name, modDir, workshop, modinfo, _serviceProvider));
         return new TestingPhysicalModImpl(this, mod, _serviceProvider);
     }
 
@@ -71,8 +41,7 @@ internal class TestingGameImpl : ITestingGameInstallation
 
     public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo, IDirectoryInfo directory, bool workshop)
     {
-        var mod = ModInstallations.CreateMod(Game, directory, dir =>
-            new Mod(Game, modinfo.Name, dir, workshop, modinfo, _serviceProvider));
+        var mod = CreateMod(directory, dir => new Mod(Game, modinfo.Name, dir, workshop, modinfo, _serviceProvider));
         return new TestingPhysicalModImpl(this, mod, _serviceProvider);
     }
 
@@ -146,17 +115,42 @@ internal class TestingGameImpl : ITestingGameInstallation
         return InstallAndAddMod(modinfo, isWorkshop);
     }
 
-    private IGame Install(IGameIdentity gameIdentity)
+    public IDirectoryInfo GetModDirectory(string name, bool workshop)
     {
-        var gameDir = gameIdentity.Type == GameType.Foc
-            ? GameInstallationHelper.InstallFoc(_fileSystem, gameIdentity.Platform)
-            : GameInstallationHelper.InstallEaw(_fileSystem, gameIdentity.Platform);
+        if (!workshop)
+            return _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(Game.ModsLocation.FullName, name));
+        if (workshop && Game.Platform is not GamePlatform.SteamGold)
+        {
+            Assert.Fail($"Game: {Game}, Mod: {name}, {workshop}");
+            throw new InvalidOperationException("compiler flow");
+        }
 
-        _fileSystem.InstallModsLocations(gameDir);
+        var steamHelpers = _serviceProvider.GetRequiredService<ISteamGameHelpers>();
+        var wsDir = steamHelpers.GetWorkshopsLocation(Game);
+        Assert.True(wsDir.Exists);
 
-        var game = new PetroglyphStarWarsGame(gameIdentity, gameDir, gameIdentity.ToString(), _serviceProvider);
-        Assert.True(game.Exists());
-        return game;
+        var nameHash = name.GetHashCode();
+        var steamId = (ulong)nameHash;
+        if (!_fileSystem.Directory.Exists(_fileSystem.Path.Combine(wsDir.FullName, steamId.ToString())))
+        {
+            steamHelpers.ToSteamWorkshopsId(steamId.ToString(), out var id);
+            Assert.Equal(steamId, id);
+        }
+        return _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(wsDir.FullName, steamId.ToString()));
+    }
+
+    private Mod CreateMod(string modName, bool workshop, Func<IDirectoryInfo, Mod> modFactory)
+    {
+        var modDir = GetModDirectory(modName, workshop);
+        return CreateMod(modDir, modFactory);
+    }
+
+    private Mod CreateMod(IDirectoryInfo directory, Func<IDirectoryInfo, Mod> modFactory)
+    {
+        Assert.True(Game.ModsLocation.Exists);
+        var mod = modFactory(directory);
+        mod.Directory.Create();
+        mod.DataDirectory().Create();
+        return mod;
     }
 }
-

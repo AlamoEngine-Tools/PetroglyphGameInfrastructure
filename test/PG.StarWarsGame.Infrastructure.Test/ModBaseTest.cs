@@ -105,8 +105,8 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_VersionMismatch_Throws()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var depLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
-        var dep = Game.InstallMod(depLoc, ws, new ModinfoData("B") { Version = new SemVersion(1) }, ServiceProvider);
+        var depLoc = GameInstallation.GetModDirectory("B", ws);
+        var dep = GameInstallation.InstallMod(new ModinfoData("B") { Version = new SemVersion(1) }, depLoc, ws).Mod;
         Game.AddMod(dep);
 
         var mod = CreateAndAddModInstallation("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2)))).Mod;
@@ -121,10 +121,10 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_VersionMatch_Throws()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var bLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
-        var cLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("C", ws, ServiceProvider));
-        var b = Game.InstallMod(bLoc, ws, new ModinfoData("B") { Version = new SemVersion(3) }, ServiceProvider);
-        var c = Game.InstallMod(cLoc, ws, new ModinfoData("C") { Version = null! }, ServiceProvider);
+        var bLoc = GameInstallation.GetModDirectory("B", ws);
+        var cLoc = GameInstallation.GetModDirectory("C", ws);
+        var b = GameInstallation.InstallMod(new ModinfoData("B") { Version = new SemVersion(3) }, bLoc, ws).Mod;
+        var c = GameInstallation.InstallMod(new ModinfoData("C") { Version = null! }, cLoc, ws).Mod;
         Game.AddMod(b);
         Game.AddMod(c);
 
@@ -192,8 +192,8 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_Faulted_DoesNotRaiseEvent()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var depLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
-        var dep = Game.InstallMod(depLoc, ws, new ModinfoData("B") { Version = new SemVersion(1) }, ServiceProvider);
+        var depLoc = GameInstallation.GetModDirectory("B", ws);
+        var dep = GameInstallation.InstallMod(new ModinfoData("B") { Version = new SemVersion(1) }, depLoc, ws).Mod;
         Game.AddMod(dep);
 
         var mod = CreateAndAddModInstallation("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2)))).Mod;

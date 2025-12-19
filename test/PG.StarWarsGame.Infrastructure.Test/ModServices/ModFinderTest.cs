@@ -309,11 +309,12 @@ public class ModFinderTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FromExternal(GameIdentity gameIdentity)
     {
-        var game = GetOrCreateGameInstallation(gameIdentity).Game;
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
         var modPath = FileSystem.DirectoryInfo.New("external/myMod");
         modPath.Create();
 
-        var mod = game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        var mod = gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false).Mod;
         
         var installedMods = _modFinder.FindMods(game, mod.Directory).ToList();
         AssertSingleFoundMod(installedMods, mod, mod.Directory.FullName, null);
@@ -323,11 +324,12 @@ public class ModFinderTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FromExternal_DirectoryNotFoundShouldSkip(GameIdentity gameIdentity)
     {
-        var game = GetOrCreateGameInstallation(gameIdentity).Game;
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
         var modPath = FileSystem.DirectoryInfo.New("external/myMod");
         modPath.Create();
 
-        var mod = game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        var mod = gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false).Mod;
         modPath.Delete(true);
 
         var installedMods = _modFinder.FindMods(game, mod.Directory).ToList();
@@ -338,14 +340,15 @@ public class ModFinderTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FromExternal_WithVariantModinfoLayout(GameIdentity gameIdentity)
     {
-        var game = GetOrCreateGameInstallation(gameIdentity).Game;
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
         var modPath = FileSystem.DirectoryInfo.New("external/123456"); // Use a number so it may look like a Steam WS ID
         modPath.Create();
 
         var main = new ModinfoData("Main");
         var info1 = new ModinfoData("MyName1");
         var info2 = new ModinfoData("MyName2");
-        var expectedMod = game.InstallMod(modPath, false, main, ServiceProvider);
+        var expectedMod = gameInstallation.InstallMod(main, modPath, false).Mod;
         expectedMod.InstallModinfoFile(main);
         expectedMod.InstallModinfoFile(info1, "variant1");
         expectedMod.InstallModinfoFile(info2, "variant2");
@@ -363,7 +366,8 @@ public class ModFinderTest : GameInfrastructureTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_FromExternal_InsideSteamWsDirWithNonIdName(GameType type)
     {
-        var game = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold)).Game;
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
+        var game = gameInstallation.Game;
         var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var steamLocation = steamHelper.GetWorkshopsLocation(game);
         steamLocation.Create();
@@ -371,7 +375,7 @@ public class ModFinderTest : GameInfrastructureTestBase
         var modPath = FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(steamLocation.FullName, "notASteamID"));
         modPath.Create();
 
-        var expectedMod = game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        var expectedMod = gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false).Mod;
         Assert.Equal(ModType.Default ,expectedMod.Type);
         
         var installedMods = _modFinder.FindMods(game, expectedMod.Directory).ToList();
@@ -383,7 +387,8 @@ public class ModFinderTest : GameInfrastructureTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_ModInsideSteamWsDirWithNonIdName_ShouldBeSkipped(GameType type)
     {
-        var game = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold)).Game;
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
+        var game = gameInstallation.Game;
         var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var steamLocation = steamHelper.GetWorkshopsLocation(game);
         steamLocation.Create();
@@ -391,7 +396,7 @@ public class ModFinderTest : GameInfrastructureTestBase
         var modPath = FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(steamLocation.FullName, "notASteamID"));
         modPath.Create();
 
-        game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false);
 
         var installedMods = _modFinder.FindMods(game).ToList();
         Assert.Empty(installedMods);
@@ -419,7 +424,8 @@ public class ModFinderTest : GameInfrastructureTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_NoSteamWsDirectoryExistsShouldStillFindExternalMods(GameType type)
     {
-        var game = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold)).Game;
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
+        var game = gameInstallation.Game;
         var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var steamLocation = steamHelper.GetWorkshopsLocation(game);
         steamLocation.Delete(true);
@@ -427,7 +433,7 @@ public class ModFinderTest : GameInfrastructureTestBase
         var modPath = FileSystem.DirectoryInfo.New("external/MyMod");
         modPath.Create();
 
-        game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false);
 
         var installedMods = _modFinder.FindMods(game).ToList();
         Assert.Empty(installedMods);

@@ -1,8 +1,8 @@
-﻿using PG.StarWarsGame.Infrastructure.Games;
-using System.IO.Abstractions;
-using AET.Modinfo.Model;
+﻿using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
+using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
+using System.IO.Abstractions;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
@@ -43,7 +43,7 @@ public interface ITestingGameInstallation : ITestingModContainerInstallation
 
     ITestingPhysicalModInstallation InstallAndAddMod(string name, IModDependencyList dependencies);
 
-
-
     ITestingVirtualModInstallation AddVirtualMod(string name, ModinfoData modinfo);
+
+    IDirectoryInfo GetModDirectory(string name, bool workshop);
 }
