@@ -220,7 +220,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod_WithInvalidModinfo(GameIdentity gameIdentity)
     {
-        var gameInstallation = GetOrCreateGameInstallation();
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
         var game = gameInstallation.Game;
         var dep = gameInstallation.InstallMod("dep", false).Mod;
 
@@ -250,7 +250,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateVirtualMod(GameIdentity gameIdentity)
     {
-        var gameInstallation = GetOrCreateGameInstallation();
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
         var game = gameInstallation.Game;
         var dep = gameInstallation.InstallMod("dep", false).Mod;
 
@@ -306,7 +306,7 @@ public class ModFactoryTest : GameInfrastructureTestBase
         }
 
         public string Name { get; } = name;
-        public SemVersion? Version { get; }
+        public SemVersion? Version => null;
         public IModDependencyList Dependencies { get; init; } = DependencyList.EmptyDependencyList;
         public string ToJson()
         {
@@ -318,12 +318,12 @@ public class ModFactoryTest : GameInfrastructureTestBase
             JsonSerializer.Serialize(stream, this, JsonSerializerOptions.Default);
         }
 
-        public string? Summary { get; }
-        public string? Icon { get; }
+        public string? Summary => null;
+        public string? Icon => null;
         public IDictionary<string, object> Custom { get; } = new Dictionary<string, object>();
-        public ISteamData? SteamData { get; }
+        public ISteamData? SteamData => null;
         public IReadOnlyCollection<ILanguageInfo> Languages { get; } = new List<ILanguageInfo>();
-        public bool LanguagesExplicitlySet { get; }
+        public bool LanguagesExplicitlySet => false;
     }
 }
 

@@ -69,7 +69,7 @@ public class ModEqualityComparerTest : GameInfrastructureTestBaseWithRandomGame
     public void Equals_DependencyAware(bool depAware)
     {
         var dep = new ModReference("B", ModType.Default);
-        var modA = (IPhysicalMod)InstallAndAddModWithDependencies("A", deps: dep).Mod;
+        var modA = InstallAndAddModWithDependencies("A", deps: dep).Mod;
 
         var sameishModindo = new ModinfoData("A")
         {

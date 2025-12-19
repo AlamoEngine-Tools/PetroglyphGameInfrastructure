@@ -7,7 +7,7 @@ namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 internal sealed class TestingVirtualModInstallationImpl(ITestingGameInstallation gameInstallation, IVirtualMod mod, IServiceProvider serviceProvider)
     : TestingModInstallationImpl(gameInstallation, mod, serviceProvider), ITestingVirtualModInstallation
 {
-    public ITestingGameInstallation GameInstallation { get; } = gameInstallation;
+    public new ITestingGameInstallation GameInstallation { get; } = gameInstallation;
 
-    public IVirtualMod Mod { get; } = mod;
+    public new IVirtualMod Mod { get; } = mod;
 }

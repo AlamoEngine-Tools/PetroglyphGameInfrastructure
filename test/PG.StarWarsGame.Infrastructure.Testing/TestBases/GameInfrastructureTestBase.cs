@@ -7,6 +7,7 @@ using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Threading;
 using Testably.Abstractions.Testing;

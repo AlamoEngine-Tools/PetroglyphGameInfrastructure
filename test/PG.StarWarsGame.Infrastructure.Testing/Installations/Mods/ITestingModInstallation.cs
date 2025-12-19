@@ -5,7 +5,7 @@ namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 public interface ITestingModInstallation : ITestingModContainerInstallation
 {
-    ITestingGameInstallation GameInstallation { get; }
+    new ITestingGameInstallation GameInstallation { get; }
 
     IMod Mod { get; }
 }

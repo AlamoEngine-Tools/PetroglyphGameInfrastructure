@@ -473,6 +473,7 @@ public class ModFinderTest : GameInfrastructureTestBase
         Assert.Equal(expectedId, foundMod.ModReference.Identifier);
     }
 
+    // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
     private static void AssertMultipleModsOfSameLocation(
         ICollection<DetectedModReference> detectedMods,
         int expectedCount,
@@ -493,6 +494,7 @@ public class ModFinderTest : GameInfrastructureTestBase
 
         Assert.Equivalent(expectedModinfoNames, detectedMods.Select(x => x.Modinfo?.Name), true);
     }
+    // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Local
 
     private class CustomModinfo(string name) : IModinfo
     {
@@ -502,8 +504,9 @@ public class ModFinderTest : GameInfrastructureTestBase
         }
 
         public string Name { get; } = name;
-        public SemVersion? Version { get; }
-        public IModDependencyList Dependencies { get; } = DependencyList.EmptyDependencyList;
+        public SemVersion? Version => null;
+        public IModDependencyList Dependencies => DependencyList.EmptyDependencyList;
+
         public string ToJson()
         {
             return JsonSerializer.Serialize(this, JsonSerializerOptions.Default);
@@ -514,11 +517,11 @@ public class ModFinderTest : GameInfrastructureTestBase
             JsonSerializer.Serialize(stream, this, JsonSerializerOptions.Default);
         }
 
-        public string? Summary { get; }
-        public string? Icon { get; }
+        public string? Summary => null;
+        public string? Icon => null;
         public IDictionary<string, object> Custom { get; } = new Dictionary<string, object>();
-        public ISteamData? SteamData { get; }
+        public ISteamData? SteamData => null;
         public IReadOnlyCollection<ILanguageInfo> Languages { get; } = new List<ILanguageInfo>();
-        public bool LanguagesExplicitlySet { get; }
+        public bool LanguagesExplicitlySet => false;
     }
 }

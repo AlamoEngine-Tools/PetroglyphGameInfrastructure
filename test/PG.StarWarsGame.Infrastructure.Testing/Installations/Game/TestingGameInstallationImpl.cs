@@ -16,7 +16,7 @@ internal partial class TestingGameInstallationImpl : TestingModContainerInstalla
 
     public override IPlayableObject PlayableObject => Game;
 
-    public override PlayableModContainer ModContainer => Game as PlayableModContainer;
+    public override PlayableModContainer ModContainer => (Game as PlayableModContainer)!;
 
     public TestingGameInstallationImpl(IGameIdentity gameIdentity, IServiceProvider serviceProvider) : base(serviceProvider)
     {

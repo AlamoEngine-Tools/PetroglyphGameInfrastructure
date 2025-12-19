@@ -8,10 +8,10 @@ namespace AET.Testing;
 public class ExceptionHelpers
 {
     public static void ValidateExceptionProperties(Exception e,
-        Exception innerException = null,
-        string message = null,
-        string source = null,
-        string stackTrace = null,
+        Exception? innerException = null,
+        string? message = null,
+        string? source = null,
+        string? stackTrace = null,
         bool validateMessage = true)
     {
         Assert.Equal(innerException, e.InnerException);

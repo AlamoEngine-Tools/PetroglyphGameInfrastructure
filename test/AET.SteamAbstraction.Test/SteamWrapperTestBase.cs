@@ -360,7 +360,7 @@ public abstract class SteamWrapperTestBase : InMemorySteamTestBase
 
     private void StopSteam()
     {
-        Steam?.Registry.SetPid(null);
+        Steam.Registry.SetPid(null);
         ProcessHelper!.SetRunningPid(null);
     }
 

@@ -71,7 +71,7 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
         var focSteam = GameInfrastructureTesting.Game(focSteamId, ServiceProvider).Game;
         var eawDisc = GameInfrastructureTesting.Game(eawDiskId, ServiceProvider).Game;
 
-        Assert.False(eawSteam.Equals(null));
+        Assert.False(eawSteam.Equals(null!));
         Assert.False(eawSteam.Equals((object)null!));
         Assert.False(eawSteam.Equals(new object()));
 

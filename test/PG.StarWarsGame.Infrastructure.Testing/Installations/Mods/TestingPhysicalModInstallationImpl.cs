@@ -12,7 +12,7 @@ internal sealed class TestingPhysicalModInstallationImpl(ITestingGameInstallatio
 {
     public new ITestingGameInstallation GameInstallation { get; } = gameInstallation;
 
-    public IPhysicalPlayableObject PlayableObject => Mod;
+    public new IPhysicalPlayableObject PlayableObject => Mod;
     
     public void InstallLanguage(ILanguageInfo language)
     {

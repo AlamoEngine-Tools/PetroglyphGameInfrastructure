@@ -36,7 +36,7 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
             return _gameInstallation;
         var type = identity?.Type ?? Random.Enum<GameType>();
         var steamIdentity = new GameIdentity(type, GamePlatform.SteamGold);
-        return GameInfrastructureTesting.Game(steamIdentity, ServiceProvider);
+        return _gameInstallation = GameInfrastructureTesting.Game(steamIdentity, ServiceProvider);
     }
 
     protected override void BeforePlay()

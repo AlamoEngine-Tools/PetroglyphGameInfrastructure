@@ -13,5 +13,5 @@ internal class TestingModInstallationImpl(ITestingGameInstallation gameInstallat
     
     public IMod Mod { get; } = mod;
 
-    public override PlayableModContainer ModContainer => Mod as ModBase;
+    public override PlayableModContainer ModContainer => (Mod as ModBase)!;
 }

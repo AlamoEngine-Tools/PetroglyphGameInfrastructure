@@ -7,6 +7,7 @@ namespace AET.SteamAbstraction.Testing.TestBases;
 public abstract class SteamTestBase : TestBaseWithServiceProvider, IDisposable
 {
     protected readonly ITestingSteamInstallation Steam;
+    
     protected SteamTestBase()
     {
         Steam = SteamTesting.Steam(ServiceProvider);

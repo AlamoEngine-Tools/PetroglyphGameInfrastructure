@@ -17,6 +17,7 @@ internal class LinuxSteamRegistry(IServiceProvider serviceProvider) : Disposable
     public IDirectoryInfo? InstallationDirectory { get; }
 
     public int? ProcessId { get; }
+
     public IRegistryKey? OpenSteamRegistryKey()
     {
         throw new NotImplementedException();

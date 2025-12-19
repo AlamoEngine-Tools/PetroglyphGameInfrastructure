@@ -24,6 +24,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
 
     protected ModBaseTest()
     {
+        // ReSharper disable once VirtualMemberCallInConstructor
         GameInstallation = GetOrCreateGameInstallation();
     }
 
