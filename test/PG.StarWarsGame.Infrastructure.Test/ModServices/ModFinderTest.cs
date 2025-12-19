@@ -15,7 +15,6 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Semver;
 using Xunit;
@@ -111,8 +110,9 @@ public class ModFinderTest : GameInfrastructureTestBase
         var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
         var game = gameInstallation.Game;
 
-        var expectedMod = gameInstallation.InstallMod("MyMod").Mod;
-        expectedMod.InstallInvalidModinfoFile();
+        var expectedModInstallation = gameInstallation.InstallMod("MyMod");
+        expectedModInstallation.InstallInvalidModinfoFile();
+        var expectedMod = expectedModInstallation.Mod;
 
         var installedMods = _modFinder.FindMods(game);
         AssertSingleFoundMod(installedMods, expectedMod, expectedMod.Directory.Name, null);
@@ -128,11 +128,12 @@ public class ModFinderTest : GameInfrastructureTestBase
         var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
         var game = gameInstallation.Game;
 
-        var expectedMod = gameInstallation.InstallMod("MyMod").Mod;
+        var expectedModInstallation = gameInstallation.InstallMod("MyMod");
         var expectedModinfo = new ModinfoData("Variant1");
+        var expectedMod = expectedModInstallation.Mod;
 
-        expectedMod.InstallModinfoFile(expectedModinfo, "variant1");
-        expectedMod.InstallInvalidModinfoFile("variant2");
+        expectedModInstallation.InstallModinfoFile(expectedModinfo, "variant1");
+        expectedModInstallation.InstallInvalidModinfoFile("variant2");
 
         var installedMods = _modFinder.FindMods(game);
         AssertSingleFoundMod(installedMods, expectedMod, $"{expectedMod.Directory.Name}:Variant1", expectedModinfo);
@@ -149,8 +150,9 @@ public class ModFinderTest : GameInfrastructureTestBase
         var game = gameInstallation.Game;
 
         var modinfoData = new ModinfoData("MyMod");
-        var expectedMod = gameInstallation.InstallMod(modinfoData).Mod;
-        expectedMod.InstallModinfoFile(modinfoData);
+        var expectedModInstallation = gameInstallation.InstallMod(modinfoData);
+        expectedModInstallation.InstallModinfoFile(modinfoData);
+        var expectedMod = expectedModInstallation.Mod;
 
         var installedMods = _modFinder.FindMods(game);
         AssertSingleFoundMod(installedMods, expectedMod, expectedMod.Directory.Name, modinfoData);
@@ -168,9 +170,10 @@ public class ModFinderTest : GameInfrastructureTestBase
 
         var info1 = new ModinfoData("MyName1");
         var info2 = new ModinfoData("MyName2");
-        var expectedMod = gameInstallation.InstallMod("DirName").Mod;
-        expectedMod.InstallModinfoFile(info1, "variant1");
-        expectedMod.InstallModinfoFile(info2, "variant2");
+        var expectedModInstallation = gameInstallation.InstallMod("DirName");
+        expectedModInstallation.InstallModinfoFile(info1, "variant1");
+        expectedModInstallation.InstallModinfoFile(info2, "variant2");
+        var expectedMod = expectedModInstallation.Mod;
 
         var installedMods = _modFinder.FindMods(game).ToList();
         AssertMultipleModsOfSameLocation(
@@ -203,10 +206,11 @@ public class ModFinderTest : GameInfrastructureTestBase
         var main = new ModinfoData("Main");
         var info1 = new ModinfoData("MyName1");
         var info2 = new ModinfoData("MyName2");
-        var expectedMod = gameInstallation.InstallMod("DirName").Mod;
-        expectedMod.InstallModinfoFile(main);
-        expectedMod.InstallModinfoFile(info1, "variant1");
-        expectedMod.InstallModinfoFile(info2, "variant2");
+        var expectedModInstallation = gameInstallation.InstallMod("DirName");
+        expectedModInstallation.InstallModinfoFile(main);
+        expectedModInstallation.InstallModinfoFile(info1, "variant1");
+        expectedModInstallation.InstallModinfoFile(info2, "variant2");
+        var expectedMod = expectedModInstallation.Mod;
 
         var installedMods = _modFinder.FindMods(game).ToList();
         AssertMultipleModsOfSameLocation(
@@ -258,8 +262,9 @@ public class ModFinderTest : GameInfrastructureTestBase
         var steamMod = gameInstallation.InstallMod("SteamMod", true).Mod;
 
         var modinfo = new ModinfoData("Name");
-        var defaultMod = gameInstallation.InstallMod(modinfo, false).Mod;
-        defaultMod.InstallModinfoFile(modinfo);
+        var defaultModInstallation = gameInstallation.InstallMod(modinfo, false);
+        defaultModInstallation.InstallModinfoFile(modinfo);
+        var defaultMod = defaultModInstallation.Mod;
 
 
         var installedMods = _modFinder.FindMods(game).ToList();
@@ -298,11 +303,11 @@ public class ModFinderTest : GameInfrastructureTestBase
         };
 
         
-        var modOfWrongGameType = gameInstallation.InstallMod(modinfo, true).Mod;
+        var modOfWrongGameType = gameInstallation.InstallMod(modinfo, true);
         modOfWrongGameType.InstallModinfoFile(modinfo);
 
         Assert.Empty(_modFinder.FindMods(game));
-        Assert.Empty(_modFinder.FindMods(game, modOfWrongGameType.Directory));
+        Assert.Empty(_modFinder.FindMods(game, modOfWrongGameType.Mod.Directory));
     }
 
     [Theory]
@@ -348,15 +353,15 @@ public class ModFinderTest : GameInfrastructureTestBase
         var main = new ModinfoData("Main");
         var info1 = new ModinfoData("MyName1");
         var info2 = new ModinfoData("MyName2");
-        var expectedMod = gameInstallation.InstallMod(main, modPath, false).Mod;
-        expectedMod.InstallModinfoFile(main);
-        expectedMod.InstallModinfoFile(info1, "variant1");
-        expectedMod.InstallModinfoFile(info2, "variant2");
+        var expectedModInstallation = gameInstallation.InstallMod(main, modPath, false);
+        expectedModInstallation.InstallModinfoFile(main);
+        expectedModInstallation.InstallModinfoFile(info1, "variant1");
+        expectedModInstallation.InstallModinfoFile(info2, "variant2");
 
-        var baseId = expectedMod.Directory.FullName;
+        var baseId = expectedModInstallation.Mod.Directory.FullName;
 
-        var installedMods = _modFinder.FindMods(game, expectedMod.Directory).ToList();
-        AssertMultipleModsOfSameLocation(installedMods, 3, expectedMod.Directory.FullName, ModType.Default, 
+        var installedMods = _modFinder.FindMods(game, expectedModInstallation.Mod.Directory).ToList();
+        AssertMultipleModsOfSameLocation(installedMods, 3, expectedModInstallation.Mod.Directory.FullName, ModType.Default, 
             [$"{baseId}", $"{baseId}:MyName1", $"{baseId}:MyName2"], 
             ["Main", "MyName1", "MyName2"]);
     }
@@ -445,13 +450,13 @@ public class ModFinderTest : GameInfrastructureTestBase
     {
         var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
         var game = gameInstallation.Game;
-        var expectedMod = gameInstallation.InstallMod("MyMod").Mod;
-        expectedMod.InstallModinfoFile(new CustomModinfo(string.Empty)); // string.Empty is not valid
+        var expectedModInstallation = gameInstallation.InstallMod("MyMod");
+        expectedModInstallation.InstallModinfoFile(new CustomModinfo(string.Empty)); // string.Empty is not valid
 
         var installedMods = _modFinder.FindMods(game);
-        var expectedId = expectedMod.Type == ModType.Workshops ? ((ulong)"MyMod".GetHashCode()).ToString() : "MyMod";
+        var expectedId = expectedModInstallation.Mod.Type == ModType.Workshops ? ((ulong)"MyMod".GetHashCode()).ToString() : "MyMod";
 
-        AssertSingleFoundMod(installedMods, expectedMod, expectedId, null);
+        AssertSingleFoundMod(installedMods, expectedModInstallation.Mod, expectedId, null);
     }
 
     private static void AssertSingleFoundMod(IEnumerable<DetectedModReference> foundMods, IPhysicalMod expectedMod, string expectedId, IModinfo? expectedModinfo)

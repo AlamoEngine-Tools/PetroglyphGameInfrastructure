@@ -22,7 +22,6 @@ using System.Globalization;
 using System.Linq;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
@@ -230,7 +229,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
 
 
         var rawSubModDir = FileSystem.Path.Combine(steamHelper.GetWorkshopsLocation(game).FullName, "123456"); // Just some ID
-        var rawSubMod = gameInstallation.InstallMod(new ModinfoData("NOT USED"), FileSystem.DirectoryInfo.New(rawSubModDir), true).Mod;
+        var rawSubModInstallation = gameInstallation.InstallMod(new ModinfoData("NOT USED"), FileSystem.DirectoryInfo.New(rawSubModDir), true);
 
 
         var rawSubModModinfoContent = @"
@@ -254,7 +253,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
         ],
     }
 }";
-        rawSubMod.InstallModinfoFile(ModinfoData.Parse(rawSubModModinfoContent));
+        rawSubModInstallation.InstallModinfoFile(ModinfoData.Parse(rawSubModModinfoContent));
     }
 
     private void AssertModFinderResult(ICollection<DetectedModReference> finderResult,
