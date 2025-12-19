@@ -8,10 +8,17 @@ using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 internal sealed class TestingPhysicalModInstallationImpl(ITestingGameInstallation gameInstallation, IPhysicalMod mod, IServiceProvider serviceProvider) 
-    : TestingModInstallationImpl(gameInstallation, mod, serviceProvider), ITestingPhysicalModInstallation
+    : TestingModInstallationImpl(gameInstallation, mod, serviceProvider), ITestingPhysicalModInstallation, ITestingPhysicalPlayableObjectInstallation
 {
     public new ITestingGameInstallation GameInstallation { get; } = gameInstallation;
+
+    public IPhysicalPlayableObject PlayableObject => Mod;
     
+    public void InstallLanguage(ILanguageInfo language)
+    {
+        PlayableObjectTestingUtilities.InstallLanguage(PlayableObject, language, FileSystem);
+    }
+
     public new IPhysicalMod Mod { get; } = mod;
 
     public IModinfoFile InstallInvalidModinfoFile(string? variantSubFileName = null)

@@ -48,15 +48,14 @@ public class ModTest : ModBaseTest
         var modInstallation = GetOrCreateGameInstallation()
             .InstallAndAddMod(modinfo, CreateModDirectoryInfo(name), _isWorkshop);
 
-        var mod = modInstallation.Mod;
         if (languages is not null)
         {
-            foreach (var languageInfo in languages) 
-                mod.InstallLanguage(languageInfo);
+            foreach (var languageInfo in languages)
+                modInstallation.InstallLanguage(languageInfo);
         }
 
         if (iconPath is not null) 
-            FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, iconPath));
+            FileSystem.File.Create(FileSystem.Path.Combine(modInstallation.Mod.Directory.FullName, iconPath));
 
         return modInstallation;
     }

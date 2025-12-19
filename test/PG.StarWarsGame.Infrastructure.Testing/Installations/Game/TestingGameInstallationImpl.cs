@@ -1,6 +1,7 @@
 ﻿using PG.StarWarsGame.Infrastructure.Games;
 using System;
 using System.IO.Abstractions;
+using AET.Modinfo.Spec;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
@@ -11,9 +12,11 @@ internal partial class TestingGameInstallationImpl : TestingModContainerInstalla
 
     public override ITestingGameInstallation GameInstallation => this;
 
-    public override PlayableModContainer ModContainer => Game as PlayableModContainer;
+    IPhysicalPlayableObject ITestingPhysicalPlayableObjectInstallation.PlayableObject => Game;
 
     public override IPlayableObject PlayableObject => Game;
+
+    public override PlayableModContainer ModContainer => Game as PlayableModContainer;
 
     public TestingGameInstallationImpl(IGameIdentity gameIdentity, IServiceProvider serviceProvider) : base(serviceProvider)
     {
@@ -30,6 +33,11 @@ internal partial class TestingGameInstallationImpl : TestingModContainerInstalla
     public IDirectoryInfo GetWrongOriginFocRegistryLocation()
     {
         return FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(GameInstallationHelper.OriginBasePath, "corruption"));
+    }
+
+    public void InstallLanguage(ILanguageInfo language)
+    {
+        PlayableObjectTestingUtilities.InstallLanguage(Game, language, FileSystem);
     }
 
     private IGame Install(IGameIdentity gameIdentity)

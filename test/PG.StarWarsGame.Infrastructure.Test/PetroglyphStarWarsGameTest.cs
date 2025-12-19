@@ -20,7 +20,7 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
         if (languages is not null)
         {
             foreach (var languageInfo in languages)
-                gameInstallation.Game.InstallLanguage(languageInfo);
+                gameInstallation.InstallLanguage(languageInfo);
         }
 
         if (iconPath is not null)

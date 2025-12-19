@@ -6,7 +6,7 @@ using System.IO.Abstractions;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
-public interface ITestingGameInstallation : ITestingModContainerInstallation
+public interface ITestingGameInstallation : ITestingModContainerInstallation, ITestingPhysicalPlayableObjectInstallation
 {
     IGame Game { get; }
     

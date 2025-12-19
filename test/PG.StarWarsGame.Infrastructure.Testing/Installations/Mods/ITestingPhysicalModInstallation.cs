@@ -3,7 +3,7 @@ using PG.StarWarsGame.Infrastructure.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
-public interface ITestingPhysicalModInstallation : ITestingModInstallation
+public interface ITestingPhysicalModInstallation : ITestingModInstallation, ITestingPhysicalPlayableObjectInstallation
 {
     new IPhysicalMod Mod { get; }
 
