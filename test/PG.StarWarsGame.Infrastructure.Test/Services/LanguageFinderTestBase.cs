@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
-using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Services;
 
@@ -143,7 +142,7 @@ public class LanguageFinderTest : GameInfrastructureTestBaseWithRandomGame
                 new ModReference(baseMod)
             }, DependencyResolveLayout.FullResolved)
         };
-        var mod = Game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(Game), modInfo, ServiceProvider);
+        var mod = GameInstallation.InstallMod(modInfo).Mod;
         // Do not resolve dependencies here!
 
         var langs = _languageFinder.FindLanguages(mod);
@@ -318,7 +317,7 @@ public class LanguageFinderTest : GameInfrastructureTestBaseWithRandomGame
     [Fact]
     public void FindLanguages_Mod_FromModinfo_WithNoLanguages()
     {
-        var mod = Game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("myMod"), ServiceProvider);
+        var mod = GameInstallation.InstallMod(new ModinfoData("myMod")).Mod;
         var langs = _languageFinder.FindLanguages(mod);
         Assert.Equivalent(new List<ILanguageInfo>(), langs, true);
     }

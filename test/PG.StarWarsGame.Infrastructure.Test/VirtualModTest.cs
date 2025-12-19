@@ -43,7 +43,7 @@ public class VirtualModTest : ModBaseTest
         return GetOrCreateGameInstallation().AddVirtualMod("VirtualModId", modinfo);
     }
 
-    protected override ITestingModInstallation CreateModInstallation(
+    protected override ITestingModInstallation CreateAndAddModInstallation(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
@@ -60,7 +60,7 @@ public class VirtualModTest : ModBaseTest
 
     protected override ITestingModContainerInstallation CreateModContainerInstallation()
     {
-        return CreateModInstallation("Mod");
+        return CreateAndAddModInstallation("Mod");
     }
 
     [Fact]

@@ -12,13 +12,6 @@ namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 
 public static partial class ModInstallations
 {
-    public static Mod InstallMod(this IGame game, bool workshop, IModinfo modinfo, IServiceProvider serviceProvider)
-    {
-        var name = modinfo.Name;
-        return CreateMod(game, name, workshop, serviceProvider,
-            modDir => new Mod(game, name, modDir, workshop, modinfo, serviceProvider));
-    }
-
     public static Mod InstallMod(this IGame game, IDirectoryInfo directory, bool isWorkshop, IModinfo modinfo, IServiceProvider serviceProvider)
     {
         return CreateMod(game, directory, dir => new Mod(game, modinfo.Name, dir, isWorkshop, modinfo, serviceProvider));
@@ -30,7 +23,7 @@ public static partial class ModInstallations
         return CreateMod(game, modDir, modFactory);
     }
 
-    private static Mod CreateMod(IGame game, IDirectoryInfo directory, Func<IDirectoryInfo, Mod> modFactory)
+    internal static Mod CreateMod(IGame game, IDirectoryInfo directory, Func<IDirectoryInfo, Mod> modFactory)
     {
         Assert.True(game.ModsLocation.Exists);
         var mod = modFactory(directory); 

@@ -49,6 +49,33 @@ internal class TestingGameImpl : ITestingGameInstallation
         return new TestingPhysicalModImpl(this, mod, _serviceProvider);
     }
 
+    public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo)
+    {
+        var workshop = GITestUtilities.GetRandomWorkshopFlag(Game);
+        return InstallMod(modinfo, workshop);
+    }
+
+    public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo, bool workshop)
+    {
+        var name = modinfo.Name;
+        var mod = ModInstallations.CreateMod(Game, name, workshop, _serviceProvider, modDir
+            => new Mod(Game, name, modDir, workshop, modinfo, _serviceProvider));
+        return new TestingPhysicalModImpl(this, mod, _serviceProvider);
+    }
+
+    public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo, IDirectoryInfo directory)
+    {
+        var workshop = GITestUtilities.GetRandomWorkshopFlag(Game);
+        return InstallMod(modinfo, directory, workshop);
+    }
+
+    public ITestingPhysicalModInstallation InstallMod(IModinfo modinfo, IDirectoryInfo directory, bool workshop)
+    {
+        var mod = ModInstallations.CreateMod(Game, directory, dir =>
+            new Mod(Game, modinfo.Name, dir, workshop, modinfo, _serviceProvider));
+        return new TestingPhysicalModImpl(this, mod, _serviceProvider);
+    }
+
     public ITestingPhysicalModInstallation InstallMod(string name)
     {
         var workshop = GITestUtilities.GetRandomWorkshopFlag(Game);
@@ -75,16 +102,23 @@ internal class TestingGameImpl : ITestingGameInstallation
 
     public ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo, bool workshop)
     {
-        var mod = Game.InstallMod(workshop, modinfo, _serviceProvider);
-        Game.AddMod(mod);
-        return new TestingPhysicalModImpl(this, mod, _serviceProvider);
+        var modInstallation = InstallMod(modinfo, workshop);
+        Game.AddMod(modInstallation.Mod);
+        return modInstallation;
     }
 
-    public ITestingPhysicalModInstallation InstallAndAddMod(IDirectoryInfo directory, bool workshop, IModinfo modinfo)
+    public ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo, IDirectoryInfo directory)
     {
-        var mod = Game.InstallMod(directory, workshop, modinfo, _serviceProvider);
-        Game.AddMod(mod);
-        return new TestingPhysicalModImpl(this, mod, _serviceProvider);
+        var modInstallation = InstallMod(modinfo, directory);
+        Game.AddMod(modInstallation.Mod);
+        return modInstallation;
+    }
+
+    public ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo, IDirectoryInfo directory, bool workshops)
+    {
+        var modInstallation = InstallMod(modinfo, directory, workshops);
+        Game.AddMod(modInstallation.Mod);
+        return modInstallation;
     }
 
     public ITestingPhysicalModInstallation InstallAndAddMod(string name, IModDependencyList dependencies)

@@ -27,7 +27,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         GameInstallation = GetOrCreateGameInstallation();
     }
 
-    protected abstract ITestingModInstallation CreateModInstallation(
+    protected abstract ITestingModInstallation CreateAndAddModInstallation(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
         params IList<IModReference> deps);
@@ -36,7 +36,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
     [Fact]
     public void VersionRange_IsNull()
     {
-        var mod = CreateModInstallation("Mod").Mod;
+        var mod = CreateAndAddModInstallation("Mod").Mod;
         Assert.Null(mod.VersionRange);
     }
 
@@ -46,7 +46,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
     {
         var mod = ModTestScenarios.CreateTestScenario(
                 testScenario,
-                (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
+                (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod,
                 (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod)
             .Mod;
 
@@ -71,7 +71,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         // Do not add mod to game
         var notAddedDep = GameInstallation.InstallMod("NotAddedMod", false).Mod;
 
-        var mod = CreateModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), notAddedDep).Mod;
+        var mod = CreateAndAddModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), notAddedDep).Mod;
         Game.AddMod(mod);
         var e = Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
         Assert.Same(Game, e.ModContainer);
@@ -93,7 +93,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         var otherGameInstallRef = GameInfrastructureTesting.Game(Game, ServiceProvider);
         var wrongGameDep = otherGameInstallRef.InstallAndAddMod("WrongGameRefMod");
 
-        var mod = CreateModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), wrongGameDep.Mod).Mod;
+        var mod = CreateAndAddModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), wrongGameDep.Mod).Mod;
         
         var e = Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
         Assert.Same(Game, e.ModContainer);
@@ -109,7 +109,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         var dep = Game.InstallMod(depLoc, ws, new ModinfoData("B") { Version = new SemVersion(1) }, ServiceProvider);
         Game.AddMod(dep);
 
-        var mod = CreateModInstallation("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2)))).Mod;
+        var mod = CreateAndAddModInstallation("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2)))).Mod;
 
         var e = Assert.Throws<VersionMismatchException>(mod.ResolveDependencies);
         Assert.Equal(new ModReference(dep), e.Mod);
@@ -128,7 +128,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         Game.AddMod(b);
         Game.AddMod(c);
 
-        var mod = CreateModInstallation("Mod", deps:
+        var mod = CreateAndAddModInstallation("Mod", deps:
             [
                 new ModReference(b.Identifier, b.Type, SemVersionRange.AtLeast(new SemVersion(2))),
                 new ModReference(c.Identifier, c.Type, SemVersionRange.AtLeast(new SemVersion(2)))
@@ -145,7 +145,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
     {
         var scenario = ModTestScenarios.CreateTestScenario(
             ModTestScenarios.TestScenario.SingleDepAndTransitive,
-            (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
+            (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod,
             (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod);
 
         var mod = scenario.Mod;
@@ -173,7 +173,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
     [Fact]
     public void ResolveDependencies_AlreadyResolved_DoesNotRaiseEvent()
     {
-        var mod = CreateModInstallation("A").Mod;
+        var mod = CreateAndAddModInstallation("A").Mod;
         mod.ResolveDependencies();
         Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
 
@@ -196,7 +196,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         var dep = Game.InstallMod(depLoc, ws, new ModinfoData("B") { Version = new SemVersion(1) }, ServiceProvider);
         Game.AddMod(dep);
 
-        var mod = CreateModInstallation("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2)))).Mod;
+        var mod = CreateAndAddModInstallation("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2)))).Mod;
 
         var depsResolvedRaised = false;
         mod.DependenciesResolved += (_, _) =>
@@ -230,9 +230,9 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void EqualsHashCode()
     {
         var dep = GameInstallation.InstallAndAddMod("B").Mod;
-        var mod = CreateModInstallation("A").Mod;
-        var samish = CreateModInstallation("A").Mod;
-        var otherA = CreateModInstallation("A", deps: dep).Mod;
+        var mod = CreateAndAddModInstallation("A").Mod;
+        var samish = CreateAndAddModInstallation("A").Mod;
+        var otherA = CreateAndAddModInstallation("A", deps: dep).Mod;
 
         ModBase custom = mod.ModInfo is not null 
             ? new CustomMod(Game, mod.Identifier, mod.Type, mod.ModInfo, ServiceProvider) 

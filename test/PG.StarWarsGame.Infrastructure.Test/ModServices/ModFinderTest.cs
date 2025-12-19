@@ -145,10 +145,11 @@ public class ModFinderTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_OneMod_WithMainModinfo(GameIdentity gameIdentity)
     {
-        var game = GetOrCreateGameInstallation(gameIdentity).Game;
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
 
         var modinfoData = new ModinfoData("MyMod");
-        var expectedMod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modinfoData, ServiceProvider);
+        var expectedMod = gameInstallation.InstallMod(modinfoData).Mod;
         expectedMod.InstallModinfoFile(modinfoData);
 
         var installedMods = _modFinder.FindMods(game);
@@ -257,7 +258,7 @@ public class ModFinderTest : GameInfrastructureTestBase
         var steamMod = gameInstallation.InstallMod("SteamMod", true).Mod;
 
         var modinfo = new ModinfoData("Name");
-        var defaultMod = game.InstallMod(false, modinfo, ServiceProvider);
+        var defaultMod = gameInstallation.InstallMod(modinfo, false).Mod;
         defaultMod.InstallModinfoFile(modinfo);
 
 
@@ -280,7 +281,8 @@ public class ModFinderTest : GameInfrastructureTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_Steam_ShouldNotContainModOfWrongGame(GameType type)
     {
-        var game = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold)).Game;
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
+        var game = gameInstallation.Game;
 
         var oppositeGameType = type is GameType.Eaw ? GameType.Foc : GameType.Eaw;
 
@@ -296,7 +298,7 @@ public class ModFinderTest : GameInfrastructureTestBase
         };
 
         
-        var modOfWrongGameType = game.InstallMod(true, modinfo, ServiceProvider);
+        var modOfWrongGameType = gameInstallation.InstallMod(modinfo, true).Mod;
         modOfWrongGameType.InstallModinfoFile(modinfo);
 
         Assert.Empty(_modFinder.FindMods(game));

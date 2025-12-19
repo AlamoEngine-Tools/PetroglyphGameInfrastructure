@@ -33,7 +33,7 @@ public class ModTest : ModBaseTest
         return new ModReference(name, modType);
     }
 
-    private ITestingPhysicalModInstallation CreatePhysicalModInstallation(
+    private ITestingPhysicalModInstallation CreateAndAddPhysicalModInstallation(
         string name,
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null,
@@ -46,7 +46,7 @@ public class ModTest : ModBaseTest
         };
 
         var modInstallation = GetOrCreateGameInstallation()
-            .InstallAndAddMod(CreateModDirectoryInfo(name), _isWorkshop, modinfo);
+            .InstallAndAddMod(modinfo, CreateModDirectoryInfo(name), _isWorkshop);
 
         var mod = modInstallation.Mod;
         if (languages is not null)
@@ -61,24 +61,24 @@ public class ModTest : ModBaseTest
         return modInstallation;
     }
 
-    protected override ITestingModInstallation CreateModInstallation(
+    protected override ITestingModInstallation CreateAndAddModInstallation(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
     {
-        return CreatePhysicalModInstallation(name, layout: layout, deps: deps);
+        return CreateAndAddPhysicalModInstallation(name, layout: layout, deps: deps);
     }
 
     protected override ITestingPlayableObjectInstallation CreatePlayableObjectInstallation(
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null)
     {
-        return CreatePhysicalModInstallation("MyMod", iconPath, languages);
+        return CreateAndAddPhysicalModInstallation("MyMod", iconPath, languages);
     }
 
     protected override ITestingModContainerInstallation CreateModContainerInstallation()
     {
-        return CreateModInstallation("MyMod");
+        return CreateAndAddModInstallation("MyMod");
     }
 
     [Fact]
@@ -174,7 +174,7 @@ public class ModTest : ModBaseTest
     [Fact]
     public void ResolveDependencies_NoDependenciesIsNOP()
     {
-        var mod = CreateModInstallation("Mod").Mod; 
+        var mod = CreateAndAddModInstallation("Mod").Mod; 
         // Should not throw or anything else
         mod.ResolveDependencies();
         Assert.Empty(mod.Dependencies);
@@ -187,7 +187,7 @@ public class ModTest : ModBaseTest
     {
         var mod = ModTestScenarios.CreateTestScenarioCycle(
                 testScenario,
-                (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
+                (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod,
                 (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod,
                 CreateModRef)
             .Mod;
