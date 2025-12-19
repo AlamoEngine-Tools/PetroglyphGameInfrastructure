@@ -49,7 +49,12 @@ internal class TestingGameImpl : ITestingGameInstallation
         return new TestingPhysicalModImpl(this, mod, _serviceProvider);
     }
 
-    public ITestingPhysicalModInstallation InstallAndAddMod(bool workshop, IModinfo modinfo)
+    public ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo)
+    {
+        return InstallAndAddMod(modinfo, GITestUtilities.GetRandomWorkshopFlag(Game));
+    }
+
+    public ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo, bool workshop)
     {
         var mod = Game.InstallMod(workshop, modinfo, _serviceProvider);
         Game.AddMod(mod);
@@ -63,11 +68,29 @@ internal class TestingGameImpl : ITestingGameInstallation
         return new TestingPhysicalModImpl(this, mod, _serviceProvider);
     }
 
+    public ITestingPhysicalModInstallation InstallAndAddMod(string name, IModDependencyList dependencies)
+    {
+        var workshop = GITestUtilities.GetRandomWorkshopFlag(Game);
+        return InstallAndAddMod(name, workshop, dependencies);
+    }
+
     public ITestingVirtualModInstallation AddVirtualMod(string name, ModinfoData modinfo)
     {
         var mod = new VirtualMod(Game, "VirtualModId", modinfo, _serviceProvider);
         Game.AddMod(mod);
         return new TestingVirtualModImpl(this, mod, _serviceProvider);
+    }
+
+    public ITestingPhysicalModInstallation InstallAndAddMod(string name, bool isWorkshop, IModDependencyList dependencies)
+    {
+        if (dependencies.Count == 0)
+            return InstallAndAddMod(name, isWorkshop);
+
+        var modinfo = new ModinfoData(name)
+        {
+            Dependencies = dependencies
+        };
+        return InstallAndAddMod(modinfo, isWorkshop);
     }
 
     private IGame Install(IGameIdentity gameIdentity)

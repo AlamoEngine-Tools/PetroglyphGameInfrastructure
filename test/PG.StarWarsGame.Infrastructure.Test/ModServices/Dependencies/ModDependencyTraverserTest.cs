@@ -29,8 +29,8 @@ public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGa
 
         var scenario = ModTestScenarios.CreateTestScenario(
             testScenario,
-            (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod,
-            (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod);
+            (name, layout, dependencies) => InstallAndAddMod(name, layout, dependencies).Mod,
+            (name, layout, dependencies) => InstallAndAddMod(name, layout, dependencies).Mod);
 
         var mod = scenario.Mod;
         mod.ResolveDependencies();
@@ -46,7 +46,7 @@ public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGa
         // Do not add to provoke faulted
         var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
 
-        var mod = CreateAndAddModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
+        var mod = InstallAndAddMod("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
 
         try
         {
@@ -66,7 +66,7 @@ public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGa
     {
         // Do not add to provoke faulted
         var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        var mod = CreateAndAddModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
+        var mod = InstallAndAddMod("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
         
         Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);
         Assert.Throws<InvalidOperationException>(() => _traverser.Traverse(mod));

@@ -16,9 +16,15 @@ public interface ITestingGameInstallation : ITestingModContainerInstallation
 
     ITestingPhysicalModInstallation InstallAndAddMod(string name, bool workshop);
 
-    ITestingPhysicalModInstallation InstallAndAddMod(bool workshop, IModinfo modinfo);
+    ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo);
+
+    ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo, bool workshop);
 
     ITestingPhysicalModInstallation InstallAndAddMod(IDirectoryInfo directory, bool workshop, IModinfo modinfo);
-    
+
+    ITestingPhysicalModInstallation InstallAndAddMod(string name, bool isWorkshop, IModDependencyList dependencies);
+
+    ITestingPhysicalModInstallation InstallAndAddMod(string name, IModDependencyList dependencies);
+
     ITestingVirtualModInstallation AddVirtualMod(string name, ModinfoData modinfo);
 }

@@ -6,6 +6,7 @@ using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Threading;
 using Testably.Abstractions.Testing;
@@ -14,10 +15,9 @@ namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
 public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
 {
-    protected IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem);
-
     private ITestingGameInstallation? _gameInstallation;
 
+    protected IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem);
     
     protected virtual IFileSystem CreateFileSystem()
     {
@@ -39,22 +39,20 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
         return _gameInstallation = GameInfrastructureTesting.Game(identity, ServiceProvider);
     }
 
-
-    // TODO: To installation
-    protected ITestingModInstallation CreateAndAddModInstallation(bool isWorkshop, string name, IModDependencyList dependencies)
+    protected ITestingPhysicalModInstallation InstallAndAddMod(
+        string name,
+        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
+        params IList<IModReference> deps)
     {
-        if (dependencies.Count == 0)
-            return GetOrCreateGameInstallation().InstallAndAddMod(name, isWorkshop);
-
-        var modinfo = new ModinfoData(name)
-        {
-            Dependencies = dependencies
-        };
-        return CreateAndAddModInstallation(isWorkshop, modinfo);
+        return GetOrCreateGameInstallation().InstallAndAddMod(name, new DependencyList(deps, layout));
     }
 
-    protected ITestingModInstallation CreateAndAddModInstallation(bool isWorkshop, IModinfo modinfo)
+    protected ITestingPhysicalModInstallation InstallAndAddMod(
+        string name,
+        bool workshop,
+        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
+        params IList<IModReference> deps)
     {
-        return GetOrCreateGameInstallation().InstallAndAddMod(isWorkshop, modinfo);
+        return GetOrCreateGameInstallation().InstallAndAddMod(name, workshop, new DependencyList(deps, layout));
     }
 }

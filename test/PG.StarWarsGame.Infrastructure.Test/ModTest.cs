@@ -33,7 +33,7 @@ public class ModTest : ModBaseTest
         return new ModReference(name, modType);
     }
 
-    private ITestingPhysicalModInstallation CreatePhysicalModInsatllation(
+    private ITestingPhysicalModInstallation CreatePhysicalModInstallation(
         string name,
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null,
@@ -66,14 +66,14 @@ public class ModTest : ModBaseTest
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
     {
-        return CreatePhysicalModInsatllation(name, layout: layout, deps: deps);
+        return CreatePhysicalModInstallation(name, layout: layout, deps: deps);
     }
 
     protected override ITestingPlayableObjectInstallation CreatePlayableObjectInstallation(
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null)
     {
-        return CreatePhysicalModInsatllation("MyMod", iconPath, languages);
+        return CreatePhysicalModInstallation("MyMod", iconPath, languages);
     }
 
     protected override ITestingModContainerInstallation CreateModContainerInstallation()
@@ -152,7 +152,7 @@ public class ModTest : ModBaseTest
     [Fact]
     public void ValidCtor_Properties_FromModinfo_WithDependencies()
     {
-        var dep = CreateOtherModInstallation("dep").Mod;
+        var dep = InstallAndAddMod("dep").Mod;
 
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
 
@@ -188,7 +188,7 @@ public class ModTest : ModBaseTest
         var mod = ModTestScenarios.CreateTestScenarioCycle(
                 testScenario,
                 (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
-                (name, layout, dependencies) => CreateOtherModInstallation(name, layout, dependencies).Mod,
+                (name, layout, dependencies) => InstallAndAddMod(name, layout, dependencies).Mod,
                 CreateModRef)
             .Mod;
 

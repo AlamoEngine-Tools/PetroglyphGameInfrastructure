@@ -30,22 +30,6 @@ public abstract class ModBaseTest : PlayableModContainerTest
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
         params IList<IModReference> deps);
 
-    protected ITestingModInstallation CreateOtherModInstallation(
-        string name, 
-        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
-        params IList<IModReference> deps)
-    {
-        return CreateOtherModInstallation(name, GITestUtilities.GetRandomWorkshopFlag(Game), layout, deps);
-    }
-
-    protected ITestingModInstallation CreateOtherModInstallation(
-        string name, 
-        bool isWorkshop,
-        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
-        params IList<IModReference> deps)
-    {
-        return CreateAndAddModInstallation(isWorkshop, name, new DependencyList(deps, layout));
-    }
 
     [Fact]
     public void VersionRange_IsNull()
@@ -61,7 +45,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         var mod = ModTestScenarios.CreateTestScenario(
                 testScenario,
                 (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
-                (name, layout, dependencies) => CreateOtherModInstallation(name, layout, dependencies).Mod)
+                (name, layout, dependencies) => InstallAndAddMod(name, layout, dependencies).Mod)
             .Mod;
 
         var expectedDirectDeps = mod.ModInfo!.Dependencies.Select(d =>
@@ -160,7 +144,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         var scenario = ModTestScenarios.CreateTestScenario(
             ModTestScenarios.TestScenario.SingleDepAndTransitive,
             (name, layout, dependencies) => CreateModInstallation(name, layout, dependencies).Mod,
-            (name, layout, dependencies) => CreateOtherModInstallation(name, layout, dependencies).Mod);
+            (name, layout, dependencies) => InstallAndAddMod(name, layout, dependencies).Mod);
 
         var mod = scenario.Mod;
         var b = Game.FindMod(scenario.ExpectedTraversedList![1])!;
@@ -243,7 +227,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
     [Fact]
     public void EqualsHashCode()
     {
-        var dep = CreateOtherModInstallation("B").Mod;
+        var dep = InstallAndAddMod("B").Mod;
         var mod = CreateModInstallation("A").Mod;
         var samish = CreateModInstallation("A").Mod;
         var otherA = CreateModInstallation("A", deps: dep).Mod;
@@ -286,7 +270,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
         [Fact]
         public void ResolveDependencies_CalledTwice_Throws()
         {
-            var dep = CreateAndAddModInstallation("Dep").Mod;
+            var dep = InstallAndAddMod("Dep").Mod;
             var modinfo = new ModinfoData("CustomMod")
             {
                 Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)
