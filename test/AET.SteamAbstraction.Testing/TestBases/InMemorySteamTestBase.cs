@@ -6,10 +6,17 @@ using Testably.Abstractions.Testing;
 
 namespace AET.SteamAbstraction.Testing.TestBases;
 
+/// <summary>
+/// Provides a base class for Steam-related tests that work with in-memory file system and registry.
+/// </summary>
 public abstract class InMemorySteamTestBase : SteamTestBase
 {
+    /// <summary>
+    /// Gets the in-memory file system used for testing.
+    /// </summary>
     protected readonly MockFileSystem FileSystem = new();
 
+    /// <inheritdoc />
     protected override void SetupServices(IServiceCollection serviceCollection)
     {
         base.SetupServices(serviceCollection);

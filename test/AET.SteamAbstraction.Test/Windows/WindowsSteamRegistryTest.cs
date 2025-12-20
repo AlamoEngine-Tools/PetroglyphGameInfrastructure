@@ -1,6 +1,7 @@
 ﻿#if Windows
 
 using AET.SteamAbstraction.Registry;
+using AET.SteamAbstraction.Testing;
 using AnakinRaW.CommonUtilities.Registry;
 using Xunit;
 
@@ -17,8 +18,8 @@ public class WindowsSteamRegistryTest : SteamRegistryTestBase
             using var hkcu = InternalRegistry.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
             using var steamKey = hkcu.CreateSubKey("Software\\Valve\\Steam")!;
 
-            steamKey.SetValue("SteamExe", FileSystem.Path.GetFullPath(SteamExePath));
-            steamKey.SetValue("SteamPath", FileSystem.Path.GetFullPath(SteamInstallPath));
+            steamKey.SetValue("SteamExe", FileSystem.Path.GetFullPath(TestingSteamConstants.SteamExePath));
+            steamKey.SetValue("SteamPath", FileSystem.Path.GetFullPath(TestingSteamConstants.SteamInstallPath));
         }
 
         return registry;

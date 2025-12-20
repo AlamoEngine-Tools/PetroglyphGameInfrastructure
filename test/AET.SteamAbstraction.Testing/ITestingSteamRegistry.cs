@@ -4,6 +4,9 @@ using System.Runtime.Versioning;
 
 namespace AET.SteamAbstraction.Testing;
 
+/// <summary>
+/// Defines methods and properties for querying and manipulating a test Steam client's registry state.
+/// </summary>
 public interface ITestingSteamRegistry : IDisposable
 {
     /// <summary>
@@ -21,11 +24,22 @@ public interface ITestingSteamRegistry : IDisposable
     /// </summary>
     int? ProcessId { get; }
 
+    /// <summary>
+    /// Registers a test installation of the Steam client to the registry.
+    /// </summary>
     [SupportedOSPlatform("windows")]
     void InstallSteam();
 
+    /// <summary>
+    /// Writes the specified process identifier as running Steam process to the registry.
+    /// </summary>
+    /// <param name="pid">The process identifier to set. <see langword="null"/> to indicate Steam is not running.</param>
     [SupportedOSPlatform("windows")]
     void SetPid(int? pid);
 
+    /// <summary>
+    /// Writes the identifier for the current user to the registry.
+    /// </summary>
+    /// <param name="userId">The unique identifier to assign to the user.</param>
     void SetUserId(uint userId);
 }

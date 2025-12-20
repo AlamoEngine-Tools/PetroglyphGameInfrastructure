@@ -9,6 +9,9 @@ using Xunit;
 
 namespace AET.SteamAbstraction.Testing;
 
+/// <summary>
+/// 
+/// </summary>
 public sealed class TestProcessHelper : IProcessHelper
 {
     private readonly IFileSystem _fileSystem;
@@ -16,26 +19,53 @@ public sealed class TestProcessHelper : IProcessHelper
 
     private int? _pid;
 
-    public TestProcessHelper(IServiceProvider sp)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestProcessHelper"/> class using the specified service provider.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider to use.</param>
+    public TestProcessHelper(IServiceProvider serviceProvider)
     {
-        _fileSystem = sp.GetRequiredService<IFileSystem>();
-        _registry = SteamTesting.SteamRegistry(sp);
+        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+        _registry = SteamTesting.SteamRegistry(serviceProvider);
     }
 
+
+    /// <summary>
+    /// Gets the actual process linked to this <see cref="IProcessHelper"/>.
+    /// </summary>
     public Process? CurrentProcess { get; private set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the process start should be delayed when <see cref="StartProcess"/> is called.
+    /// </summary>
     public bool DelayStart { get; set; }
 
+    /// <summary>
+    /// Sets the running process identifier.
+    /// </summary>
+    /// <remarks>
+    /// This method can be used to simulate a running process with the specified PID without actually starting a real process using <see cref="StartProcess"/>.
+    /// </remarks>
+    /// <param name="pid">The PID to use. Use <see langword="null"/> to indicate no process is running.</param>
     public void SetRunningPid(int? pid)
     {
         _pid = pid;
     }
 
+    /// <summary>
+    /// Checks whether the specified process identifier is the same as the process identifier linked to this <see cref="IProcessHelper"/>.
+    /// </summary>
+    /// <remarks>
+    /// The process identifier of this <see cref="IProcessHelper"/> is either set by using <see cref="SetRunningPid(int?)"/> or <see cref="StartProcess"/>.
+    /// </remarks>
+    /// <param name="pid"></param>
+    /// <returns></returns>
     public bool IsProcessRunning(int pid)
     {
         return pid == _pid;
     }
 
+    /// <inheritdoc />
     public Process StartProcess(ProcessStartInfo startInfo)
     {
         var expectedFileName = _registry.ExecutableFile?.FullName;
@@ -56,7 +86,10 @@ public sealed class TestProcessHelper : IProcessHelper
         return p;
     }
 
-    internal void KillCurrent()
+    /// <summary>
+    /// Terminates the current process linked to this <see cref="IProcessHelper"/>, if any and sets the PID to <see langword="null"/>.
+    /// </summary>
+    public void KillCurrent()
     {
         try
         {

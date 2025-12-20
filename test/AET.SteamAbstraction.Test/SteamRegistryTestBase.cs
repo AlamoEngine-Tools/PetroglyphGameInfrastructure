@@ -1,4 +1,5 @@
 ﻿using AET.SteamAbstraction.Registry;
+using AET.SteamAbstraction.Testing;
 using AET.Testing;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,9 +18,6 @@ public abstract class SteamRegistryTestBase : TestBaseWithServiceProvider
     protected readonly IRegistry InternalRegistry = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
         ? new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike) 
         : new InMemoryRegistry();
-
-    protected readonly string SteamInstallPath = "steamDir";
-    protected readonly string SteamExePath = "steamDir/steam";
 
     protected override void SetupServices(IServiceCollection serviceCollection)
     {
@@ -48,8 +46,8 @@ public abstract class SteamRegistryTestBase : TestBaseWithServiceProvider
     {
         var registry = CreateRegistry();
 
-        Assert.Equal(FileSystem.FileInfo.New(SteamExePath).FullName, registry.ExecutableFile!.FullName);
-        Assert.Equal(FileSystem.DirectoryInfo.New(SteamInstallPath).FullName, registry.InstallationDirectory!.FullName);
+        Assert.Equal(FileSystem.FileInfo.New(TestingSteamConstants.SteamExePath).FullName, registry.ExecutableFile!.FullName);
+        Assert.Equal(FileSystem.DirectoryInfo.New(TestingSteamConstants.SteamInstallPath).FullName, registry.InstallationDirectory!.FullName);
         Assert.True(registry.ProcessId is null or 0);
     }
 
@@ -58,8 +56,8 @@ public abstract class SteamRegistryTestBase : TestBaseWithServiceProvider
     {
         var registry = CreateRegistry();
 
-        Assert.Equal(FileSystem.FileInfo.New(SteamExePath).FullName, registry.ExecutableFile!.FullName);
-        Assert.Equal(FileSystem.DirectoryInfo.New(SteamInstallPath).FullName, registry.InstallationDirectory!.FullName);
+        Assert.Equal(FileSystem.FileInfo.New(TestingSteamConstants.SteamExePath).FullName, registry.ExecutableFile!.FullName);
+        Assert.Equal(FileSystem.DirectoryInfo.New(TestingSteamConstants.SteamInstallPath).FullName, registry.InstallationDirectory!.FullName);
 
         SetSteamPid(1234);
 
