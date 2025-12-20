@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -66,6 +67,7 @@ public sealed class TestProcessHelper : IProcessHelper
     }
 
     /// <inheritdoc />
+    [SupportedOSPlatform("windows")]
     public Process StartProcess(ProcessStartInfo startInfo)
     {
         var expectedFileName = _registry.ExecutableFile?.FullName;
@@ -89,6 +91,7 @@ public sealed class TestProcessHelper : IProcessHelper
     /// <summary>
     /// Terminates the current process linked to this <see cref="IProcessHelper"/>, if any and sets the PID to <see langword="null"/>.
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public void KillCurrent()
     {
         try

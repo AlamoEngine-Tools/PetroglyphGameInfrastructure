@@ -1,8 +1,10 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Runtime.Versioning;
 
 namespace AET.SteamAbstraction.Testing;
 
+[SupportedOSPlatform("windows")]
 internal sealed class SteamFakeProcessImpl : ISteamFakeProcess
 {
     private readonly TestProcessHelper _processHelper;
