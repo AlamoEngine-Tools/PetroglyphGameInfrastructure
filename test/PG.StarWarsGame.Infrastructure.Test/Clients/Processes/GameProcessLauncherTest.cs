@@ -18,20 +18,17 @@ public class GameProcessLauncherTest : GameInfrastructureTestBaseWithRandomGame,
     private readonly GameProcessLauncher _launcher;
     private readonly IFileInfo _executable;
 
-    // We need to use the real FS here, cause Process.Start uses it too.
-    private readonly IFileSystem _realFileSystem = new RealFileSystem();
-
     private GameProcess? _gameProcess;
 
     public GameProcessLauncherTest()
     {
         _launcher = new GameProcessLauncher(ServiceProvider);
 
-        var tempDir = _realFileSystem.Path.Combine(_realFileSystem.Path.GetTempPath(), "GameProcessLauncherTest");
-        _realFileSystem.Directory.CreateDirectory(tempDir);
+        var tempDir = FileSystem.Path.Combine(FileSystem.Path.GetTempPath(), "GameProcessLauncherTest");
+        FileSystem.Directory.CreateDirectory(tempDir);
 
         var executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "TestExecutable.bat" : "TestExecutable.sh";
-        _executable = _realFileSystem.FileInfo.New(_realFileSystem.Path.Combine(tempDir, executableName));
+        _executable = FileSystem.FileInfo.New(FileSystem.Path.Combine(tempDir, executableName));
 
         var scriptContent = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
             ? "@echo off\r\n" +
@@ -39,10 +36,15 @@ public class GameProcessLauncherTest : GameInfrastructureTestBaseWithRandomGame,
               "exit 0"
             : "#!/bin/bash\nsleep 5\nexit 0";
 
-        _realFileSystem.File.WriteAllText(_executable.FullName,scriptContent);
+        FileSystem.File.WriteAllText(_executable.FullName,scriptContent);
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) 
             Process.Start("chmod", $"+x {_executable.FullName}")!.WaitForExit();
+    }
+
+    protected override IFileSystem CreateFileSystem()
+    {
+        return new RealFileSystem();
     }
 
     [Fact]
@@ -137,9 +139,9 @@ public class GameProcessLauncherTest : GameInfrastructureTestBaseWithRandomGame,
             _gameProcess?.Process.Kill();
             _gameProcess?.Dispose();
 
-            var tempDir = _realFileSystem.Path.GetDirectoryName(_executable.FullName);
-            if (_realFileSystem.Directory.Exists(tempDir))
-                _realFileSystem.Directory.Delete(tempDir, true);
+            var tempDir = FileSystem.Path.GetDirectoryName(_executable.FullName);
+            if (FileSystem.Directory.Exists(tempDir))
+                FileSystem.Directory.Delete(tempDir, true);
         }
         catch
         {

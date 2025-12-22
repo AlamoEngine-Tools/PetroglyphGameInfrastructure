@@ -62,7 +62,7 @@ public class PetroglyphStarWarsGameClientTest : GameInfrastructureTestBase, IDis
     {
         base.SetupServices(serviceCollection);
         PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
-        serviceCollection.AddSingleton<IGameProcessLauncher>(_processLauncher);
+        TestGameProcessLauncher.RegisterAsService(serviceCollection, _processLauncher);
     }
 
     [Fact]

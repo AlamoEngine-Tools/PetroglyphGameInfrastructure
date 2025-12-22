@@ -35,9 +35,9 @@ public abstract class TestBaseWithServiceProvider
     }
 
     /// <summary>
-    /// Configures test services by adding them to the specified service collection.
+    /// Configures test services by adding them to the specified <see cref="IServiceCollection"/>.
     /// </summary>
-    /// <param name="serviceCollection">The collection of service descriptors to which application services are added.</param>
+    /// <param name="serviceCollection">The <see cref="IServiceCollection"/> to which services will be added.</param>
     protected virtual void SetupServices(IServiceCollection serviceCollection)
     {
     }

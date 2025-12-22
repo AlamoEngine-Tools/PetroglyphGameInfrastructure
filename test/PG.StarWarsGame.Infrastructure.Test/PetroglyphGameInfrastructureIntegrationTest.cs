@@ -63,7 +63,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTes
         gameDetector.InitializationRequested += (_, args) =>
         {
             var game = args.GameType == GameType.Eaw ? eaw : foc;
-            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstlled(game);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstalled(game);
             args.Handled = true;
             initCount++;
         };

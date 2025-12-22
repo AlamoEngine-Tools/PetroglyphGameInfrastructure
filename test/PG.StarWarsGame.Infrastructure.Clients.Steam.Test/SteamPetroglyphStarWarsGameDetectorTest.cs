@@ -42,7 +42,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
     {
         return SetupGame(gameIdentity, (game, otherGameType) =>
         {
-            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstlled(game);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstalled(game);
             GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(otherGameType);
         });
     }
@@ -112,7 +112,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
 
         var info = SetupGame(gameId, (game, otherGameType) =>
         {
-            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstlled(game);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstalled(game);
             GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(otherGameType);
         }, SteamAppState.StateUpdateRequired);
 

@@ -4,6 +4,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public partial class GameDetectorTestBase<T>
 {
     private void TestDetectorGameInstalled(GameIdentity identity, params GamePlatform[] queryPlatforms)
@@ -183,3 +184,4 @@ public partial class GameDetectorTestBase<T>
             queryPlatforms: []);
     }
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -20,7 +20,7 @@ internal sealed class TestingGameRegistryImpl(IServiceProvider serviceProvider) 
         return _registryFactory.CreateRegistry(gameType);
     }
 
-    public IGameRegistry CreateInstlled(IGame game)
+    public IGameRegistry CreateInstalled(IGame game)
     {
         return CreateFrom(TestGameRegistrySetupData.Installed(game.Type, game.Directory));
     }

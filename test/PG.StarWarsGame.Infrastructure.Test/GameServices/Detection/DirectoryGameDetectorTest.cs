@@ -24,7 +24,7 @@ public class DirectoryGameDetectorTest : GameDetectorTestBase<object>
     protected override GameDetectorTestInfo<object> SetupGame(GameIdentity gameIdentity)
     {
         var game = GetOrCreateGameInstallation(gameIdentity).Game;
-        return new(gameIdentity.Type, game.Directory, null);
+        return new GameDetectorTestInfo<object>(gameIdentity.Type, game.Directory, null);
     }
 
     [Fact]

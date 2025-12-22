@@ -76,13 +76,6 @@ internal partial class TestingGameInstallationImpl
         return modInstallation;
     }
 
-    public ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo, IDirectoryInfo directory)
-    {
-        var modInstallation = InstallMod(modinfo, directory);
-        Game.AddMod(modInstallation.Mod);
-        return modInstallation;
-    }
-
     public ITestingPhysicalModInstallation InstallAndAddMod(IModinfo modinfo, IDirectoryInfo directory, bool workshops)
     {
         var modInstallation = InstallMod(modinfo, directory, workshops);
