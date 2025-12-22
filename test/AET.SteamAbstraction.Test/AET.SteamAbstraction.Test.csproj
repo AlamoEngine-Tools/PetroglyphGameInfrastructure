@@ -10,7 +10,6 @@
 		<IsPackable>false</IsPackable>
 		<IsTestable>true</IsTestable>
 		<OutputType>Exe</OutputType>
-		<EnableMSTestRunner>true</EnableMSTestRunner>
 	</PropertyGroup>
 
 	<ItemGroup>
