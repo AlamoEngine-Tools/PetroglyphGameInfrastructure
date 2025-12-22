@@ -2,30 +2,57 @@
 
 namespace AET.Testing.Extensions;
 
+/// <summary>
+/// Provides extension methods for string manipulation and testing.
+/// </summary>
 public static class StringExtensions
 {
     private static readonly Random Random = new();
 
     extension(string)
     {
-        public static string ShuffleCasing(string input)
+        /// <summary>
+        /// Randomly shuffles the casing of the characters in the specified string.
+        /// </summary>
+        /// <param name="input">The input string whose character casing will be shuffled.</param>
+        /// <returns>A new string with randomly shuffled character casing.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="input"/> is <c>null</c>.</exception>
+        public static unsafe string ShuffleCasing(string input)
         {
-            var characters = input.ToCharArray();
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
 
-            for (var i = 0; i < characters.Length; i++)
+            if (input.Length == 0)
+                return string.Empty;
+
+            var buffer = input.Length <= 256
+                ? stackalloc char[input.Length]
+                : new char[input.Length];
+
+            input.AsSpan().CopyTo(buffer);
+
+            var rnd = Random;
+
+            for (var i = 0; i < buffer.Length; i++)
             {
-                if (char.IsLetter(characters[i]))
-                {
-                    if (Random.Next(2) == 0)
-                    {
-                        characters[i] = char.IsUpper(characters[i])
-                            ? char.ToLower(characters[i])
-                            : char.ToUpper(characters[i]);
-                    }
-                }
+                var c = buffer[i];
+                if (!char.IsLetter(c))
+                    continue;
+
+                if (rnd.Next(2) != 0)
+                    continue;
+
+                buffer[i] = char.IsUpper(c)
+                    ? char.ToLower(c)
+                    : char.ToUpper(c);
             }
 
-            return new string(characters);
+#if NET
+            return new string(buffer);
+#else
+            fixed (char* t = buffer)
+                return new string(t, 0, buffer.Length);
+#endif
         }
     }
 }

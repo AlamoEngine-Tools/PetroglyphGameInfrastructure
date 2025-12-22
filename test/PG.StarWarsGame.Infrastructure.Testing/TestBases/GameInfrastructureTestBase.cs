@@ -1,4 +1,5 @@
-﻿using AET.Modinfo.Model;
+﻿using System;
+using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +19,9 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
 {
     private ITestingGameInstallation? _gameInstallation;
 
-    protected IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem);
+    [field:MaybeNull, AllowNull]
+    protected IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem)
+                                        ?? throw new InvalidOperationException("Creation of file system must not return null.");
     
     protected virtual IFileSystem CreateFileSystem()
     {

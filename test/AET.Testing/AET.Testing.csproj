@@ -16,8 +16,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
-		<!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<InheritDocEnabled>true</InheritDocEnabled>
 	</PropertyGroup>
 	<PropertyGroup>
