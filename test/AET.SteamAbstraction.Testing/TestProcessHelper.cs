@@ -68,7 +68,14 @@ public sealed class TestProcessHelper : IProcessHelper
         return pid == _pid;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Starts a new process using the specified <see cref="ProcessStartInfo"/> configuration.
+    /// </summary>
+    /// <param name="startInfo"> The <see cref="ProcessStartInfo"/> object that specifies the configuration for the process to be started.</param>
+    /// <returns> A <see cref="Process"/> object that represents the started process, or <see langword="null"/> if the process could not be started.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="startInfo"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if no file name is specified in <paramref name="startInfo"/>.</exception>
+    /// <exception cref="System.ComponentModel.Win32Exception">Thrown if an error occurs when opening the associated file.</exception>
     [SupportedOSPlatform("windows")]
     public Process StartProcess(ProcessStartInfo startInfo)
     {
