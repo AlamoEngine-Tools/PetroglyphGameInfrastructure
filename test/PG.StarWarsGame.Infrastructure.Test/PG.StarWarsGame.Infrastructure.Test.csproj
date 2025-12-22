@@ -35,7 +35,6 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj" />
 	  <ProjectReference Include="..\AET.Testing\AET.Testing.csproj" />
-	  <ProjectReference Include="..\PG.StarWarsGame.Infrastructure.Testing\PG.StarWarsGame.Infrastructure.Testing.csproj" />
 	</ItemGroup>
 
 </Project>
