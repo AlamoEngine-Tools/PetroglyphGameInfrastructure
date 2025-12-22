@@ -11,7 +11,7 @@ using Xunit;
 namespace AET.SteamAbstraction.Testing;
 
 /// <summary>
-/// 
+/// Provides a test for managing and simulating process-related operations.
 /// </summary>
 public sealed class TestProcessHelper : IProcessHelper
 {
@@ -60,7 +60,9 @@ public sealed class TestProcessHelper : IProcessHelper
     /// The process identifier of this <see cref="IProcessHelper"/> is either set by using <see cref="SetRunningPid(int?)"/> or <see cref="StartProcess"/>.
     /// </remarks>
     /// <param name="pid"></param>
-    /// <returns></returns>
+    /// <returns>
+    /// <see langword="true"/> if a process with the specified PID is running; otherwise, <see langword="false"/>.
+    /// </returns>
     public bool IsProcessRunning(int pid)
     {
         return pid == _pid;
