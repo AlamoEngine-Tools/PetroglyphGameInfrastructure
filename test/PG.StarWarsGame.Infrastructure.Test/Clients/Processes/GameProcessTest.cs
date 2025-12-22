@@ -52,7 +52,8 @@ public class GameProcessTest : GameInfrastructureTestBaseWithRandomGame, IDispos
         Assert.Equal(GameProcessState.Running, gameProcess.State);
 
         var exitTask = gameProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
-        await process.StandardInput.WriteLineAsync();
+        // ReSharper disable once MethodHasAsyncOverload
+        process.StandardInput.WriteLine();
 
         await exitTask;
         Assert.True(process.HasExited);
