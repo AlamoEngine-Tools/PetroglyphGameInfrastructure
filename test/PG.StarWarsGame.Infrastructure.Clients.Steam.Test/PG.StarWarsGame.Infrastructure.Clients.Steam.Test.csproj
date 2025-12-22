@@ -12,12 +12,6 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 
-	<PropertyGroup>
-		<TestingPlatformCommandLineArguments Condition="$([MSBuild]::IsOsUnixLike())">
-			$(TestingPlatformCommandLineArguments) --ignore-exit-code 8
-		</TestingPlatformCommandLineArguments>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="GitHubActionsTestLogger" Version="3.0.1" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
