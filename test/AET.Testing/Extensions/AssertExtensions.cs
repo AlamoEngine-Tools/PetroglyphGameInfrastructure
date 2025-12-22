@@ -16,7 +16,7 @@ public static class AssertExtensions
         /// <typeparam name="T">The type of the result returned by the action.</typeparam>
         /// <param name="action">A delegate to the code to be tested.</param>
         /// <returns>The result of the executed test code.</returns>
-        public static T AssertDoesNotThrowException<T>(Func<T> action)
+        public static T DoesNotThrowException<T>(Func<T> action)
         {
             try
             {
@@ -33,9 +33,9 @@ public static class AssertExtensions
         /// Verifies that the specified action does not throw any exception.
         /// </summary>
         /// <param name="action">A delegate to the code to be tested.</param>
-        public static void AssertDoesNotThrowException(Action action)
+        public static void DoesNotThrowException(Action action)
         {
-            Assert.AssertDoesNotThrowException(() => action);
+            Assert.DoesNotThrowException(() => action);
         }
     }
 }
