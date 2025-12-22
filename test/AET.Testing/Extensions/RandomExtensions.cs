@@ -176,8 +176,23 @@ public static class RandomExtensions
         /// <param name="length">The desired length of the generated string. Must be a non-negative value.</param>
         /// <returns>A randomly generated string of the specified length. Returns an empty string if <paramref name="length"/> is 0.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="length"/> is less than 0.</exception>
-        public static unsafe string GetRandomStringOfLength(int length)
+        public static string String(int length)
         {
+            return Random.String(length, AllowedChars);
+        }
+
+        /// <summary>
+        /// Generates a random string of the specified length using the specified pool of characters.
+        /// </summary>
+        /// <param name="length">The desired length of the generated string. Must be a non-negative value.</param>
+        /// <param name="charPool">The pool of characters to pick random characters from.</param>
+        /// <returns>A randomly generated string of the specified length. Returns an empty string if <paramref name="length"/> is 0.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="length"/> is less than 0.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="charPool"/> is empty or <see langword="null"/>.</exception>
+        public static unsafe string String(int length, ReadOnlySpan<char> charPool)
+        {
+            if (charPool == ReadOnlySpan<char>.Empty || charPool.IsEmpty)
+                throw new ArgumentException("charPool must not be null or empty", nameof(charPool));
             switch (length)
             {
                 case < 0:
@@ -193,8 +208,8 @@ public static class RandomExtensions
             var random = Random;
             for (var i = 0; i < buffer.Length; i++)
             {
-                var index = random.Next(AllowedChars.Length);
-                buffer[i] = AllowedChars[index];
+                var index = random.Next(charPool.Length);
+                buffer[i] = charPool[index];
             }
 
 #if NET
