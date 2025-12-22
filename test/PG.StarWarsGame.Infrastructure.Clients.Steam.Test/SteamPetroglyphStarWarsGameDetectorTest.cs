@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using AET.SteamAbstraction;
 using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Testing;
@@ -17,6 +18,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
+[SupportedOSPlatform("windows")]
 public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<object>
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);

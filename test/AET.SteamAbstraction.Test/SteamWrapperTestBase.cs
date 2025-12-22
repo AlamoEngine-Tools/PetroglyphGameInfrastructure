@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Library;
@@ -14,6 +15,7 @@ using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
+[SupportedOSPlatform("windows")]
 public abstract class SteamWrapperTestBase : InMemorySteamTestBase
 {
     private readonly ISteamWrapperFactory _wrapperFactory;
@@ -209,7 +211,7 @@ public abstract class SteamWrapperTestBase : InMemorySteamTestBase
         Steam.DeleteLoginUsersFile();
         Assert.Null(wrapper.UserWantsOfflineMode);
 
-        Steam.WriteLoginUsers(new TestingSteamUserLoginMetadata(ulong.MaxValue, false, false));
+        Steam.WriteLoginUsers(new TestingSteamUserLoginMetadata(ulong.MaxValue, mostRecent: false, userWantsOffline: false));
         Assert.False(wrapper.UserWantsOfflineMode);
 
         // Not most recent
@@ -227,7 +229,7 @@ public abstract class SteamWrapperTestBase : InMemorySteamTestBase
         // Not most recent
         Steam.WriteLoginUsers(
             new TestingSteamUserLoginMetadata(ulong.MaxValue, false, true),
-            new TestingSteamUserLoginMetadata(456, true, false));
+            new TestingSteamUserLoginMetadata(456, true, userWantsOffline: false));
         Assert.False(wrapper.UserWantsOfflineMode);
 
         Steam.WriteCorruptLoginUsers();
@@ -265,7 +267,7 @@ public abstract class SteamWrapperTestBase : InMemorySteamTestBase
 
         LoginUser(12345);
 
-        await Assert.ThrowsAsync<SteamException>(async () => await wrapper.WaitSteamRunningAndLoggedInAsync(false));
+        await Assert.ThrowsAsync<SteamException>(async () => await wrapper.WaitSteamRunningAndLoggedInAsync(false, TestContext.Current.CancellationToken));
 
         Assert.Equal(0u, wrapper.GetCurrentUserId());
     }
@@ -279,7 +281,7 @@ public abstract class SteamWrapperTestBase : InMemorySteamTestBase
         FakeStartSteam();
         LoginUser(12345);
 
-        await wrapper.WaitSteamRunningAndLoggedInAsync(false);
+        await wrapper.WaitSteamRunningAndLoggedInAsync(false, TestContext.Current.CancellationToken);
 
         Assert.Equal(12345u, wrapper.GetCurrentUserId());
     }
@@ -290,7 +292,7 @@ public abstract class SteamWrapperTestBase : InMemorySteamTestBase
         InstallSteam();
         var wrapper = CreateWrapper();
 
-        var waitTask = wrapper.WaitSteamRunningAndLoggedInAsync(true);
+        var waitTask = wrapper.WaitSteamRunningAndLoggedInAsync(true, TestContext.Current.CancellationToken);
 
         // Ensure that code had time to proceed to past running check. then wait a little more.
         await wrapper.WaitSteamRunningAsync(CancellationToken.None)
@@ -381,6 +383,6 @@ public abstract class SteamWrapperTestBase : InMemorySteamTestBase
     {
         Assert.NotNull(Steam);
         Steam.Registry.SetUserId(userId);
-        Steam.WriteLoginUsers(new TestingSteamUserLoginMetadata(userId, true, false));
+        Steam.WriteLoginUsers(new TestingSteamUserLoginMetadata(userId, true, userWantsOffline: false));
     }
 }

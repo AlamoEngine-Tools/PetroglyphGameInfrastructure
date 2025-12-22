@@ -111,7 +111,7 @@ public class GameProcessLauncherTest : GameInfrastructureTestBaseWithRandomGame,
         Assert.Equal(_executable.FullName, internalProcess.StartInfo.FileName);
         Assert.Empty(internalProcess.StartInfo.Arguments);
 
-        await process.WaitForExitAsync();
+        await process.WaitForExitAsync(TestContext.Current.CancellationToken);
         Assert.Equal(GameProcessState.Closed, process.State);
     }
 

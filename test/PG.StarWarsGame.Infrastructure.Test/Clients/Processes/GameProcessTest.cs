@@ -51,8 +51,8 @@ public class GameProcessTest : GameInfrastructureTestBaseWithRandomGame, IDispos
 
         Assert.Equal(GameProcessState.Running, gameProcess.State);
 
-        var exitTask = gameProcess.WaitForExitAsync();
-        process.StandardInput.WriteLine();
+        var exitTask = gameProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
+        await process.StandardInput.WriteLineAsync();
 
         await exitTask;
         Assert.True(process.HasExited);
@@ -86,7 +86,7 @@ public class GameProcessTest : GameInfrastructureTestBaseWithRandomGame, IDispos
         
         process.WaitForExit();
 
-        await gameProcess.WaitForExitAsync();
+        await gameProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
 
         Assert.True(process.HasExited);
         Assert.Equal(GameProcessState.Closed, gameProcess.State);
@@ -109,12 +109,12 @@ public class GameProcessTest : GameInfrastructureTestBaseWithRandomGame, IDispos
         {
             b.SignalAndWait();
             gameProcess.Exit();
-        });
+        }, TestContext.Current.CancellationToken);
         var t2 = Task.Run(() =>
         {
             b.SignalAndWait();
             gameProcess.Exit();
-        });
+        }, TestContext.Current.CancellationToken);
 
 
         await Task.WhenAll(t1, t2);
@@ -299,12 +299,12 @@ public class GameProcessTest : GameInfrastructureTestBaseWithRandomGame, IDispos
         var processInfo = new GameProcessInfo(Game, GameBuildType.Release, ArgumentCollection.Empty);
         var gameProcess = new GameProcess(process, processInfo);
 
-        var waitTask = gameProcess.WaitForExitAsync();
+        var waitTask = gameProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
 
         gameProcess.Dispose();
 
         // WaitForExitAsync continues listening
-        var t = await Task.WhenAny(waitTask, Task.Delay(2000));
+        var t = await Task.WhenAny(waitTask, Task.Delay(2000, TestContext.Current.CancellationToken));
         Assert.NotSame(t, waitTask);
     }
 }
