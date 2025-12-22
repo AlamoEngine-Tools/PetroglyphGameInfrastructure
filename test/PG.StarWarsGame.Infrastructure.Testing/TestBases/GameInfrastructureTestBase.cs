@@ -1,5 +1,4 @@
-﻿using System;
-using AET.Modinfo.Model;
+﻿using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,10 +7,6 @@ using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO.Abstractions;
-using System.Threading;
-using Testably.Abstractions.Testing;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
@@ -20,38 +15,9 @@ namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 /// This class facilitates the setup of services, file system management, and game or mod installations
 /// required for testing purposes.
 /// </summary>
-public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
+public abstract class GameInfrastructureTestBase : TestBaseWithFileSystem
 {
     private ITestingGameInstallation? _gameInstallation;
-
-    /// <summary>
-    /// Gets the file system abstraction used for testing purposes.
-    /// This property provides access to an <see cref="IFileSystem"/> instance, which is lazily initialized
-    /// and can be overridden by derived classes to customize the file system behavior.
-    /// </summary>
-    /// <remarks>
-    /// The file system is initialized using the <see cref="CreateFileSystem"/> method. If the initialization
-    /// fails or returns <c>null</c>, an <see cref="InvalidOperationException"/> is thrown.
-    /// </remarks>
-    [field:MaybeNull, AllowNull]
-    protected IFileSystem FileSystem => LazyInitializer.EnsureInitialized(ref field, CreateFileSystem)
-                                        ?? throw new InvalidOperationException("Creation of file system must not return null.");
-    
-    /// <summary>
-    /// Creates and returns a new instance of the file system abstraction for testing purposes.
-    /// </summary>
-    /// <remarks>
-    /// This method is invoked to initialize the <see cref="FileSystem"/> property. By default, it returns
-    /// a <see cref="MockFileSystem"/> instance, but derived classes can override this method to provide
-    /// a custom implementation of <see cref="IFileSystem"/>.
-    /// </remarks>
-    /// <returns>
-    /// An instance of <see cref="IFileSystem"/> representing the file system abstraction to be used in tests.
-    /// </returns>
-    protected virtual IFileSystem CreateFileSystem()
-    {
-        return new MockFileSystem();
-    }
 
     /// <summary>
     /// Configures test services by adding them to the specified <see cref="IServiceCollection"/>.
@@ -60,7 +26,6 @@ public abstract class GameInfrastructureTestBase : TestBaseWithServiceProvider
     protected override void SetupServices(IServiceCollection serviceCollection)
     {
         base.SetupServices(serviceCollection);
-        serviceCollection.AddSingleton(FileSystem);
         PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
     }
 
