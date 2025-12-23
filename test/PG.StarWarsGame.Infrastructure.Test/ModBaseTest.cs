@@ -239,7 +239,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
             ? new CustomMod(Game, mod.Identifier, mod.Type, mod.ModInfo, ServiceProvider) 
             : new CustomMod(Game, mod.Identifier, mod.Type, mod.Name, ServiceProvider);
 
-        Assert.False(mod.Equals(null));
+        Assert.False(mod.Equals(null!));
         Assert.False(mod.Equals((object)null!));
         Assert.False(mod.Equals((IModIdentity)null!));
         Assert.False(mod.Equals((IModReference)null!));

@@ -63,13 +63,11 @@ public partial class GameDetectorTestBase<T>
     public void Detect_TryDetect_TypeOfDesiredPlatformNotFound(GameIdentity identity)
     {
         // Install the opposite of the desired game type.
-        var typeToInstall = identity.Type == GameType.Foc ? GameType.Eaw : GameType.Foc;
-
         var expected = GameDetectionResult.NotInstalled(identity.Type);
 
         TestDetectorCore(
             identity,
-            _ => SetupGame(new GameIdentity(typeToInstall, identity.Platform)), // Set up the opposite game
+            _ => SetupGame(new GameIdentity(identity.Type.Opposite(), identity.Platform)), // Set up the opposite game
             _ => expected,
             identity.Platform
         );

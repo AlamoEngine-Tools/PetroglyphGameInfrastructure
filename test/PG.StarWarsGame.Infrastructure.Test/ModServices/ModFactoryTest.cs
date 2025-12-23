@@ -187,10 +187,9 @@ public class ModFactoryTest : GameInfrastructureTestBase
     public void CreatePhysicalMod_ModNotCompatible_Throws(GameIdentity gameIdentity)
     {
         var game = GetOrCreateGameInstallation(gameIdentity).Game;
-
-        var oppositeGameType = gameIdentity.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw;
+        
         var otherGameInstallation = GameInfrastructureTesting
-            .Game(new GameIdentity(oppositeGameType, Random.Item(GITestUtilities.RealPlatforms)), ServiceProvider);
+            .Game(new GameIdentity(gameIdentity.Type.Opposite(), Random.Item(GITestUtilities.RealPlatforms)), ServiceProvider);
 
         var modDir = otherGameInstallation.GetModDirectory("Mod_Name", false);
         var modData = CreateDetectedModReference(otherGameInstallation, modDir, false, null);

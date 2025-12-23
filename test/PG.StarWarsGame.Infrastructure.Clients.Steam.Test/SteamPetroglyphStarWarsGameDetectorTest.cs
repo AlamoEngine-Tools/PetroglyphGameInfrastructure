@@ -145,8 +145,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<obje
         lib.InstallGame(32470, "Star Wars Empire at War", depots, appState);
 
         // To Registry
-        var otherGameType = gameIdentity.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw;
-        registrySetup(game, otherGameType);
+        registrySetup(game, gameIdentity.Type.Opposite());
 
         return new GameDetectorTestInfo<object>(gameIdentity.Type, game.Directory, null);
     }

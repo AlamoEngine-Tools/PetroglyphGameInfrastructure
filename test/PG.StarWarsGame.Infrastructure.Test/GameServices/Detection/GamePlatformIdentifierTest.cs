@@ -32,8 +32,7 @@ public class GamePlatformIdentifierTest : GameInfrastructureTestBase
     [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetGamePlatform_WrongGameInstalledReturnsUndefined(GameIdentity identity)
     {
-        var oppositeGameType = identity.Type == GameType.Foc ? GameType.Eaw : GameType.Foc;
-        var game = GetOrCreateGameInstallation(new GameIdentity(oppositeGameType, identity.Platform)).Game;
+        var game = GetOrCreateGameInstallation(new GameIdentity(identity.Type.Opposite(), identity.Platform)).Game;
         var gameLocation = game.Directory;
 
         var actual = _platformIdentifier.GetGamePlatform(identity.Type, ref gameLocation);

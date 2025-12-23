@@ -288,15 +288,13 @@ public class ModFinderTest : GameInfrastructureTestBase
     {
         var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
         var game = gameInstallation.Game;
-
-        var oppositeGameType = type is GameType.Eaw ? GameType.Foc : GameType.Eaw;
-
+        
         var steamData = new SteamData(
             new Random().Next(0, int.MaxValue).ToString(),
             "path",
             Random.Enum<SteamWorkshopVisibility>(),
             "Title",
-            [$"{oppositeGameType.ToString().ToUpper()}"]);
+            [$"{type.Opposite().ToString().ToUpper()}"]);
         var modinfo = new ModinfoData("Name")
         {
             SteamData = steamData
@@ -412,11 +410,10 @@ public class ModFinderTest : GameInfrastructureTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_ModInstalledInWrongGameModsDirectoryShouldBeSkipped(GameType type)
     {
-        var oppositeGameType = type is GameType.Eaw ? GameType.Foc : GameType.Eaw;
         var game = GetOrCreateGameInstallation(new GameIdentity(type, Random.Item(GITestUtilities.RealPlatforms))).Game;
         // Other, random platform to shuffle a bit more.
         var otherTypeGame = GameInfrastructureTesting
-            .Game(new GameIdentity(oppositeGameType, Random.Item(GITestUtilities.RealPlatforms)), ServiceProvider);
+            .Game(new GameIdentity(type.Opposite(), Random.Item(GITestUtilities.RealPlatforms)), ServiceProvider);
 
         var wrongMod = otherTypeGame.InstallMod("MyMod", false).Mod;
 

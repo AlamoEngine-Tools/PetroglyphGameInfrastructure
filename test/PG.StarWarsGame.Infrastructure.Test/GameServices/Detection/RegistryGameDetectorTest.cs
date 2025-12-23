@@ -58,10 +58,8 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
 
     private GameRegistryContainer SetupRegistry(GameType gameType, TestGameRegistrySetupData registrySetup)
     {
-        var otherGameType = gameType == GameType.Eaw ? GameType.Foc : GameType.Eaw;
-
         var gameRegistry = GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(registrySetup);
-        var defaultRegistry = GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(otherGameType);
+        var defaultRegistry = GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(gameType.Opposite());
 
         IGameRegistry eawRegistry;
         IGameRegistry focRegistry;

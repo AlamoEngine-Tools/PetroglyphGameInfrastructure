@@ -7,7 +7,10 @@ namespace System.Runtime.Versioning;
 /// Base type for all platform-specific API attributes.
 /// </summary>
 
-internal abstract class OSPlatformAttribute(string PlatformName) : Attribute;
+internal abstract class OSPlatformAttribute(string platformName) : Attribute
+{
+    public string PlatformName { get; } = platformName;
+}
 
 /// <summary>
 /// Records the platform that the project targeted.

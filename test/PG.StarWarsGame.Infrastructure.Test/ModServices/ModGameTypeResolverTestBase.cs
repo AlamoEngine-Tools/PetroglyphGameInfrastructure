@@ -203,7 +203,7 @@ public abstract class ModGameTypeResolverTestBase : GameInfrastructureTestBase
             if (knownMod.Value.Types.Length == 2)
                 incompatible = null;
             else
-                incompatible = knownMod.Value.Types.First() == GameType.Foc ? GameType.Eaw : GameType.Foc;
+                incompatible = knownMod.Value.Types.First().Opposite();
 
             yield return [knownMod.Key.ToString(), knownMod.Value.Types, incompatible!];
         }

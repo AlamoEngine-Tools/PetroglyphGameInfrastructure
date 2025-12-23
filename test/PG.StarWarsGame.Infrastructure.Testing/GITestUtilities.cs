@@ -119,4 +119,17 @@ public static class GITestUtilities
         var platforms = realOnly ? RealPlatforms : (GamePlatform[])Enum.GetValues(typeof(GamePlatform));
         return new GameIdentity(Random.Enum<GameType>(), Random.Item(platforms));
     }
+
+    /// <summary>
+    /// Gets the opposite <see cref="GameType"/>.
+    /// </summary>
+    /// <param name="type">The current <see cref="GameType"/>.</param>
+    /// <returns>
+    /// The opposite <see cref="GameType"/>. If the input is <see cref="GameType.Eaw"/>, the result is <see cref="GameType.Foc"/>; 
+    /// if the input is <see cref="GameType.Foc"/>, the result is <see cref="GameType.Eaw"/>.
+    /// </returns>
+    public static GameType Opposite(this GameType type)
+    {
+        return (GameType)((int)type ^ 1);
+    }
 }
