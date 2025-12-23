@@ -85,7 +85,7 @@ public abstract class ModGameTypeResolver : IModGameTypeResolver
     private bool GetGameType(ISteamData? steamData, out ReadOnlyFrugalList<GameType> gameTypes)
     {
         gameTypes = default;
-        Logger?.LogTrace($"Try getting game type from steam data '[{string.Join(",", steamData?.Tags ?? ["tags n/a"])}]'");
+        Logger?.LogTrace("Try getting game type from steam data '[{Tags}]'", string.Join(",", steamData?.Tags ?? ["tags n/a"]));
         return steamData is not null && GetGameTypesFromTags(steamData.Tags, out gameTypes);
     }
 
