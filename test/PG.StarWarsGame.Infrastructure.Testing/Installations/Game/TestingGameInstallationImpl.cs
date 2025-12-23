@@ -48,7 +48,7 @@ internal partial class TestingGameInstallationImpl : TestingModContainerInstalla
 
         FileSystem.InstallModsLocations(gameDir);
 
-        var game = new PetroglyphStarWarsGame(gameIdentity, gameDir, gameIdentity.ToString(), ServiceProvider);
+        var game = new PetroglyphStarWarsGame(gameIdentity, gameDir, gameIdentity.ToString()!, ServiceProvider);
         Assert.True(game.Exists());
         return game;
     }
