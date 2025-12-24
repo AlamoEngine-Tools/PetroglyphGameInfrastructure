@@ -1,4 +1,7 @@
-﻿using AET.SteamAbstraction.Games;
+﻿// Copyright (c) Alamo Engine Tools and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+
+using AET.SteamAbstraction.Games;
 using AET.SteamAbstraction.Library;
 using System.Collections.Generic;
 

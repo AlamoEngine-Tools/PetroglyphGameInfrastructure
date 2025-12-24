@@ -1,4 +1,7 @@
-﻿using AET.Modinfo.Spec;
+﻿// Copyright (c) Alamo Engine Tools and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+
+using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations;

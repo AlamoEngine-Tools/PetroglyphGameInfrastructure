@@ -1,4 +1,7 @@
-﻿using PG.StarWarsGame.Infrastructure.Games;
+﻿// Copyright (c) Alamo Engine Tools and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+
+using PG.StarWarsGame.Infrastructure.Games;
 using System;
 using System.IO.Abstractions;
 using AET.Modinfo.Spec;

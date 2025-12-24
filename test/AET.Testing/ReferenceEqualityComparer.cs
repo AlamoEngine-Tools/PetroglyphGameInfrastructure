@@ -1,5 +1,7 @@
-﻿#if !NET5_0_OR_GREATER
-using System;
+﻿// Copyright (c) Alamo Engine Tools and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+
+#if !NET5_0_OR_GREATER
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;

@@ -27,7 +27,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.Memory" Version="4.6.3" Condition="$(TargetFramework) == 'netstandard2.0'"/>
+		<!--<PackageReference Include="System.Memory" Version="4.6.3" Condition="$(TargetFramework) == 'netstandard2.0'"/>-->
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
 		<PackageReference Include="Testably.Abstractions.Testing" Version="5.0.1" />
 		<PackageReference Include="xunit.v3.extensibility.core" Version="3.2.1" />

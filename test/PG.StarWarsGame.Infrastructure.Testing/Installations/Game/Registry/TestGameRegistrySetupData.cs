@@ -1,4 +1,7 @@
-﻿using System.IO.Abstractions;
+﻿// Copyright (c) Alamo Engine Tools and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+
+using System.IO.Abstractions;
 using PG.StarWarsGame.Infrastructure.Games;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
