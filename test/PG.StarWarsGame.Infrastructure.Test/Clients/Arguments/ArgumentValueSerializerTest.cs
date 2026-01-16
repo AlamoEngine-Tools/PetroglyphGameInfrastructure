@@ -1,5 +1,5 @@
 ﻿using System;
-using AET.Testing.Attributes;
+using AnakinRaW.CommonUtilities.Testing.Attributes;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using Testably.Abstractions.Testing;

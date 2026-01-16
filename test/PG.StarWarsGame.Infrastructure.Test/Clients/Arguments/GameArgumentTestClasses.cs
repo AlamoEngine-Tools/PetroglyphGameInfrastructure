@@ -1,7 +1,7 @@
 ﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.CommandLine;
 using System;
-using AET.Testing.Extensions;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 

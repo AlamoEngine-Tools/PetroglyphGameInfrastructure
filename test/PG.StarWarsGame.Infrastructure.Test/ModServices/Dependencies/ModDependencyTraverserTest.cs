@@ -1,6 +1,6 @@
 ﻿using System;
 using AET.Modinfo.Spec;
-using AET.Testing.Extensions;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;

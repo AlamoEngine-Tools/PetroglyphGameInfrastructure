@@ -2,7 +2,7 @@
 using System.Linq;
 using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Testing.TestBases;
-using AET.Testing.Attributes;
+using AnakinRaW.CommonUtilities.Testing.Attributes;
 using Xunit;
 
 #if NET5_0_OR_GREATER

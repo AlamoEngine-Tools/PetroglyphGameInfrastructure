@@ -6,7 +6,7 @@ using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Modinfo.Spec.Steam;
 using AET.Modinfo.Utilities;
-using AET.Testing.Extensions;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;

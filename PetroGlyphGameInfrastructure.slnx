@@ -11,7 +11,6 @@
   </Folder>
   <Folder Name="/testing/">
     <Project Path="test/AET.SteamAbstraction.Testing/AET.SteamAbstraction.Testing.csproj" />
-    <Project Path="test/AET.Testing/AET.Testing.csproj" />
     <Project Path="test/PG.StarWarsGame.Infrastructure.Testing/PG.StarWarsGame.Infrastructure.Testing.csproj" />
   </Folder>
   <Project Path="sampleApp/SampleApplication.csproj" />

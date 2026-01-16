@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
-using AET.Testing.Extensions;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Games;
 using Xunit;

@@ -26,6 +26,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AnakinRaW.CommonUtilities.Testing" Version="13.0.3-g989307af40" />
 		<PackageReference Include="Required" Version="1.0.0" Condition="$(TargetFramework) == 'netstandard2.0'">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -34,6 +35,5 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj" />
-	  <ProjectReference Include="..\AET.Testing\AET.Testing.csproj" />
 	</ItemGroup>
 </Project>

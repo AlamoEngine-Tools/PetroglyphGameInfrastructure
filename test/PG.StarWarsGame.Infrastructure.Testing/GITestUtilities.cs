@@ -8,7 +8,7 @@ using PG.StarWarsGame.Infrastructure.Services.Detection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AET.Testing.Extensions;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing;

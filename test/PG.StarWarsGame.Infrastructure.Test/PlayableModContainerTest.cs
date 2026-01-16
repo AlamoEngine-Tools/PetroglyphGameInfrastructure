@@ -7,7 +7,7 @@ using PG.StarWarsGame.Infrastructure.Testing.Installations;
 #if NET5_0_OR_GREATER
 using System.Collections.Generic;
 #else
-using AET.Testing;
+using AnakinRaW.CommonUtilities.Testing.EqualityComparers;
 #endif
 
 namespace PG.StarWarsGame.Infrastructure.Test;

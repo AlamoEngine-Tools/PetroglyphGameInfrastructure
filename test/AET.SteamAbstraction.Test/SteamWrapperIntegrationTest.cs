@@ -1,9 +1,9 @@
 ﻿using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using AET.Testing;
 using AnakinRaW.CommonUtilities.Registry;
 using AnakinRaW.CommonUtilities.Registry.Windows;
+using AnakinRaW.CommonUtilities.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions;
 using Xunit;

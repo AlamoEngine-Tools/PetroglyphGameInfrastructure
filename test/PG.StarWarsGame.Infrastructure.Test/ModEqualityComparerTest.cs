@@ -1,12 +1,12 @@
 ﻿using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
-using AET.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using System;
 using System.Collections.Generic;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;

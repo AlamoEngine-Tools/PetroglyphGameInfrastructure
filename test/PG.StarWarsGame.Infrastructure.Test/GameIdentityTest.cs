@@ -1,6 +1,6 @@
 ﻿using PG.StarWarsGame.Infrastructure.Games;
 using System;
-using AET.Testing.Extensions;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;

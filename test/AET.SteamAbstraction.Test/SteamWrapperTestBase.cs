@@ -8,8 +8,8 @@ using AET.SteamAbstraction.Library;
 using AET.SteamAbstraction.Testing;
 using AET.SteamAbstraction.Testing.TestBases;
 using AET.SteamAbstraction.Utilities;
-using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 

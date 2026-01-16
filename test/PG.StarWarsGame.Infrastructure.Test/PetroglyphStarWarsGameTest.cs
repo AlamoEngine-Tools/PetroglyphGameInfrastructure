@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AET.Modinfo.Spec;
-using AET.Testing.Extensions;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;

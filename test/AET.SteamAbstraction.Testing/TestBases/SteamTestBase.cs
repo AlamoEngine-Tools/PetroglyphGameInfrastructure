@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 using System;
-using AET.Testing;
+using AnakinRaW.CommonUtilities.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AET.SteamAbstraction.Testing.TestBases;

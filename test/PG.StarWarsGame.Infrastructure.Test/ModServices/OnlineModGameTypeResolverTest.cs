@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AET.Modinfo.Spec;
-using AET.Testing.Extensions;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;

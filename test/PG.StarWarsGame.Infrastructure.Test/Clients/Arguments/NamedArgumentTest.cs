@@ -1,6 +1,6 @@
 ﻿using System;
-using AET.Testing.Extensions;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using Testably.Abstractions.Testing;
 using Xunit;

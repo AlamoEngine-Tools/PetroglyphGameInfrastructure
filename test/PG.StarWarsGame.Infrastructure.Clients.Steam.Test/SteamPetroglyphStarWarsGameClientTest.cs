@@ -13,7 +13,7 @@ using PG.StarWarsGame.Infrastructure.Testing;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
-using AET.Testing.Extensions;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
