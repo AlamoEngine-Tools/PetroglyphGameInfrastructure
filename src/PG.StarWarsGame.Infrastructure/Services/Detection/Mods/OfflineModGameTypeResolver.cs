@@ -23,7 +23,7 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
 
 
     /// <inheritdoc />
-    protected internal override bool TryGetGameTypeCore(DetectedModReference modInformation, out ReadOnlyFrugalList<GameType> gameTypes)
+    protected internal override bool TryGetGameTypeCore(DetectedModReference modInformation, out ImmutableFrugalList<GameType> gameTypes)
     {
         gameTypes = default;
 
@@ -47,21 +47,21 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
         if (detector.Detect(GameType.Foc, GamePlatform.Undefined).Installed)
         {
             Logger?.LogTrace("{ModRef} is located in FoC's Mods directory.", modInformation.ModReference);
-            gameTypes = new ReadOnlyFrugalList<GameType>(GameType.Foc);
+            gameTypes = ImmutableFrugalList.Single(GameType.Foc);
             return true;
         }
 
         if (detector.Detect(GameType.Eaw, GamePlatform.Undefined).Installed)
         {
             Logger?.LogTrace("{ModRef} is located in EaW's Mods directory.", modInformation.ModReference);
-            gameTypes = new ReadOnlyFrugalList<GameType>(GameType.Eaw);
+            gameTypes = ImmutableFrugalList.Single(GameType.Eaw);
             return true;
         }
 
         return false;
     }
 
-    private bool HandleWorkshop(DetectedModReference modInformation, out ReadOnlyFrugalList<GameType> gameTypes)
+    private bool HandleWorkshop(DetectedModReference modInformation, out ImmutableFrugalList<GameType> gameTypes)
     { 
         gameTypes = default;
         if (modInformation.ModReference.Type == ModType.Workshops)
@@ -69,15 +69,14 @@ public sealed class OfflineModGameTypeResolver(IServiceProvider serviceProvider)
             if (!_steamGameHelpers.ToSteamWorkshopsId(modInformation.Directory.Name, out var steamId))
                 return false;
 
-            // Modinfo is superior to cache, because this value can change faster,
-            // than new distribution of this library might release.
-            // so that the cache would then be invalid.
+            // Modinfo is superior to cache, because a modinfo file can change more frequently
+            // than new release of this library (and therefore the cache).
             if (TryGetGameType(modInformation.Modinfo, out gameTypes))
                 return true;
 
             if (_cache.ContainsMod(steamId))
             {
-                gameTypes = new ReadOnlyFrugalList<GameType>(_cache.GetGameTypes(steamId));
+                gameTypes = ImmutableFrugalList.Create(_cache.GetGameTypes(steamId));
                 return true;
             }
         }

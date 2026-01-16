@@ -25,14 +25,14 @@ public sealed class OnlineModGameTypeResolver(IServiceProvider serviceProvider) 
     private readonly ISteamWorkshopWebpageDownloader _steamWebpageDownloader = serviceProvider.GetRequiredService<ISteamWorkshopWebpageDownloader>();
 
     /// <inheritdoc />
-    protected internal override bool TryGetGameTypeCore(DetectedModReference modInformation, out ReadOnlyFrugalList<GameType> gameTypes)
+    protected internal override bool TryGetGameTypeCore(DetectedModReference modInformation, out ImmutableFrugalList<GameType> gameTypes)
     {
         if (_offlineResolver.TryGetGameTypeCore(modInformation, out gameTypes))
             return true;
         return modInformation.ModReference.Type == ModType.Workshops && GetGameTypeFromSteamPage(modInformation.Directory.Name, out gameTypes);
     }
 
-    private bool GetGameTypeFromSteamPage(string steamIdValue, out ReadOnlyFrugalList<GameType> gameTypes)
+    private bool GetGameTypeFromSteamPage(string steamIdValue, out ImmutableFrugalList<GameType> gameTypes)
     {
         gameTypes = default;
         if (!_steamGameHelpers.ToSteamWorkshopsId(steamIdValue, out var steamId))
