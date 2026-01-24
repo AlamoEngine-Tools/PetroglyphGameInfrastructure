@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AnakinRaW.CommonUtilities.Registry;
+using System;
 using System.IO.Abstractions;
 
 namespace AET.SteamAbstraction.Registry;
@@ -22,4 +23,10 @@ internal interface ISteamRegistry : IDisposable
     /// The PID of the current Steam Process. 0 or <see langword="null"/> if Steam is not running.
     /// </summary>
     int? ProcessId { get; }
+
+    /// <summary>
+    /// Opens the Steam registry and returns a writeable key.
+    /// </summary>
+    /// <returns>The steam registry key.</returns>
+    IRegistryKey? OpenSteamRegistryKey();
 }

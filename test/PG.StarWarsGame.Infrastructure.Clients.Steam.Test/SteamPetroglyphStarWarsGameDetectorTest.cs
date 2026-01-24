@@ -2,24 +2,24 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using AET.SteamAbstraction;
 using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Registry;
-using AET.SteamAbstraction.Testing.Installation;
+using AET.SteamAbstraction.Testing;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
-using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
-public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<EmptyStruct>
+[SupportedOSPlatform("windows")]
+public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<object>
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
 
@@ -27,44 +27,43 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
     protected override ICollection<GamePlatform> SupportedPlatforms => [GamePlatform.SteamGold];
     protected override bool CanDisableInitRequest => false;
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        sc.AddSingleton(_registry);
-        SteamAbstractionLayer.InitializeServices(sc);
-        PetroglyphGameInfrastructure.InitializeServices(sc);
-        SteamPetroglyphStarWarsGameClients.InitializeServices(sc);
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton(_registry);
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
+        SteamPetroglyphStarWarsGameClients.InitializeServices(serviceCollection);
     }
 
-    protected override IGameDetector CreateDetector(GameDetectorTestInfo<EmptyStruct> gameInfo, bool shallHandleInitialization)
+    protected override IGameDetector CreateDetector(GameDetectorTestInfo<object> gameInfo, bool shallHandleInitialization)
     {
         return new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
     }
 
-    protected override GameDetectorTestInfo<EmptyStruct> SetupGame(GameIdentity gameIdentity)
+    protected override GameDetectorTestInfo<object> SetupGame(GameIdentity gameIdentity)
     {
         return SetupGame(gameIdentity, (game, otherGameType) =>
         {
-            TestGameRegistrySetupData.Installed(game.Type, game.Directory).Create(ServiceProvider);
-            otherGameType.CreateNonExistingRegistry(ServiceProvider);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstalled(game);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(otherGameType);
         });
     }
 
-    protected override GameDetectorTestInfo<EmptyStruct> SetupForRequiredInitialization(GameIdentity gameIdentity)
+    protected override GameDetectorTestInfo<object> SetupForRequiredInitialization(GameIdentity gameIdentity)
     {
         return SetupGame(gameIdentity, (game, otherGameType) =>
         {
-            TestGameRegistrySetupData.Uninitialized(game.Type).Create(ServiceProvider);
-            otherGameType.CreateNonExistingRegistry(ServiceProvider);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(game.Type));
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(otherGameType);
         });
     }
 
-    protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<EmptyStruct> info)
+    protected override void HandleInitialization(bool shallInitSuccessfully, GameDetectorTestInfo<object> info)
     {
         if (!shallInitSuccessfully)
             return;
         var registrySetupData = TestGameRegistrySetupData.Installed(info.GameType, info.GameDirectory!);
-        registrySetupData.Create(ServiceProvider);
+        GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(registrySetupData);
     }
 
     [Fact]
@@ -81,7 +80,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         var gameId = new GameIdentity(gameType, GamePlatform.SteamGold);
         var expected = GameDetectionResult.NotInstalled(gameId.Type);
 
-        FileSystem.InstallGame(gameId, ServiceProvider);
+        GetOrCreateGameInstallation(gameId);
 
         var detector = new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
         var result = detector.Detect(gameType, GamePlatform.SteamGold);
@@ -97,7 +96,7 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         var gameId = new GameIdentity(gameType, GamePlatform.SteamGold);
         var expected = GameDetectionResult.NotInstalled(gameId.Type);
 
-        FileSystem.InstallGame(gameId, ServiceProvider);
+        GetOrCreateGameInstallation(gameId);
 
         var detector = new SteamPetroglyphStarWarsGameDetector(ServiceProvider);
         var result = detector.Detect(gameType, GamePlatform.SteamGold);
@@ -115,8 +114,8 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
 
         var info = SetupGame(gameId, (game, otherGameType) =>
         {
-            TestGameRegistrySetupData.Installed(game.Type, game.Directory).Create(ServiceProvider);
-            otherGameType.CreateNonExistingRegistry(ServiceProvider);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstalled(game);
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(otherGameType);
         }, SteamAppState.StateUpdateRequired);
 
         var detector = CreateDetector(info, true);
@@ -125,31 +124,30 @@ public class SteamPetroglyphStarWarsGameDetectorTest : GameDetectorTestBase<Empt
         expected.AssertEqual(result);
     }
 
-    private GameDetectorTestInfo<EmptyStruct> SetupGame(
+    private GameDetectorTestInfo<object> SetupGame(
         GameIdentity gameIdentity,
         Action<IGame, GameType> registrySetup,
         SteamAppState appState = SteamAppState.StateFullyInstalled)
     {
         // Install Steam (regardless whether the identity is supported)
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        FileSystem.InstallSteam(registry);
+        var steam = SteamTesting.Steam(ServiceProvider);
+        steam.Install();
 
         if (gameIdentity.Platform != GamePlatform.SteamGold)
-            return new GameDetectorTestInfo<EmptyStruct>(gameIdentity.Type, null, default);
+            return new GameDetectorTestInfo<object>(gameIdentity.Type, null, null);
 
         // Install Game
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
 
         // Register Game to Steam
-        var lib = FileSystem.InstallDefaultLibrary(ServiceProvider);
+        var lib = steam.InstallDefaultLibrary();
         IList<uint> depots = gameIdentity.Type == GameType.Foc ? [32472] : [];
         lib.InstallGame(32470, "Star Wars Empire at War", depots, appState);
 
         // To Registry
-        var otherGameType = gameIdentity.Type == GameType.Eaw ? GameType.Foc : GameType.Eaw;
-        registrySetup(game, otherGameType);
+        registrySetup(game, gameIdentity.Type.Opposite());
 
-        return new GameDetectorTestInfo<EmptyStruct>(gameIdentity.Type, game.Directory, default);
+        return new GameDetectorTestInfo<object>(gameIdentity.Type, game.Directory, null);
     }
 }
 

@@ -13,7 +13,9 @@ public class ArgumentCollectionTest
     {
         var empty = ArgumentCollection.Empty;
         Assert.Empty(empty);
+#pragma warning disable xUnit2013
         Assert.Equal(0, empty.Count);
+#pragma warning restore xUnit2013
     }
 
     [Fact]
@@ -24,7 +26,9 @@ public class ArgumentCollectionTest
         
         args.Add(new MapArgument("Map"));
 
+#pragma warning disable xUnit2013
         Assert.Equal(1, argList.Count);
+#pragma warning restore xUnit2013
         var a = Assert.Single(argList);
 
         var e = ((IEnumerable)argList).GetEnumerator();

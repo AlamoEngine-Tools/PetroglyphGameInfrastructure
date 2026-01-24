@@ -87,7 +87,7 @@ public static class PlayableObjectExtensions
         subPath ??= string.Empty;
         var fs = playableObject.Directory.FileSystem;
         var searchLocation = fs.Path.Combine("Data", subPath);
-        return EnumerateFiles(playableObject, fileSearchPattern, searchLocation, searchRecursive);
+        return playableObject.EnumerateFiles(fileSearchPattern, searchLocation, searchRecursive);
     }
 
     /// <summary>

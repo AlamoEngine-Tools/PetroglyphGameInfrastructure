@@ -3,54 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Games;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
-using PG.TestingUtilities;
 using Xunit;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
 using Semver;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
 public abstract class ModBaseTest : PlayableModContainerTest
 {
-    protected IGame Game;
+    protected IGame Game => GameInstallation.Game;
+    protected ITestingGameInstallation GameInstallation { get; }
 
     protected ModBaseTest()
     {
-        Game = CreateRandomGame();
+        // ReSharper disable once VirtualMemberCallInConstructor
+        GameInstallation = GetOrCreateGameInstallation();
     }
 
-    protected abstract ModBase CreateMod(
+    protected abstract ITestingModInstallation CreateAndAddModInstallation(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved,
         params IList<IModReference> deps);
 
-    protected IMod CreateOtherMod(
-        string name, 
-        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
-        params IList<IModReference> deps)
-    {
-        return CreateOtherMod(name, GITestUtilities.GetRandomWorkshopFlag(Game), layout, deps);
-    }   
-    
-    
-    protected IMod CreateOtherMod(
-        string name, 
-        bool isWorkshop,
-        DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
-        params IList<IModReference> deps)
-    {
-        return CreateAndAddMod(Game, isWorkshop, name, new DependencyList(deps, layout));
-    }
 
     [Fact]
     public void VersionRange_IsNull()
     {
-        var mod = CreateMod("Mod");
+        var mod = CreateAndAddModInstallation("Mod").Mod;
         Assert.Null(mod.VersionRange);
     }
 
@@ -59,9 +46,9 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_ResolvesCorrectly(ModTestScenarios.TestScenario testScenario)
     {
         var mod = ModTestScenarios.CreateTestScenario(
-                testScenario, 
-                CreateMod, 
-                CreateOtherMod)
+                testScenario,
+                (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod,
+                (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod)
             .Mod;
 
         var expectedDirectDeps = mod.ModInfo!.Dependencies.Select(d =>
@@ -83,9 +70,9 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_DepNotAdded_Throws_ThenAddingModResolvesCorrectly()
     {
         // Do not add mod to game
-        var notAddedDep = Game.InstallMod("NotAddedMod", false, ServiceProvider);
+        var notAddedDep = GameInstallation.InstallMod("NotAddedMod", false).Mod;
 
-        var mod = CreateMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), notAddedDep);
+        var mod = CreateAndAddModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), notAddedDep).Mod;
         Game.AddMod(mod);
         var e = Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
         Assert.Same(Game, e.ModContainer);
@@ -104,14 +91,14 @@ public abstract class ModBaseTest : PlayableModContainerTest
     [Fact]
     public void ResolveDependencies_DepOfWrongGame_Throws()
     {
-        var otherGameReference = new PetroglyphStarWarsGame(Game, Game.Directory, Game.Name, ServiceProvider);
-        var wrongGameDep = otherGameReference.InstallAndAddMod("WrongGameRefMod", 
-            GITestUtilities.GetRandomWorkshopFlag(otherGameReference), ServiceProvider);
-        var mod = CreateMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), wrongGameDep);
+        var otherGameInstallRef = GameInfrastructureTesting.Game(Game, ServiceProvider);
+        var wrongGameDep = otherGameInstallRef.InstallAndAddMod("WrongGameRefMod");
+
+        var mod = CreateAndAddModInstallation("Mod", Random.Enum<DependencyResolveLayout>(), wrongGameDep.Mod).Mod;
         
         var e = Assert.Throws<ModNotFoundException>(mod.ResolveDependencies);
         Assert.Same(Game, e.ModContainer);
-        Assert.Equal(wrongGameDep, e.Mod);
+        Assert.Equal(wrongGameDep.Mod, e.Mod);
         Assert.Equal(DependencyResolveStatus.Faulted, mod.DependencyResolveStatus);
     }
 
@@ -119,11 +106,11 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_VersionMismatch_Throws()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var depLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
-        var dep = Game.InstallMod(depLoc, ws, new ModinfoData("B") { Version = new SemVersion(1) }, ServiceProvider);
+        var depLoc = GameInstallation.GetModDirectory("B", ws);
+        var dep = GameInstallation.InstallMod(new ModinfoData("B") { Version = new SemVersion(1) }, depLoc, ws).Mod;
         Game.AddMod(dep);
 
-        var mod = CreateMod("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2))));
+        var mod = CreateAndAddModInstallation("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2)))).Mod;
 
         var e = Assert.Throws<VersionMismatchException>(mod.ResolveDependencies);
         Assert.Equal(new ModReference(dep), e.Mod);
@@ -135,19 +122,19 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_VersionMatch_Throws()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var bLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
-        var cLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("C", ws, ServiceProvider));
-        var b = Game.InstallMod(bLoc, ws, new ModinfoData("B") { Version = new SemVersion(3) }, ServiceProvider);
-        var c = Game.InstallMod(cLoc, ws, new ModinfoData("C") { Version = null! }, ServiceProvider);
+        var bLoc = GameInstallation.GetModDirectory("B", ws);
+        var cLoc = GameInstallation.GetModDirectory("C", ws);
+        var b = GameInstallation.InstallMod(new ModinfoData("B") { Version = new SemVersion(3) }, bLoc, ws).Mod;
+        var c = GameInstallation.InstallMod(new ModinfoData("C") { Version = null! }, cLoc, ws).Mod;
         Game.AddMod(b);
         Game.AddMod(c);
 
-        var mod = CreateMod("Mod", deps:
+        var mod = CreateAndAddModInstallation("Mod", deps:
             [
                 new ModReference(b.Identifier, b.Type, SemVersionRange.AtLeast(new SemVersion(2))),
                 new ModReference(c.Identifier, c.Type, SemVersionRange.AtLeast(new SemVersion(2)))
             ]
-        );
+        ).Mod;
 
         mod.ResolveDependencies();
         Assert.Equal([b, c], mod.Dependencies);
@@ -159,8 +146,8 @@ public abstract class ModBaseTest : PlayableModContainerTest
     {
         var scenario = ModTestScenarios.CreateTestScenario(
             ModTestScenarios.TestScenario.SingleDepAndTransitive,
-            CreateMod,
-            CreateOtherMod);
+            (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod,
+            (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod);
 
         var mod = scenario.Mod;
         var b = Game.FindMod(scenario.ExpectedTraversedList![1])!;
@@ -187,7 +174,7 @@ public abstract class ModBaseTest : PlayableModContainerTest
     [Fact]
     public void ResolveDependencies_AlreadyResolved_DoesNotRaiseEvent()
     {
-        var mod = CreateMod("A");
+        var mod = CreateAndAddModInstallation("A").Mod;
         mod.ResolveDependencies();
         Assert.Equal(DependencyResolveStatus.Resolved, mod.DependencyResolveStatus);
 
@@ -206,11 +193,11 @@ public abstract class ModBaseTest : PlayableModContainerTest
     public void ResolveDependencies_Faulted_DoesNotRaiseEvent()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var depLoc = FileSystem.DirectoryInfo.New(Game.GetModDirectory("B", ws, ServiceProvider));
-        var dep = Game.InstallMod(depLoc, ws, new ModinfoData("B") { Version = new SemVersion(1) }, ServiceProvider);
+        var depLoc = GameInstallation.GetModDirectory("B", ws);
+        var dep = GameInstallation.InstallMod(new ModinfoData("B") { Version = new SemVersion(1) }, depLoc, ws).Mod;
         Game.AddMod(dep);
 
-        var mod = CreateMod("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2))));
+        var mod = CreateAndAddModInstallation("Mod", deps: new ModReference(dep.Identifier, dep.Type, SemVersionRange.AtLeast(new SemVersion(2)))).Mod;
 
         var depsResolvedRaised = false;
         mod.DependenciesResolved += (_, _) =>
@@ -243,16 +230,16 @@ public abstract class ModBaseTest : PlayableModContainerTest
     [Fact]
     public void EqualsHashCode()
     {
-        var dep = CreateOtherMod("B");
-        var mod = CreateMod("A");
-        var samish = CreateMod("A");
-        var otherA = CreateMod("A", deps: dep);
+        var dep = GameInstallation.InstallAndAddMod("B").Mod;
+        var mod = CreateAndAddModInstallation("A").Mod;
+        var samish = CreateAndAddModInstallation("A").Mod;
+        var otherA = CreateAndAddModInstallation("A", deps: dep).Mod;
 
         ModBase custom = mod.ModInfo is not null 
             ? new CustomMod(Game, mod.Identifier, mod.Type, mod.ModInfo, ServiceProvider) 
             : new CustomMod(Game, mod.Identifier, mod.Type, mod.Name, ServiceProvider);
 
-        Assert.False(mod.Equals(null));
+        Assert.False(mod.Equals(null!));
         Assert.False(mod.Equals((object)null!));
         Assert.False(mod.Equals((IModIdentity)null!));
         Assert.False(mod.Equals((IModReference)null!));
@@ -281,12 +268,12 @@ public abstract class ModBaseTest : PlayableModContainerTest
         Assert.True(mod.Equals((IModReference)custom));
     }
 
-    public class ModBaseAbstractTest : CommonTestBaseWithRandomGame
+    public class ModBaseAbstractTest : GameInfrastructureTestBaseWithRandomGame
     {
         [Fact]
         public void ResolveDependencies_CalledTwice_Throws()
         {
-            var dep = CreateAndAddMod("Dep");
+            var dep = GameInstallation.InstallAndAddMod("Dep").Mod;
             var modinfo = new ModinfoData("CustomMod")
             {
                 Dependencies = new DependencyList(new List<IModReference> { dep }, DependencyResolveLayout.FullResolved)

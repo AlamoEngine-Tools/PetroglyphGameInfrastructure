@@ -1,25 +1,22 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO.Abstractions;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using PG.StarWarsGame.Infrastructure.Clients;
+﻿using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using System;
+using System.Diagnostics;
+using System.IO.Abstractions;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Testably.Abstractions;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Processes;
 
-public class GameProcessLauncherTest : CommonTestBaseWithRandomGame, IDisposable
+public class GameProcessLauncherTest : GameInfrastructureTestBaseWithRandomGame, IDisposable
 {
     private readonly GameProcessLauncher _launcher;
     private readonly IFileInfo _executable;
-
-    // We need to use the real FS here, cause Process.Start uses it too.
-    private readonly IFileSystem _realFileSystem = new RealFileSystem();
 
     private GameProcess? _gameProcess;
 
@@ -27,20 +24,27 @@ public class GameProcessLauncherTest : CommonTestBaseWithRandomGame, IDisposable
     {
         _launcher = new GameProcessLauncher(ServiceProvider);
 
-        var tempDir = _realFileSystem.Path.Combine(_realFileSystem.Path.GetTempPath(), "GameProcessLauncherTest");
-        _realFileSystem.Directory.CreateDirectory(tempDir);
+        var tempDir = FileSystem.Path.Combine(FileSystem.Path.GetTempPath(), "GameProcessLauncherTest");
+        FileSystem.Directory.CreateDirectory(tempDir);
 
         var executableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "TestExecutable.bat" : "TestExecutable.sh";
-        _executable = _realFileSystem.FileInfo.New(_realFileSystem.Path.Combine(tempDir, executableName));
+        _executable = FileSystem.FileInfo.New(FileSystem.Path.Combine(tempDir, executableName));
 
         var scriptContent = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? "@echo off\nexit 0"
+            ? "@echo off\r\n" +
+              "timeout /t 5 /nobreak >nul\r\n" +
+              "exit 0"
             : "#!/bin/bash\nsleep 5\nexit 0";
 
-        _realFileSystem.File.WriteAllText(_executable.FullName,scriptContent);
+        FileSystem.File.WriteAllText(_executable.FullName,scriptContent);
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) 
             Process.Start("chmod", $"+x {_executable.FullName}")!.WaitForExit();
+    }
+
+    protected override IFileSystem CreateFileSystem()
+    {
+        return new RealFileSystem();
     }
 
     [Fact]
@@ -107,7 +111,7 @@ public class GameProcessLauncherTest : CommonTestBaseWithRandomGame, IDisposable
         Assert.Equal(_executable.FullName, internalProcess.StartInfo.FileName);
         Assert.Empty(internalProcess.StartInfo.Arguments);
 
-        await process.WaitForExitAsync();
+        await process.WaitForExitAsync(TestContext.Current.CancellationToken);
         Assert.Equal(GameProcessState.Closed, process.State);
     }
 
@@ -135,9 +139,9 @@ public class GameProcessLauncherTest : CommonTestBaseWithRandomGame, IDisposable
             _gameProcess?.Process.Kill();
             _gameProcess?.Dispose();
 
-            var tempDir = _realFileSystem.Path.GetDirectoryName(_executable.FullName);
-            if (_realFileSystem.Directory.Exists(tempDir))
-                _realFileSystem.Directory.Delete(tempDir, true);
+            var tempDir = FileSystem.Path.GetDirectoryName(_executable.FullName);
+            if (FileSystem.Directory.Exists(tempDir))
+                FileSystem.Directory.Delete(tempDir, true);
         }
         catch
         {

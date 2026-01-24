@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using AET.Modinfo.File;
-using AET.Modinfo.Spec;
 using AET.Modinfo.Utilities;
 using AnakinRaW.CommonUtilities.FileSystem;
 using Microsoft.Extensions.DependencyInjection;
@@ -83,8 +82,7 @@ internal class ModFinder(IServiceProvider serviceProvider) : IModFinder
 
         _logger?.LogTrace("Searching for mods at location '{Location}'", modDirectory.FullName);
 
-        ModinfoFinderCollection modinfoFiles;
-        modinfoFiles = ModinfoFileFinder.FindModinfoFiles(modDirectory);
+        var modinfoFiles = ModinfoFileFinder.FindModinfoFiles(modDirectory);
         
         foreach (var modRef in ModReferenceBuilder.CreateIdentifiers(modinfoFiles, locationKind))
         {

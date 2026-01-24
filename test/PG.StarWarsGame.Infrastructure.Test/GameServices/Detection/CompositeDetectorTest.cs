@@ -10,7 +10,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
-public class CompositeDetectorTest : CommonTestBase
+public class CompositeDetectorTest : GameInfrastructureTestBase
 {
     [Fact]
     public void Ctor_InvalidThrows()
@@ -22,7 +22,7 @@ public class CompositeDetectorTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_InstalledGame_MultipleDetectorsRunInSpecifiedSequence(GameIdentity identity)
     {
         var expectedResult = GameDetectionResult.FromInstalled(identity, FileSystem.DirectoryInfo.New("installed"));
@@ -67,7 +67,7 @@ public class CompositeDetectorTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_InstalledGame_SecondDetectorDoesNotRunBecauseFirstFoundGame(GameIdentity identity)
     {
         var expectedResult = GameDetectionResult.FromInstalled(identity, FileSystem.DirectoryInfo.New("installed"));
@@ -104,7 +104,7 @@ public class CompositeDetectorTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_InstalledGame_ShallNotThrowIfInstalled(GameIdentity identity)
     {
         var expectedResult = GameDetectionResult.FromInstalled(identity, FileSystem.DirectoryInfo.New("installed"));
@@ -123,7 +123,7 @@ public class CompositeDetectorTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_NotInstalledGame_ShallNotThrowEvenIfNotInstalled(GameIdentity identity)
     {
         var expectedResult = GameDetectionResult.NotInstalled(identity.Type);
@@ -142,7 +142,7 @@ public class CompositeDetectorTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_NotInstalledGame_WhenAllDetectorsReturnNull(GameIdentity identity)
     {
         var expectedResult = GameDetectionResult.NotInstalled(identity.Type);
@@ -161,7 +161,7 @@ public class CompositeDetectorTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_ShallThrowAggregateException_TryDetect_ReturnsNotInstalledGame_WhenAllDetectorsThrow(GameIdentity identity)
     {
         var expectedResult = GameDetectionResult.NotInstalled(identity.Type);
@@ -179,7 +179,7 @@ public class CompositeDetectorTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_ShallPropagateRequireInitializationEvent(GameIdentity identity)
     {
         var expectedResult = GameDetectionResult.RequiresInitialization(identity.Type);
@@ -234,7 +234,7 @@ public class CompositeDetectorTest : CommonTestBase
     //}
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_ShallDisposeDetectors(GameIdentity identity)
     {
         var expectedResult = GameDetectionResult.FromInstalled(identity, FileSystem.DirectoryInfo.New("installed"));
@@ -255,11 +255,16 @@ public class CompositeDetectorTest : CommonTestBase
         Assert.True(thirdDetector.IsDisposed);
     }
 
-    private class EmptyDetector : IGameDetector
+    private sealed class EmptyDetector : IGameDetector
     {
         public event EventHandler<GameInitializeRequestEventArgs>? InitializationRequested;
         public GameDetectionResult Detect(GameType gameType, ICollection<GamePlatform> platforms) => throw new NotImplementedException();
         public bool TryDetect(GameType gameType, ICollection<GamePlatform> platforms, out GameDetectionResult result) => throw new NotImplementedException();
+
+        private void OnInitializationRequested(GameInitializeRequestEventArgs e)
+        {
+            InitializationRequested?.Invoke(this, e);
+        }
     }
 
     private delegate GameDetectionResult DetectDelegate(IGameDetector detector, GameType gameType, ICollection<GamePlatform> platforms);

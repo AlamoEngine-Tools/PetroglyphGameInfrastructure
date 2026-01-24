@@ -19,8 +19,11 @@ internal class SteamLibrary : ISteamLibrary
         TrailingDirectorySeparatorBehavior = TrailingDirectorySeparatorBehavior.Trim
     };
 
+    private readonly string _normalizedLocation;
     private readonly ILogger? _logger;
     private readonly ConcurrentDictionary<KnownLibraryLocations, IDirectoryInfo> _locations = new();
+
+    private protected readonly IFileSystem FileSystem;
 
     private readonly Dictionary<KnownLibraryLocations, string[]> _locationsNames = new()
     {
@@ -28,9 +31,6 @@ internal class SteamLibrary : ISteamLibrary
         { KnownLibraryLocations.Common, ["steamapps", "common"] },
         { KnownLibraryLocations.Workshops, ["steamapps", "workshop"] }
     };
-
-    private readonly string _normalizedLocation;
-    private readonly IFileSystem _fileSystem;
 
     public IDirectoryInfo LibraryLocation { get; }
 
@@ -46,9 +46,9 @@ internal class SteamLibrary : ISteamLibrary
             throw new ArgumentNullException(nameof(libraryLocation));
         if (serviceProvider == null) 
             throw new ArgumentNullException(nameof(serviceProvider));
-        _fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+        FileSystem = serviceProvider.GetRequiredService<IFileSystem>();
         _logger = serviceProvider.GetService<ILoggerFactory>()?.CreateLogger(GetType());
-        _normalizedLocation = PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(libraryLocation.FullName), SteamLibraryPathNormalizeOptions);
+        _normalizedLocation = PathNormalizer.Normalize(FileSystem.Path.GetFullPath(libraryLocation.FullName), SteamLibraryPathNormalizeOptions);
         LibraryLocation = libraryLocation;
     }
 
@@ -91,7 +91,7 @@ internal class SteamLibrary : ISteamLibrary
         if (ReferenceEquals(this, other))
             return true;
 
-        var normalizedOtherPath = PathNormalizer.Normalize(_fileSystem.Path.GetFullPath(other.LibraryLocation.FullName), SteamLibraryPathNormalizeOptions);
+        var normalizedOtherPath = PathNormalizer.Normalize(FileSystem.Path.GetFullPath(other.LibraryLocation.FullName), SteamLibraryPathNormalizeOptions);
         return _normalizedLocation.Equals(normalizedOtherPath);
     }
 

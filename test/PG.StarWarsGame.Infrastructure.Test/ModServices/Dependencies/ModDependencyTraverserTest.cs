@@ -1,16 +1,14 @@
 ﻿using System;
 using AET.Modinfo.Spec;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
-using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices.Dependencies;
 
-public class ModDependencyTraverserTest : CommonTestBaseWithRandomGame
+public class ModDependencyTraverserTest : GameInfrastructureTestBaseWithRandomGame
 {
     private readonly ModDependencyTraverser _traverser;
 
@@ -21,6 +19,7 @@ public class ModDependencyTraverserTest : CommonTestBaseWithRandomGame
         _traverser = new ModDependencyTraverser(ServiceProvider);
     }
 
+
     [Theory]
     [MemberData(nameof(ModTestScenarios.ValidScenarios), MemberType = typeof(ModTestScenarios))]
     public void Traverse_ValidScenarios(ModTestScenarios.TestScenario testScenario)
@@ -28,8 +27,8 @@ public class ModDependencyTraverserTest : CommonTestBaseWithRandomGame
 
         var scenario = ModTestScenarios.CreateTestScenario(
             testScenario,
-            CreateAndAddMod,
-            CreateAndAddMod);
+            (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod,
+            (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod);
 
         var mod = scenario.Mod;
         mod.ResolveDependencies();
@@ -38,14 +37,14 @@ public class ModDependencyTraverserTest : CommonTestBaseWithRandomGame
 
         Assert.Equal(scenario.ExpectedTraversedList, traversedList);
     }
-    
+
     [Fact]
     public void Traverse_FaultedResolvedMod_Throws()
     {
         // Do not add to provoke faulted
-        var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        var dep = GameInstallation.InstallMod("B").Mod;
 
-        var mod = CreateAndAddMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), dep);
+        var mod = InstallAndAddModWithDependencies("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
 
         try
         {
@@ -64,8 +63,8 @@ public class ModDependencyTraverserTest : CommonTestBaseWithRandomGame
     public void Traverse_NotResolvedMod_Throws()
     {
         // Do not add to provoke faulted
-        var dep = Game.InstallMod("B", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-        var mod = CreateAndAddMod("Mod", TestHelpers.GetRandomEnum<DependencyResolveLayout>(), dep);
+        var dep = GameInstallation.InstallMod("B").Mod;
+        var mod = InstallAndAddModWithDependencies("Mod", Random.Enum<DependencyResolveLayout>(), dep).Mod;
         
         Assert.Equal(DependencyResolveStatus.None, mod.DependencyResolveStatus);
         Assert.Throws<InvalidOperationException>(() => _traverser.Traverse(mod));

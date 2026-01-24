@@ -1,47 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using AET.Modinfo.Spec;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using PG.TestingUtilities;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class PetroglyphStarWarsGameTest : PlayableModContainerTest
 {
-    private PetroglyphStarWarsGame CreateGame(
-        string? iconPath = null,
-        ICollection<ILanguageInfo>? languages = null)
+    private ITestingGameInstallation CreateGameInstallation(string? iconPath = null, ICollection<ILanguageInfo>? languages = null)
     {
-        var gameId = new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), TestHelpers.GetRandom(GITestUtilities.RealPlatforms));
-        var game =  FileSystem.InstallGame(gameId, ServiceProvider);
+        var gameId = new GameIdentity(Random.Enum<GameType>(), Random.Item(GITestUtilities.RealPlatforms));
+        var gameInstallation = GetOrCreateGameInstallation(gameId);
+
         if (languages is not null)
         {
             foreach (var languageInfo in languages)
-                game.InstallLanguage(languageInfo);
+                gameInstallation.InstallLanguage(languageInfo);
         }
 
         if (iconPath is not null)
         {
-            iconPath = game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
-            FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, iconPath));
+            iconPath = gameInstallation.Game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
+            FileSystem.File.Create(FileSystem.Path.Combine(gameInstallation.Game.Directory.FullName, iconPath));
         }
 
-        return game;
+        return gameInstallation;
     }
 
-    protected override IPlayableObject CreatePlayableObject(
-        string? iconPath = null,
+    protected override ITestingPlayableObjectInstallation CreatePlayableObjectInstallation(
+        string? iconPath = null, 
         ICollection<ILanguageInfo>? languages = null)
     {
-        return CreateGame(iconPath, languages);
+        return CreateGameInstallation(iconPath, languages);
     }
 
-    protected override PlayableModContainer CreateModContainer()
+    protected override ITestingModContainerInstallation CreateModContainerInstallation()
     {
-        return CreateGame();
+        return CreateGameInstallation();
     }
 
     [Fact]
@@ -67,11 +67,11 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
         var focSteamId = new GameIdentity(GameType.Foc, GamePlatform.SteamGold);
         var eawDiskId = new GameIdentity(GameType.Eaw, GamePlatform.Disk);
 
-        var eawSteam = FileSystem.InstallGame(eawSteamId, ServiceProvider);
-        var focSteam = FileSystem.InstallGame(focSteamId, ServiceProvider);
-        var eawDisc = FileSystem.InstallGame(eawDiskId, ServiceProvider);
+        var eawSteam = GameInfrastructureTesting.Game(eawSteamId, ServiceProvider).Game;
+        var focSteam = GameInfrastructureTesting.Game(focSteamId, ServiceProvider).Game;
+        var eawDisc = GameInfrastructureTesting.Game(eawDiskId, ServiceProvider).Game;
 
-        Assert.False(eawSteam.Equals(null));
+        Assert.False(eawSteam.Equals(null!));
         Assert.False(eawSteam.Equals((object)null!));
         Assert.False(eawSteam.Equals(new object()));
 
@@ -101,10 +101,10 @@ public class PetroglyphStarWarsGameTest : PlayableModContainerTest
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetModDirTest(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         var dataLocation = game.ModsLocation;
         Assert.Equal(FileSystem.Path.GetFullPath(FileSystem.Path.Combine(game.Directory.FullName, "Mods")), dataLocation.FullName);
     }

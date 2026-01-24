@@ -1,5 +1,6 @@
-﻿using PG.StarWarsGame.Infrastructure.Clients.Arguments;
-using PG.TestingUtilities;
+﻿using System;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
+using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
@@ -52,7 +53,7 @@ public class GameArgumentTest : GameArgumentTestBase
     }
 
     public class ValidatingTestArgument(bool isValueValid, string value)
-        : GameArgument(TestHelpers.GetRandom(GameArgumentNames.AllInternalSupportedArgumentNames), value)
+        : GameArgument(Random.Item(GameArgumentNames.AllInternalSupportedArgumentNames), value)
     {
         private protected override bool IsDataValid()
         {

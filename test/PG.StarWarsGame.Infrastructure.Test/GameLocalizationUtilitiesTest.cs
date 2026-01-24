@@ -9,7 +9,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
-public class GameLocalizationUtilitiesTest : CommonTestBaseWithRandomGame
+public class GameLocalizationUtilitiesTest : GameInfrastructureTestBaseWithRandomGame
 {
     [Fact]
     public void ArgumentNull_Throws()

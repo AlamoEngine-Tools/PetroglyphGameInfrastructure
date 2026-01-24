@@ -74,6 +74,12 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
         }
     }
 
+    public IRegistryKey? OpenSteamRegistryKey()
+    {
+        ThrowIfDisposed();
+        return _registryKey!.OpenSubKey(string.Empty, true);
+    }
+
     protected override void DisposeResources()
     {
         _registryKey?.Dispose();
@@ -94,11 +100,5 @@ internal sealed class WindowsSteamRegistry(IServiceProvider serviceProvider) : D
         using var subKey = _registryKey?.CreateSubKey(subKeyName);
         if (subKey is not null)
             keyAction(subKey);
-    }
-
-    internal IRegistryKey GetSteamRegistryKey()
-    {
-        ThrowIfDisposed();
-        return _registryKey!.OpenSubKey(string.Empty, true)!;
     }
 }

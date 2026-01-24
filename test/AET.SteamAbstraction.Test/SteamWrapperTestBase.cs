@@ -1,53 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Abstractions;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using AET.SteamAbstraction.Library;
-using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Testing;
-using AET.SteamAbstraction.Testing.Installation;
+using AET.SteamAbstraction.Testing.TestBases;
 using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using PG.TestingUtilities;
-using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace AET.SteamAbstraction.Test;
 
-public abstract class SteamWrapperTestBase : IDisposable
+[SupportedOSPlatform("windows")]
+public abstract class SteamWrapperTestBase : InMemorySteamTestBase
 {
     private readonly ISteamWrapperFactory _wrapperFactory;
 
-    protected readonly MockFileSystem FileSystem = new();
-    protected readonly IServiceProvider ServiceProvider;
     internal TestProcessHelper? ProcessHelper;
 
     protected SteamWrapperTestBase()
     {
-        var sc = new ServiceCollection();
-        sc.AddSingleton<IFileSystem>(FileSystem);
-        SteamAbstractionLayer.InitializeServices(sc);
-        sc.AddSingleton<IProcessHelper>(sp =>
-        {
-            return ProcessHelper = new TestProcessHelper(sp);
-        });
-        // ReSharper disable once VirtualMemberCallInConstructor
-        BuildServiceCollection(sc);
-        ServiceProvider = sc.BuildServiceProvider();
         _wrapperFactory = ServiceProvider.GetRequiredService<ISteamWrapperFactory>();
     }
 
-    protected virtual void BuildServiceCollection(IServiceCollection serviceCollection)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<TestProcessHelper>(sp =>
+        {
+            return ProcessHelper = new TestProcessHelper(sp);
+        });
+        serviceCollection.AddSingleton<IProcessHelper>(sp => sp.GetRequiredService<TestProcessHelper>());
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        ProcessHelper?.KillCurrent();
     }
 
     protected void InstallSteam()
     {
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        FileSystem.InstallSteam(registry);
+        Steam.Install();
     }
 
     private protected SteamWrapper CreateWrapper()
@@ -69,7 +67,7 @@ public abstract class SteamWrapperTestBase : IDisposable
 
         Assert.Throws<SteamNotFoundException>(() => wrapper.IsGameInstalled(123, out _));
         Assert.Throws<SteamNotFoundException>(wrapper.StartSteam);
-        await Assert.ThrowsAsync<SteamNotFoundException>(() => wrapper.WaitSteamRunningAndLoggedInAsync(TestHelpers.RandomBool(), CancellationToken.None));
+        await Assert.ThrowsAsync<SteamNotFoundException>(() => wrapper.WaitSteamRunningAndLoggedInAsync(Random.Bool(), CancellationToken.None));
 
         // Install Steam
         InstallSteam();
@@ -97,7 +95,7 @@ public abstract class SteamWrapperTestBase : IDisposable
         Assert.Throws<ObjectDisposedException>(() => wrapper.UserWantsOfflineMode);
         Assert.Throws<ObjectDisposedException>(wrapper.StartSteam);
         Assert.Throws<ObjectDisposedException>(() => wrapper.IsGameInstalled(123, out _));
-        await Assert.ThrowsAsync<ObjectDisposedException>(() => wrapper.WaitSteamRunningAndLoggedInAsync(TestHelpers.RandomBool(), CancellationToken.None));
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => wrapper.WaitSteamRunningAndLoggedInAsync(Random.Bool(), CancellationToken.None));
     }
 
     [Fact]
@@ -121,8 +119,7 @@ public abstract class SteamWrapperTestBase : IDisposable
         var wrapper = CreateWrapper();
 
         var expectedPid = new Random().Next(0, int.MaxValue);
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        registry.SetPid(expectedPid);
+        Steam.Registry.SetPid(expectedPid);
 
         Assert.False(wrapper.IsRunning);
         Assert.False(wrapper.IsUserLoggedIn);
@@ -137,11 +134,11 @@ public abstract class SteamWrapperTestBase : IDisposable
 
         Assert.Empty(wrapper.Libraries);
 
-        var expectedLib = FileSystem.InstallDefaultLibrary(ServiceProvider);
+        var expectedLib = Steam.InstallDefaultLibrary();
         var lib = Assert.Single(wrapper.Libraries);
         Assert.Equal(expectedLib, lib);
 
-        var otherExpectedLib = FileSystem.InstallSteamLibrary("externalLib", ServiceProvider);
+        var otherExpectedLib = Steam.InstallLibrary("externalLib");
         Assert.Equal(
             new List<ISteamLibrary>{ expectedLib, otherExpectedLib }.OrderBy(x => x.LibraryLocation.FullName),
             wrapper.Libraries.OrderBy(x => x.LibraryLocation.FullName));
@@ -159,7 +156,7 @@ public abstract class SteamWrapperTestBase : IDisposable
         Assert.Null(game);
 
 
-        var lib = FileSystem.InstallDefaultLibrary(ServiceProvider);
+        var lib = Steam.InstallDefaultLibrary();
         // One Lib with no games
         Assert.False(wrapper.IsGameInstalled(123, out game));
         Assert.Null(game);
@@ -174,8 +171,8 @@ public abstract class SteamWrapperTestBase : IDisposable
         Assert.Null(otherGame);
 
 
-        var otherLib = FileSystem.InstallSteamLibrary("externalLib", ServiceProvider);
-        otherLib.InstallCorruptApp(FileSystem);
+        var otherLib = Steam.InstallLibrary("externalLib");
+        otherLib.InstallCorruptApp();
         var otherExpectedGame = otherLib.InstallGame(456, "OtherGame");
         Assert.True(wrapper.IsGameInstalled(456, out otherGame));
         Assert.NotNull(otherGame);
@@ -211,27 +208,31 @@ public abstract class SteamWrapperTestBase : IDisposable
         InstallSteam();
 
         var wrapper = CreateWrapper();
-        FileSystem.DeleteLoginUsersFile();
+        Steam.DeleteLoginUsersFile();
         Assert.Null(wrapper.UserWantsOfflineMode);
 
-        FileSystem.WriteLoginUsers(new SteamUserLoginMetadata(ulong.MaxValue, false, false));
+        Steam.WriteLoginUsers(new TestingSteamUserLoginMetadata(ulong.MaxValue, mostRecent: false, userWantsOffline: false));
         Assert.False(wrapper.UserWantsOfflineMode);
 
         // Not most recent
-        FileSystem.WriteLoginUsers(new SteamUserLoginMetadata(ulong.MaxValue, false, true));
+        Steam.WriteLoginUsers(new TestingSteamUserLoginMetadata(ulong.MaxValue, false, true));
         Assert.False(wrapper.UserWantsOfflineMode);
 
-        FileSystem.WriteLoginUsers(new SteamUserLoginMetadata(ulong.MaxValue, true, true));
+        Steam.WriteLoginUsers(new TestingSteamUserLoginMetadata(ulong.MaxValue, true, true));
         Assert.True(wrapper.UserWantsOfflineMode);
 
-        FileSystem.WriteLoginUsers(new SteamUserLoginMetadata(ulong.MaxValue, false, true), new SteamUserLoginMetadata(456, true, true));
+        Steam.WriteLoginUsers(
+            new TestingSteamUserLoginMetadata(ulong.MaxValue, false, true),
+            new TestingSteamUserLoginMetadata(456, true, true));
         Assert.True(wrapper.UserWantsOfflineMode);
 
         // Not most recent
-        FileSystem.WriteLoginUsers(new SteamUserLoginMetadata(ulong.MaxValue, false, true), new SteamUserLoginMetadata(456, true, false));
+        Steam.WriteLoginUsers(
+            new TestingSteamUserLoginMetadata(ulong.MaxValue, false, true),
+            new TestingSteamUserLoginMetadata(456, true, userWantsOffline: false));
         Assert.False(wrapper.UserWantsOfflineMode);
 
-        FileSystem.WriteCorruptLoginUsers();
+        Steam.WriteCorruptLoginUsers();
         Assert.Null(wrapper.UserWantsOfflineMode);
     }
 
@@ -266,7 +267,7 @@ public abstract class SteamWrapperTestBase : IDisposable
 
         LoginUser(12345);
 
-        await Assert.ThrowsAsync<SteamException>(async () => await wrapper.WaitSteamRunningAndLoggedInAsync(false));
+        await Assert.ThrowsAsync<SteamException>(async () => await wrapper.WaitSteamRunningAndLoggedInAsync(false, TestContext.Current.CancellationToken));
 
         Assert.Equal(0u, wrapper.GetCurrentUserId());
     }
@@ -280,7 +281,7 @@ public abstract class SteamWrapperTestBase : IDisposable
         FakeStartSteam();
         LoginUser(12345);
 
-        await wrapper.WaitSteamRunningAndLoggedInAsync(false);
+        await wrapper.WaitSteamRunningAndLoggedInAsync(false, TestContext.Current.CancellationToken);
 
         Assert.Equal(12345u, wrapper.GetCurrentUserId());
     }
@@ -291,7 +292,7 @@ public abstract class SteamWrapperTestBase : IDisposable
         InstallSteam();
         var wrapper = CreateWrapper();
 
-        var waitTask = wrapper.WaitSteamRunningAndLoggedInAsync(true);
+        var waitTask = wrapper.WaitSteamRunningAndLoggedInAsync(true, TestContext.Current.CancellationToken);
 
         // Ensure that code had time to proceed to past running check. then wait a little more.
         await wrapper.WaitSteamRunningAsync(CancellationToken.None)
@@ -361,39 +362,27 @@ public abstract class SteamWrapperTestBase : IDisposable
 
     private void StopSteam()
     {
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        registry.SetPid(null);
+        Steam.Registry.SetPid(null);
         ProcessHelper!.SetRunningPid(null);
-    }
-
-    private void FakeStartSteam(int pid)
-    {
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        registry.SetPid(pid);
-        ProcessHelper!.SetRunningPid(pid);
     }
 
     private void FakeStartSteam()
     {
-        FakeStartSteam(new Random().Next(100, 10000));
+        Assert.NotNull(Steam);
+        Steam.FakeStart(new Random().Next(100, 10000));
     }
 
     protected virtual void LogoutUser()
     {
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        registry.SetUserId(0);
-        FileSystem.WriteLoginUsers(null);
+        Assert.NotNull(Steam);
+        Steam.Registry.SetUserId(0);
+        Steam.WriteLoginUsers(null);
     }
 
     protected virtual void LoginUser(uint userId)
     {
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        registry.SetUserId(userId);
-        FileSystem.WriteLoginUsers(new SteamUserLoginMetadata(userId, true, false));
-    }
-
-    public void Dispose()
-    {
-        ProcessHelper?.KillCurrent();
+        Assert.NotNull(Steam);
+        Steam.Registry.SetUserId(userId);
+        Steam.WriteLoginUsers(new TestingSteamUserLoginMetadata(userId, true, userWantsOffline: false));
     }
 }

@@ -38,7 +38,7 @@ public class OnlineModNameResolverTest : ModNameResolverTestBase
 
     [Theory]
     [InlineData("path/1125718579", "z3r0x's mod version 3.5")]
-    [InlineData("path/2508288191", "Empire at War Expanded: Deep Core 3.1")]
+    [InlineData("path/2978074984", "EAWFOC Mod Template")]
     public void ResolveName_Steam_WithoutModinfo_FindNameOnline(string path, string containsExpected)
     {
         var modRef = CreateDetectedModReference(path, ModType.Workshops, null);
@@ -53,7 +53,7 @@ public class OnlineModNameResolverTest : ModNameResolverTestBase
     }
 }
 
-public abstract class ModNameResolverTestBase : CommonTestBase
+public abstract class ModNameResolverTestBase : GameInfrastructureTestBase
 {
     public abstract ModNameResolverBase CreateResolver();
 

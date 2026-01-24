@@ -6,7 +6,8 @@ using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using Semver;
 using Xunit;
 
@@ -23,7 +24,7 @@ public class ModTest : ModBaseTest
 
     private IDirectoryInfo CreateModDirectoryInfo(string name)
     {
-        return FileSystem.DirectoryInfo.New(Game.GetModDirectory(name, _isWorkshop, ServiceProvider));
+        return GameInstallation.GetModDirectory(name, _isWorkshop);
     }
 
     private IModReference CreateModRef(string name)
@@ -32,7 +33,7 @@ public class ModTest : ModBaseTest
         return new ModReference(name, modType);
     }
 
-    private Mod CreatePhysicalMod(
+    private ITestingPhysicalModInstallation CreateAndAddPhysicalModInstallation(
         string name,
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null,
@@ -44,39 +45,39 @@ public class ModTest : ModBaseTest
             Dependencies = new DependencyList(deps, layout)
         };
 
-        var mod = Game.InstallMod(CreateModDirectoryInfo(name), _isWorkshop, modinfo, ServiceProvider);
-        Game.AddMod(mod);
+        var modInstallation = GetOrCreateGameInstallation()
+            .InstallAndAddMod(modinfo, CreateModDirectoryInfo(name), _isWorkshop);
 
         if (languages is not null)
         {
-            foreach (var languageInfo in languages) 
-                mod.InstallLanguage(languageInfo);
+            foreach (var languageInfo in languages)
+                modInstallation.InstallLanguage(languageInfo);
         }
 
         if (iconPath is not null) 
-            FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, iconPath));
+            FileSystem.File.Create(FileSystem.Path.Combine(modInstallation.Mod.Directory.FullName, iconPath));
 
-        return mod;
+        return modInstallation;
     }
 
-    protected override ModBase CreateMod(
+    protected override ITestingModInstallation CreateAndAddModInstallation(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
     {
-        return CreatePhysicalMod(name, layout: layout, deps: deps);
+        return CreateAndAddPhysicalModInstallation(name, layout: layout, deps: deps);
     }
 
-    protected override IPlayableObject CreatePlayableObject(
+    protected override ITestingPlayableObjectInstallation CreatePlayableObjectInstallation(
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null)
     {
-        return CreatePhysicalMod("MyMod", iconPath, languages);
+        return CreateAndAddPhysicalModInstallation("MyMod", iconPath, languages);
     }
 
-    protected override PlayableModContainer CreateModContainer()
+    protected override ITestingModContainerInstallation CreateModContainerInstallation()
     {
-        return CreateMod("MyMod");
+        return CreateAndAddModInstallation("MyMod");
     }
 
     [Fact]
@@ -94,9 +95,9 @@ public class ModTest : ModBaseTest
     public void ValidCtor_Properties_FromName()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var loc = Game.GetModDirectory("Mod", ws, ServiceProvider);
+        var loc = GameInstallation.GetModDirectory("Mod", ws);
 
-        var mod = new Mod(Game, "ModId", FileSystem.DirectoryInfo.New(loc), ws, "Mod", ServiceProvider);
+        var mod = new Mod(Game, "ModId", loc, ws, "Mod", ServiceProvider);
 
         Assert.Same(Game, mod.Game);
         Assert.Equal("Mod", mod.Name);
@@ -119,7 +120,7 @@ public class ModTest : ModBaseTest
     public void ValidCtor_Properties_FromModinfo_WithoutDependencies()
     {
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
-        var loc = Game.GetModDirectory("Mod", ws, ServiceProvider);
+        var loc = GameInstallation.GetModDirectory("Mod", ws);
 
         var modInfo = new ModinfoData("Mod")
         {
@@ -127,7 +128,7 @@ public class ModTest : ModBaseTest
             Version = new SemVersion(1, 0, 0),
             Languages = new List<ILanguageInfo>(),
         };
-        var mod = new Mod(Game, "ModId", FileSystem.DirectoryInfo.New(loc), ws, modInfo, ServiceProvider);
+        var mod = new Mod(Game, "ModId", loc, ws, modInfo, ServiceProvider);
 
         Assert.Same(Game, mod.Game);
         Assert.Equal("Mod", mod.Name);
@@ -150,7 +151,7 @@ public class ModTest : ModBaseTest
     [Fact]
     public void ValidCtor_Properties_FromModinfo_WithDependencies()
     {
-        var dep = CreateOtherMod("dep");
+        var dep = GameInstallation.InstallAndAddMod("dep").Mod;
 
         var ws = GITestUtilities.GetRandomWorkshopFlag(Game);
 
@@ -158,7 +159,7 @@ public class ModTest : ModBaseTest
         {
             Dependencies = new DependencyList(new List<IModReference>{ dep }, DependencyResolveLayout.ResolveLastItem)
         };
-        var mod = Game.InstallAndAddMod(ws, modInfo, ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod(modInfo, ws).Mod;
 
         Assert.Empty(mod.Dependencies);
         Assert.Single(((IModIdentity)mod).Dependencies);
@@ -172,7 +173,7 @@ public class ModTest : ModBaseTest
     [Fact]
     public void ResolveDependencies_NoDependenciesIsNOP()
     {
-        var mod = CreateMod("Mod"); 
+        var mod = CreateAndAddModInstallation("Mod").Mod; 
         // Should not throw or anything else
         mod.ResolveDependencies();
         Assert.Empty(mod.Dependencies);
@@ -185,8 +186,8 @@ public class ModTest : ModBaseTest
     {
         var mod = ModTestScenarios.CreateTestScenarioCycle(
                 testScenario,
-                CreateMod,
-                CreateOtherMod,
+                (name, layout, dependencies) => CreateAndAddModInstallation(name, layout, dependencies).Mod,
+                (name, layout, dependencies) => InstallAndAddModWithDependencies(name, layout, dependencies).Mod,
                 CreateModRef)
             .Mod;
 

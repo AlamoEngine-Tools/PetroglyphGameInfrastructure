@@ -21,7 +21,7 @@ public interface IModGameTypeResolver
     /// <param name="gameTypes">When this method returns <see langword="true"/>, the assured game types will be stored in this variable.</param>
     /// <returns><see langword="true"/> when the game type could be determined; <see langword="false"/> if there is no clear evidence of the actual game type.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="modInformation"/> is <see langword="null"/>.</exception>
-    public bool TryGetGameType(DetectedModReference modInformation, out ReadOnlyFrugalList<GameType> gameTypes);
+    public bool TryGetGameType(DetectedModReference modInformation, out ImmutableFrugalList<GameType> gameTypes);
 
     /// <summary>
     /// Tries to determine the <see cref="GameType"/> from a specified modinfo data.
@@ -32,7 +32,7 @@ public interface IModGameTypeResolver
     /// <param name="modinfo">The modinfo data.</param>
     /// <param name="gameTypes">When this method returns <see langword="true"/>, the assured game types will be stored in this variable.</param>
     /// <returns><see langword="true"/> when the game type could be determined; <see langword="false"/> if there is no clear evidence of the actual game type.</returns>
-    public bool TryGetGameType(IModinfo? modinfo, out ReadOnlyFrugalList<GameType> gameTypes);
+    public bool TryGetGameType(IModinfo? modinfo, out ImmutableFrugalList<GameType> gameTypes);
 
     /// <summary>
     /// Determines whether the specified mod information are definitely not compatible to a game type.

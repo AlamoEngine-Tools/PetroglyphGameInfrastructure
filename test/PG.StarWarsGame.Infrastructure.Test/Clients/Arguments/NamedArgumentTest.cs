@@ -1,7 +1,7 @@
 ﻿using System;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments;
-using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 
@@ -21,8 +21,8 @@ public class NamedArgumentTest : GameArgumentTestBase
     [Fact]
     public void Ctor_SetProperty()
     {
-        var name = TestHelpers.GetRandom(GameArgumentNames.AllInternalSupportedArgumentNames);
-        var isDebug = TestHelpers.RandomBool();
+        var name = Random.Item(GameArgumentNames.AllInternalSupportedArgumentNames);
+        var isDebug = Random.Bool();
         var a = new TestNamedArg(name, "value", isDebug);
 
         Assert.Equal(name, a.Name);

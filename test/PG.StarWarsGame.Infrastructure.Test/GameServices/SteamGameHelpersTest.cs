@@ -1,42 +1,40 @@
 ﻿using System;
 using AnakinRaW.CommonUtilities.FileSystem.Normalization;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
-using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
-public class SteamGameHelpersTest : CommonTestBase
+public class SteamGameHelpersTest : GameInfrastructureTestBase
 {
-    private readonly SteamGameHelpers _service;
+    private readonly SteamGameHelpers _steamGameHelpers;
 
     public SteamGameHelpersTest()
     {
-        _service = new SteamGameHelpers(ServiceProvider);
+        _steamGameHelpers = new SteamGameHelpers(ServiceProvider);
     }
 
     [Fact]
     public void GetWorkshopsLocation_NullArgs_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => _service.GetWorkshopsLocation(null!));
-        Assert.Throws<ArgumentNullException>(() => _service.TryGetWorkshopsLocation(null!, out _));
+        Assert.Throws<ArgumentNullException>(() => _steamGameHelpers.GetWorkshopsLocation(null!));
+        Assert.Throws<ArgumentNullException>(() => _steamGameHelpers.TryGetWorkshopsLocation(null!, out _));
     }
 
     [Fact]
     public void GetWorkshopsLocation_Success()
     {
-        var game = FileSystem.InstallGame(new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), GamePlatform.SteamGold),
-            ServiceProvider);
+        var game = GetOrCreateGameInstallation(new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold)).Game;
 
-        var wsDir = _service.GetWorkshopsLocation(game);
+        var wsDir = _steamGameHelpers.GetWorkshopsLocation(game);
 
         var expectedEnd = PathNormalizer.Normalize("/workshop/content/32470", PathNormalizeOptions.UnifySeparators);
         Assert.EndsWith(expectedEnd, wsDir.FullName);
 
-        Assert.True(_service.TryGetWorkshopsLocation(game, out var directoryInfo));
+        Assert.True(_steamGameHelpers.TryGetWorkshopsLocation(game, out var directoryInfo));
         Assert.EndsWith(expectedEnd, directoryInfo.FullName);
     }
 
@@ -46,11 +44,11 @@ public class SteamGameHelpersTest : CommonTestBase
         var gameDir = FileSystem.DirectoryInfo.New("SteamFakeFame");
         gameDir.Create();
         var game = new PetroglyphStarWarsGame(
-            new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), GamePlatform.SteamGold), gameDir, "Game",
+            new GameIdentity(Random.Enum<GameType>(), GamePlatform.SteamGold), gameDir, "Game",
             ServiceProvider);
 
-        Assert.Throws<GameException>(() => _service.GetWorkshopsLocation(game));
-        Assert.False(_service.TryGetWorkshopsLocation(game, out _));
+        Assert.Throws<GameException>(() => _steamGameHelpers.GetWorkshopsLocation(game));
+        Assert.False(_steamGameHelpers.TryGetWorkshopsLocation(game, out _));
     }
 
     [Theory]
@@ -60,10 +58,9 @@ public class SteamGameHelpersTest : CommonTestBase
     [InlineData(GamePlatform.Origin)]
     public void GetWorkshopsLocation_FailNoSteam(GamePlatform platform)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), platform),
-            ServiceProvider);
-        Assert.Throws<GameException>(() => _service.GetWorkshopsLocation(game));
-        Assert.False(_service.TryGetWorkshopsLocation(game, out _));
+        var game = GetOrCreateGameInstallation(new GameIdentity(Random.Enum<GameType>(), platform)).Game;
+        Assert.Throws<GameException>(() => _steamGameHelpers.GetWorkshopsLocation(game));
+        Assert.False(_steamGameHelpers.TryGetWorkshopsLocation(game, out _));
     }
 
     [Fact]
@@ -73,7 +70,7 @@ public class SteamGameHelpersTest : CommonTestBase
         new Random().NextBytes(buf);
         var steamId = (ulong)BitConverter.ToInt64(buf, 0);
 
-        Assert.True(_service.ToSteamWorkshopsId(steamId.ToString(), out var result));
+        Assert.True(_steamGameHelpers.ToSteamWorkshopsId(steamId.ToString(), out var result));
         Assert.Equal(steamId, result);
 
         Assert.True(SteamGameHelpers.IstValidSteamWorkshopsDir(steamId.ToString(), out result));
@@ -96,7 +93,7 @@ public class SteamGameHelpersTest : CommonTestBase
     [InlineData("1  ")]
     public void ToSteamWorkshopsId_InvalidFormats(string input)
     {
-        Assert.False(_service.ToSteamWorkshopsId(input, out _));
+        Assert.False(_steamGameHelpers.ToSteamWorkshopsId(input, out _));
         Assert.False(SteamGameHelpers.IstValidSteamWorkshopsDir(input, out _));
         Assert.False(SteamGameHelpers.IstValidSteamWorkshopsDir(input));
     }
@@ -104,8 +101,8 @@ public class SteamGameHelpersTest : CommonTestBase
     [Fact]
     public void ToSteamWorkshopsId_InvalidArgs_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => _service.ToSteamWorkshopsId(null!, out _));
-        Assert.Throws<ArgumentException>(() => _service.ToSteamWorkshopsId(string.Empty, out _));
+        Assert.Throws<ArgumentNullException>(() => _steamGameHelpers.ToSteamWorkshopsId(null!, out _));
+        Assert.Throws<ArgumentException>(() => _steamGameHelpers.ToSteamWorkshopsId(string.Empty, out _));
 
         Assert.Throws<ArgumentNullException>(() => SteamGameHelpers.IstValidSteamWorkshopsDir(null!, out _));
         Assert.Throws<ArgumentException>(() => SteamGameHelpers.IstValidSteamWorkshopsDir(string.Empty, out _));
