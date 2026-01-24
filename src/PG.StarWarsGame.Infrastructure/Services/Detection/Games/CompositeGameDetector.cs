@@ -29,7 +29,7 @@ public sealed class CompositeGameDetector : IGameDetector
     /// <param name="sortedDetectors">The sorted list of detectors which shall get used.</param>
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="disposeDetectors">
-    /// When <see langword="true"/>after a detector was used, it will get disposed if it implements <see cref="IDisposable"/>.
+    /// If <see langword="true"/>, a detector that implements <see cref="IDisposable"/> gets disposed after usage.
     /// Default is <see langword="false"/>
     /// </param>
     public CompositeGameDetector(IList<IGameDetector> sortedDetectors, IServiceProvider serviceProvider, bool disposeDetectors = false)
@@ -49,7 +49,10 @@ public sealed class CompositeGameDetector : IGameDetector
     /// <param name="gameType">The game type to detect.</param>
     /// <param name="platforms">Collection of the platforms to search for.</param>
     /// <returns>Data which holds the game's location or error information.</returns>
-    /// <exception cref="AggregateException"></exception>
+    /// <exception cref="AggregateException">
+    /// All exceptions that occurred during an unsuccessful game detection.
+    /// The exception is not thrown when any detector returns an installed game result.
+    /// </exception>
     public GameDetectionResult Detect(GameType gameType, params ICollection<GamePlatform> platforms)
     {
         var errors = new List<Exception>();

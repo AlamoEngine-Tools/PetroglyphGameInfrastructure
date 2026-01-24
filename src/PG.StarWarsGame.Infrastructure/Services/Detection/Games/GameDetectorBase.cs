@@ -151,7 +151,6 @@ public abstract class GameDetectorBase : IGameDetector
     /// </summary>
     /// <param name="gameType">The game type to detect.</param>
     /// <returns>Information about a found game installation.</returns>
-    /// <remarks>This method may throw arbitrary exceptions.</remarks>
     protected abstract GameLocationData FindGameLocation(GameType gameType);
 
     private static bool MatchesOptionsPlatform(ICollection<GamePlatform> platforms, GamePlatform identifiedPlatform)
