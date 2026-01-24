@@ -6,23 +6,39 @@ using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Arguments.GameArguments;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Arguments;
 
-public class GameArgumentsBuilderTest : CommonTestBase
+public sealed class GameArgumentsBuilderTest : GameInfrastructureTestBase
 {
     private readonly MockFileSystem _fileSystem = new();
     private readonly GameArgumentsBuilder _builder = new();
     private readonly IGame _game;
+    private readonly ITestingGameInstallation _gameInstallation;
 
     public GameArgumentsBuilderTest()
     {
-        _game = _fileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
+        _gameInstallation = GetOrCreateGameInstallation(new GameIdentity(GameType.Foc, GamePlatform.SteamGold));
+        _game = _gameInstallation.Game;
+    }
+
+    private IPhysicalMod CreateMod(string name)
+    {
+        return _gameInstallation.InstallMod(name, false).Mod;
+    }
+
+    private (IMod virtualMod, IPhysicalMod dep) CreateVirtualMod()
+    {
+        var dep = CreateMod("dep");
+        var modinfo = new ModinfoData("VirtualMod")
+        {
+            Dependencies = new DependencyList([dep], DependencyResolveLayout.FullResolved)
+        };
+        return (new VirtualMod(_game, modinfo.ToJson(), modinfo, ServiceProvider), dep);
     }
 
     [Fact]
@@ -288,20 +304,5 @@ public class GameArgumentsBuilderTest : CommonTestBase
         Assert.Throws<ObjectDisposedException>(() => _builder.AddMods(new List<IMod>()));
         Assert.Throws<ObjectDisposedException>(() => _builder.Remove(new WindowedArgument()));
         Assert.Throws<ObjectDisposedException>(_builder.Build);
-    }
-
-    private IPhysicalMod CreateMod(string name)
-    {
-        return _game.InstallMod(name, false, ServiceProvider);
-    }
-
-    private (IMod virtualMod, IPhysicalMod dep) CreateVirtualMod()
-    {
-        var dep = _game.InstallMod("dep", false, ServiceProvider);
-        var modinfo = new ModinfoData("VirtualMod")
-        {
-            Dependencies = new DependencyList([dep], DependencyResolveLayout.FullResolved)
-        };
-        return (new VirtualMod(_game, modinfo.ToJson(), modinfo, ServiceProvider), dep);
     }
 }

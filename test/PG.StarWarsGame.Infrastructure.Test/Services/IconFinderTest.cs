@@ -5,15 +5,13 @@ using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Icon;
-using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using PG.StarWarsGame.Infrastructure.Utilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Services;
 
-public class IconFinderTest : CommonTestBaseWithRandomGame
+public class IconFinderTest : GameInfrastructureTestBaseWithRandomGame
 {
     private readonly IconFinder _iconFinder = new();
 
@@ -57,7 +55,7 @@ public class IconFinderTest : CommonTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_NotInstalled()
     {
-        var mod = Game.InstallAndAddMod("Mod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod("Mod").Mod;
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "Data", "icon.ico"));
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "icon.txt"));
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "icon.ic"));
@@ -67,8 +65,7 @@ public class IconFinderTest : CommonTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_Installed()
     {
-        var mod = Game.InstallAndAddMod("Mod", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
-
+        var mod = GameInstallation.InstallAndAddMod("Mod").Mod;
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
 
@@ -87,7 +84,7 @@ public class IconFinderTest : CommonTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_UseIconFromFs_ModinfoIconIsNull()
     {
-        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name"), ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod(new ModinfoData("name")).Mod;
 
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
@@ -107,10 +104,10 @@ public class IconFinderTest : CommonTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_UseIconFromFs_ModinfoIconIsEmpty()
     {
-        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name")
+        var mod = GameInstallation.InstallAndAddMod(new ModinfoData("name")
         {
             Icon = string.Empty
-        }, ServiceProvider);
+        }).Mod;
 
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
@@ -130,10 +127,10 @@ public class IconFinderTest : CommonTestBaseWithRandomGame
     [Fact]
     public void FindIcon_Mod_UseIconFromModinfo()
     {
-        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name")
+        var mod = GameInstallation.InstallAndAddMod(new ModinfoData("name")
         {
             Icon = "icon.ico"
-        }, ServiceProvider);
+        }).Mod;
 
         var icon1 = $"{FileSystem.Path.GetRandomFileName()}.ico";
         var icon2 = $"{FileSystem.Path.GetRandomFileName()}.ico";
@@ -153,7 +150,7 @@ public class IconFinderTest : CommonTestBaseWithRandomGame
         FileSystem.File.Create(FileSystem.Path.Combine(Game.Directory.FullName, "foc.ico"));
         var expectedFileName = Game.Type == GameType.Eaw ? "eaw.ico" : "foc.ico";
 
-        var mod = Game.InstallAndAddMod(GITestUtilities.GetRandomWorkshopFlag(Game), new ModinfoData("name"), ServiceProvider);
+        var mod = GameInstallation.InstallAndAddMod(new ModinfoData("name")).Mod;
 
         FileSystem.File.Create(FileSystem.Path.Combine(mod.Directory.FullName, "Data", "notAnIcon.ico"));
 
@@ -167,7 +164,7 @@ public class IconFinderTest : CommonTestBaseWithRandomGame
     [Fact]
     public void FindIcon_VirtualMod_UseIconFromModinfo()
     {
-        var dep = Game.InstallAndAddMod("dep", false, ServiceProvider);
+        var dep = GameInstallation.InstallAndAddMod("Mod", false).Mod;
         var mod = new VirtualMod(Game, "Mod",
             new ModinfoData("Mod")
             {

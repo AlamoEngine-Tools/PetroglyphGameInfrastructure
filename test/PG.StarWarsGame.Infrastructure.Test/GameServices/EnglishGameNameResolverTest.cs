@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Name;
+using PG.StarWarsGame.Infrastructure.Testing;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
-public class EnglishGameNameResolverTest : CommonTestBase
+public class EnglishGameNameResolverTest : GameInfrastructureTestBase
 {
     public static IEnumerable<object[]> GetCultures()
     {
@@ -25,7 +26,7 @@ public class EnglishGameNameResolverTest : CommonTestBase
     public void ResolveName_IgnoreCulture(CultureInfo culture)
     {
         var resolver = new EnglishGameNameResolver();
-        var id = CreateRandomGameIdentity();
+        var id = GITestUtilities.GetRandomGameIdentity();
         resolver.ResolveName(id, culture);
         var name = resolver.ResolveName(id, CultureInfo.CurrentCulture);
 

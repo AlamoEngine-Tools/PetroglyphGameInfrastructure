@@ -1,51 +1,39 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AssemblyName>AET.SteamAbstraction.TestingUtilities</AssemblyName>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<TargetFrameworks>net10.0</TargetFrameworks>
-		<TargetFrameworks Condition="!$([MSBuild]::IsOsUnixLike())">$(TargetFrameworks);net481</TargetFrameworks>
-		<IsPackable>false</IsPackable>
+		<AssemblyName>AET.SteamAbstraction.Testing</AssemblyName>
+		<TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
+		<IsPackable>true</IsPackable>
 		<IsTestProject>false</IsTestProject>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="C:\Users\Anakin\source\repos\AlamoEngine-Tools\PetroglyphGameInfrastructure\README.md" />
-	</ItemGroup>
+	<PropertyGroup>
+		<Title>AET.SteamAbstraction.Testing</Title>
+		<Description>Provides a testing layer that allowes to virtualize Steam, so that it does not need to be physically installed.</Description>
+		<PackageId>AlamoEngineTools.SteamAbstraction.Testing</PackageId>
+		<PackageTags>alamo,petroglyph,glyphx</PackageTags>
+		<NeutralLanguage>en</NeutralLanguage>
+	</PropertyGroup>
 
+	<PropertyGroup>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<InheritDocEnabled>true</InheritDocEnabled>
+	</PropertyGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+	
 	<ItemGroup>
-		<PackageReference Include="GitHubActionsTestLogger" Version="3.0.1">
+		<PackageReference Include="AnakinRaW.CommonUtilities.Testing" Version="13.0.1" />
+		<PackageReference Include="IsExternalInit" Version="1.0.3" Condition="$(TargetFramework) == 'netstandard2.0'">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
-		<PackageReference Include="Required" Version="1.0.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-		<PackageReference Include="coverlet.collector" Version="6.0.4">
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-		<PackageReference Include="Testably.Abstractions.Testing" Version="5.0.1" />
-		<PackageReference Include="xunit" Version="2.9.3" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Installation\" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\AET.SteamAbstraction\AET.SteamAbstraction.csproj" />
-	  <ProjectReference Include="..\PG.TestingUtilities\PG.TestingUtilities.csproj" />
 	</ItemGroup>
-
 </Project>

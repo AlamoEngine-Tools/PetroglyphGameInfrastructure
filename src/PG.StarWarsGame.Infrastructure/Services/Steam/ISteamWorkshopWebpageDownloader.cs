@@ -6,5 +6,5 @@ namespace PG.StarWarsGame.Infrastructure.Services.Steam;
 
 internal interface ISteamWorkshopWebpageDownloader
 {
-    Task<HtmlDocument?> GetSteamWorkshopsPageHtmlAsync(ulong workshopId, CultureInfo? culture);
+    Task<HtmlDocument> GetSteamWorkshopsPageHtmlAsync(ulong workshopId, CultureInfo? culture);
 }

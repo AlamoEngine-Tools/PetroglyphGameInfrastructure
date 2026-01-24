@@ -6,7 +6,7 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
-public class GameDetectionResultTest : CommonTestBase
+public class GameDetectionResultTest : GameInfrastructureTestBase
 {
     [Fact]
     public void CreateInstance_Throws()

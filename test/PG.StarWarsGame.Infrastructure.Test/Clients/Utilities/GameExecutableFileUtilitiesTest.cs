@@ -4,13 +4,12 @@ using PG.StarWarsGame.Infrastructure.Clients;
 using PG.StarWarsGame.Infrastructure.Clients.Utilities;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Utilities;
 
-public class GameExecutableFileUtilitiesTest : CommonTestBase
+public class GameExecutableFileUtilitiesTest : GameInfrastructureTestBase
 {
     public static IEnumerable<object[]> GetGameExeNamesTestData()
     {
@@ -38,17 +37,17 @@ public class GameExecutableFileUtilitiesTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetExecutableForGame_NullGame_ThrowsArgumentNullException(GameIdentity gameIdentity)
     {
-        FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        GetOrCreateGameInstallation(gameIdentity);
         var buildTypes = new List<GameBuildType> { GameBuildType.Release, GameBuildType.Debug };
         foreach (var buildType in buildTypes) 
             Assert.Throws<ArgumentNullException>(() => GameExecutableFileUtilities.GetExecutableForGame(null!, buildType));
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetExecutableForGame_GameExeFilesNotInstalled_ReturnsNull(GameIdentity gameIdentity)
     {
         var gameDir = FileSystem.DirectoryInfo.New("Game");
@@ -71,11 +70,11 @@ public class GameExecutableFileUtilitiesTest : CommonTestBase
     [MemberData(nameof(GetGameExeNamesTestData))]
     public void GetExecutableForGame_ReturnsFileHandle(GameIdentity gameIdentity, GameBuildType buildType, string expectedName)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
         if (buildType == GameBuildType.Debug)
-            game.InstallDebug();
+            gameInstallation.InstallDebug();
 
-        var exeFile = GameExecutableFileUtilities.GetExecutableForGame(game, buildType);
+        var exeFile = GameExecutableFileUtilities.GetExecutableForGame(gameInstallation.Game, buildType);
         Assert.NotNull(exeFile);
         Assert.Equal(expectedName, exeFile.Name);
     }
@@ -85,7 +84,7 @@ public class GameExecutableFileUtilitiesTest : CommonTestBase
     [InlineData(GameType.Foc)]
     public void GetExecutableForGame_SteamHasReleaseButNotDebugFiles(GameType gameType)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(gameType, GamePlatform.SteamGold), ServiceProvider);
+        var game = GetOrCreateGameInstallation(new GameIdentity(gameType, GamePlatform.SteamGold)).Game;
 
         var releaseExe = GameExecutableFileUtilities.GetExecutableForGame(game, GameBuildType.Release);
         Assert.NotNull(releaseExe);
@@ -95,13 +94,13 @@ public class GameExecutableFileUtilitiesTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void GetExecutableForGame_DebugFilesForOtherThanSteam_ShouldReturnNull(GameIdentity identity)
     {
         if (identity.Platform == GamePlatform.SteamGold)
             return;
 
-        var game = FileSystem.InstallGame(identity, ServiceProvider);
+        var game = GetOrCreateGameInstallation(identity).Game;
         using var _ = FileSystem.File.Create(FileSystem.Path.Combine(game.Directory.FullName, "StarWarsG.exe"));
 
         Assert.Null(GameExecutableFileUtilities.GetExecutableForGame(game, GameBuildType.Debug));

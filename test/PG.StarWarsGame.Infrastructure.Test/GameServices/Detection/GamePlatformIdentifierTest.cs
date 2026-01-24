@@ -1,29 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
-using PG.StarWarsGame.Infrastructure.Games;
+﻿using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection.Platform;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using System;
+using System.Collections.Generic;
+using System.IO.Abstractions;
 using Testably.Abstractions.Testing;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices.Detection;
 
-public class GamePlatformIdentifierTest
+public class GamePlatformIdentifierTest : GameInfrastructureTestBase
 {
-    private readonly MockFileSystem _fileSystem = new();
     private readonly GamePlatformIdentifier _platformIdentifier;
-    private readonly IServiceProvider _serviceProvider;
 
     public GamePlatformIdentifierTest()
     {
-        var sc = new ServiceCollection();
-        sc.AddSingleton<IFileSystem>(_fileSystem);
-        PetroglyphGameInfrastructure.InitializeServices(sc);
-        _serviceProvider = sc.BuildServiceProvider();
-        _platformIdentifier = new GamePlatformIdentifier(_serviceProvider);
+        _platformIdentifier = new GamePlatformIdentifier(ServiceProvider);
     }
 
     [Fact]
@@ -36,20 +29,15 @@ public class GamePlatformIdentifierTest
     }
 
     [Theory]
-    [InlineData(GameType.Eaw)]
-    [InlineData(GameType.Foc)]
-    public void GetGamePlatform_WrongGameInstalledReturnsUndefined(GameType queryGameType)
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
+    public void GetGamePlatform_WrongGameInstalledReturnsUndefined(GameIdentity identity)
     {
-        foreach (var platform in GITestUtilities.RealPlatforms)
-        {
-            var installType = queryGameType == GameType.Foc ? GameType.Eaw : GameType.Foc;
-            var game = _fileSystem.InstallGame(new GameIdentity(installType, platform), _serviceProvider);
-            var gameLocation = game.Directory;
+        var game = GetOrCreateGameInstallation(new GameIdentity(identity.Type.Opposite(), identity.Platform)).Game;
+        var gameLocation = game.Directory;
 
-            var actual = _platformIdentifier.GetGamePlatform(queryGameType, ref gameLocation);
-            Assert.True(GamePlatform.Undefined == actual, $"Expected value to be Undefined for platform {platform}");
-            Assert.Equal(game.Directory.FullName, gameLocation.FullName);
-        }
+        var actual = _platformIdentifier.GetGamePlatform(identity.Type, ref gameLocation);
+        Assert.True(GamePlatform.Undefined == actual, $"Expected value to be Undefined for platform {identity.Platform}");
+        Assert.Equal(game.Directory.FullName, gameLocation.FullName);
     }
 
 
@@ -58,7 +46,7 @@ public class GamePlatformIdentifierTest
     [InlineData(GameType.Foc)]
     public void GetGamePlatform_NoGameInstalledReturnsUndefined(GameType queryGameType)
     {
-        var gameLocation = _fileSystem.DirectoryInfo.New("noGameDir");
+        var gameLocation = FileSystem.DirectoryInfo.New("noGameDir");
         var locRef = gameLocation;
         var actual = _platformIdentifier.GetGamePlatform(queryGameType, ref locRef);
         Assert.Equal(GamePlatform.Undefined, actual);
@@ -68,9 +56,9 @@ public class GamePlatformIdentifierTest
     [Fact]
     public void GetGamePlatform_FocOriginWithSanitization()
     {
-        _fileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.Origin), _serviceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(GameType.Foc, GamePlatform.Origin));
 
-        var locRef = _fileSystem.GetWrongOriginFocRegistryLocation();
+        var locRef = gameInstallation.GetWrongOriginFocRegistryLocation();
         var locStore = locRef;
 
         var actual = _platformIdentifier.GetGamePlatform(GameType.Foc, ref locRef);
@@ -94,9 +82,9 @@ public class GamePlatformIdentifierTest
 
     private void GetGamePlatform_CannotGetPlatform_GameExeNotFound(GameType gameType, string gamePath)
     {
-        _fileSystem.Initialize().WithFile(_fileSystem.Path.Combine(gamePath, "Data", "megafiles.xml"));
+        FileSystem.Initialize().WithFile(FileSystem.Path.Combine(gamePath, "Data", "megafiles.xml"));
 
-        var loc = _fileSystem.DirectoryInfo.New(gamePath);
+        var loc = FileSystem.DirectoryInfo.New(gamePath);
 
         var actual = _platformIdentifier.GetGamePlatform(gameType, ref loc);
         Assert.Equal(GamePlatform.Undefined, actual);
@@ -119,14 +107,14 @@ public class GamePlatformIdentifierTest
     
     private void GetGamePlatform_CannotGetPlatform_DataAndMegafilesXmlNotFound(GameType gameType, string gamePath)
     {
-        _fileSystem.Initialize().WithFile(_fileSystem.Path.Combine(gamePath, PetroglyphStarWarsGameConstants.ForcesOfCorruptionExeFileName));
-        var loc = _fileSystem.DirectoryInfo.New(_fileSystem.Path.Combine(gamePath));
+        FileSystem.Initialize().WithFile(FileSystem.Path.Combine(gamePath, PetroglyphStarWarsGameConstants.ForcesOfCorruptionExeFileName));
+        var loc = FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(gamePath));
 
         var actual = _platformIdentifier.GetGamePlatform(gameType, ref loc);
         Assert.Equal(GamePlatform.Undefined, actual);
         Assert.Equal(loc, loc);
 
-        _fileSystem.Directory.CreateDirectory(_fileSystem.Path.Combine(gamePath, "Data"));
+        FileSystem.Directory.CreateDirectory(FileSystem.Path.Combine(gamePath, "Data"));
         actual = _platformIdentifier.GetGamePlatform(gameType, ref loc);
         Assert.Equal(GamePlatform.Undefined, actual);
         Assert.Equal(loc, loc);

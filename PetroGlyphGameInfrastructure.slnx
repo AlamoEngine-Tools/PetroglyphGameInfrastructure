@@ -6,11 +6,12 @@
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/AET.SteamAbstraction.Test/AET.SteamAbstraction.Test.csproj" />
-    <Project Path="test/AET.SteamAbstraction.Testing/AET.SteamAbstraction.Testing.csproj" />
     <Project Path="test/PG.StarWarsGame.Infrastructure.Clients.Steam.Test/PG.StarWarsGame.Infrastructure.Clients.Steam.Test.csproj" />
     <Project Path="test/PG.StarWarsGame.Infrastructure.Test/PG.StarWarsGame.Infrastructure.Test.csproj" />
+  </Folder>
+  <Folder Name="/testing/">
+    <Project Path="test/AET.SteamAbstraction.Testing/AET.SteamAbstraction.Testing.csproj" />
     <Project Path="test/PG.StarWarsGame.Infrastructure.Testing/PG.StarWarsGame.Infrastructure.Testing.csproj" />
-    <Project Path="test/PG.TestingUtilities/PG.TestingUtilities.csproj" />
   </Folder>
   <Project Path="sampleApp/SampleApplication.csproj" />
 </Solution>

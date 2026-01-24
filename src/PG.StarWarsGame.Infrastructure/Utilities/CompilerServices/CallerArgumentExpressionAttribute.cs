@@ -1,6 +1,8 @@
-﻿#if !NET
+﻿using System;
+
+#if !NET
 #pragma warning disable IDE0130
-namespace System.Runtime.CompilerServices;
+namespace PG.StarWarsGame.Infrastructure.Utilities.CompilerServices;
 #pragma warning restore IDE0130
 
 [AttributeUsage(AttributeTargets.Parameter)]

@@ -6,8 +6,8 @@ using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Games.Registry;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
@@ -27,46 +27,39 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
     protected override bool CanDisableInitRequest => true;
     protected override ICollection<GamePlatform> SupportedPlatforms => GITestUtilities.RealPlatforms;
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        sc.AddSingleton(_registry);
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton(_registry);
     }
 
     protected override IGameDetector CreateDetector(GameDetectorTestInfo<GameRegistryContainer> gameInfo, bool shallHandleInitialization)
     {
         var eawRegistry = gameInfo.DetectorSetupInfo?.EawRegistry 
-                          ?? GameType.Eaw.CreateNonExistingRegistry(ServiceProvider);
+                          ?? GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(GameType.Eaw);
         var focRegistry = gameInfo.DetectorSetupInfo?.FocRegistry 
-                          ?? GameType.Foc.CreateNonExistingRegistry(ServiceProvider);
+                          ?? GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(GameType.Foc);
         return new RegistryGameDetector(eawRegistry, focRegistry, shallHandleInitialization, ServiceProvider);
-    }
-
-    private IGame InstallGame(GameIdentity gameIdentity)
-    {
-        return FileSystem.InstallGame(gameIdentity, ServiceProvider);
     }
 
     protected override GameDetectorTestInfo<GameRegistryContainer> SetupGame(GameIdentity gameIdentity)
     {
-        var game = InstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         var registryContainer = SetupRegistry(game.Type, TestGameRegistrySetupData.Installed(game.Type, game.Directory));
         return new GameDetectorTestInfo<GameRegistryContainer>(game.Type, game.Directory, registryContainer);
     }
 
     protected override GameDetectorTestInfo<GameRegistryContainer> SetupForRequiredInitialization(GameIdentity gameIdentity)
     {
-        var game = InstallGame(gameIdentity);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         var registryContainer = SetupRegistry(game.Type, TestGameRegistrySetupData.Uninitialized(gameIdentity.Type));
         return new GameDetectorTestInfo<GameRegistryContainer>(game.Type, game.Directory, registryContainer);
     }
 
     private GameRegistryContainer SetupRegistry(GameType gameType, TestGameRegistrySetupData registrySetup)
     {
-        var otherGameType = gameType == GameType.Eaw ? GameType.Foc : GameType.Eaw;
-
-        var gameRegistry = registrySetup.Create(ServiceProvider);
-        var defaultRegistry = otherGameType.CreateNonExistingRegistry(ServiceProvider);
+        var gameRegistry = GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(registrySetup);
+        var defaultRegistry = GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(gameType.Opposite());
 
         IGameRegistry eawRegistry;
         IGameRegistry focRegistry;
@@ -90,14 +83,14 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
         if (!shallInitSuccessfully)
             return;
         var registrySetupData = TestGameRegistrySetupData.Installed(info.GameType, info.GameDirectory!);
-        registrySetupData.Create(ServiceProvider);
+        GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(registrySetupData);
     }
 
     [Fact]
     public void TestInvalidArgs_Throws()
     {
-        var eawRegistry = GameType.Eaw.CreateNonExistingRegistry(ServiceProvider);
-        var focRegistry = GameType.Foc.CreateNonExistingRegistry(ServiceProvider);
+        var eawRegistry = GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(GameType.Eaw);
+        var focRegistry = GameInfrastructureTesting.Registry(ServiceProvider).CreateNonExistingRegistry(GameType.Foc);
         Assert.Throws<ArgumentNullException>(() => new RegistryGameDetector(null!, focRegistry, false, ServiceProvider));
         Assert.Throws<ArgumentNullException>(() => new RegistryGameDetector(eawRegistry, null!, false, ServiceProvider));
         Assert.Throws<ArgumentNullException>(() => new RegistryGameDetector(eawRegistry, focRegistry, false, null!));
@@ -106,7 +99,7 @@ public class RegistryGameDetectorTest : GameDetectorTestBase<GameRegistryContain
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Dispose_ShallDisposeRegistries(GameIdentity identity)
     {
         var info = SetupGame(identity);

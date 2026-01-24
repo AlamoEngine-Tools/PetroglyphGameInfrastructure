@@ -1,11 +1,7 @@
 ﻿#if Windows // TODO: Enable for linux
 
-using System;
-using System.Collections.Generic;
 using AET.SteamAbstraction;
-using AET.SteamAbstraction.Registry;
 using AET.SteamAbstraction.Testing;
-using AET.SteamAbstraction.Testing.Installation;
 using AET.SteamAbstraction.Utilities;
 using AnakinRaW.CommonUtilities.Registry;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,57 +9,68 @@ using PG.StarWarsGame.Infrastructure.Clients.Arguments;
 using PG.StarWarsGame.Infrastructure.Clients.Processes;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Test.Clients;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
+using PG.StarWarsGame.Infrastructure.Testing;
+using System;
+using System.Collections.Generic;
+using System.Runtime.Versioning;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Xunit;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 namespace PG.StarWarsGame.Infrastructure.Clients.Steam.Test;
 
+[SupportedOSPlatform("windows")]
 public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClientTest
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
-    private readonly PetroglyphStarWarsGame _game;
-    private TestProcessHelper? _processHelper;
+
+    private ISteamFakeProcess? _steamProcess;
+    private ITestingGameInstallation? _gameInstallation;
 
     protected override ICollection<GamePlatform> SupportedPlatforms { get; } = [GamePlatform.SteamGold];
+
+    protected override ITestingGameInstallation GetOrCreateGameInstallation(IGameIdentity? identity = null)
+    {
+        if (_gameInstallation is not null)
+            return _gameInstallation;
+        var type = identity?.Type ?? Random.Enum<GameType>();
+        var steamIdentity = new GameIdentity(type, GamePlatform.SteamGold);
+        return _gameInstallation = GameInfrastructureTesting.Game(steamIdentity, ServiceProvider);
+    }
 
     protected override void BeforePlay()
     {
         // Install Steam (regardless whether the identity is supported)
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        FileSystem.InstallSteam(registry);
-        FakeStartSteam(12345);
+        var steam = SteamTesting.Steam(ServiceProvider);
+        steam.Install();
+        _steamProcess = steam.FakeStart(12345);
         base.BeforePlay();
     }
 
-    public SteamPetroglyphStarWarsGameClientTest()
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        _game = FileSystem.InstallGame(new GameIdentity(GameType.Foc, GamePlatform.SteamGold), ServiceProvider);
-    }
+        serviceCollection.AddSingleton(_registry);
+        base.SetupServices(serviceCollection);
+        SteamAbstractionLayer.InitializeServices(serviceCollection);
+        SteamPetroglyphStarWarsGameClients.InitializeServices(serviceCollection);
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
-    {
-        sc.AddSingleton(_registry);
-        base.SetupServiceProvider(sc);
-        SteamAbstractionLayer.InitializeServices(sc);
-        SteamPetroglyphStarWarsGameClients.InitializeServices(sc);
-
-        sc.AddSingleton<IProcessHelper>(sp =>
-        {
-            return _processHelper = new TestProcessHelper(sp);
-        });
+        serviceCollection.AddSingleton<TestProcessHelper>(sp => new TestProcessHelper(sp));
+        serviceCollection.AddSingleton<IProcessHelper>(sp => sp.GetRequiredService<TestProcessHelper>());
+        
     }
 
     [Fact]
     public void Ctor_SteamClient_NullArgs_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameClient(null!, ServiceProvider));
-        Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameClient(_game, null!));
+        Assert.Throws<ArgumentNullException>(() => new SteamPetroglyphStarWarsGameClient(GetOrCreateGameInstallation().Game, null!));
     }
 
     [Fact]
     public void SteamPetroglyphStarWarsGameClient_Lifecycle()
     {
-        var client = new SteamPetroglyphStarWarsGameClient(_game, ServiceProvider);
+        var client = new SteamPetroglyphStarWarsGameClient(GetOrCreateGameInstallation().Game, ServiceProvider);
         Assert.NotNull(client.SteamWrapper);
 
         client.Dispose();
@@ -72,50 +79,43 @@ public class SteamPetroglyphStarWarsGameClientTest : PetroglyphStarWarsGameClien
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Ctor_NonSteamGameThrows(GameIdentity identity)
     {
         if (identity.Platform is GamePlatform.SteamGold)
             return;
-        var game = FileSystem.InstallGame(identity, ServiceProvider);
-        Assert.Throws<ArgumentException>(() => new SteamPetroglyphStarWarsGameClient(game, ServiceProvider));
+        var otherGame = GameInfrastructureTesting.Game(identity, ServiceProvider).Game;
+        Assert.Throws<ArgumentException>(() => new SteamPetroglyphStarWarsGameClient(otherGame, ServiceProvider));
     }
 
     [Fact]
     public void Play_SteamNotInstalled_Throws()
     {
-        var client = new SteamPetroglyphStarWarsGameClient(_game, ServiceProvider);
+        var game = GetOrCreateGameInstallation().Game;
+        var client = new SteamPetroglyphStarWarsGameClient(game, ServiceProvider);
         Assert.Throws<GameStartException>(client.Play);
 
-        var expected = new GameProcessInfo(_game, GameBuildType.Release, ArgumentCollection.Empty);
+        var expected = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
 
-        TestPlay(_game, expected, gameClient => gameClient.Play(), shallThrowGameStartException: true);
+        TestPlay(game, expected, gameClient => gameClient.Play(), shallThrowGameStartException: true);
     }
 
     [Fact]
     public void Play_SteamNotRunning_Throws()
     {
         // Install Steam (regardless whether the identity is supported)
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        FileSystem.InstallSteam(registry);
+        SteamTesting.Steam(ServiceProvider).Install();
 
-        var expected = new GameProcessInfo(_game, GameBuildType.Release, ArgumentCollection.Empty);
+        var game = GetOrCreateGameInstallation().Game;
+        var expected = new GameProcessInfo(game, GameBuildType.Release, ArgumentCollection.Empty);
 
-        TestPlay(_game, expected, gameClient => gameClient.Play(), shallThrowGameStartException: true);
-    }
-
-
-    private void FakeStartSteam(int pid)
-    {
-        var registry = ServiceProvider.GetRequiredService<ISteamRegistryFactory>().CreateRegistry();
-        registry.SetPid(pid);
-        _processHelper!.SetRunningPid(pid);
+        TestPlay(game, expected, gameClient => gameClient.Play(), shallThrowGameStartException: true);
     }
 
     public override void Dispose()
     {
         base.Dispose();
-        _processHelper?.KillCurrent();
+        _steamProcess?.Kill();
     }
 }
 

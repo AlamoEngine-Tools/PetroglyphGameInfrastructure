@@ -7,22 +7,21 @@ using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Modinfo.Spec.Steam;
 using AET.Modinfo.Utilities;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
-using PG.TestingUtilities;
 using Semver;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
-public class ModFinderTest : CommonTestBase
+public class ModFinderTest : GameInfrastructureTestBase
 {
     private readonly ModFinder _modFinder;
     private readonly ISteamGameHelpers _steamGameHelpers;
@@ -38,25 +37,24 @@ public class ModFinderTest : CommonTestBase
     {
         Assert.Throws<ArgumentNullException>(() => _modFinder.FindMods(null!));
         Assert.Throws<ArgumentNullException>(() => _modFinder.FindMods(null!, FileSystem.Directory.CreateDirectory("path")));
-        var game = FileSystem.InstallGame(CreateRandomGameIdentity(), ServiceProvider);
-        Assert.Throws<ArgumentNullException>(() => _modFinder.FindMods(game, null!));
+        Assert.Throws<ArgumentNullException>(() => _modFinder.FindMods(GetOrCreateGameInstallation().Game, null!));
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_GameNotExists_Throws(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         game.Directory.Delete(true);
         Assert.Throws<GameException>(() => _modFinder.FindMods(game));
         Assert.Throws<GameException>(() => _modFinder.FindMods(game, FileSystem.DirectoryInfo.New("path")));
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_NoModsDirectory_ShouldNotFindMods(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         game.ModsLocation.Delete(true);
 
         if (game.Platform is GamePlatform.SteamGold)
@@ -73,10 +71,10 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_EmptyModsDirectory_ShouldNotFindMods(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var game = GetOrCreateGameInstallation(gameIdentity).Game;
         game.ModsLocation.Create();
 
         if (game.Platform is GamePlatform.SteamGold)
@@ -90,11 +88,13 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_OneMod_WithoutModinfo(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
-        var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
+
+        var expectedMod = gameInstallation.InstallMod("MyMod").Mod;
 
         var installedMods = _modFinder.FindMods(game);
         AssertSingleFoundMod(installedMods, expectedMod, expectedMod.Directory.Name, null);
@@ -104,13 +104,15 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_OneMod_WithInvalidModinfo(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
 
-        var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
-        expectedMod.InstallInvalidModinfoFile();
+        var expectedModInstallation = gameInstallation.InstallMod("MyMod");
+        expectedModInstallation.InstallInvalidModinfoFile();
+        var expectedMod = expectedModInstallation.Mod;
 
         var installedMods = _modFinder.FindMods(game);
         AssertSingleFoundMod(installedMods, expectedMod, expectedMod.Directory.Name, null);
@@ -120,16 +122,18 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_OneMod_WithOneInvalidModinfoVariant(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
 
-        var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var expectedModInstallation = gameInstallation.InstallMod("MyMod");
         var expectedModinfo = new ModinfoData("Variant1");
+        var expectedMod = expectedModInstallation.Mod;
 
-        expectedMod.InstallModinfoFile(expectedModinfo, "variant1");
-        expectedMod.InstallInvalidModinfoFile("variant2");
+        expectedModInstallation.InstallModinfoFile(expectedModinfo, "variant1");
+        expectedModInstallation.InstallInvalidModinfoFile("variant2");
 
         var installedMods = _modFinder.FindMods(game);
         AssertSingleFoundMod(installedMods, expectedMod, $"{expectedMod.Directory.Name}:Variant1", expectedModinfo);
@@ -139,14 +143,16 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_OneMod_WithMainModinfo(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
 
         var modinfoData = new ModinfoData("MyMod");
-        var expectedMod = game.InstallMod(GITestUtilities.GetRandomWorkshopFlag(game), modinfoData, ServiceProvider);
-        expectedMod.InstallModinfoFile(modinfoData);
+        var expectedModInstallation = gameInstallation.InstallMod(modinfoData);
+        expectedModInstallation.InstallModinfoFile(modinfoData);
+        var expectedMod = expectedModInstallation.Mod;
 
         var installedMods = _modFinder.FindMods(game);
         AssertSingleFoundMod(installedMods, expectedMod, expectedMod.Directory.Name, modinfoData);
@@ -156,16 +162,18 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_WithOnlyManyVariantModinfos(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
 
         var info1 = new ModinfoData("MyName1");
         var info2 = new ModinfoData("MyName2");
-        var expectedMod = game.InstallMod("DirName", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
-        expectedMod.InstallModinfoFile(info1, "variant1");
-        expectedMod.InstallModinfoFile(info2, "variant2");
+        var expectedModInstallation = gameInstallation.InstallMod("DirName");
+        expectedModInstallation.InstallModinfoFile(info1, "variant1");
+        expectedModInstallation.InstallModinfoFile(info2, "variant2");
+        var expectedMod = expectedModInstallation.Mod;
 
         var installedMods = _modFinder.FindMods(game).ToList();
         AssertMultipleModsOfSameLocation(
@@ -189,18 +197,20 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_WithMainAndManyVariantModinfos(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
 
         var main = new ModinfoData("Main");
         var info1 = new ModinfoData("MyName1");
         var info2 = new ModinfoData("MyName2");
-        var expectedMod = game.InstallMod("DirName", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
-        expectedMod.InstallModinfoFile(main);
-        expectedMod.InstallModinfoFile(info1, "variant1");
-        expectedMod.InstallModinfoFile(info2, "variant2");
+        var expectedModInstallation = gameInstallation.InstallMod("DirName");
+        expectedModInstallation.InstallModinfoFile(main);
+        expectedModInstallation.InstallModinfoFile(info1, "variant1");
+        expectedModInstallation.InstallModinfoFile(info2, "variant2");
+        var expectedMod = expectedModInstallation.Mod;
 
         var installedMods = _modFinder.FindMods(game).ToList();
         AssertMultipleModsOfSameLocation(
@@ -222,12 +232,14 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FindAllInstalledMods(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
-        var mod1 = game.InstallMod("Mod1", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
-        var mod2 = game.InstallMod("Mod2", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
+
+        var mod1 = gameInstallation.InstallMod("Mod1").Mod;
+        var mod2 = gameInstallation.InstallMod("Mod2").Mod;
 
         var expectedDirs = new[] {mod1.Directory.FullName, mod2.Directory.FullName};
         var expectedIds = new[] {mod1.Directory.Name, mod2.Directory.Name};
@@ -244,13 +256,15 @@ public class ModFinderTest : CommonTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_Steam_ShouldAddWorkshopsAndMods(GameType type)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
+        var game = gameInstallation.Game;
 
-        var steamMod = game.InstallMod("SteamMod", true, ServiceProvider);
+        var steamMod = gameInstallation.InstallMod("SteamMod", true).Mod;
 
         var modinfo = new ModinfoData("Name");
-        var defaultMod = game.InstallMod(false, modinfo, ServiceProvider);
-        defaultMod.InstallModinfoFile(modinfo);
+        var defaultModInstallation = gameInstallation.InstallMod(modinfo, false);
+        defaultModInstallation.InstallModinfoFile(modinfo);
+        var defaultMod = defaultModInstallation.Mod;
 
 
         var installedMods = _modFinder.FindMods(game).ToList();
@@ -272,52 +286,53 @@ public class ModFinderTest : CommonTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_Steam_ShouldNotContainModOfWrongGame(GameType type)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
-
-        var oppositeGameType = type is GameType.Eaw ? GameType.Foc : GameType.Eaw;
-
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
+        var game = gameInstallation.Game;
+        
         var steamData = new SteamData(
             new Random().Next(0, int.MaxValue).ToString(),
             "path",
-            TestHelpers.GetRandomEnum<SteamWorkshopVisibility>(),
+            Random.Enum<SteamWorkshopVisibility>(),
             "Title",
-            [$"{oppositeGameType.ToString().ToUpper()}"]);
+            [$"{type.Opposite().ToString().ToUpper()}"]);
         var modinfo = new ModinfoData("Name")
         {
             SteamData = steamData
         };
 
         
-        var modOfWrongGameType = game.InstallMod(true, modinfo, ServiceProvider);
+        var modOfWrongGameType = gameInstallation.InstallMod(modinfo, true);
         modOfWrongGameType.InstallModinfoFile(modinfo);
 
         Assert.Empty(_modFinder.FindMods(game));
-        Assert.Empty(_modFinder.FindMods(game, modOfWrongGameType.Directory));
+        Assert.Empty(_modFinder.FindMods(game, modOfWrongGameType.Mod.Directory));
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FromExternal(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
         var modPath = FileSystem.DirectoryInfo.New("external/myMod");
         modPath.Create();
 
-        var mod = game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        var mod = gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false).Mod;
         
         var installedMods = _modFinder.FindMods(game, mod.Directory).ToList();
         AssertSingleFoundMod(installedMods, mod, mod.Directory.FullName, null);
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FromExternal_DirectoryNotFoundShouldSkip(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
         var modPath = FileSystem.DirectoryInfo.New("external/myMod");
         modPath.Create();
 
-        var mod = game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        var mod = gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false).Mod;
         modPath.Delete(true);
 
         var installedMods = _modFinder.FindMods(game, mod.Directory).ToList();
@@ -325,25 +340,26 @@ public class ModFinderTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_FromExternal_WithVariantModinfoLayout(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
         var modPath = FileSystem.DirectoryInfo.New("external/123456"); // Use a number so it may look like a Steam WS ID
         modPath.Create();
 
         var main = new ModinfoData("Main");
         var info1 = new ModinfoData("MyName1");
         var info2 = new ModinfoData("MyName2");
-        var expectedMod = game.InstallMod(modPath, false, main, ServiceProvider);
-        expectedMod.InstallModinfoFile(main);
-        expectedMod.InstallModinfoFile(info1, "variant1");
-        expectedMod.InstallModinfoFile(info2, "variant2");
+        var expectedModInstallation = gameInstallation.InstallMod(main, modPath, false);
+        expectedModInstallation.InstallModinfoFile(main);
+        expectedModInstallation.InstallModinfoFile(info1, "variant1");
+        expectedModInstallation.InstallModinfoFile(info2, "variant2");
 
-        var baseId = expectedMod.Directory.FullName;
+        var baseId = expectedModInstallation.Mod.Directory.FullName;
 
-        var installedMods = _modFinder.FindMods(game, expectedMod.Directory).ToList();
-        AssertMultipleModsOfSameLocation(installedMods, 3, expectedMod.Directory.FullName, ModType.Default, 
+        var installedMods = _modFinder.FindMods(game, expectedModInstallation.Mod.Directory).ToList();
+        AssertMultipleModsOfSameLocation(installedMods, 3, expectedModInstallation.Mod.Directory.FullName, ModType.Default, 
             [$"{baseId}", $"{baseId}:MyName1", $"{baseId}:MyName2"], 
             ["Main", "MyName1", "MyName2"]);
     }
@@ -353,7 +369,8 @@ public class ModFinderTest : CommonTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_FromExternal_InsideSteamWsDirWithNonIdName(GameType type)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
+        var game = gameInstallation.Game;
         var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var steamLocation = steamHelper.GetWorkshopsLocation(game);
         steamLocation.Create();
@@ -361,7 +378,7 @@ public class ModFinderTest : CommonTestBase
         var modPath = FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(steamLocation.FullName, "notASteamID"));
         modPath.Create();
 
-        var expectedMod = game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        var expectedMod = gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false).Mod;
         Assert.Equal(ModType.Default ,expectedMod.Type);
         
         var installedMods = _modFinder.FindMods(game, expectedMod.Directory).ToList();
@@ -373,7 +390,8 @@ public class ModFinderTest : CommonTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_ModInsideSteamWsDirWithNonIdName_ShouldBeSkipped(GameType type)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
+        var game = gameInstallation.Game;
         var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var steamLocation = steamHelper.GetWorkshopsLocation(game);
         steamLocation.Create();
@@ -381,7 +399,7 @@ public class ModFinderTest : CommonTestBase
         var modPath = FileSystem.DirectoryInfo.New(FileSystem.Path.Combine(steamLocation.FullName, "notASteamID"));
         modPath.Create();
 
-        game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false);
 
         var installedMods = _modFinder.FindMods(game).ToList();
         Assert.Empty(installedMods);
@@ -392,12 +410,12 @@ public class ModFinderTest : CommonTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_ModInstalledInWrongGameModsDirectoryShouldBeSkipped(GameType type)
     {
-        var oppositeGameType = type is GameType.Eaw ? GameType.Foc : GameType.Eaw;
-        var game = FileSystem.InstallGame(new GameIdentity(type, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
+        var game = GetOrCreateGameInstallation(new GameIdentity(type, Random.Item(GITestUtilities.RealPlatforms))).Game;
         // Other, random platform to shuffle a bit more.
-        var otherTypeGame = FileSystem.InstallGame(new GameIdentity(oppositeGameType, TestHelpers.GetRandom(GITestUtilities.RealPlatforms)), ServiceProvider);
+        var otherTypeGame = GameInfrastructureTesting
+            .Game(new GameIdentity(type.Opposite(), Random.Item(GITestUtilities.RealPlatforms)), ServiceProvider);
 
-        var wrongMod = otherTypeGame.InstallMod("MyMod", false, ServiceProvider);
+        var wrongMod = otherTypeGame.InstallMod("MyMod", false).Mod;
 
         var installedMods = _modFinder.FindMods(game, wrongMod.Directory).ToList();
         Assert.Empty(installedMods);
@@ -408,7 +426,8 @@ public class ModFinderTest : CommonTestBase
     [InlineData(GameType.Foc)]
     public void FindMods_NoSteamWsDirectoryExistsShouldStillFindExternalMods(GameType type)
     {
-        var game = FileSystem.InstallGame(new GameIdentity(type, GamePlatform.SteamGold), ServiceProvider);
+        var gameInstallation = GetOrCreateGameInstallation(new GameIdentity(type, GamePlatform.SteamGold));
+        var game = gameInstallation.Game;
         var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
         var steamLocation = steamHelper.GetWorkshopsLocation(game);
         steamLocation.Delete(true);
@@ -416,24 +435,25 @@ public class ModFinderTest : CommonTestBase
         var modPath = FileSystem.DirectoryInfo.New("external/MyMod");
         modPath.Create();
 
-        game.InstallMod(modPath, false, new ModinfoData("MyMod"), ServiceProvider);
+        gameInstallation.InstallMod(new ModinfoData("MyMod"), modPath, false);
 
         var installedMods = _modFinder.FindMods(game).ToList();
         Assert.Empty(installedMods);
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void FindMods_InvalidModinfoContentIsSkippedButModIsFound(GameIdentity gameIdentity)
     {
-        var game = FileSystem.InstallGame(gameIdentity, ServiceProvider);
-        var expectedMod = game.InstallMod("MyMod", GITestUtilities.GetRandomWorkshopFlag(game), ServiceProvider);
-        expectedMod.InstallModinfoFile(new CustomModinfo(string.Empty)); // string.Empty is not valid
+        var gameInstallation = GetOrCreateGameInstallation(gameIdentity);
+        var game = gameInstallation.Game;
+        var expectedModInstallation = gameInstallation.InstallMod("MyMod");
+        expectedModInstallation.InstallModinfoFile(new CustomModinfo(string.Empty)); // string.Empty is not valid
 
         var installedMods = _modFinder.FindMods(game);
-        var expectedId = expectedMod.Type == ModType.Workshops ? ((ulong)"MyMod".GetHashCode()).ToString() : "MyMod";
+        var expectedId = expectedModInstallation.Mod.Type == ModType.Workshops ? ((ulong)"MyMod".GetHashCode()).ToString() : "MyMod";
 
-        AssertSingleFoundMod(installedMods, expectedMod, expectedId, null);
+        AssertSingleFoundMod(installedMods, expectedModInstallation.Mod, expectedId, null);
     }
 
     private static void AssertSingleFoundMod(IEnumerable<DetectedModReference> foundMods, IPhysicalMod expectedMod, string expectedId, IModinfo? expectedModinfo)
@@ -450,6 +470,7 @@ public class ModFinderTest : CommonTestBase
         Assert.Equal(expectedId, foundMod.ModReference.Identifier);
     }
 
+    // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
     private static void AssertMultipleModsOfSameLocation(
         ICollection<DetectedModReference> detectedMods,
         int expectedCount,
@@ -470,6 +491,7 @@ public class ModFinderTest : CommonTestBase
 
         Assert.Equivalent(expectedModinfoNames, detectedMods.Select(x => x.Modinfo?.Name), true);
     }
+    // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Local
 
     private class CustomModinfo(string name) : IModinfo
     {
@@ -479,8 +501,9 @@ public class ModFinderTest : CommonTestBase
         }
 
         public string Name { get; } = name;
-        public SemVersion? Version { get; }
-        public IModDependencyList Dependencies { get; } = DependencyList.EmptyDependencyList;
+        public SemVersion? Version => null;
+        public IModDependencyList Dependencies => DependencyList.EmptyDependencyList;
+
         public string ToJson()
         {
             return JsonSerializer.Serialize(this, JsonSerializerOptions.Default);
@@ -491,11 +514,11 @@ public class ModFinderTest : CommonTestBase
             JsonSerializer.Serialize(stream, this, JsonSerializerOptions.Default);
         }
 
-        public string? Summary { get; }
-        public string? Icon { get; }
+        public string? Summary => null;
+        public string? Icon => null;
         public IDictionary<string, object> Custom { get; } = new Dictionary<string, object>();
-        public ISteamData? SteamData { get; }
+        public ISteamData? SteamData => null;
         public IReadOnlyCollection<ILanguageInfo> Languages { get; } = new List<ILanguageInfo>();
-        public bool LanguagesExplicitlySet { get; }
+        public bool LanguagesExplicitlySet => false;
     }
 }

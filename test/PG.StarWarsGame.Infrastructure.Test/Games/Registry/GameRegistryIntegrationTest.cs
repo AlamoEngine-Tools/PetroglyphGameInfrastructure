@@ -2,10 +2,10 @@
 using System.IO.Abstractions;
 using AnakinRaW.CommonUtilities.Registry;
 using AnakinRaW.CommonUtilities.Registry.Windows;
+using AnakinRaW.CommonUtilities.Testing.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Games.Registry;
-using PG.TestingUtilities;
 using Testably.Abstractions.Testing;
 using Xunit;
 

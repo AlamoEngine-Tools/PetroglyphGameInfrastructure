@@ -6,12 +6,12 @@ using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients;
 
-public class GameClientFactoryTest : CommonTestBase
+public class GameClientFactoryTest : GameInfrastructureTestBase
 {
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        PetroglyphGameInfrastructure.InitializeServices(sc);
+        base.SetupServices(serviceCollection);
+        PetroglyphGameInfrastructure.InitializeServices(serviceCollection);
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class GameClientFactoryTest : CommonTestBase
     public void CreateClient_CorrectTypeAndSetsProperty()
     {
         var factory = new GameClientFactory(ServiceProvider);
-        var game = CreateRandomGame();
+        var game = GetOrCreateGameInstallation().Game;
 
         var client = factory.CreateClient(game);
         Assert.IsType<PetroglyphStarWarsGameClient>(client);

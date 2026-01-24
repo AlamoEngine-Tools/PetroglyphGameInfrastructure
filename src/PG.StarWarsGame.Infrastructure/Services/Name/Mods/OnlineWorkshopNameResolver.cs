@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using AET.Modinfo.Spec;
 using AET.Modinfo.Utilities;
+using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
@@ -50,12 +51,21 @@ public sealed class OnlineModNameResolver : ModNameResolverBase
 
     private string? GetNameFromOnline(ulong modId, CultureInfo culture)
     {
-        var modsWorkshopWebpage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(modId, culture)
-            .GetAwaiter().GetResult();
-
-        if (modsWorkshopWebpage == null)
+        HtmlDocument modsWorkshopWebpage;
+        try
         {
-            Logger?.LogTrace("Unable to download website for Steam ID '{ModId}'.", modId);
+            modsWorkshopWebpage = _steamWebpageDownloader.GetSteamWorkshopsPageHtmlAsync(modId, culture)
+                .GetAwaiter().GetResult();
+
+            if (modsWorkshopWebpage == null)
+            {
+                Logger?.LogTrace("Unable to download website for Steam ID '{ModId}'.", modId);
+                return null;
+            }
+        }
+        catch (Exception e)
+        {
+            Logger?.LogTrace(e, "Unable to download website for Steam ID '{ModId}'.", modId);
             return null;
         }
 

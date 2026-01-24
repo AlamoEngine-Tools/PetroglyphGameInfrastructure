@@ -1,5 +1,6 @@
 ﻿using PG.StarWarsGame.Infrastructure.Games;
-using PG.TestingUtilities;
+using System;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
@@ -9,8 +10,8 @@ public class GameIdentityTest
     [Fact]
     public void Ctor()
     {
-        var type = TestHelpers.GetRandomEnum<GameType>();
-        var platform = TestHelpers.GetRandomEnum<GamePlatform>();
+        var type = Random.Enum<GameType>();
+        var platform = Random.Enum<GamePlatform>();
         var id = new GameIdentity(type, platform);
         
         Assert.Equal(type, id.Type);

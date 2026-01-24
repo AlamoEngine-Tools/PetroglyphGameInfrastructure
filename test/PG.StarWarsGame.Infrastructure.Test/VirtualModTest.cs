@@ -6,8 +6,8 @@ using AET.Modinfo.Spec;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Mods;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
-using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Mods;
 using Semver;
 using Xunit;
 
@@ -15,7 +15,7 @@ namespace PG.StarWarsGame.Infrastructure.Test;
 
 public class VirtualModTest : ModBaseTest
 {
-    private VirtualMod CreateVirtualMod(
+    private ITestingVirtualModInstallation CreateVirtualMod(
         string name,
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null,
@@ -25,7 +25,7 @@ public class VirtualModTest : ModBaseTest
         IModDependencyList depList;
         if (deps.Count == 0)
         {
-            var dep = CreateOtherMod("dep", false);
+            var dep = GameInstallation.InstallAndAddMod("dep", false).Mod;
             depList = new DependencyList(new List<IModReference> { dep }, layout);
         }
         else
@@ -40,12 +40,10 @@ public class VirtualModTest : ModBaseTest
             Dependencies = depList
         };
 
-        var mod = new VirtualMod(Game, "VirtualModId", modinfo, ServiceProvider);
-        Game.AddMod(mod);
-        return mod;
+        return GetOrCreateGameInstallation().AddVirtualMod("VirtualModId", modinfo);
     }
 
-    protected override ModBase CreateMod(
+    protected override ITestingModInstallation CreateAndAddModInstallation(
         string name,
         DependencyResolveLayout layout = DependencyResolveLayout.FullResolved, 
         params IList<IModReference> deps)
@@ -53,22 +51,22 @@ public class VirtualModTest : ModBaseTest
         return CreateVirtualMod(name, layout: layout, deps: deps);
     }
 
-    protected override IPlayableObject CreatePlayableObject(
+    protected override ITestingPlayableObjectInstallation CreatePlayableObjectInstallation(
         string? iconPath = null,
         ICollection<ILanguageInfo>? languages = null)
     {
         return CreateVirtualMod("Mod", iconPath, languages);
     }
 
-    protected override PlayableModContainer CreateModContainer()
+    protected override ITestingModContainerInstallation CreateModContainerInstallation()
     {
-        return CreateMod("Mod");
+        return CreateAndAddModInstallation("Mod");
     }
 
     [Fact]
     public void InvalidCtor_ArgumentNull_Throws()
     {
-        Game.InstallAndAddMod("Dep", GITestUtilities.GetRandomWorkshopFlag(Game), ServiceProvider);
+        GameInstallation.InstallAndAddMod("Dep");
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(null!, "VirtualModId", new ModinfoData("Name"), ServiceProvider));
 
         Assert.Throws<ArgumentNullException>(() => new VirtualMod(Game, "VirtualModId", null!, ServiceProvider));
@@ -92,7 +90,7 @@ public class VirtualModTest : ModBaseTest
     [Fact]
     public void Ctor_FromModinfo_Properties()
     {
-        var dep = CreateOtherMod("dep");
+        var dep = GameInstallation.InstallAndAddMod("dep").Mod;
 
         var modinfo = new ModinfoData("VirtualMod")
         {

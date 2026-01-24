@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using AET.Modinfo.Model;
+﻿using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Modinfo.Spec.Equality;
 using AET.Modinfo.Utilities;
@@ -15,38 +11,46 @@ using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Dependencies;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Steam;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Registry;
-using PG.StarWarsGame.Infrastructure.Testing.Mods;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game.Registry;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Semver;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Xunit;
+using PG.StarWarsGame.Infrastructure.Testing.Installations.Game;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
-public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
+public class PetroglyphGameInfrastructureIntegrationTest : GameInfrastructureTestBase
 {
     private readonly IRegistry _registry = new InMemoryRegistry(InMemoryRegistryCreationFlags.WindowsLike);
 
     private const string ExternalModPath = "externalMods/MyExternalMod";
 
-    protected override void SetupServiceProvider(IServiceCollection sc)
+    protected override void SetupServices(IServiceCollection serviceCollection)
     {
-        base.SetupServiceProvider(sc);
-        sc.AddSingleton(_registry);
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton(_registry);
     }
 
     [Theory]
-    [MemberData(nameof(RealPlatforms))]
+    [MemberData(nameof(GITestUtilities.GetRealPlatforms), MemberType = typeof(GITestUtilities))]
     public void FullWorkflow_WithGamesAndMultipleModsWithMultipleModsDependencies(GamePlatform platform)
     {
         // Init Mods uninitialized
 
-        var eaw = FileSystem.InstallGame(new GameIdentity(GameType.Eaw, platform), ServiceProvider);
-        var foc = FileSystem.InstallGame(new GameIdentity(GameType.Foc, platform), ServiceProvider);
+        var eawInstallation = GameInfrastructureTesting.Game(new GameIdentity(GameType.Eaw, platform), ServiceProvider);
+        var focInstallation = GameInfrastructureTesting.Game(new GameIdentity(GameType.Foc, platform), ServiceProvider);
 
-        TestGameRegistrySetupData.Uninitialized(GameType.Eaw).Create(ServiceProvider); 
-        TestGameRegistrySetupData.Uninitialized(GameType.Foc).Create(ServiceProvider);
+        var eaw = eawInstallation.Game;
+        var foc = focInstallation.Game;
+
+        GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(GameType.Eaw));
+        GameInfrastructureTesting.Registry(ServiceProvider).CreateFrom(TestGameRegistrySetupData.Uninitialized(GameType.Foc));
 
         var registryFactory = ServiceProvider.GetRequiredService<IGameRegistryFactory>();
         var eawRegistry = registryFactory.CreateRegistry(GameType.Eaw);
@@ -58,10 +62,8 @@ public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
         var initCount = 0;
         gameDetector.InitializationRequested += (_, args) =>
         {
-            if (args.GameType == GameType.Eaw)
-                TestGameRegistrySetupData.Installed(GameType.Eaw, eaw.Directory).Create(ServiceProvider);
-            else
-                TestGameRegistrySetupData.Installed(GameType.Foc, foc.Directory).Create(ServiceProvider);
+            var game = args.GameType == GameType.Eaw ? eaw : foc;
+            GameInfrastructureTesting.Registry(ServiceProvider).CreateInstalled(game);
             args.Handled = true;
             initCount++;
         };
@@ -80,10 +82,10 @@ public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
         AssertExpectedGame(foc, actualFoc);
 
         // Init Mods
-        CreateExternalMod(actualFoc);
+        CreateExternalMod(focInstallation);
         if (platform == GamePlatform.SteamGold)
-            CreateAndAddSteamScenario(actualFoc);
-        Eaw_CreateModInModsDir(eaw);
+            CreateAndAddSteamScenario(focInstallation);
+        Eaw_CreateModInModsDir(eawInstallation);
 
 
         // Test Mod detection
@@ -216,18 +218,18 @@ public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
         }
     }
 
-    private void CreateAndAddSteamScenario(IGame actualFoc)
+    private void CreateAndAddSteamScenario(ITestingGameInstallation gameInstallation)
     {
-        Assert.Equal(GamePlatform.SteamGold, actualFoc.Platform);
+        var game = gameInstallation.Game;
+        Assert.Equal(GamePlatform.SteamGold, game.Platform);
         var steamHelper = ServiceProvider.GetRequiredService<ISteamGameHelpers>();
 
-        var republicAtWarDir = FileSystem.Path.Combine(steamHelper.GetWorkshopsLocation(actualFoc).FullName, "1129810972"); // This is RaW's Steam ID
-        actualFoc.InstallMod(FileSystem.DirectoryInfo.New(republicAtWarDir), true, new ModinfoData("NOT USED"), ServiceProvider);
+        var republicAtWarDir = FileSystem.Path.Combine(steamHelper.GetWorkshopsLocation(game).FullName, "1129810972"); // This is RaW's Steam ID
+        gameInstallation.InstallMod(new ModinfoData("NOT USED"), FileSystem.DirectoryInfo.New(republicAtWarDir), true);
 
 
-        var rawSubModDir = FileSystem.Path.Combine(steamHelper.GetWorkshopsLocation(actualFoc).FullName, "123456"); // Just some ID
-        var rawSubMod = actualFoc.InstallMod(FileSystem.DirectoryInfo.New(rawSubModDir), true,
-            new ModinfoData("NOT USED"), ServiceProvider);
+        var rawSubModDir = FileSystem.Path.Combine(steamHelper.GetWorkshopsLocation(game).FullName, "123456"); // Just some ID
+        var rawSubModInstallation = gameInstallation.InstallMod(new ModinfoData("NOT USED"), FileSystem.DirectoryInfo.New(rawSubModDir), true);
 
 
         var rawSubModModinfoContent = @"
@@ -251,7 +253,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
         ],
     }
 }";
-        rawSubMod.InstallModinfoFile(ModinfoData.Parse(rawSubModModinfoContent));
+        rawSubModInstallation.InstallModinfoFile(ModinfoData.Parse(rawSubModModinfoContent));
     }
 
     private void AssertModFinderResult(ICollection<DetectedModReference> finderResult,
@@ -271,7 +273,7 @@ public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
         Assert.Equal(expectedDepList, depList);
     }
 
-    private void AssertExpectedGame(PetroglyphStarWarsGame expected, IGame actual)
+    private void AssertExpectedGame(IGame expected, IGame actual)
     {
         Assert.Equal(expected.Directory.FullName, actual.Directory.FullName);
         Assert.Equal(expected.Type, actual.Type);
@@ -287,16 +289,16 @@ public class PetroglyphGameInfrastructureIntegrationTest : CommonTestBase
         assertAction(mod);
     }
 
-    private void CreateExternalMod(IGame game)
+    private void CreateExternalMod(ITestingGameInstallation gameInstallation)
     {
         var modinfo = new ModinfoData("NAME NOT TAKE CAUSE NO MODINFO"); 
-        game.InstallMod(FileSystem.DirectoryInfo.New("externalMods/MyExternalMod"), false, modinfo, ServiceProvider);
+        gameInstallation.InstallMod(modinfo, FileSystem.DirectoryInfo.New("externalMods/MyExternalMod"), false);
     }
 
 
-    private void Eaw_CreateModInModsDir(IGame game)
+    private void Eaw_CreateModInModsDir(ITestingGameInstallation installation)
     {
-        game.InstallMod("In-Mods-Dir", false, ServiceProvider);
+        installation.InstallMod("In-Mods-Dir", false);
     }
 
     private class DetectedModReferenceEqualityComparer : IEqualityComparer<DetectedModReference>

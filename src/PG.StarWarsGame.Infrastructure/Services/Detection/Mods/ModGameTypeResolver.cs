@@ -37,7 +37,7 @@ public abstract class ModGameTypeResolver : IModGameTypeResolver
     }
 
     /// <inheritdoc />
-    public bool TryGetGameType(DetectedModReference modInformation, out ReadOnlyFrugalList<GameType> gameTypes)
+    public bool TryGetGameType(DetectedModReference modInformation, out ImmutableFrugalList<GameType> gameTypes)
     {
         if (modInformation == null)
             throw new ArgumentNullException(nameof(modInformation));
@@ -56,10 +56,10 @@ public abstract class ModGameTypeResolver : IModGameTypeResolver
     /// <param name="modInformation">The information of the mod.</param>
     /// <param name="gameTypes">When this method returns <see langword="true"/>, the assured game types will be stored in this variable.</param>
     /// <returns><see langword="true"/> when the game type could be determined; <see langword="false"/> if there is no clear evidence of the actual game type.</returns>
-    protected internal abstract bool TryGetGameTypeCore(DetectedModReference modInformation, out ReadOnlyFrugalList<GameType> gameTypes);
+    protected internal abstract bool TryGetGameTypeCore(DetectedModReference modInformation, out ImmutableFrugalList<GameType> gameTypes);
 
     /// <inheritdoc />
-    public virtual bool TryGetGameType(IModinfo? modinfo, out ReadOnlyFrugalList<GameType> gameTypes)
+    public virtual bool TryGetGameType(IModinfo? modinfo, out ImmutableFrugalList<GameType> gameTypes)
     {
         return GetGameType(modinfo?.SteamData, out gameTypes);
     }
@@ -82,14 +82,14 @@ public abstract class ModGameTypeResolver : IModGameTypeResolver
         return TryGetGameType(modinfo, out var gameTypes) && !gameTypes.Contains(expectedGameType);
     }
 
-    private bool GetGameType(ISteamData? steamData, out ReadOnlyFrugalList<GameType> gameTypes)
+    private bool GetGameType(ISteamData? steamData, out ImmutableFrugalList<GameType> gameTypes)
     {
         gameTypes = default;
-        Logger?.LogTrace($"Try getting game type from steam data '[{string.Join(",", steamData?.Tags ?? ["tags n/a"])}]'");
+        Logger?.LogTrace("Try getting game type from steam data '[{Tags}]'", string.Join(",", steamData?.Tags ?? ["tags n/a"]));
         return steamData is not null && GetGameTypesFromTags(steamData.Tags, out gameTypes);
     }
 
-    internal static bool GetGameTypesFromTags(IEnumerable<string> tags, out ReadOnlyFrugalList<GameType> gameTypes)
+    internal static bool GetGameTypesFromTags(IEnumerable<string> tags, out ImmutableFrugalList<GameType> gameTypes)
     {
         var mutableGameTypes = new FrugalList<GameType>();
 
@@ -104,7 +104,7 @@ public abstract class ModGameTypeResolver : IModGameTypeResolver
                 mutableGameTypes.Add(GameType.Foc);
         }
 
-        gameTypes = mutableGameTypes.AsReadOnly();
+        gameTypes = mutableGameTypes.ToImmutableList();
         return gameTypes.Count > 0;
     }
 }

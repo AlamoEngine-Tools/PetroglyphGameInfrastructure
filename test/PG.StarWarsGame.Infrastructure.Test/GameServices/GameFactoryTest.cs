@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using AnakinRaW.CommonUtilities.Testing.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
 using PG.StarWarsGame.Infrastructure.Services.Name;
 using PG.StarWarsGame.Infrastructure.Testing;
-using PG.StarWarsGame.Infrastructure.Testing.Game.Installation;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
-using PG.TestingUtilities;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
-public class GameFactoryTest : CommonTestBase
+public class GameFactoryTest : GameInfrastructureTestBase
 {
     private readonly GameFactory _factory;
     private readonly IGameNameResolver _nameResolver;
@@ -36,23 +35,23 @@ public class GameFactoryTest : CommonTestBase
     {
         Assert.Throws<ArgumentNullException>(() => _factory.CreateGame(null!, CultureInfo.CurrentCulture));
         Assert.Throws<ArgumentNullException>(() => _factory.CreateGame(
-            GameDetectionResult.NotInstalled(TestHelpers.GetRandomEnum<GameType>()),
+            GameDetectionResult.NotInstalled(Random.Enum<GameType>()),
             null!));
 
         Assert.Throws<ArgumentNullException>(() => _factory.CreateGame(
             null!,
             FileSystem.DirectoryInfo.New("path"),
-            TestHelpers.RandomBool(),
+            Random.Bool(),
             CultureInfo.CurrentCulture));
         Assert.Throws<ArgumentNullException>(() => _factory.CreateGame(
-            CreateRandomGameIdentity(),
+            GITestUtilities.GetRandomGameIdentity(),
             null!,
-            TestHelpers.RandomBool(),
+            Random.Bool(),
             CultureInfo.CurrentCulture));
         Assert.Throws<ArgumentNullException>(() => _factory.CreateGame(
-            CreateRandomGameIdentity(),
+            GITestUtilities.GetRandomGameIdentity(),
             FileSystem.DirectoryInfo.New("path"),
-            TestHelpers.RandomBool(),
+            Random.Bool(),
             null!));
     }
 
@@ -61,23 +60,23 @@ public class GameFactoryTest : CommonTestBase
     {
         Assert.Throws<ArgumentNullException>(() => _factory.TryCreateGame(null!, CultureInfo.CurrentCulture, out _));
         Assert.Throws<ArgumentNullException>(() => _factory.TryCreateGame(
-            GameDetectionResult.NotInstalled(TestHelpers.GetRandomEnum<GameType>()),
+            GameDetectionResult.NotInstalled(Random.Enum<GameType>()),
             null!, out _));
 
         Assert.Throws<ArgumentNullException>(() => _factory.TryCreateGame(
             null!,
             FileSystem.DirectoryInfo.New("path"),
-            TestHelpers.RandomBool(),
+            Random.Bool(),
             CultureInfo.CurrentCulture, out _));
         Assert.Throws<ArgumentNullException>(() => _factory.TryCreateGame(
-            CreateRandomGameIdentity(),
+            GITestUtilities.GetRandomGameIdentity(),
             null!,
-            TestHelpers.RandomBool(),
+            Random.Bool(),
             CultureInfo.CurrentCulture, out _));
         Assert.Throws<ArgumentNullException>(() => _factory.TryCreateGame(
-            CreateRandomGameIdentity(),
+            GITestUtilities.GetRandomGameIdentity(),
             FileSystem.DirectoryInfo.New("path"),
-            TestHelpers.RandomBool(),
+            Random.Bool(),
             null!, out _));
     }
 
@@ -85,20 +84,20 @@ public class GameFactoryTest : CommonTestBase
     public void CreateGame_NoGameInstalled_Throws()
     {
         Assert.Throws<GameException>(() =>
-            _factory.CreateGame(GameDetectionResult.NotInstalled(TestHelpers.GetRandomEnum<GameType>()),
+            _factory.CreateGame(GameDetectionResult.NotInstalled(Random.Enum<GameType>()),
                 CultureInfo.CurrentCulture));
         Assert.Throws<GameException>(() =>
-            _factory.CreateGame(GameDetectionResult.RequiresInitialization(TestHelpers.GetRandomEnum<GameType>()),
+            _factory.CreateGame(GameDetectionResult.RequiresInitialization(Random.Enum<GameType>()),
                 CultureInfo.CurrentCulture));
     }
 
     [Fact]
     public void TryCreateGame_NoGameInstalled_Throws()
     {
-        Assert.False(_factory.TryCreateGame(GameDetectionResult.NotInstalled(TestHelpers.GetRandomEnum<GameType>()),
+        Assert.False(_factory.TryCreateGame(GameDetectionResult.NotInstalled(Random.Enum<GameType>()),
             CultureInfo.CurrentCulture, out _));
         Assert.False(_factory.TryCreateGame(
-            GameDetectionResult.RequiresInitialization(TestHelpers.GetRandomEnum<GameType>()),
+            GameDetectionResult.RequiresInitialization(Random.Enum<GameType>()),
             CultureInfo.CurrentCulture, out _));
     }
 
@@ -107,12 +106,12 @@ public class GameFactoryTest : CommonTestBase
     {
         Assert.Throws<GameException>(() =>
             _factory.CreateGame(
-                CreateRandomGameIdentity(),
+                GITestUtilities.GetRandomGameIdentity(),
                 FileSystem.DirectoryInfo.New("gamePath"),
                 true, CultureInfo.CurrentCulture));
 
         Assert.False(_factory.TryCreateGame(
-            CreateRandomGameIdentity(),
+            GITestUtilities.GetRandomGameIdentity(),
             FileSystem.DirectoryInfo.New("gamePath"),
             true,
             CultureInfo.CurrentCulture,
@@ -123,12 +122,12 @@ public class GameFactoryTest : CommonTestBase
 
         Assert.Throws<GameException>(() =>
             _factory.CreateGame(
-                CreateRandomGameIdentity(),
+                GITestUtilities.GetRandomGameIdentity(),
                 FileSystem.DirectoryInfo.New("gamePath"),
                 true, CultureInfo.CurrentCulture));
 
         Assert.False(_factory.TryCreateGame(
-            CreateRandomGameIdentity(),
+            GITestUtilities.GetRandomGameIdentity(),
             FileSystem.DirectoryInfo.New("gamePath"),
             true,
             CultureInfo.CurrentCulture,
@@ -146,11 +145,10 @@ public class GameFactoryTest : CommonTestBase
     [InlineData(GamePlatform.SteamGold, false)]
     public void CreateGame_WrongGameIdentityInstalled_WrongPlatform_Throws(GamePlatform platform, bool checkExists)
     {
-        var actualGameType = TestHelpers.GetRandomEnum<GameType>();
+        var actualGameType = Random.Enum<GameType>();
 
         // Use Disk so that we can check against more specific platforms
-        var installedGame =
-            FileSystem.InstallGame(new GameIdentity(actualGameType, GamePlatform.Disk), ServiceProvider);
+        var installedGame = GetOrCreateGameInstallation(new GameIdentity(actualGameType, GamePlatform.Disk)).Game;
 
         var createIdentity = new GameIdentity(actualGameType, platform);
 
@@ -170,11 +168,10 @@ public class GameFactoryTest : CommonTestBase
     [MemberData(nameof(GetWrongGameTypeTestData))]
     public void CreateGame_WrongGameIdentityInstalled_WrongType_Throws(GamePlatform platform, bool checkExists)
     {
-        var actualGameType = TestHelpers.GetRandomEnum<GameType>();
+        var actualGameType = Random.Enum<GameType>();
 
         // Use Disk so that we can check against more specific platforms
-        var installedGame = FileSystem.InstallGame(
-            new GameIdentity(actualGameType, platform), ServiceProvider);
+        var installedGame = GetOrCreateGameInstallation(new GameIdentity(actualGameType, platform)).Game;
 
         var createGameType = actualGameType == GameType.Eaw ? GameType.Foc : GameType.Eaw;
         var createIdentity = new GameIdentity(createGameType, platform);
@@ -185,17 +182,17 @@ public class GameFactoryTest : CommonTestBase
     [Fact]
     public void CreateGame_UnidentifiedPlatform_Throws()
     {
-        var installedGame = CreateRandomGame();
+        var game = GetOrCreateGameInstallation().Game;
         Assert.Throws<GameException>(() => _factory.CreateGame(
-            new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), GamePlatform.Undefined),
-            installedGame.Directory,
-            TestHelpers.RandomBool(),
+            new GameIdentity(Random.Enum<GameType>(), GamePlatform.Undefined),
+            game.Directory,
+            Random.Bool(),
             CultureInfo.CurrentCulture));
 
         Assert.False(_factory.TryCreateGame(
-            new GameIdentity(TestHelpers.GetRandomEnum<GameType>(), GamePlatform.Undefined),
-            installedGame.Directory,
-            TestHelpers.RandomBool(),
+            new GameIdentity(Random.Enum<GameType>(), GamePlatform.Undefined),
+            game.Directory,
+            Random.Bool(),
             CultureInfo.CurrentCulture, out _));
     }
 
@@ -239,10 +236,10 @@ public class GameFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateGame_FromIdentity_GameCreated(GameIdentity gameIdentity)
     {
-        var installedGame = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var installedGame = GetOrCreateGameInstallation(gameIdentity).Game;
 
         var expectedName = _nameResolver.ResolveName(gameIdentity, CultureInfo.CurrentCulture);
 
@@ -257,10 +254,10 @@ public class GameFactoryTest : CommonTestBase
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void CreateGame_FromDetectionResult_GameCreated(GameIdentity gameIdentity)
     {
-        var installedGame = FileSystem.InstallGame(gameIdentity, ServiceProvider);
+        var installedGame = GetOrCreateGameInstallation(gameIdentity).Game;
 
         var detector = new DirectoryGameDetector(installedGame.Directory, ServiceProvider);
         var detectionResult = detector.Detect(gameIdentity.Type, gameIdentity.Platform);
@@ -276,7 +273,7 @@ public class GameFactoryTest : CommonTestBase
         AssertGame(tryGame, gameIdentity, installedGame.Directory.FullName, expectedName);
     }
 
-    public class GameFactoryWithNullNameResolver : CommonTestBaseWithRandomGame
+    public class GameFactoryWithNullNameResolver : GameInfrastructureTestBaseWithRandomGame
     {
         private readonly GameFactory _factory;
 
@@ -285,10 +282,10 @@ public class GameFactoryTest : CommonTestBase
             _factory = new GameFactory(ServiceProvider);
         }
 
-        protected override void SetupServiceProvider(IServiceCollection sc)
+        protected override void SetupServices(IServiceCollection serviceCollection)
         {
-            base.SetupServiceProvider(sc);
-            sc.AddSingleton<IGameNameResolver>(new NullGameNameResolver());
+            base.SetupServices(serviceCollection);
+            serviceCollection.AddSingleton<IGameNameResolver>(new NullGameNameResolver());
         }
 
         [Fact]
@@ -306,7 +303,7 @@ public class GameFactoryTest : CommonTestBase
         }
     }
 
-    public class GameFactoryWithCustomNameResolver : CommonTestBaseWithRandomGame
+    public class GameFactoryWithCustomNameResolver : GameInfrastructureTestBaseWithRandomGame
     {
         private readonly GameFactory _factory;
 
@@ -315,10 +312,10 @@ public class GameFactoryTest : CommonTestBase
             _factory = new GameFactory(ServiceProvider);
         }
 
-        protected override void SetupServiceProvider(IServiceCollection sc)
+        protected override void SetupServices(IServiceCollection serviceCollection)
         {
-            base.SetupServiceProvider(sc);
-            sc.AddSingleton<IGameNameResolver>(new CultureAwareGameNameResolver());
+            base.SetupServices(serviceCollection);
+            serviceCollection.AddSingleton<IGameNameResolver>(new CultureAwareGameNameResolver());
         }
 
         public static IEnumerable<object[]> GetCultures()

@@ -1,27 +1,21 @@
-﻿using System;
+﻿using AET.SteamAbstraction.Games;
+using AET.SteamAbstraction.Testing;
+using AET.SteamAbstraction.Testing.TestBases;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Abstractions;
 using System.Linq;
-using AET.SteamAbstraction.Games;
-using AET.SteamAbstraction.Testing.Installation;
-using Microsoft.Extensions.DependencyInjection;
 using Testably.Abstractions.Testing;
 using Xunit;
 using VdfException = AET.SteamAbstraction.Vdf.VdfException;
 
 namespace AET.SteamAbstraction.Test;
 
-public class SteamVdfReaderTest
+public class SteamVdfReaderTest : InMemorySteamTestBase
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly MockFileSystem _fileSystem = new();
-
     public SteamVdfReaderTest()
     {
-        var sc = new ServiceCollection();
-        sc.AddSingleton<IFileSystem>(_ => _fileSystem);
-        _serviceProvider = sc.BuildServiceProvider();
+        Steam.InstallSteamFilesOnly();
     }
 
     #region ReadLibraryLocationsFromConfig
@@ -29,8 +23,8 @@ public class SteamVdfReaderTest
     [Fact]
     public void ReadLibraryLocationsFromConfig_EmptyFile_Throws()
     {
-        _fileSystem.Initialize().WithFile("input.vdf");
-        var input = _fileSystem.FileInfo.New("input.vdf");
+        FileSystem.Initialize().WithFile("input.vdf");
+        var input = FileSystem.FileInfo.New("input.vdf");
         Assert.Throws<VdfException>(() => SteamVdfReader.ReadLibraryLocationsFromConfig(input).ToList());
     }
 
@@ -42,9 +36,9 @@ public class SteamVdfReaderTest
     ""0""		""/Lib""
 }
 ";
-        _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
+        FileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
-        var input = _fileSystem.FileInfo.New("input.vdf");
+        var input = FileSystem.FileInfo.New("input.vdf");
         Assert.Throws<VdfException>(() => SteamVdfReader.ReadLibraryLocationsFromConfig(input).ToList());
     }
 
@@ -52,9 +46,9 @@ public class SteamVdfReaderTest
     public void ReadLibraryLocationsFromConfig_InvalidRootNodeKind_Throws()
     {
         var data = @"""libraryfolders"" ""someData""";
-        _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
+        FileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
-        var input = _fileSystem.FileInfo.New("input.vdf");
+        var input = FileSystem.FileInfo.New("input.vdf");
         Assert.Throws<VdfException>(() => SteamVdfReader.ReadLibraryLocationsFromConfig(input).ToList());
     }
 
@@ -82,16 +76,16 @@ public class SteamVdfReaderTest
 }
 ";
 
-        var expected1 = _fileSystem.DirectoryInfo.New("/Lib1").FullName;
-        var expected2 = _fileSystem.DirectoryInfo.New("/Lib2").FullName;
-        var expected3 = _fileSystem.DirectoryInfo.New("/Lib3").FullName;
+        var expected1 = FileSystem.DirectoryInfo.New("/Lib1").FullName;
+        var expected2 = FileSystem.DirectoryInfo.New("/Lib2").FullName;
+        var expected3 = FileSystem.DirectoryInfo.New("/Lib3").FullName;
 
-        var notExpected1 = _fileSystem.DirectoryInfo.New("/LibA").FullName;
-        var notExpected2 = _fileSystem.DirectoryInfo.New("/LabelA").FullName;
+        var notExpected1 = FileSystem.DirectoryInfo.New("/LibA").FullName;
+        var notExpected2 = FileSystem.DirectoryInfo.New("/LabelA").FullName;
 
-        _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
+        FileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
-        var input = _fileSystem.FileInfo.New("input.vdf");
+        var input = FileSystem.FileInfo.New("input.vdf");
         var locations = SteamVdfReader.ReadLibraryLocationsFromConfig(input).Select(l => l.FullName).ToList();
 
         Assert.Contains(expected1, locations);
@@ -109,9 +103,9 @@ public class SteamVdfReaderTest
     ""NaN""		""/Lib""
 }
 ";
-        _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
+        FileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
-        var input = _fileSystem.FileInfo.New("input.vdf");
+        var input = FileSystem.FileInfo.New("input.vdf");
         var libs = SteamVdfReader.ReadLibraryLocationsFromConfig(input);
         Assert.Empty(libs);
     }
@@ -123,9 +117,9 @@ public class SteamVdfReaderTest
 {
 }
 ";
-        _fileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
+        FileSystem.Initialize().WithFile("input.vdf").Which(d => d.HasStringContent(data));
 
-        var input = _fileSystem.FileInfo.New("input.vdf");
+        var input = FileSystem.FileInfo.New("input.vdf");
         var libs = SteamVdfReader.ReadLibraryLocationsFromConfig(input);
         Assert.Empty(libs);
     }
@@ -137,15 +131,15 @@ public class SteamVdfReaderTest
     [Fact]
     public void ReadManifest_NullArgs_Throws()
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
+        var lib = Steam.InstallLibrary("steamLib", false);
         Assert.Throws<ArgumentNullException>(() => SteamVdfReader.ReadManifest(null!, lib));
-        Assert.Throws<ArgumentNullException>(() => SteamVdfReader.ReadManifest(_fileSystem.FileInfo.New("path"), null!));
+        Assert.Throws<ArgumentNullException>(() => SteamVdfReader.ReadManifest(FileSystem.FileInfo.New("path"), null!));
     }
 
     [Fact]
     public void ReadManifest_CorrectManifest()
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
+        var lib = Steam.InstallLibrary("steamLib", false);
 
         var expectedManifest = lib.InstallGame(
             1230,
@@ -295,19 +289,19 @@ public class SteamVdfReaderTest
     [MemberData(nameof(GetInvalidAppManifestContent))]
     public void ReadManifest_InvalidAppManifest_Throws(string content)
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
+        var lib = Steam.InstallLibrary("steamLib", false);
 
-        var manifestFile = _fileSystem.Path.Combine(lib.SteamAppsLocation.FullName, "manifest.acf");
-        _fileSystem.File.WriteAllText(manifestFile, content);
+        var manifestFile = FileSystem.Path.Combine(lib.SteamAppsLocation.FullName, "manifest.acf");
+        FileSystem.File.WriteAllText(manifestFile, content);
 
-        Assert.ThrowsAny<SteamException>(() => SteamVdfReader.ReadManifest(_fileSystem.FileInfo.New(manifestFile), lib));
+        Assert.ThrowsAny<SteamException>(() => SteamVdfReader.ReadManifest(FileSystem.FileInfo.New(manifestFile), lib));
     }
 
     [Fact]
     public void ReadManifest_ManifestNotPartOfLibrary_Throws()
     {
-        var lib = _fileSystem.InstallSteamLibrary("steamLib", _serviceProvider, false);
-        var otherLib = _fileSystem.InstallSteamLibrary("otherLib", _serviceProvider, false);
+        var lib = Steam.InstallLibrary("steamLib", false);
+        var otherLib = Steam.InstallLibrary("otherLib",  false);
 
         var manifestFile = otherLib.InstallGame(1230, "MyGame").ManifestFile;
 
@@ -327,7 +321,7 @@ public class SteamVdfReaderTest
     [Fact]
     public void ReadLoginUsers_FileNotExists_Throws()
     {
-        var e = Assert.ThrowsAny<SteamException>(() => SteamVdfReader.ReadLoginUsers(_fileSystem.FileInfo.New("NotExists.vdf")));
+        var e = Assert.ThrowsAny<SteamException>(() => SteamVdfReader.ReadLoginUsers(FileSystem.FileInfo.New("NotExists.vdf")));
         Assert.IsType<FileNotFoundException>(e.InnerException);
     }
 
@@ -392,8 +386,8 @@ public class SteamVdfReaderTest
     [MemberData(nameof(GetInvalidLoginUserContent))]
     public void ReadLoginUsers_FileWithInvalidContent(string content)
     {
-        _fileSystem.File.WriteAllText("loginusers.vdf", content);
-        var file = _fileSystem.FileInfo.New("loginusers.vdf");
+        FileSystem.File.WriteAllText("loginusers.vdf", content);
+        var file = FileSystem.FileInfo.New("loginusers.vdf");
         
         Assert.ThrowsAny<SteamException>(() => SteamVdfReader.ReadLoginUsers(file));
     }
@@ -427,8 +421,8 @@ public class SteamVdfReaderTest
 	    ""Timestamp""		""00000000""
     }
 }";
-        _fileSystem.File.WriteAllText("loginusers.vdf", content);
-        var file = _fileSystem.FileInfo.New("loginusers.vdf");
+        FileSystem.File.WriteAllText("loginusers.vdf", content);
+        var file = FileSystem.FileInfo.New("loginusers.vdf");
 
         var user = Assert.Single(SteamVdfReader.ReadLoginUsers(file).Users);
         Assert.Equal(18446744073709551615u, user.UserId);
@@ -447,8 +441,8 @@ public class SteamVdfReaderTest
 	}
 }
 ";
-        _fileSystem.File.WriteAllText("loginusers.vdf", content);
-        var file = _fileSystem.FileInfo.New("loginusers.vdf");
+        FileSystem.File.WriteAllText("loginusers.vdf", content);
+        var file = FileSystem.FileInfo.New("loginusers.vdf");
 
         var user = Assert.Single(SteamVdfReader.ReadLoginUsers(file).Users);
         Assert.Equal(123456789u, user.UserId);
@@ -464,8 +458,8 @@ public class SteamVdfReaderTest
 {
 }
 ";
-        _fileSystem.File.WriteAllText("loginusers.vdf", content);
-        var file = _fileSystem.FileInfo.New("loginusers.vdf");
+        FileSystem.File.WriteAllText("loginusers.vdf", content);
+        var file = FileSystem.FileInfo.New("loginusers.vdf");
 
         Assert.Empty(SteamVdfReader.ReadLoginUsers(file).Users);
     }
@@ -473,9 +467,7 @@ public class SteamVdfReaderTest
     [Fact]
     public void ReadLoginUsers()
     {
-        _fileSystem.InstallSteamFiles();
-
-        var expectedUsers = new List<SteamUserLoginMetadata>
+        var expectedUsers = new List<TestingSteamUserLoginMetadata>
         {
             new(1, true, false),
             new(2, false, false),
@@ -483,11 +475,14 @@ public class SteamVdfReaderTest
             new(4, true, true),
         };
 
-        var file = _fileSystem.WriteLoginUsers(expectedUsers);
+        var file = Steam.WriteLoginUsers(expectedUsers);
 
         var users = SteamVdfReader.ReadLoginUsers(file);
 
-        Assert.Equal(expectedUsers, users.Users.OrderBy(x => x.UserId).ToList(), new SteamUserLoginMetadataEqualityComparer());
+        Assert.Equal(
+            expectedUsers.Select(x => new SteamUserLoginMetadata(x.UserId, x.MostRecent, x.UserWantsOffline)), 
+            users.Users.OrderBy(x => x.UserId).ToList(), 
+            new SteamUserLoginMetadataEqualityComparer());
     }
 
     private class SteamUserLoginMetadataEqualityComparer : IEqualityComparer<SteamUserLoginMetadata>

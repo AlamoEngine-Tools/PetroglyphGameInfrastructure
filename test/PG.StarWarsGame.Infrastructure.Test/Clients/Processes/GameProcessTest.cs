@@ -11,7 +11,7 @@ using System;
 
 namespace PG.StarWarsGame.Infrastructure.Test.Clients.Processes;
 
-public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
+public class GameProcessTest : GameInfrastructureTestBaseWithRandomGame, IDisposable
 {
     private Process _testProcess = null!;
 
@@ -51,7 +51,8 @@ public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
 
         Assert.Equal(GameProcessState.Running, gameProcess.State);
 
-        var exitTask = gameProcess.WaitForExitAsync();
+        var exitTask = gameProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
+        // ReSharper disable once MethodHasAsyncOverload
         process.StandardInput.WriteLine();
 
         await exitTask;
@@ -86,7 +87,7 @@ public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
         
         process.WaitForExit();
 
-        await gameProcess.WaitForExitAsync();
+        await gameProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
 
         Assert.True(process.HasExited);
         Assert.Equal(GameProcessState.Closed, gameProcess.State);
@@ -109,12 +110,12 @@ public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
         {
             b.SignalAndWait();
             gameProcess.Exit();
-        });
+        }, TestContext.Current.CancellationToken);
         var t2 = Task.Run(() =>
         {
             b.SignalAndWait();
             gameProcess.Exit();
-        });
+        }, TestContext.Current.CancellationToken);
 
 
         await Task.WhenAll(t1, t2);
@@ -299,12 +300,12 @@ public class GameProcessTest : CommonTestBaseWithRandomGame, IDisposable
         var processInfo = new GameProcessInfo(Game, GameBuildType.Release, ArgumentCollection.Empty);
         var gameProcess = new GameProcess(process, processInfo);
 
-        var waitTask = gameProcess.WaitForExitAsync();
+        var waitTask = gameProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
 
         gameProcess.Dispose();
 
         // WaitForExitAsync continues listening
-        var t = await Task.WhenAny(waitTask, Task.Delay(2000));
+        var t = await Task.WhenAny(waitTask, Task.Delay(2000, TestContext.Current.CancellationToken));
         Assert.NotSame(t, waitTask);
     }
 }

@@ -1,29 +1,30 @@
-﻿using System.Collections.Generic;
-using AET.Modinfo.Spec;
+﻿using AET.Modinfo.Spec;
 using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Services.Language;
+using PG.StarWarsGame.Infrastructure.Testing;
+using PG.StarWarsGame.Infrastructure.Testing.Installations;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Test;
 
-public abstract class PlayableObjectTest : CommonTestBase
+public abstract class PlayableObjectTest : GameInfrastructureTestBase
 {
-    protected abstract IPlayableObject CreatePlayableObject(
-        string? iconPath = null, 
-        ICollection<ILanguageInfo>? languages = null);
+    protected abstract ITestingPlayableObjectInstallation CreatePlayableObjectInstallation(string? iconPath = null, ICollection<ILanguageInfo>? languages = null);
 
     [Fact]
     public void IconFile_NoIcon()
     {
-        var obj = CreatePlayableObject();
+        var obj = CreatePlayableObjectInstallation().PlayableObject;
         Assert.Null(obj.IconFile);
     }
 
     [Fact]
     public void IconFile_IconInstalled()
     {
-        var obj = CreatePlayableObject(iconPath: $"{FileSystem.Path.GetRandomFileName()}.ico");
+        var obj = CreatePlayableObjectInstallation(iconPath: $"{FileSystem.Path.GetRandomFileName()}.ico")
+            .PlayableObject;
         Assert.NotNull(obj.IconFile);
         Assert.NotNull(obj.IconFile);
     }
@@ -31,7 +32,7 @@ public abstract class PlayableObjectTest : CommonTestBase
     [Fact]
     public void InstalledLanguages_NoLanguagesFound()
     {
-        var obj = CreatePlayableObject();
+        var obj = CreatePlayableObjectInstallation().PlayableObject;
         Assert.Empty(obj.InstalledLanguages);
         // Get a second time
         Assert.Empty(obj.InstalledLanguages);
@@ -40,19 +41,19 @@ public abstract class PlayableObjectTest : CommonTestBase
     [Fact]
     public void InstalledLanguages()
     {
-        var expected = GetRandomLanguages();
-        var obj = CreatePlayableObject(languages: expected);
+        var expected = GITestUtilities.GetRandomLanguages();
+        var obj = CreatePlayableObjectInstallation(languages: expected).PlayableObject;
         Assert.Equivalent(expected, obj.InstalledLanguages, true);
         // Get a second time
         Assert.Equivalent(expected, obj.InstalledLanguages, true);
     }
 
-    public class PlayableObjectAbstractTest : CommonTestBaseWithRandomGame
+    public class PlayableObectAbstractTest : GameInfrastructureTestBaseWithRandomGame
     { 
-        protected override void SetupServiceProvider(IServiceCollection sc)
+        protected override void SetupServices(IServiceCollection serviceCollection)
         {
-            base.SetupServiceProvider(sc);
-            sc.AddSingleton<ILanguageFinder>(new NullLanguageFinder());
+            base.SetupServices(serviceCollection);
+            serviceCollection.AddSingleton<ILanguageFinder>(new NullLanguageFinder());
         }
 
         [Fact]

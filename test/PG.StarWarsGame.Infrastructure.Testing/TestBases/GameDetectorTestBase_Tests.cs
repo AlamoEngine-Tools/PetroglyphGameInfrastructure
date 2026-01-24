@@ -1,8 +1,13 @@
-﻿using PG.StarWarsGame.Infrastructure.Games;
+﻿// Copyright (c) Alamo Engine Tools and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+
+using PG.StarWarsGame.Infrastructure.Games;
 using PG.StarWarsGame.Infrastructure.Services.Detection;
+using Xunit;
 
 namespace PG.StarWarsGame.Infrastructure.Testing.TestBases;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public partial class GameDetectorTestBase<T>
 {
     private void TestDetectorGameInstalled(GameIdentity identity, params GamePlatform[] queryPlatforms)
@@ -17,35 +22,35 @@ public partial class GameDetectorTestBase<T>
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_GameInstalled_DetectWithSinglePlatform(GameIdentity identity)
     { 
         TestDetectorGameInstalled(identity, identity.Platform);
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_GameInstalled_NoQueryPlatformSearchesAll(GameIdentity identity)
     {
         TestDetectorGameInstalled(identity, queryPlatforms: []);
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_GameInstalled_UndefinedPlatformPlatformSearchesAll(GameIdentity identity)
     {
         TestDetectorGameInstalled(identity, queryPlatforms: [GamePlatform.Undefined]);
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_GameInstalled_QueryContainsUndefinedSearchesAll(GameIdentity identity)
     {
         TestDetectorGameInstalled(identity, queryPlatforms: [GamePlatform.Disk, GamePlatform.Undefined]);
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_GameNotInstalled(GameIdentity identity)
     {
         var expected = GameDetectionResult.NotInstalled(identity.Type);
@@ -57,17 +62,15 @@ public partial class GameDetectorTestBase<T>
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_TypeOfDesiredPlatformNotFound(GameIdentity identity)
     {
         // Install the opposite of the desired game type.
-        var typeToInstall = identity.Type == GameType.Foc ? GameType.Eaw : GameType.Foc;
-
         var expected = GameDetectionResult.NotInstalled(identity.Type);
 
         TestDetectorCore(
             identity,
-            _ => SetupGame(new GameIdentity(typeToInstall, identity.Platform)), // Set up the opposite game
+            _ => SetupGame(new GameIdentity(identity.Type.Opposite(), identity.Platform)), // Set up the opposite game
             _ => expected,
             identity.Platform
         );
@@ -90,7 +93,7 @@ public partial class GameDetectorTestBase<T>
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_TestRequiresGameInitialization_DetectorDoesNotHandle(GameIdentity identity)
     {
         if (!SupportInitialization)
@@ -109,7 +112,7 @@ public partial class GameDetectorTestBase<T>
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_TestRequiresGameInitialization_DetectorCanHandle_ButDoesNotHandle(GameIdentity identity)
     {
         if (!SupportInitialization)
@@ -127,7 +130,7 @@ public partial class GameDetectorTestBase<T>
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_TestRequiresGameInitialization_DetectorCanHandle_DoesHandleAndGameIsInitialized(GameIdentity identity)
     {
         if (!SupportInitialization)
@@ -155,7 +158,7 @@ public partial class GameDetectorTestBase<T>
     }
 
     [Theory]
-    [MemberData(nameof(RealGameIdentities))]
+    [MemberData(nameof(GITestUtilities.RealGameIdentities), MemberType = typeof(GITestUtilities))]
     public void Detect_TryDetect_TestRequiresGameInitialization_DetectorCanHandle_DoesHandleButGameIsNotInitialized(GameIdentity identity)
     {
         if (!SupportInitialization)
@@ -182,3 +185,4 @@ public partial class GameDetectorTestBase<T>
             queryPlatforms: []);
     }
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
