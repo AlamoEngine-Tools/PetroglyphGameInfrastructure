@@ -38,8 +38,4 @@
   	<PackageReference Include="Testably.Abstractions.Testing" Version="6.0.0" />
 	  <ProjectReference Include="..\..\src\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Update="Microsoft.SourceLink.GitHub" Version="10.0.201" />
-	</ItemGroup>
 </Project>
