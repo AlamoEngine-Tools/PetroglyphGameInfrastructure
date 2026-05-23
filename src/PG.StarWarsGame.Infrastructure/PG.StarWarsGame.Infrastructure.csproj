@@ -23,9 +23,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AlamoEngineTools.Modinfo" Version="8.0.6" />
-		<PackageReference Include="AnakinRaW.CommonUtilities" Version="13.0.18" />
-		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="13.0.18" />
-		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="13.0.18" />
+		<PackageReference Include="AnakinRaW.CommonUtilities" Version="13.0.23" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.FileSystem" Version="13.0.23" />
+		<PackageReference Include="AnakinRaW.CommonUtilities.Registry" Version="13.0.23" />
 		<PackageReference Include="semver" Version="3.0.0" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
