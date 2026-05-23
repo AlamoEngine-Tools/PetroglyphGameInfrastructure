@@ -10,6 +10,8 @@ jobs:
 
   test:
     uses: ./.github/workflows/test.yml
+    with:
+      steam-live-tests: true
 
   pack:
     name: Pack

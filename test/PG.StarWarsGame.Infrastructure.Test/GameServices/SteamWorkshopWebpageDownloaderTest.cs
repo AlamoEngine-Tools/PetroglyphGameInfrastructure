@@ -7,7 +7,10 @@ namespace PG.StarWarsGame.Infrastructure.Test.GameServices;
 
 public class SteamWorkshopWebpageDownloaderTest
 {
-    [Fact]
+    [Fact(
+        Skip = TestEnvironment.SteamLiveTestsSkipReason,
+        SkipUnless = nameof(TestEnvironment.SteamLiveTestsEnabled),
+        SkipType = typeof(TestEnvironment))]
     public async Task GetSteamWorkshopsPageHtmlAsync()
     {
         var downloader = new SteamWorkshopWebpageDownloader();

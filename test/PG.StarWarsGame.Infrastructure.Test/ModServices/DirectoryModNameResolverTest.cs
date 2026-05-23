@@ -36,7 +36,10 @@ public class OnlineModNameResolverTest : ModNameResolverTestBase
         Assert.Throws<ArgumentNullException>(() => new OnlineModNameResolver(null!));
     }
 
-    [Theory]
+    [Theory(
+        Skip = TestEnvironment.SteamLiveTestsSkipReason,
+        SkipUnless = nameof(TestEnvironment.SteamLiveTestsEnabled),
+        SkipType = typeof(TestEnvironment))]
     [InlineData("path/1125718579", "z3r0x's mod version 3.5")]
     [InlineData("path/2978074984", "EAWFOC Mod Template")]
     public void ResolveName_Steam_WithoutModinfo_FindNameOnline(string path, string containsExpected)

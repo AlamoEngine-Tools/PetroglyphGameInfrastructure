@@ -23,7 +23,10 @@ public class OnlineModGameTypeResolverTest : ModGameTypeResolverTestBase
         yield return ["2508288191", new[] {GameType.Foc, GameType.Eaw}, null!]; //Mod Template
     }
 
-    [Theory]
+    [Theory(
+        Skip = TestEnvironment.SteamLiveTestsSkipReason,
+        SkipUnless = nameof(TestEnvironment.SteamLiveTestsEnabled),
+        SkipType = typeof(TestEnvironment))]
     [MemberData(nameof(GetOnlineModsData))]
     public void Online_GetTagsFromSteamOnline(string knownId, ICollection<GameType> expectedTypes, GameType? incompatibleWith)
     {
