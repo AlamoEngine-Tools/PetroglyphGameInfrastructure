@@ -9,7 +9,7 @@ namespace PG.StarWarsGame.Infrastructure.Clients.Processes;
 
 internal sealed class GameProcess : DisposableObject, IGameProcess
 {
-    private volatile bool _closed;
+    private int _closedFlag;
 
     private EventHandler? _closingHandler;
 
@@ -18,7 +18,7 @@ internal sealed class GameProcess : DisposableObject, IGameProcess
         add
         {
             // Execute event right away if the process was already closed.
-            if (_closed)
+            if (Volatile.Read(ref _closedFlag) != 0)
                 value?.Invoke(this, EventArgs.Empty);
             else
                 _closingHandler += value;
@@ -30,8 +30,8 @@ internal sealed class GameProcess : DisposableObject, IGameProcess
 
     // To avoid complexity this property does not query the underlying process but just "trusts"
     // on the OnClosed function to set the value when the process was terminated.
-    // This means this property has theoretically a race condition with the game's process. 
-    public GameProcessState State => _closed ? GameProcessState.Closed : GameProcessState.Running;
+    // This means this property has theoretically a race condition with the game's process.
+    public GameProcessState State => Volatile.Read(ref _closedFlag) != 0 ? GameProcessState.Closed : GameProcessState.Running;
 
     internal Process Process { get; }
 
@@ -51,10 +51,16 @@ internal sealed class GameProcess : DisposableObject, IGameProcess
         try
         {
             Process.Kill();
+            Process.WaitForExit();
         }
         catch (Exception e) when (e is InvalidOperationException or Win32Exception)
         {
         }
+
+        // Process.Exited is dispatched asynchronously on a ThreadPool work item, so
+        // WaitForExit can return before OnClosed has been invoked. Drive it synchronously
+        // here; OnClosed is idempotent via the Interlocked guard.
+        OnClosed(this, EventArgs.Empty);
     }
 
     public Task WaitForExitAsync(CancellationToken cancellationToken = default)
@@ -74,15 +80,13 @@ internal sealed class GameProcess : DisposableObject, IGameProcess
         Process.EnableRaisingEvents = true;
         Process.Exited += OnClosed;
         if (process.HasExited)
-        {
-            _closed = true;
-            Process.Exited -= OnClosed;
-        }
+            OnClosed(this, EventArgs.Empty);
     }
 
     private void OnClosed(object? sender, EventArgs e)
     {
-        _closed = true;
+        if (Interlocked.Exchange(ref _closedFlag, 1) != 0)
+            return;
         Process.Exited -= OnClosed;
         _closingHandler?.Invoke(this, EventArgs.Empty);
     }
