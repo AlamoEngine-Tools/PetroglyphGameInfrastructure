@@ -34,4 +34,8 @@
 	  <ProjectReference Include="..\..\src\PG.StarWarsGame.Infrastructure\PG.StarWarsGame.Infrastructure.csproj" />
 	  <ProjectReference Include="..\PG.StarWarsGame.Infrastructure.Testing\PG.StarWarsGame.Infrastructure.Testing.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="ModServices\Fixtures\*.html" />
+	</ItemGroup>
 </Project>

@@ -3,7 +3,9 @@ using System.Globalization;
 using AET.Modinfo.Model;
 using AET.Modinfo.Spec;
 using AET.Modinfo.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 using PG.StarWarsGame.Infrastructure.Services.Name;
+using PG.StarWarsGame.Infrastructure.Services.Steam;
 using PG.StarWarsGame.Infrastructure.Testing.TestBases;
 using Xunit;
 
@@ -25,6 +27,12 @@ public class OfflineModNameResolverTest : ModNameResolverTestBase
 
 public class OnlineModNameResolverTest : ModNameResolverTestBase
 {
+    protected override void SetupServices(IServiceCollection serviceCollection)
+    {
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<ISteamWorkshopWebpageDownloader>(new FakeSteamWorkshopWebpageDownloader());
+    }
+
     public override ModNameResolverBase CreateResolver()
     {
         return new OnlineModNameResolver(ServiceProvider);
@@ -36,10 +44,7 @@ public class OnlineModNameResolverTest : ModNameResolverTestBase
         Assert.Throws<ArgumentNullException>(() => new OnlineModNameResolver(null!));
     }
 
-    [Theory(
-        Skip = TestEnvironment.SteamLiveTestsSkipReason,
-        SkipUnless = nameof(TestEnvironment.SteamLiveTestsEnabled),
-        SkipType = typeof(TestEnvironment))]
+    [Theory]
     [InlineData("path/1125718579", "z3r0x's mod version 3.5")]
     [InlineData("path/2978074984", "EAWFOC Mod Template")]
     public void ResolveName_Steam_WithoutModinfo_FindNameOnline(string path, string containsExpected)
