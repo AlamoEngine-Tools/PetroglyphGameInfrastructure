@@ -32,7 +32,7 @@
 			<Version>3.9.50</Version>
 		</PackageReference>
 		<PackageReference Include="SauceControl.InheritDoc" Version="2.0.2" PrivateAssets="all" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.201">
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" />

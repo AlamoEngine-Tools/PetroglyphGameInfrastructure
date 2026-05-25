@@ -29,6 +29,24 @@ public class GameProcessTest : GameInfrastructureTestBaseWithRandomGame, IDispos
         return _testProcess;
     }
 
+    // Long-running process that does not read stdin, so closing the redirected
+    // stdin handle (e.g. via Process.Dispose) cannot terminate it early. Used by
+    // tests that need a process which stays alive across a Dispose() call.
+    private Process StartUnattendedTestProcess()
+    {
+        var processStartInfo = new ProcessStartInfo
+        {
+            FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/sh",
+            Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "/c ping -n 10 127.0.0.1 > nul"
+                : "-c \"sleep 10\"",
+            CreateNoWindow = true,
+            UseShellExecute = false,
+        };
+        _testProcess = Process.Start(processStartInfo)!;
+        return _testProcess;
+    }
+
     public void Dispose()
     {
         try
@@ -296,7 +314,10 @@ public class GameProcessTest : GameInfrastructureTestBaseWithRandomGame, IDispos
     [Fact]
     public async Task Dispose_CompletesWaitForExitAsyncSilently()
     {
-        var process = StartStableTestProcess();
+        // Must not use StartStableTestProcess here: `cmd /c pause` reads from redirected
+        // stdin and exits on EOF, so disposing the Process (which closes the pipe) would
+        // race the assertion.
+        var process = StartUnattendedTestProcess();
         var processInfo = new GameProcessInfo(Game, GameBuildType.Release, ArgumentCollection.Empty);
         var gameProcess = new GameProcess(process, processInfo);
 

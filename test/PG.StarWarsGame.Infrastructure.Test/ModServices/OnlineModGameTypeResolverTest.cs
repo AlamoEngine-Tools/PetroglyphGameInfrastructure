@@ -12,6 +12,12 @@ namespace PG.StarWarsGame.Infrastructure.Test.ModServices;
 
 public class OnlineModGameTypeResolverTest : ModGameTypeResolverTestBase
 {
+    protected override void SetupServices(IServiceCollection serviceCollection)
+    {
+        base.SetupServices(serviceCollection);
+        serviceCollection.AddSingleton<ISteamWorkshopWebpageDownloader>(new FakeSteamWorkshopWebpageDownloader());
+    }
+
     public override ModGameTypeResolver CreateResolver()
     {
         return new OnlineModGameTypeResolver(ServiceProvider);
@@ -20,7 +26,7 @@ public class OnlineModGameTypeResolverTest : ModGameTypeResolverTestBase
     public static IEnumerable<object[]> GetOnlineModsData()
     {
         yield return ["1125718579", new[] {GameType.Foc}, GameType.Eaw]; //z3r0x's Mod (3.5)
-        yield return ["2508288191", new[] {GameType.Foc, GameType.Eaw}, null!]; //Mod Template
+        yield return ["2508288191", new[] {GameType.Foc, GameType.Eaw}, null!]; //Deep Core
     }
 
     [Theory]

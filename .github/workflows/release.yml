@@ -10,6 +10,8 @@ jobs:
 
   test:
     uses: ./.github/workflows/test.yml
+    with:
+      steam-live-tests: true
 
   pack:
     name: Pack
@@ -51,10 +53,10 @@ jobs:
           path: packages
       - name: Push packages
         run: dotnet nuget push "packages/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-      - uses: dotnet/nbgv@v0.5.1
+      - uses: dotnet/nbgv@v0.5.2
         id: nbgv
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: v${{ steps.nbgv.outputs.SemVer2 }}
           tag_name: v${{ steps.nbgv.outputs.SemVer2 }}

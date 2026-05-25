@@ -2,7 +2,17 @@ name: Build & Test
 
 on:
   workflow_call:
+    inputs:
+      steam-live-tests:
+        description: 'Run live Steam-network tests (sets STEAM_LIVE_TESTS=1).'
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs:
+      steam-live-tests:
+        description: 'Run live Steam-network tests (sets STEAM_LIVE_TESTS=1).'
+        type: boolean
+        default: false
   push:
     branches: [ develop ]
   pull_request:
@@ -16,7 +26,7 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
-        
+
     steps:
       - uses: actions/checkout@v6
         with:
@@ -24,10 +34,11 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
-        
+
       - name: Build & Test in Release Mode
         run: dotnet test --configuration Release --report-github
-        # Ignore exit code 8 on Linux (zero tests are now allowed) 
+        # Ignore exit code 8 on Linux (zero tests are now allowed)
         # TODO: Remove this when linux is supported
         env:
-          TESTINGPLATFORM_EXITCODE_IGNORE: ${{ matrix.os == 'ubuntu-latest' && '8' || '' }} 
+          TESTINGPLATFORM_EXITCODE_IGNORE: ${{ matrix.os == 'ubuntu-latest' && '8' || '' }}
+          STEAM_LIVE_TESTS: ${{ inputs.steam-live-tests && '1' || '' }}
