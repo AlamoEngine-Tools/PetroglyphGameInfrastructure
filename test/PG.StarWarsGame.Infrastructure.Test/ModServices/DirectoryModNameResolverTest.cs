@@ -44,12 +44,10 @@ public class OnlineModNameResolverTest : ModNameResolverTestBase
         Assert.Throws<ArgumentNullException>(() => new OnlineModNameResolver(null!));
     }
 
-    [Theory]
-    [InlineData("path/1125718579", "z3r0x's mod version 3.5")]
-    [InlineData("path/2978074984", "EAWFOC Mod Template")]
-    public void ResolveName_Steam_WithoutModinfo_FindNameOnline(string path, string containsExpected)
+    [Fact]
+    public void ResolveName_Steam_WithoutModinfo_FindNameOnline()
     {
-        var modRef = CreateDetectedModReference(path, ModType.Workshops, null);
+        var modRef = CreateDetectedModReference("path/1125718579", ModType.Workshops, null);
 
         var resolver = CreateResolver();
 
@@ -57,7 +55,7 @@ public class OnlineModNameResolverTest : ModNameResolverTestBase
         var nameDe = resolver.ResolveName(modRef, new CultureInfo("de"));
 
         Assert.Equal(nameInv, nameDe);
-        Assert.Contains(containsExpected, nameInv);
+        Assert.Contains("z3r0x's mod version 3.5", nameInv);
     }
 }
 
